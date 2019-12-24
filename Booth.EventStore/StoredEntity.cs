@@ -9,6 +9,7 @@ namespace Booth.EventStore
         public Guid EntityId { get; set; }
         public string Type { get; set; }
         public int CurrentVersion { get; set; }
+
         public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
 
         public List<Event> Events { get; set; } = new List<Event>();

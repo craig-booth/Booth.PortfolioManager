@@ -6,7 +6,8 @@ using Booth.EventStore;
 
 namespace Booth.PortfolioManager.Domain
 {
-    public interface IRepository<T> where T : ITrackedEntity
+    public interface IRepository<T>
+        where T : ITrackedEntity
     {
         T Get(Guid id);
         IEnumerable<T> All();
