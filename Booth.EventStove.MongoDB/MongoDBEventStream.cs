@@ -13,27 +13,21 @@ namespace Booth.EventStore.MongoDB
        IEventStream,
        IEventStream<T>
     {
-        public string Collection { get; private set; }
+        private readonly IMongoCollection<StoredEntity> _Collection;
 
-        private readonly string _ConnectionString;
-        private readonly string _Database;
-
-        public MongodbEventStream(string collection, string connectionString, string database)
+        public string Collection
         {
-            Collection = collection;
+            get { return _Collection.CollectionNamespace.CollectionName; }
+        }
 
-            _ConnectionString = connectionString;
-            _Database = database;
+        public MongodbEventStream(IMongoCollection<StoredEntity> collection)
+        {
+            _Collection = collection;
         }
 
         public StoredEntity Get(Guid entityId)
         {
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
-            var entity = collection.Find(x => x.EntityId == entityId)?.Single();
+            var entity = _Collection.Find(x => x.EntityId == entityId)?.Single();
 
             return entity;
         }
@@ -42,25 +36,15 @@ namespace Booth.EventStore.MongoDB
         {
             var result = new List<StoredEntity>();
 
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
-            var entities = collection.Find("{}").ToList<StoredEntity>();
+            var entities = _Collection.Find("{}").ToList<StoredEntity>();
 
             return entities;
         }
 
         public StoredEntity FindFirst(string property, string value)
         {
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
             var filter = String.Format("{{Properties: {{{0}: '{1}'}}}}", property, value);
-            var result = collection.Find(filter).Limit(1).ToList();
+            var result = _Collection.Find(filter).Limit(1).ToList();
             if (result.Count == 0)
                 return null;
 
@@ -69,13 +53,8 @@ namespace Booth.EventStore.MongoDB
 
         public IEnumerable<StoredEntity> Find(string property, string value)
         {
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
             var filter = String.Format("{{Properties: {{{0}: '{1}'}}}}", property, value);
-            var result = collection.Find(filter).ToList();
+            var result = _Collection.Find(filter).ToList();
 
             return result;
         }
@@ -87,11 +66,6 @@ namespace Booth.EventStore.MongoDB
 
         public void Add(Guid entityId, string type, IDictionary<string, string> properties, IEnumerable<Event> events)
         {
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
             var entity = new StoredEntity()
             {
                 EntityId = entityId,
@@ -106,39 +80,24 @@ namespace Booth.EventStore.MongoDB
 
             entity.Events.AddRange(events);
 
-            collection.InsertOne(entity);
+            _Collection.InsertOne(entity);
         }
 
         public void UpdateProperties(Guid entityId, IDictionary<string, string> properties)
         {
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
-            collection.FindOneAndUpdate<StoredEntity>(x => x.EntityId == entityId,
+            _Collection.FindOneAndUpdate<StoredEntity>(x => x.EntityId == entityId,
                 Builders<StoredEntity>.Update.Set<Dictionary<string, string>>(x => x.Properties, (Dictionary<string, string>)properties));
         }
 
         public void AppendEvent(Guid entityId, Event @event)
         {
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
-            collection.FindOneAndUpdate<StoredEntity>(x => x.EntityId == entityId,
+            _Collection.FindOneAndUpdate<StoredEntity>(x => x.EntityId == entityId,
                 Builders<StoredEntity>.Update.Push<Event>(x => x.Events, @event));
         }
 
         public void AppendEvents(Guid entityId, IEnumerable<Event> events)
         {
-            var client = new MongoClient(_ConnectionString);
-            var database = client.GetDatabase(_Database);
-
-            var collection = database.GetCollection<StoredEntity>(Collection);
-
-            collection.FindOneAndUpdate<StoredEntity>(x => x.EntityId == entityId,
+            _Collection.FindOneAndUpdate<StoredEntity>(x => x.EntityId == entityId,
                 Builders<StoredEntity>.Update.PushEach<Event>(x => x.Events, events));
         }
 

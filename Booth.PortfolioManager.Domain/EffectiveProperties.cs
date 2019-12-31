@@ -30,7 +30,12 @@ namespace Booth.PortfolioManager.Domain
         {
             get
             {
-                return _Properties.First(x => x.IsEffectiveAt(date)).Properties;
+                var property = _Properties.FirstOrDefault(x => x.IsEffectiveAt(date));
+
+                if (property == null)
+                    throw new KeyNotFoundException();
+
+                return property.Properties;
             }
         }
 
@@ -69,7 +74,7 @@ namespace Booth.PortfolioManager.Domain
                 var currentProperties = _Properties.Peek();
 
                 if (!currentProperties.IsEffectiveAt(date))
-                    throw new Exception("Only the current period can be modified");
+                    throw new EffectiveDateException("Only the current period can be modified");
 
                 if (currentProperties.EffectivePeriod.FromDate.Equals(date))
                     _Properties.Pop();
@@ -81,11 +86,18 @@ namespace Booth.PortfolioManager.Domain
 
         public void End(Date date)
         {
-            if (_Properties.Count > 0)
-            {
-                var currentProperties = _Properties.Peek();
-                currentProperties.End(date);
-            }
+            if (_Properties.Count == 0)
+                throw new EffectiveDateException("Entity is not active");
+
+            var currentProperties = _Properties.Peek();
+
+            if (currentProperties.EffectivePeriod.ToDate != Date.MaxValue)
+                throw new EffectiveDateException("Entity is already ended");
+
+            if (!currentProperties.IsEffectiveAt(date))
+                throw new EffectiveDateException("Only the current period can be modified");
+
+            currentProperties.End(date);
         }
     }
 

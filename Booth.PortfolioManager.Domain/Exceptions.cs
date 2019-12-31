@@ -5,6 +5,10 @@ using Booth.PortfolioManager.Domain.Transactions;
 namespace Booth.PortfolioManager.Domain
 {
 
+    public class EffectiveDateException : Exception
+    {
+        public EffectiveDateException(string message) : base(message) { }
+    }
     public abstract class TransactionException : Exception
     {
         public Transaction Transacation { get; private set; }
@@ -14,7 +18,7 @@ namespace Booth.PortfolioManager.Domain
         {
             Transacation = transcation;
         }
-    }
+    } 
 /*
     public class TransctionNotSupportedForStapledSecurity: TransactionException 
     {   
@@ -39,17 +43,17 @@ namespace Booth.PortfolioManager.Domain
         {
 
         }
-    }
-
+    } 
+    
     public class NotEnoughSharesForDisposal : TransactionException
     {
         public NotEnoughSharesForDisposal(Transaction transcation, string message)
             : base(transcation, message)
         {
         }
-    }
+    } 
 
-    public class AttemptToModifyPreviousParcelVersion : Exception
+ /*   public class AttemptToModifyPreviousParcelVersion : Exception
     {
         public Guid Parcel { get; private set; }
 
@@ -58,5 +62,5 @@ namespace Booth.PortfolioManager.Domain
         {
             Parcel = parcel;
         }
-    }
+    } */
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+using MongoDB.Driver;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
@@ -11,25 +12,33 @@ namespace Booth.EventStore.MongoDB
 {
     public class MongodbEventStore : IEventStore
     {
-        private readonly string _ConnectionString;
-        private readonly string _Database;
+        private readonly MongoClient _MongoClient;
+        private readonly IMongoDatabase _Database;
 
         public MongodbEventStore(string connectionString, string database)
         {
-            _ConnectionString = connectionString;
+            _MongoClient = new MongoClient(connectionString);
+            _Database = _MongoClient.GetDatabase(database);
+
+            EventStoreSerializers.Register();
+        }
+        public MongodbEventStore(IMongoDatabase database)
+        {
             _Database = database;
 
             EventStoreSerializers.Register();
         }
 
-        public IEventStream GetEventStream(string collection)
+        public IEventStream GetEventStream(string name)
         {
-            return GetEventStream<object>(collection);
+            return GetEventStream<object>(name);
         }
 
-        public IEventStream<T> GetEventStream<T>(string streamName)
+        public IEventStream<T> GetEventStream<T>(string name)
         {
-            var eventStream = new MongodbEventStream<T>(streamName, _ConnectionString, _Database);
+            var collection = _Database.GetCollection<StoredEntity>(name);
+
+            var eventStream = new MongodbEventStream<T>(collection);
             return (IEventStream<T>)eventStream;
         }
     }
@@ -52,16 +61,10 @@ namespace Booth.EventStore.MongoDB
             };
             ConventionRegistry.Register("Booth.EventStore.StoredEntity", conventionPack, t => (t == typeof(StoredEntity)) || t.IsSubclassOf(typeof(Event)));
 
-            /*   BsonSerializer.RegisterSerializer(typeof(DateTime), new DateOnlySerializer());
-               var conventionPack = new ConventionPack()
-               {
-                   new IgnoreExtraElementsConvention(true),
-               };
-               ConventionRegistry.Register("PortfolioManager.Events", conventionPack, t => (t == typeof(StoredEntity)) || t.IsSubclassOf(typeof(Event)));
 
-               var eventTypes = typeof(Event).GetSubclassesOf(true);
-               foreach (var eventType in eventTypes)
-                   BsonClassMap.LookupClassMap(eventType); */
+            var eventTypes = typeof(Event).GetSubclassesOf(true);
+            foreach (var eventType in eventTypes)
+                BsonClassMap.LookupClassMap(eventType);
         }
     } 
 }

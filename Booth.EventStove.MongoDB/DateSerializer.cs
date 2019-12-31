@@ -13,7 +13,7 @@ using Booth.Common;
 namespace Booth.EventStore.MongoDB
 {
     [BsonSerializer(typeof(DateSerializer))]
-    class DateSerializer : SerializerBase<Date>
+    public class DateSerializer : SerializerBase<Date>
     {
         public override Date Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
@@ -29,10 +29,25 @@ namespace Booth.EventStore.MongoDB
                 else
                     return Date.MinValue;
             }
+            else if (context.Reader.CurrentBsonType == BsonType.DateTime)
+            {
+                var value = context.Reader.ReadDateTime();
+                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(value).DateTime;
 
-            context.Reader.SkipValue();
+                return new Date(dateTime);
+            }
+            else if (context.Reader.CurrentBsonType == BsonType.Timestamp)
+            {
+                var value = context.Reader.ReadTimestamp();
+                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(value).DateTime;
 
-            return Date.MinValue;
+                return new Date(dateTime);
+            }
+            else
+            {
+                context.Reader.SkipValue();
+                return Date.MinValue;
+            }
         }
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Date value)
