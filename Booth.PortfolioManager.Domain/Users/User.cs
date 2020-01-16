@@ -21,8 +21,11 @@ namespace Booth.PortfolioManager.Domain.Users
 
         public void Create(string userName, string password)
         {
+            if (!ValidateUserName(userName))
+                throw new ArgumentException("Username is not valid");
+
             if (!ValidatePassword(password))
-                throw new Exception("Password is not valid");
+                throw new ArgumentException("Password is not valid");
 
             var hashedPassword = HashPassword(password);
             var @event = new UserCreatedEvent(Id, Version, userName, hashedPassword);
@@ -48,6 +51,9 @@ namespace Booth.PortfolioManager.Domain.Users
 
         public void ChangeUserName(string newUserName)
         {
+            if (!ValidateUserName(newUserName))
+                throw new ArgumentException("Username is not valid");
+
             var @event = new UserNameChangedEvent(Id, Version, newUserName);
 
             Apply(@event);
@@ -65,9 +71,13 @@ namespace Booth.PortfolioManager.Domain.Users
         public void ChangePassword(string newPassword)
         {
             if (!ValidatePassword(newPassword))
-                throw new Exception("Password is not valid");
+                throw new ArgumentException("Password is not valid");
 
             var hashedPassword = HashPassword(newPassword);
+
+            if (hashedPassword == _Password)
+                throw new ArgumentException("Password must not be the same as your existing password");
+
             var @event = new PasswordChangedEvent(Id, Version, hashedPassword);
 
             Apply(@event);
@@ -86,6 +96,14 @@ namespace Booth.PortfolioManager.Domain.Users
             var hashedPassword = HashPassword(password);
 
             return (hashedPassword == _Password);
+        }
+
+        private bool ValidateUserName(string userName)
+        {
+            if (userName == "")
+                return false;
+
+            return true;
         }
 
         private bool ValidatePassword(string password)
