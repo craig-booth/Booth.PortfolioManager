@@ -7,7 +7,7 @@ using Booth.Common;
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Users.Events;
 
-namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
+namespace Booth.PortfolioManager.Domain.Test.Users
 {
     class UserTests
     {
