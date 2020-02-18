@@ -44,7 +44,7 @@ namespace Booth.PortfolioManager.Domain.TradingCalanders
 
             PublishEvent(@event);
         }
-        private void Apply(NonTradingDaysSetEvent @event)
+        public void Apply(NonTradingDaysSetEvent @event)
         {
             Version++;
 

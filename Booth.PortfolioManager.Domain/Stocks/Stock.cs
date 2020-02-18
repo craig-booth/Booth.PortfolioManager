@@ -62,7 +62,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        private void Apply(StockListedEvent @event)
+        public void Apply(StockListedEvent @event)
         {
             Version++;
             Trust = @event.Trust;
@@ -84,7 +84,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        protected virtual void Apply(StockDelistedEvent @event)
+        public virtual void Apply(StockDelistedEvent @event)
         {
             Version++;
 
@@ -94,7 +94,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             End(@event.DelistedDate);
         }
 
-        protected virtual void Apply(CorporateActionAddedEvent @event)
+        public virtual void Apply(CorporateActionAddedEvent @event)
         {
             Version++;
 
@@ -146,7 +146,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _Events.Add(@event);
         }
 
-        private void Apply(StockPropertiesChangedEvent @event)
+        public void Apply(StockPropertiesChangedEvent @event)
         {
             Version++;
 
@@ -158,7 +158,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _Properties.Change(@event.ChangeDate, newProperties);
         }
 
-        private void Apply(ChangeDividendRulesEvent @event)
+        public void Apply(ChangeDividendRulesEvent @event)
         {
             Version++;
 

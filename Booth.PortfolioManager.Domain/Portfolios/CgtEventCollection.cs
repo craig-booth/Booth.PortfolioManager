@@ -10,8 +10,7 @@ using Booth.PortfolioManager.Domain.Utils;
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
 
-    public interface ICgtEventCollection
-    : ITransactionList<CgtEvent>
+    public interface ICgtEventCollection : ITransactionList<CgtEvent>
     {
 
     }

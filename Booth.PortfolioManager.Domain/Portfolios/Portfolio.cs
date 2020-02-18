@@ -65,7 +65,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             PublishEvent(@event);
         }
 
-        private void Apply(PortfolioCreatedEvent @event)
+        public void Apply(PortfolioCreatedEvent @event)
         {
             Version++;
 
@@ -81,7 +81,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             PublishEvent(@event);
         }
 
-        private void Apply(DrpParticipationChangedEvent @event)
+        public void Apply(DrpParticipationChangedEvent @event)
         {
             Version++;
 
@@ -102,7 +102,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             PublishEvent(@event);
         }
 
-        private void Apply(CashTransactionOccurredEvent @event)
+        public void Apply(CashTransactionOccurredEvent @event)
         {
             var cashTransaction = new CashTransaction();
             MapFieldsFromEvent(cashTransaction, @event);
@@ -128,7 +128,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             PublishEvent(@event);
         }
 
-        private void Apply(AquisitionOccurredEvent @event)
+        public void Apply(AquisitionOccurredEvent @event)
         {
             var aquisition = new Aquisition();
             MapFieldsFromEvent(aquisition, @event);
@@ -157,7 +157,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             PublishEvent(@event);
         }
 
-        private void Apply(DisposalOccurredEvent @event)
+        public void Apply(DisposalOccurredEvent @event)
         {
             var disposal = new Disposal();
             MapFieldsFromEvent(disposal, @event);
@@ -189,7 +189,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             PublishEvent(@event);
         }
 
-        private void Apply(IncomeOccurredEvent @event)
+        public void Apply(IncomeOccurredEvent @event)
         {
             var incomeReceived = new IncomeReceived();
             MapFieldsFromEvent(incomeReceived, @event);
@@ -220,7 +220,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             PublishEvent(@event);
         }
 
-        private void Apply(OpeningBalanceOccurredEvent @event)
+        public void Apply(OpeningBalanceOccurredEvent @event)
         {
             var openingBalance = new OpeningBalance();
             MapFieldsFromEvent(openingBalance, @event);
@@ -238,7 +238,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         }
 
-        private void Apply(ReturnOfCapitalOccurredEvent @event)
+        public void Apply(ReturnOfCapitalOccurredEvent @event)
         {
 
         }

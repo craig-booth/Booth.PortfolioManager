@@ -20,6 +20,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
         public void ApplyTransaction(Transaction transaction)
         {
             var aquisition = transaction as Aquisition;
+            if (aquisition == null)
+                throw new ArgumentException("Expected transaction to be an Aquisition");
 
             var holding = _Holdings.Get(aquisition.Stock.Id);
             if (holding == null)

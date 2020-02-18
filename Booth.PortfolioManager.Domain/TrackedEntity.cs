@@ -39,7 +39,7 @@ namespace Booth.PortfolioManager.Domain
             return _Events.Fetch();
         }
 
-        private void Apply(Event @event)
+        public void Apply(Event @event)
         {
             throw new NotSupportedException();
         }
