@@ -101,7 +101,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        public void Apply(ClosingPricesAddedEvent @event)
+        private void Apply(ClosingPricesAddedEvent @event)
         {
             Version++;
             foreach (var closingPrice in @event.ClosingPrices)

@@ -36,7 +36,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        public void Apply(StapledSecurityListedEvent @event)
+        private void Apply(StapledSecurityListedEvent @event)
         {
             Version++;
 
@@ -59,7 +59,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _RelativeNTAs.Change(@event.ListingDate, new RelativeNTA(percentages));
         }
 
-        public override void Apply(StockDelistedEvent @event)
+        protected override void Apply(StockDelistedEvent @event)
         {
             base.Apply(@event);
 
@@ -83,7 +83,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        public void Apply(RelativeNTAChangedEvent @event)
+        private void Apply(RelativeNTAChangedEvent @event)
         {
             Version++;
 

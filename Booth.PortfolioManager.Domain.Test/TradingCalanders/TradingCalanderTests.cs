@@ -61,7 +61,7 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
             };
             var @event = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
 
-            tradingCalander.Apply(@event);
+            tradingCalander.ApplyEvents(new Event[] { @event });
 
             Assert.Multiple(() => {
                 Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 01)), Is.False);
@@ -80,13 +80,13 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
                 new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
             };
             var @event1 = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
-            tradingCalander.Apply(@event1);
 
             var nonTradingDays2 = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 02), "Still Hungover")
             };
             var @event2 = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays2);
-            tradingCalander.Apply(@event2);
+
+            tradingCalander.ApplyEvents(new Event[] { @event1, @event2 });
 
             Assert.Multiple(() => {
                 Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 01)), Is.True);
@@ -135,7 +135,7 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
             };
             var @event = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
 
-            tradingCalander.Apply(@event);
+            tradingCalander.ApplyEvents(new Event[] { @event });
 
             Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 02)), Is.True);
         }
@@ -151,7 +151,7 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
             };
             var @event = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
 
-            tradingCalander.Apply(@event);
+            tradingCalander.ApplyEvents(new Event[] { @event });
 
             Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 01)), Is.False);
         }

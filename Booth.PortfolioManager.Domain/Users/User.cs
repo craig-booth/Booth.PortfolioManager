@@ -39,7 +39,7 @@ namespace Booth.PortfolioManager.Domain.Users
             return _Properties;
         }
 
-        public void Apply(UserCreatedEvent @event)
+        private void Apply(UserCreatedEvent @event)
         {
             Version++;
 
@@ -60,7 +60,7 @@ namespace Booth.PortfolioManager.Domain.Users
             PublishEvent(@event);
         }
 
-        public void Apply(UserNameChangedEvent @event)
+        private void Apply(UserNameChangedEvent @event)
         {
             Version++;
 
@@ -84,7 +84,7 @@ namespace Booth.PortfolioManager.Domain.Users
             PublishEvent(@event);
         }
 
-        public void Apply(PasswordChangedEvent @event)
+        private void Apply(PasswordChangedEvent @event)
         {
             Version++;
 

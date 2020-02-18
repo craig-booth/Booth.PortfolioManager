@@ -6,15 +6,14 @@ using Booth.Common;
 
 namespace Booth.PortfolioManager.Domain
 {
-    interface IEffectiveEntity
+    interface IEffectiveEntity : IEntity
     {
-        Guid Id { get; }
         DateRange EffectivePeriod { get; }
+        bool IsEffectiveAt(Date date);
+        bool IsEffectiveDuring(DateRange dateRange);
     }
 
-    public abstract class EffectiveEntity :
-        IEntity,
-        IEffectiveEntity
+    public abstract class EffectiveEntity : IEffectiveEntity
     {
         public Guid Id { get; }
         public DateRange EffectivePeriod { get; private set; }

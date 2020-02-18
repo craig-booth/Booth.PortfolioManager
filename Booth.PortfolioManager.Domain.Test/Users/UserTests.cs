@@ -3,7 +3,7 @@ using System.Linq;
 
 using NUnit.Framework;
 
-using Booth.Common;
+using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Users.Events;
 
@@ -51,7 +51,7 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             var user = new User(Guid.NewGuid());
 
             var @event = new UserCreatedEvent(user.Id, 0, "john", "secret");
-            user.Apply(@event);
+            user.ApplyEvents(new Event[] { @event });
 
             Assert.That(user.UserName, Is.EqualTo("john"));
         }
@@ -99,7 +99,7 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             var user = new User(Guid.NewGuid());
 
             var @event = new UserNameChangedEvent(user.Id, 0, "bill");
-            user.Apply(@event);
+            user.ApplyEvents(new Event[] { @event });
 
             Assert.That(user.UserName, Is.EqualTo("bill"));
         }
@@ -144,7 +144,7 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             var user = new User(Guid.NewGuid());
 
             var @event = new PasswordChangedEvent(user.Id, 0, HashedTestPassword);
-            user.Apply(@event);
+            user.ApplyEvents(new Event[] { @event });
 
             Assert.That(user.PasswordCorrect(TestPassword), Is.True);
         }
