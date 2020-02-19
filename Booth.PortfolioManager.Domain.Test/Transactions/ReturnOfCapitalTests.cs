@@ -31,16 +31,20 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = false
             };
 
-            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
-            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(default(IHolding));
+            var holding = mockRepository.Create<IHolding>();
 
-            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            var holdings = mockRepository.Create<IHoldingCollection>();
+            holdings.Setup(x => x[stock.Id]).Returns(default(IHolding));
 
-            var handler = new ReturnOfCapitalHandler(holdings, cashAccount);
+            var cashAccount = mockRepository.Create<ICashAccount>();
+
+            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
 
             Assert.That(() => handler.ApplyTransaction(transaction), Throws.Exception.InstanceOf(typeof(NoParcelsForTransaction)));
+
+            mockRepository.Verify();
         }
 
         [TestCase]
@@ -60,24 +64,26 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = true
             };
 
-            var parcel = Mock.Of<IParcel>(MockBehavior.Strict);
-            Mock.Get(parcel).Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
-            Mock.Get(parcel).Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
-            Mock.Get(holding).Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
-            Mock.Get(holding).Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel });
+            var parcel = mockRepository.Create<IParcel>();
+            parcel.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
+            parcel.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
+
+            var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
+            holding.Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel.Object });
     
-            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
-            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(holding);
+            var holdings = mockRepository.Create<IHoldingCollection>();
+            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
 
-            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
-            Mock.Get(cashAccount).Setup(x => x.Transfer(new Date(2020, 02, 01), 100.00m, "Return of capital for ABC")).Verifiable(); 
+            var cashAccount = mockRepository.Create<ICashAccount>();
+            cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 100.00m, "Return of capital for ABC")).Verifiable(); 
 
-            var handler = new ReturnOfCapitalHandler(holdings, cashAccount);
+            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
             handler.ApplyTransaction(transaction);
 
-            Mock.Verify(new Mock[] { Mock.Get(parcel), Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
+            mockRepository.Verify();
         }
 
         [TestCase]
@@ -97,30 +103,32 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = true
             };
 
-            var parcel1 = Mock.Of<IParcel>(MockBehavior.Strict);
-            Mock.Get(parcel1).Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(100, 1000.00m, 1000.00m));
-            Mock.Get(parcel1).Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 200.00m, transaction)).Verifiable();
-            var parcel2 = Mock.Of<IParcel>(MockBehavior.Strict);
-            Mock.Get(parcel2).Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 500.00m, 500.00m));
-            Mock.Get(parcel2).Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
-            var parcel3 = Mock.Of<IParcel>(MockBehavior.Strict);
-            Mock.Get(parcel3).Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(200, 1000.00m, 1000.00m));
-            Mock.Get(parcel3).Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 400.00m, transaction)).Verifiable();
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
-            Mock.Get(holding).Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
-            Mock.Get(holding).Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel1, parcel2, parcel3 });
+            var parcel1 = mockRepository.Create<IParcel>();
+            parcel1.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(100, 1000.00m, 1000.00m));
+            parcel1.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 200.00m, transaction)).Verifiable();
+            var parcel2 = mockRepository.Create<IParcel>();
+            parcel2.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 500.00m, 500.00m));
+            parcel2.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
+            var parcel3 = mockRepository.Create<IParcel>();
+            parcel3.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(200, 1000.00m, 1000.00m));
+            parcel3.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 400.00m, transaction)).Verifiable();
 
-            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
-            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(holding);
+            var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
+            holding.Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
 
-            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
-            Mock.Get(cashAccount).Setup(x => x.Transfer(new Date(2020, 02, 01), 700.00m, "Return of capital for ABC")).Verifiable();
+            var holdings = mockRepository.Create<IHoldingCollection>();
+            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
 
-            var handler = new ReturnOfCapitalHandler(holdings, cashAccount);
+            var cashAccount = mockRepository.Create<ICashAccount>();
+            cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 700.00m, "Return of capital for ABC")).Verifiable();
+
+            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
             handler.ApplyTransaction(transaction);
 
-            Mock.Verify(new Mock[] { Mock.Get(parcel1), Mock.Get(parcel2), Mock.Get(parcel3), Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
+            mockRepository.Verify();
         }
 
 
@@ -141,23 +149,25 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = false
             };
 
-            var parcel = Mock.Of<IParcel>(MockBehavior.Strict);
-            Mock.Get(parcel).Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
-            Mock.Get(parcel).Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
-            Mock.Get(holding).Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
-            Mock.Get(holding).Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel });
+            var parcel = mockRepository.Create<IParcel>();
+            parcel.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
+            parcel.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
 
-            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
-            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(holding);
+            var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
+            holding.Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel.Object });
 
-            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            var holdings = mockRepository.Create<IHoldingCollection>();
+            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+
+            var cashAccount = mockRepository.Create<ICashAccount>();
   
-            var handler = new ReturnOfCapitalHandler(holdings, cashAccount);
+            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
             handler.ApplyTransaction(transaction);
 
-            Mock.Verify(new Mock[] { Mock.Get(parcel), Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
+            mockRepository.Verify();
         }
 
 
@@ -173,12 +183,16 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Amount = 100.00m
             };
 
-            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
-            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var handler = new ReturnOfCapitalHandler(holdings, cashAccount);
+            var holdings = mockRepository.Create<IHoldingCollection>();
+            var cashAccount = mockRepository.Create<ICashAccount>();
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException); 
+            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
+
+            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException);
+
+            mockRepository.Verify();
         }
     }
 }

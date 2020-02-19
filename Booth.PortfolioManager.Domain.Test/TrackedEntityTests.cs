@@ -53,15 +53,19 @@ namespace Booth.PortfolioManager.Domain.Test
         [TestCase]
         public void ApplyEvents()
         {
-            var entity = Mock.Of<TrackedEntityTestClass>();
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var entity = mockRepository.Create<TrackedEntityTestClass>(MockBehavior.Loose);
 
             var @event1 = new EventTestClass(Guid.NewGuid(), 0);
             var @event2 = new EventTestClass(Guid.NewGuid(), 0);
 
-            entity.ApplyEvents(new Event[] { @event1, @event2 });
+            entity.Object.ApplyEvents(new Event[] { @event1, @event2 });
 
-            Mock.Get(entity).Verify(x => x.Apply(@event1), Times.Once);
-            Mock.Get(entity).Verify(x => x.Apply(@event2), Times.Once);
+            entity.Verify(x => x.Apply(@event1), Times.Once);
+            entity.Verify(x => x.Apply(@event2), Times.Once);
+
+            mockRepository.Verify();
         }
 
         [TestCase]
