@@ -22,17 +22,17 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         private IStockResolver _StockResolver;
 
-        private HoldingCollection _Holdings = new HoldingCollection();
-        public IHoldingCollection Holdings => _Holdings;
+        private IHoldingCollection _Holdings = new HoldingCollection();
+        public IReadOnlyHoldingCollection Holdings => _Holdings;
 
         private TransactionCollection _Transactions = new TransactionCollection();
         public ITransactionCollection Transactions => _Transactions;
 
-        private CashAccount _CashAccount = new CashAccount();
-        public ICashAccount CashAccount => _CashAccount;
+        private ICashAccount _CashAccount = new CashAccount();
+        public IReadOnlyCashAccount CashAccount => _CashAccount;
 
         private CgtEventCollection _CgtEvents = new CgtEventCollection();
-        public ICgtEventCollection CgtEvents => _CgtEvents;
+        public ITransactionList<CgtEvent> CgtEvents => _CgtEvents;
 
         public Date StartDate
         {
@@ -85,9 +85,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         {
             Version++;
 
-            var holding = _Holdings.Get(@event.Holding);
-            if (holding != null)
-                holding.ChangeDrpParticipation(@event.ParticipateInDrp);
+            var holding = _Holdings[@event.Holding];
+            holding.ChangeDrpParticipation(@event.ParticipateInDrp);
         }
 
         public void MakeCashTransaction(Date transactionDate, BankAccountTransactionType type, decimal amount, string comment, Guid transactionId)

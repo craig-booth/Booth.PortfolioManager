@@ -6,7 +6,7 @@ using Booth.Common;
 
 namespace Booth.PortfolioManager.Domain
 {
-    interface IEffectiveEntity : IEntity
+    public interface IEffectiveEntity : IEntity
     {
         DateRange EffectivePeriod { get; }
         bool IsEffectiveAt(Date date);

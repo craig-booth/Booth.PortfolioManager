@@ -60,8 +60,8 @@ namespace Booth.PortfolioManager.Domain.Test
 
             entity.ApplyEvents(new Event[] { @event1, @event2 });
 
-            Mock.Get(entity).Verify(x => x.Apply(@event1));
-            Mock.Get(entity).Verify(x => x.Apply(@event2));
+            Mock.Get(entity).Verify(x => x.Apply(@event1), Times.Once);
+            Mock.Get(entity).Verify(x => x.Apply(@event2), Times.Once);
         }
 
         [TestCase]

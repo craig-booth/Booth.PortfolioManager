@@ -17,8 +17,6 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         [TestCase]
         public void Deposit()
         {
-            Assert.That(false);
-            /*
             var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
@@ -29,19 +27,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             };
 
             var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 100.00m, "Test Deposit", BankAccountTransactionType.Deposit));
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 100.00m, "Test Deposit", BankAccountTransactionType.Deposit)).Verifiable();
 
             var handler = new CashTransactionHandler(cashAccount);
+            handler.ApplyTransaction(transaction);
 
-
-            handler.ApplyTransaction(transaction);*/
+            Mock.Verify(Mock.Get(cashAccount));
         }
 
         [TestCase]
         public void Fee()
         {
-        Assert.That(false);
-            /*
             var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
@@ -52,18 +48,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             };
 
             var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 20.00m, "Test Fee", BankAccountTransactionType.Fee)).Verifiable();
 
             var handler = new CashTransactionHandler(cashAccount);
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 20.00m, "Test Fee", BankAccountTransactionType.Fee));
+            handler.ApplyTransaction(transaction);
 
-            handler.ApplyTransaction(transaction);*/
+            Mock.Verify(Mock.Get(cashAccount));
         }
 
         [TestCase]
         public void Interest()
         {
-        Assert.That(false);
-            /*
             var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
@@ -74,18 +69,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             };
 
             var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 20.00m, "Test Interest", BankAccountTransactionType.Interest)).Verifiable();
 
             var handler = new CashTransactionHandler(cashAccount);
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 20.00m, "Test Interest", BankAccountTransactionType.Interest));
+            handler.ApplyTransaction(transaction);
 
-            handler.ApplyTransaction(transaction);*/
+            Mock.Verify(Mock.Get(cashAccount));
         }
 
         [TestCase]
         public void Transfer()
         {
-        Assert.That(false);
-            /*
             var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
@@ -96,18 +90,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             };
 
             var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 120.00m, "Test Transfer", BankAccountTransactionType.Transfer)).Verifiable();
 
             var handler = new CashTransactionHandler(cashAccount);
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 120.00m, "Test Transfer", BankAccountTransactionType.Transfer));
+            handler.ApplyTransaction(transaction);
 
-            handler.ApplyTransaction(transaction);*/
+            Mock.Verify(Mock.Get(cashAccount));
         }
 
         [TestCase]
         public void Withdrawl()
         {
-        Assert.That(false);
-            /*
             var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
@@ -118,18 +111,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             };
 
             var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 200.00m, "Test Withdrawl", BankAccountTransactionType.Withdrawl)).Verifiable();
 
             var handler = new CashTransactionHandler(cashAccount);
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 200.00m, "Test Withdrawl", BankAccountTransactionType.Withdrawl));
+            handler.ApplyTransaction(transaction);
 
-            handler.ApplyTransaction(transaction);*/
+            Mock.Verify(Mock.Get(cashAccount));
         }
 
         [TestCase]
         public void MissingCommnet()
         {
-        Assert.That(false);
-            /*
             var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
@@ -141,11 +133,11 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
 
             var handler = new CashTransactionHandler(cashAccount);
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Deposit", BankAccountTransactionType.Deposit));
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Fee", BankAccountTransactionType.Fee));
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Interest", BankAccountTransactionType.Interest));
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Transfer", BankAccountTransactionType.Transfer));
-            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Withdrawl", BankAccountTransactionType.Withdrawl));
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Deposit", BankAccountTransactionType.Deposit)).Verifiable();
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Fee", BankAccountTransactionType.Fee)).Verifiable();
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Interest", BankAccountTransactionType.Interest)).Verifiable();
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Transfer", BankAccountTransactionType.Transfer)).Verifiable();
+            Mock.Get(cashAccount).Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Withdrawl", BankAccountTransactionType.Withdrawl)).Verifiable();
 
             transaction.CashTransactionType = BankAccountTransactionType.Deposit;
             handler.ApplyTransaction(transaction);
@@ -160,7 +152,10 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             handler.ApplyTransaction(transaction);
 
             transaction.CashTransactionType = BankAccountTransactionType.Withdrawl;
-            handler.ApplyTransaction(transaction);*/
+            handler.ApplyTransaction(transaction);
+
+
+            Mock.Verify(Mock.Get(cashAccount));
         }
 
         [TestCase]
@@ -173,7 +168,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Comment = ""
             };
 
-            var cashAccount = new CashAccount();
+            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
 
             var handler = new CashTransactionHandler(cashAccount);
 

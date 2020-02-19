@@ -32,31 +32,19 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = false
             };
 
-            var holdings = new HoldingCollection();
-            var cashAccount = new CashAccount();
-            var handler = new AquisitionHandler(holdings, cashAccount);
+            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
+            Mock.Get(holding).Setup(x => x.AddParcel(new Date(2020, 01, 01), new Date(2020, 01, 01), 100, 1020.00m, 1020.00m, transaction)).Returns(default(IParcel)).Verifiable();
 
+            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
+            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(default(IHolding));
+            Mock.Get(holdings).Setup(x => x.Add(stock, new Date(2020, 01, 01))).Returns(holding);
+
+            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+
+            var handler = new AquisitionHandler(holdings, cashAccount);
             handler.ApplyTransaction(transaction);
 
-            var holding = holdings.Get(stock.Id);
-            var parcels = holding.Parcels(new Date(2020, 01, 01)).ToList();
-            Assert.Multiple(() =>
-            {       
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-
-                Assert.That(parcels, Has.Count.EqualTo(1));
-
-                Assert.That(parcels[0].EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-                Assert.That(parcels[0].AquisitionDate, Is.EqualTo(new Date(2020, 01, 01)));
-                Assert.That(parcels[0].Properties.Values.Count(), Is.EqualTo(1));
-
-                var properties = parcels[0].Properties[new Date(2020, 01, 01)];
-                Assert.That(properties.Amount, Is.EqualTo(1020.00m));
-                Assert.That(properties.CostBase, Is.EqualTo(1020.00m));
-                Assert.That(properties.Units, Is.EqualTo(100));
-
-                Assert.That(cashAccount.Transactions.Count, Is.EqualTo(0));
-            }); 
+            Mock.Verify(new Mock[] { Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
         }
 
         [TestCase]
@@ -77,31 +65,18 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = false
             };
 
-            var holdings = new HoldingCollection();
-            var cashAccount = new CashAccount();
-            var handler = new AquisitionHandler(holdings, cashAccount);
+            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
+            Mock.Get(holding).Setup(x => x.AddParcel(new Date(2020, 01, 01), new Date(2020, 01, 01), 100, 1000.00m, 1000.00m, transaction)).Returns(default(IParcel)).Verifiable();
 
+            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
+            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(holding);
+
+            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+
+            var handler = new AquisitionHandler(holdings, cashAccount);
             handler.ApplyTransaction(transaction);
 
-            var holding = holdings.Get(stock.Id);
-            var parcels = holding.Parcels(new Date(2020, 01, 01)).ToList();
-            Assert.Multiple(() =>
-            {
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-
-                Assert.That(parcels, Has.Count.EqualTo(1));
-
-                Assert.That(parcels[0].EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-                Assert.That(parcels[0].AquisitionDate, Is.EqualTo(new Date(2020, 01, 01)));
-                Assert.That(parcels[0].Properties.Values.Count(), Is.EqualTo(1));
-
-                var properties = parcels[0].Properties[new Date(2020, 01, 01)];
-                Assert.That(properties.Amount, Is.EqualTo(1000.00m));
-                Assert.That(properties.CostBase, Is.EqualTo(1000.00m));
-                Assert.That(properties.Units, Is.EqualTo(100));
-
-                Assert.That(cashAccount.Transactions.Count, Is.EqualTo(0));
-            });
+            Mock.Verify(new Mock[] { Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
         }
 
         [TestCase]
@@ -122,31 +97,18 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = false
             };
 
-            var holdings = new HoldingCollection();
-            var cashAccount = new CashAccount();
-            var handler = new AquisitionHandler(holdings, cashAccount);
+            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
+            Mock.Get(holding).Setup(x => x.AddParcel(new Date(2020, 01, 01), new Date(2020, 01, 01), 100, 1020.00m, 1020.00m, transaction)).Returns(default(IParcel)).Verifiable();
 
+            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
+            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(holding);
+
+            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+
+            var handler = new AquisitionHandler(holdings, cashAccount);
             handler.ApplyTransaction(transaction);
 
-            var holding = holdings.Get(stock.Id);
-            var parcels = holding.Parcels(new Date(2020, 01, 01)).ToList();
-            Assert.Multiple(() =>
-            {
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-
-                Assert.That(parcels, Has.Count.EqualTo(1));
-
-                Assert.That(parcels[0].EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-                Assert.That(parcels[0].AquisitionDate, Is.EqualTo(new Date(2020, 01, 01)));
-                Assert.That(parcels[0].Properties.Values.Count(), Is.EqualTo(1));
-
-                var properties = parcels[0].Properties[new Date(2020, 01, 01)];
-                Assert.That(properties.Amount, Is.EqualTo(1020.00m));
-                Assert.That(properties.CostBase, Is.EqualTo(1020.00m));
-                Assert.That(properties.Units, Is.EqualTo(100));
-
-                Assert.That(cashAccount.Transactions.Count, Is.EqualTo(0));
-            });
+            Mock.Verify(new Mock[] { Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
         }
 
         [TestCase]
@@ -167,31 +129,19 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = true
             };
 
-            var holdings = new HoldingCollection();
-            var cashAccount = new CashAccount();
-            var handler = new AquisitionHandler(holdings, cashAccount);
+            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
+            Mock.Get(holding).Setup(x => x.AddParcel(new Date(2020, 01, 01), new Date(2020, 01, 01), 100, 1000.00m, 1000.00m, transaction)).Returns(default(IParcel)).Verifiable();
 
+            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
+            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(holding);
+
+            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            Mock.Get(cashAccount).Setup(x => x.Transfer(new Date(2020, 01, 01), -1000.00m, "Purchase of ABC")).Verifiable();
+
+            var handler = new AquisitionHandler(holdings, cashAccount);
             handler.ApplyTransaction(transaction);
 
-            var holding = holdings.Get(stock.Id);
-            var parcels = holding.Parcels(new Date(2020, 01, 01)).ToList();
-            Assert.Multiple(() =>
-            {
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-
-                Assert.That(parcels, Has.Count.EqualTo(1));
-
-                Assert.That(parcels[0].EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-                Assert.That(parcels[0].AquisitionDate, Is.EqualTo(new Date(2020, 01, 01)));
-                Assert.That(parcels[0].Properties.Values.Count(), Is.EqualTo(1));
-
-                var properties = parcels[0].Properties[new Date(2020, 01, 01)];
-                Assert.That(properties.Amount, Is.EqualTo(1000.00m));
-                Assert.That(properties.CostBase, Is.EqualTo(1000.00m));
-                Assert.That(properties.Units, Is.EqualTo(100));
-
-                Assert.That(cashAccount.Transactions.Count, Is.EqualTo(0));
-            });
+            Mock.Verify(new Mock[] { Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
         }
 
         [TestCase]
@@ -212,36 +162,26 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 CreateCashTransaction = true
             };
 
-            var holdings = new HoldingCollection();
-            var cashAccount = new CashAccount();
-            var handler = new AquisitionHandler(holdings, cashAccount);
+            var holding = Mock.Of<IHolding>(MockBehavior.Strict);
+            Mock.Get(holding).Setup(x => x.AddParcel(new Date(2020, 01, 01), new Date(2020, 01, 01), 100, 1020.00m, 1020.00m, transaction)).Returns(default(IParcel)).Verifiable();
 
+            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
+            Mock.Get(holdings).Setup(x => x[stock.Id]).Returns(holding);
+
+            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
+            Mock.Get(cashAccount).Setup(x => x.Transfer(new Date(2020, 01, 01), -1000.00m, "Purchase of ABC")).Verifiable();
+            Mock.Get(cashAccount).Setup(x => x.FeeDeducted(new Date(2020, 01, 01), 20.00m, "Brokerage for purchase of ABC")).Verifiable();
+
+            var handler = new AquisitionHandler(holdings, cashAccount);
             handler.ApplyTransaction(transaction);
 
-            var holding = holdings.Get(stock.Id);
-            var parcels = holding.Parcels(new Date(2020, 01, 01)).ToList();
-            Assert.Multiple(() =>
-            {
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-
-                Assert.That(parcels, Has.Count.EqualTo(1));
-
-                Assert.That(parcels[0].EffectivePeriod, Is.EqualTo(new DateRange(new Date(2020, 01, 01), Date.MaxValue)));
-                Assert.That(parcels[0].AquisitionDate, Is.EqualTo(new Date(2020, 01, 01)));
-                Assert.That(parcels[0].Properties.Values.Count(), Is.EqualTo(1));
-
-                var properties = parcels[0].Properties[new Date(2020, 01, 01)];
-                Assert.That(properties.Amount, Is.EqualTo(1020.00m));
-                Assert.That(properties.CostBase, Is.EqualTo(1020.00m));
-                Assert.That(properties.Units, Is.EqualTo(100));
-
-                Assert.That(cashAccount.Transactions.Count, Is.EqualTo(0));
-            });
+            Mock.Verify(new Mock[] { Mock.Get(holding), Mock.Get(holdings), Mock.Get(cashAccount) });
         }
 
         [TestCase]
         public void IncorrectTransactionType()
         {
+
             var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
@@ -251,8 +191,8 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Amount = 100.00m
             };
 
-            var holdings = new HoldingCollection();
-            var cashAccount = new CashAccount();
+            var holdings = Mock.Of<IHoldingCollection>(MockBehavior.Strict);
+            var cashAccount = Mock.Of<ICashAccount>(MockBehavior.Strict);
 
             var handler = new AquisitionHandler(holdings, cashAccount);
 

@@ -9,19 +9,43 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public class Holding : EffectiveEntity
+
+    public interface IReadOnlyHolding : IEffectiveEntity
+    {
+        Stock Stock { get; }
+        IEffectiveProperties<HoldingProperties> Properties { get; }
+        HoldingSettings Settings { get; }
+        IReadOnlyCashAccount DrpAccount { get; }
+        IEnumerable<IReadOnlyParcel> Parcels(Date date);
+
+        decimal Value(Date date);
+    }
+
+    public interface IHolding : IReadOnlyHolding
+    {
+        IEnumerable<IParcel> this[Date date] { get; }
+
+        IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, Transaction transaction);
+        void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, Transaction transaction);
+
+        void AddDrpAccountAmount(Date date, decimal amount);
+
+        void ChangeDrpParticipation(bool participateInDrp);
+    }
+
+    public class Holding : EffectiveEntity, IHolding, IReadOnlyHolding
     {
         public Stock Stock { get; set; }
 
         private EffectiveProperties<HoldingProperties> _Properties = new EffectiveProperties<HoldingProperties>();
         public IEffectiveProperties<HoldingProperties> Properties => _Properties;
 
-        public HoldingSettings Settings = new HoldingSettings(false);
+        public HoldingSettings Settings { get; } = new HoldingSettings(false);
 
         private Dictionary<Guid, Parcel> _Parcels = new Dictionary<Guid, Parcel>();
 
         private CashAccount _DrpAccount = new CashAccount();
-        public ICashAccount DrpAccount => _DrpAccount;
+        public IReadOnlyCashAccount DrpAccount => _DrpAccount;
 
         public Holding(Stock stock, Date fromDate)
             : base(stock.Id)
@@ -32,12 +56,21 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _Properties.Change(fromDate, new HoldingProperties(0, 0.00m, 0.00m));
         }
 
-        public IEnumerable<Parcel> Parcels(Date date)
-        {
-            return _Parcels.Values.Where(x => x.IsEffectiveAt(date));
+        public IEnumerable<IParcel> this[Date date] 
+        { 
+            get
+            {
+                return _Parcels.Values.Where(x => x.IsEffectiveAt(date));
+            }
         }
 
-        public void AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, Transaction transaction)
+
+        public IEnumerable<IReadOnlyParcel> Parcels(Date date)
+        {
+            return this[date];
+        }
+
+        public IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, Transaction transaction)
         {
             var parcel = new Parcel(Guid.NewGuid(), date, aquisitionDate, new ParcelProperties(units, amount, costBase), transaction);
 
@@ -46,9 +79,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             var exisingProperties = Properties[date];
             var newProperties = new HoldingProperties(exisingProperties.Units + units, exisingProperties.Amount + amount, exisingProperties.CostBase + costBase);
             _Properties.Change(date, newProperties);
+
+            return parcel;
         }
 
-        public void DisposeOfParcel(Parcel parcel, Date date, int units, decimal amount, Transaction transaction)
+        public void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, Transaction transaction)
         {        
             var parcelProperties = parcel.Properties[date];
 

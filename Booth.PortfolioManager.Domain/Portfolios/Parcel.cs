@@ -8,7 +8,19 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public class Parcel : EffectiveEntity
+    public interface IReadOnlyParcel : IEffectiveEntity
+    {
+        Date AquisitionDate { get; }
+        IEffectiveProperties<ParcelProperties> Properties { get; }
+        IEnumerable<ParcelAudit> Audit { get; }
+    }
+
+    public interface IParcel : IReadOnlyParcel
+    {          
+        void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, Transaction transaction);
+    }
+
+    public class Parcel : EffectiveEntity, IParcel, IReadOnlyParcel
     {
         public Date AquisitionDate { get; private set; }
 
@@ -29,7 +41,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _Audit.Add(new ParcelAudit(aquisitionDate, properties.Units, properties.CostBase, properties.Amount, transaction));
         }
 
-        internal void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, Transaction transaction)
+        public void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, Transaction transaction)
         {
             var parcelProperties = _Properties[date];
 

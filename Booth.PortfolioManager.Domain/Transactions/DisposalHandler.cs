@@ -10,11 +10,11 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public class DisposalHandler : ITransactionHandler
     { 
-        private HoldingCollection _Holdings;
-        private CashAccount _CashAccount;
-        private CgtEventCollection _CgtEvents;
+        private IHoldingCollection _Holdings;
+        private ICashAccount _CashAccount;
+        private ICgtEventCollection _CgtEvents;
 
-        public DisposalHandler(HoldingCollection holdings, CashAccount cashAccount, CgtEventCollection cgtEvents)
+        public DisposalHandler(IHoldingCollection holdings, ICashAccount cashAccount, ICgtEventCollection cgtEvents)
         {
             _Holdings = holdings;
             _CashAccount = cashAccount;
@@ -24,16 +24,21 @@ namespace Booth.PortfolioManager.Domain.Transactions
         public void ApplyTransaction(Transaction transaction)
         {
             var disposal = transaction as Disposal;
+            if (disposal == null)
+                throw new ArgumentException("Expected transaction to be a Disposal");
 
-            var holding = _Holdings.Get(disposal.Stock.Id);
+            var holding = _Holdings[disposal.Stock.Id];
+            if (holding == null)
+                throw new NoParcelsForTransaction(disposal, "No parcels found for transaction");
+
+            if (holding.Properties[disposal.Date].Units < disposal.Units)
+                throw new NotEnoughSharesForDisposal(disposal, "Not enough shares for disposal");
 
             // Determine which parcels to sell based on CGT method 
-            decimal amountReceived = (disposal.Units * disposal.AveragePrice) - disposal.TransactionCosts;
-            var cgtCalculation = CgtCalculator.CalculateCapitalGain(holding.Parcels(disposal.Date), disposal.Date, disposal.Units, amountReceived, disposal.CGTMethod);
-
-            if (cgtCalculation.UnitsSold == 0)
-                throw new NoParcelsForTransaction(disposal, "No parcels found for transaction");
-            else if (cgtCalculation.UnitsSold < disposal.Units)
+            var parcels = holding[disposal.Date];
+            var amountReceived = (disposal.Units * disposal.AveragePrice) - disposal.TransactionCosts;
+            var cgtCalculation = CgtCalculator.CalculateCapitalGain(parcels, disposal.Date, disposal.Units, amountReceived, disposal.CGTMethod);
+            if (cgtCalculation.UnitsSold < disposal.Units)
                 throw new NotEnoughSharesForDisposal(disposal, "Not enough shares for disposal");
                    
             // Dispose of select parcels 
@@ -61,7 +66,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             } 
             else
             {
-                foreach (ParcelSold parcelSold in cgtCalculation.ParcelsSold)
+                foreach (var parcelSold in cgtCalculation.ParcelsSold)
                 {
                     holding.DisposeOfParcel(parcelSold.Parcel, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, transaction);
 

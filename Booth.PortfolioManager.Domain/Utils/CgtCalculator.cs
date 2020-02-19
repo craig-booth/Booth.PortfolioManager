@@ -10,7 +10,7 @@ namespace Booth.PortfolioManager.Domain.Utils
 {
     public class ParcelSold
     {
-        public Parcel Parcel { get; private set; }
+        public IParcel Parcel { get; private set; }
 
         public Date DisposalDate { get; private set; }
         public int UnitsSold { get; private set; }   
@@ -19,7 +19,7 @@ namespace Booth.PortfolioManager.Domain.Utils
         public decimal CapitalGain { get; private set; }
         public CGTMethod CgtMethod { get; private set; }
 
-        public ParcelSold(Parcel parcel, int unitsSold, Date disposalDate)
+        public ParcelSold(IParcel parcel, int unitsSold, Date disposalDate)
         {
             Parcel = parcel;
             UnitsSold = unitsSold;
@@ -71,7 +71,7 @@ namespace Booth.PortfolioManager.Domain.Utils
             ApportionedCurrencyValue[] apportionedAmountReceived = new ApportionedCurrencyValue[_ParcelsSold.Count];
             int i = 0;
             foreach (ParcelSold parcelSold in _ParcelsSold)
-                apportionedAmountReceived[i++].Units = parcelSold.UnitsSold; ;
+                apportionedAmountReceived[i++].Units = parcelSold.UnitsSold; 
             MathUtils.ApportionAmount(amountReceived, apportionedAmountReceived);
 
 
@@ -92,12 +92,12 @@ namespace Booth.PortfolioManager.Domain.Utils
 
     public static class CgtCalculator
     {
-        private class CgtComparer : Comparer<Parcel>
+        private class CgtComparer : Comparer<IReadOnlyParcel>
         {
             public Date DisposalDate { get; private set; }
             public CGTCalculationMethod Method { get; private set; }
 
-            public override int Compare(Parcel a, Parcel b)
+            public override int Compare(IReadOnlyParcel a, IReadOnlyParcel b)
             {
                 if (Method == CGTCalculationMethod.FirstInFirstOut)
                     return a.AquisitionDate.CompareTo(b.AquisitionDate);
@@ -168,7 +168,7 @@ namespace Booth.PortfolioManager.Domain.Utils
                 return 0.00m;
         }
 
-        public static CgtCalculation CalculateCapitalGain(IEnumerable<Parcel> parcelsOwned, Date saleDate, int unitsToSell, decimal amountReceived, CGTCalculationMethod method)
+        public static CgtCalculation CalculateCapitalGain(IEnumerable<IParcel> parcelsOwned, Date saleDate, int unitsToSell, decimal amountReceived, CGTCalculationMethod method)
         {
             // Sort in prefered sell order
             var sortedParcels = parcelsOwned.Where(x => x.EffectivePeriod.ToDate == Date.MaxValue).OrderBy(x => x, new CgtComparer(saleDate, method));
