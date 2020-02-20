@@ -17,6 +17,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
     public interface ITransactionCollection : ITransactionList<Transaction>
     {
         IEnumerable<Transaction> ForHolding(Guid stockId);
+
+        IEnumerable<Transaction> ForHolding(Guid stockId, Date date);
         IEnumerable<Transaction> ForHolding(Guid stockId, DateRange dateRange);
     }
 
@@ -33,6 +35,11 @@ namespace Booth.PortfolioManager.Domain.Transactions
         public IEnumerable<Transaction> ForHolding(Guid stockId)
         {
             return this.Where(x => (x.Stock != null) && (x.Stock.Id == stockId));
+        }
+
+        public IEnumerable<Transaction> ForHolding(Guid stockId, Date date)
+        {
+            return ForDate(date).Where(x => (x.Stock != null) && (x.Stock.Id == stockId));
         }
 
         public IEnumerable<Transaction> ForHolding(Guid stockId, DateRange dateRange)

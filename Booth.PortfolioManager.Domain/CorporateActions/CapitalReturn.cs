@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             Amount = amount;
         }
 
-        public override IEnumerable<Transaction> GetTransactionList(Holding holding)
+        public override IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding)
         {
             var transactions = new List<Transaction>();
 

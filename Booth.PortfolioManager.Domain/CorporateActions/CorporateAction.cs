@@ -13,7 +13,17 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
 {
 
     public enum CorporateActionType { Dividend, CapitalReturn, Transformation, SplitConsolidation, Composite }
-    public abstract class CorporateAction : ITransaction
+
+    public interface ICorporateAction : ITransaction
+    {
+        Stock Stock { get; }
+        CorporateActionType Type { get; }
+        string Description { get; }
+        IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding);
+        bool HasBeenApplied(ITransactionCollection transactions);
+    }
+
+    public abstract class CorporateAction : ICorporateAction
     {
         public Guid Id { get; private set; }
         public Stock Stock { get; private set; }
@@ -30,7 +40,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             Description = description;
         }
 
-        public abstract IEnumerable<Transaction> GetTransactionList(Holding holding);
+        public abstract IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding);
         public abstract bool HasBeenApplied(ITransactionCollection transactions);
     }
 }

@@ -22,6 +22,8 @@ namespace Booth.PortfolioManager.Domain.Utils
 
         ITransactionRange<T> FromDate(Date date);
         ITransactionRange<T> ToDate(Date date);
+
+        ITransactionRange<T> ForDate(Date dateRange);
         ITransactionRange<T> InDateRange(DateRange dateRange);
     }
 
@@ -245,6 +247,19 @@ namespace Booth.PortfolioManager.Domain.Utils
                 end = end + 1;
 
             return new TransactionRange<T>(this, 0, end);
+        }
+
+        public ITransactionRange<T> ForDate(Date date)
+        {
+            var start = IndexOf(date, TransationListPosition.First);
+            if (start < 0)
+                start = ~start;
+
+            var end = IndexOf(date, TransationListPosition.Last);
+            if (end < 0)
+                end = ~end - 1;
+
+            return new TransactionRange<T>(this, start, end);
         }
 
         public ITransactionRange<T> InDateRange(DateRange dateRange)
