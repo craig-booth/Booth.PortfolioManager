@@ -51,7 +51,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                 Id = Guid.NewGuid(),
                 Date = new Date(2020, 02, 01),
                 Stock = stock,
-                Comment = "Test Dividend",
+                Comment = "Test Return Of Capital",
                 RecordDate = new Date(2020, 01, 01),
                 Amount = 2.00m,
                 CreateCashTransaction = false
