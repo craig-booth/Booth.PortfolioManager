@@ -242,6 +242,16 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         }
 
+        public void AdjustUnitCount(Date date, Stock stock, int oldCount, int NewCount, string comment, Guid transactionId)
+        {
+
+        }
+
+        public void Apply(UnitCountAdjustmentOccurredEvent @event)
+        {
+
+        }
+
         private void MapFieldsFromEvent(Transaction transaction, TransactionOccurredEvent @event)
         {
             transaction.Id = @event.TransactionId;

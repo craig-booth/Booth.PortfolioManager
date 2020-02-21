@@ -13,9 +13,13 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
 {
     public class SplitConsolidation : CorporateAction
     {
-        internal SplitConsolidation(Guid id, Stock stock, Date actionDate, string description)
+        public int OriginalUnits { get; private set; }
+        public int NewUnits { get; private set; }
+        internal SplitConsolidation(Guid id, Stock stock, Date actionDate, string description, int originalUnits, int newUnits)
             : base(id, stock, CorporateActionType.SplitConsolidation, actionDate, description)
         {
+            OriginalUnits = originalUnits;
+            NewUnits = newUnits;
         }
 
         public override IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding)
