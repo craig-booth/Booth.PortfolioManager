@@ -8,19 +8,18 @@ using Booth.PortfolioManager.Domain.Stocks.Events;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
-
     public interface IStockPriceHistory
     {
         Guid Id { get; }
         Date EarliestDate { get; }
         Date LatestDate { get; }
         decimal GetPrice(Date date);
-        IEnumerable<KeyValuePair<Date, decimal>> GetPrices(DateRange dateRange);
+        IEnumerable<StockPrice> GetPrices(DateRange dateRange);
     }
 
     public class StockPriceHistory : TrackedEntity, IStockPriceHistory
     {
-        private SortedList<Date, decimal> _Prices { get; } = new SortedList<Date, decimal>();
+        private List<StockPrice> _Prices { get; } = new List<StockPrice>();
 
         public StockPriceHistory(Guid id)
             : base(id)
@@ -33,7 +32,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             get
             {
                 if (_Prices.Count > 0)
-                    return _Prices.First().Key;
+                    return _Prices[0].Date;
                 else
                     return Date.MinValue;
             }
@@ -44,7 +43,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             get
             {
                 if (_Prices.Count > 0)
-                    return _Prices.Last().Key;
+                    return _Prices[_Prices.Count -1].Date;
                 else
                     return Date.MinValue;
             }
@@ -52,30 +51,25 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public decimal GetPrice(Date date)
         {
-            var index = IndexOf(date);
+            var index = _Prices.BinarySearch(new StockPrice(date, 0.00m), new StockPriceComparer());
 
             if (index >= 0)
-                return _Prices.Values[index];
+                return _Prices[index].Price;
             else if (index == -1)
                 return 0.00m;
             else
-                return _Prices.Values[~index];
-
+                return _Prices[~index - 1].Price;
         }
 
-        public IEnumerable<KeyValuePair<Date, decimal>> GetPrices(DateRange dateRange)
+        public IEnumerable<StockPrice> GetPrices(DateRange dateRange)
         {
-            var first = IndexOf(dateRange.FromDate);
-            if (first == -1)
-                first = 0;
-            else if (first < 0)
+            var first = _Prices.BinarySearch(new StockPrice(dateRange.FromDate, 0.00m), new StockPriceComparer());
+            if (first < 0)
                 first = ~first;
 
-            var last = IndexOf(dateRange.ToDate);
-            if (last == -1)
-                last = 0;
-            else if (last < 0)
-                last = ~last;
+            var last = _Prices.BinarySearch(new StockPrice(dateRange.ToDate, 0.00m), new StockPriceComparer());
+            if (last < 0)
+                last = ~last - 1;
 
             return _Prices.Skip(first).Take(last - first + 1);
         }
@@ -110,37 +104,20 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         private void UpdatePrice(Date date, decimal price)
         {
-            if (_Prices.ContainsKey(date))
-                _Prices[date] = price;
+            var index = _Prices.BinarySearch(new StockPrice(date, 0.00m), new StockPriceComparer());
+
+            if (index >= 0)
+                _Prices[index] = new StockPrice(date, price);
             else
-                _Prices.Add(date, price);
+                _Prices.Insert(~index, new StockPrice(date, price));
         }
 
-        private int IndexOf(Date date)
+        private class StockPriceComparer : IComparer<StockPrice>
         {
-            if (_Prices.Keys.Count == 0)
-                return -1;
-
-            int begin = 0;
-            int end = _Prices.Keys.Count;
-            while (end > begin)
+            public int Compare(StockPrice x, StockPrice y)
             {
-                int index = (begin + end) / 2;
-                var el = _Prices.Keys[index];
-
-                var r = el.CompareTo(date);
-                if (r == 0)
-                    return index;
-                else if (r > 0)
-                    end = index;
-                else
-                    begin = index + 1;
+                return x.Date.CompareTo(y.Date);
             }
-
-            if (end == 0)
-                return -1;
-            else
-                return -end;
         }
     }
 }
