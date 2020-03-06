@@ -9,7 +9,15 @@ using Booth.EventStore;
 
 namespace Booth.PortfolioManager.Domain
 {
-    class EventList
+
+    public interface IEventList
+    {
+        void Add(Event @event);
+        bool EventsAvailable { get; }
+        IEnumerable<Event> Fetch();
+    }
+
+    class EventList : IEventList
     {
         private Queue<Event> _Events = new Queue<Event>();
 
@@ -23,7 +31,7 @@ namespace Booth.PortfolioManager.Domain
             get { return _Events.Count > 0; }
         }
         
-        public List<Event> Fetch()
+        public IEnumerable<Event> Fetch()
         {
             var eventsToReturn = new List<Event>();
 
@@ -32,6 +40,5 @@ namespace Booth.PortfolioManager.Domain
 
             return eventsToReturn;
         }
-
     }
 }

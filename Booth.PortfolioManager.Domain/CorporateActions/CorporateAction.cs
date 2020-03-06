@@ -22,22 +22,4 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver);
         bool HasBeenApplied(IPortfolioTransactionList transactions);
     }
-
-    public abstract class CorporateAction
-    {
-        public Guid Id { get; private set; }
-        public Stock Stock { get; private set; }
-        public Date Date { get; private set; }
-        public CorporateActionType Type { get; private set; }
-        public string Description { get; private set; }
-
-        internal CorporateAction(Guid id, Stock stock, CorporateActionType type, Date actionDate, string description)
-        {
-            Id = id;
-            Stock = stock;
-            Type = type;
-            Date = actionDate;
-            Description = description;
-        }
-    }
 }

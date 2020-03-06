@@ -11,14 +11,23 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class CapitalReturn : CorporateAction, ICorporateAction
+    public class CapitalReturn : ICorporateAction
     {
+        public Guid Id { get; private set; }
+        public Stock Stock { get; private set; }
+        public Date Date { get; private set; }
+        public CorporateActionType Type { get; private set; }
+        public string Description { get; private set; }
         public Date PaymentDate { get; private set; }
         public decimal Amount { get; private set; }
 
         internal CapitalReturn(Guid id, Stock stock, Date actionDate, string description, Date paymentDate, decimal amount)
-            : base(id, stock, CorporateActionType.CapitalReturn, actionDate, description)
         {
+            Id = id;
+            Stock = stock;
+            Date = actionDate;
+            Type = CorporateActionType.CapitalReturn;
+            Description = description;
             PaymentDate = paymentDate;
             Amount = amount;
         }

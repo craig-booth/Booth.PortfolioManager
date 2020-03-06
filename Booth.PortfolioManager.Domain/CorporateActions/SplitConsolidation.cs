@@ -11,13 +11,22 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class SplitConsolidation : CorporateAction
+    public class SplitConsolidation : ICorporateAction
     {
+        public Guid Id { get; private set; }
+        public Stock Stock { get; private set; }
+        public Date Date { get; private set; }
+        public CorporateActionType Type { get; private set; }
+        public string Description { get; private set; }
         public int OriginalUnits { get; private set; }
         public int NewUnits { get; private set; }
         internal SplitConsolidation(Guid id, Stock stock, Date actionDate, string description, int originalUnits, int newUnits)
-            : base(id, stock, CorporateActionType.SplitConsolidation, actionDate, description)
         {
+            Id = id;
+            Stock = stock;
+            Date = actionDate;
+            Type = CorporateActionType.SplitConsolidation;
+            Description = description;
             OriginalUnits = originalUnits;
             NewUnits = newUnits;
         }

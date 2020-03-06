@@ -11,8 +11,13 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class Transformation : CorporateAction, ICorporateAction
+    public class Transformation : ICorporateAction
     {
+        public Guid Id { get; private set; }
+        public Stock Stock { get; private set; }
+        public Date Date { get; private set; }
+        public CorporateActionType Type { get; private set; }
+        public string Description { get; private set; }
         public Date ImplementationDate { get; private set; }
         public decimal CashComponent { get; private set; }
         public bool RolloverRefliefApplies { get; private set; }
@@ -24,8 +29,12 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         }
 
         internal Transformation(Guid id, Stock stock, Date actionDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<ResultingStock> resultingStocks)
-            : base(id, stock, CorporateActionType.Transformation, actionDate, description)
         {
+            Id = id;
+            Stock = stock;
+            Date = actionDate;
+            Type = CorporateActionType.Transformation;
+            Description = description;
             ImplementationDate = implementationDate;
             CashComponent = cashComponent;
             RolloverRefliefApplies = rolloverReliefApplies;

@@ -11,16 +11,25 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class Dividend : CorporateAction, ICorporateAction
+    public class Dividend : ICorporateAction
     {
+        public Guid Id { get; private set; }
+        public Stock Stock { get; private set; }
+        public Date Date { get; private set; }
+        public CorporateActionType Type { get; private set; }
+        public string Description { get; private set; }
         public Date PaymentDate { get; private set; }
         public decimal DividendAmount { get; private set; }
         public decimal PercentFranked { get; private set; }
         public decimal DRPPrice { get; private set; }
 
         internal Dividend(Guid id, Stock stock, Date actionDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
-            : base(id, stock, CorporateActionType.Dividend, actionDate, description)
         {
+            Id = id;
+            Stock = stock;
+            Date = actionDate;
+            Type = CorporateActionType.Dividend;
+            Description = description;
             PaymentDate = paymentDate;
             DividendAmount = dividendAmount;
             PercentFranked = percentFranked;

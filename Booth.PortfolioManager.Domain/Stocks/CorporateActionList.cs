@@ -11,19 +11,22 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
+
     public interface ICorporateActionList : ITransactionList<ICorporateAction>
     {
         void AddCapitalReturn(Guid id, Date recordDate, string description, Date paymentDate, decimal amount);
         void AddDividend(Guid id, Date recordDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice);
         void AddTransformation(Guid id, Date recordDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<Transformation.ResultingStock> resultingStocks);
+        void AddSplitConsolidation(Guid id, Date recordDate, string description, int originalUnits, int newUnits);
+        ICompositeActionBuilder StartCompositeAction(Guid id, Date recordDate, string description);
     }
 
     public class CorporateActionList : TransactionList<ICorporateAction>, ICorporateActionList
     {
-        private EventList _Events;
+        private IEventList _Events;
         public Stock Stock { get; }
 
-        internal CorporateActionList(Stock stock, EventList eventList)
+        internal CorporateActionList(Stock stock, IEventList eventList)
         {
             Stock = stock;
             _Events = eventList;
@@ -87,5 +90,31 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
             Add(transformation);
         }
+
+        public void AddSplitConsolidation(Guid id, Date recordDate, string description, int originalUnits, int newUnits)
+        {
+
+        }
+
+        public void Apply(SplitConsolidationAddedEvent @event)
+        {
+
+        }
+
+        public ICompositeActionBuilder StartCompositeAction(Guid id, Date recordDate, string description)
+        {
+            if (description == "")
+                description = "Complex corporate action ";
+
+            var builder = new CompositeActionBuilder(Stock, id, recordDate, description, x => { Apply(x); PublishEvent(x); });
+
+            return builder;
+        }
+
+        public void Apply(CompositeActionAddedEvent @event)
+        {
+
+        }
     }
+
 }
