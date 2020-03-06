@@ -14,7 +14,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             else if (storedEntityType == "StapledSecurity")
                 return new StapledSecurity(id);
             else
-                throw new NotSupportedException();
+                throw new ArgumentException("Unknown entity type");
         }
     }
 }
