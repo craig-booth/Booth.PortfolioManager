@@ -19,11 +19,11 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         Stock Stock { get; }
         CorporateActionType Type { get; }
         string Description { get; }
-        IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding);
-        bool HasBeenApplied(ITransactionCollection transactions);
+        IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver);
+        bool HasBeenApplied(IPortfolioTransactionList transactions);
     }
 
-    public abstract class CorporateAction : ICorporateAction
+    public abstract class CorporateAction
     {
         public Guid Id { get; private set; }
         public Stock Stock { get; private set; }
@@ -39,8 +39,5 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             Date = actionDate;
             Description = description;
         }
-
-        public abstract IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding);
-        public abstract bool HasBeenApplied(ITransactionCollection transactions);
     }
 }

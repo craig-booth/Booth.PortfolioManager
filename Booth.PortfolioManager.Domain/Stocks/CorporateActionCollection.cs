@@ -11,9 +11,7 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
-    public class CorporateActionCollection :
-        TransactionList<CorporateAction>,
-        ITransactionList<CorporateAction>
+    public class CorporateActionCollection : TransactionList<ICorporateAction>, ITransactionList<ICorporateAction>
     {
         private EventList _Events;
         public Stock Stock { get; }
@@ -67,7 +65,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public void AddTransformation(Guid id, Date recordDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<Transformation.ResultingStock> resultingStocks)
         {
-            var eventResultingStocks = resultingStocks.Select(x => new TransformationAddedEvent.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBase, x.AquisitionDate));
+            var eventResultingStocks = resultingStocks.Select(x => new TransformationAddedEvent.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBasePercentage, x.AquisitionDate));
 
             var @event = new TransformationAddedEvent(Stock.Id, Stock.Version, id, recordDate, description, implementationDate, cashComponent, rolloverReliefApplies, eventResultingStocks);                
 
@@ -77,7 +75,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public void Apply(TransformationAddedEvent @event)
         {
-            var transformationResultingStocks = @event.ResultingStocks.Select(x => new Transformation.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBase, x.AquisitionDate));
+            var transformationResultingStocks = @event.ResultingStocks.Select(x => new Transformation.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBasePercentage, x.AquisitionDate));
             var transformation = new Transformation(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.ImplementationDate, @event.CashComponent, @event.RolloverRefliefApplies, transformationResultingStocks);
 
             Add(transformation);

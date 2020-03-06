@@ -15,7 +15,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             _Holdings = holdings;
         }
 
-        public void ApplyTransaction(Transaction transaction)
+        public void ApplyTransaction(IPortfolioTransaction transaction)
         {
             var unitCountAdjustment = transaction as UnitCountAdjustment;
             if (unitCountAdjustment == null) 

@@ -11,7 +11,7 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class Dividend : CorporateAction
+    public class Dividend : CorporateAction, ICorporateAction
     {
         public Date PaymentDate { get; private set; }
         public decimal DividendAmount { get; private set; }
@@ -27,9 +27,9 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             DRPPrice = drpPrice;
         }
 
-        public override IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding)
+        public IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
         {
-            var transactions = new List<Transaction>();
+            var transactions = new List<IPortfolioTransaction>();
 
             var holdingProperties = holding.Properties[Date];        
             if (holdingProperties.Units == 0)
@@ -107,13 +107,13 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
                         AquisitionDate = PaymentDate,
                         Comment = "DRP " + MathUtils.FormatCurrency(DRPPrice, false, true)
                     });
-                }
+                } 
             } 
 
             return transactions;
         }
 
-        public override bool HasBeenApplied(ITransactionCollection transactions)
+        public bool HasBeenApplied(IPortfolioTransactionList transactions)
         {
             return transactions.ForHolding(Stock.Id, PaymentDate).OfType<IncomeReceived>().Any();
         }

@@ -16,9 +16,9 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public decimal CostBaseChange { get; }
         public decimal AmountChange { get; }
 
-        public Transaction Transaction { get; }
+        public IPortfolioTransaction Transaction { get; }
 
-        public ParcelAudit(Date date, int unitCountChange, decimal costBaseChange, decimal amountChange, Transaction transaction)
+        public ParcelAudit(Date date, int unitCountChange, decimal costBaseChange, decimal amountChange, IPortfolioTransaction transaction)
         {
             Date = date;
             UnitCountChange = unitCountChange;

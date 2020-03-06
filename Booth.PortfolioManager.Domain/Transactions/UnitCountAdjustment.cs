@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Text;
 
 using Booth.Common;
+using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class UnitCountAdjustment : Transaction
+    class UnitCountAdjustment : IPortfolioTransaction
     {
+        public Guid Id { get; set; }
+        public Date Date { get; set; }
+        public Stock Stock { get; set; }
+        public string Comment { get; set; }
         public int OriginalUnits { get; set; }
         public int NewUnits { get; set; }
 
-        public override string Description
+        public string Description
         {
             get
             {

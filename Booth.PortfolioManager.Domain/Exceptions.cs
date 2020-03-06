@@ -11,9 +11,9 @@ namespace Booth.PortfolioManager.Domain
     }
     public abstract class TransactionException : Exception
     {
-        public Transaction Transacation { get; private set; }
+        public IPortfolioTransaction Transacation { get; private set; }
 
-        public TransactionException(Transaction transcation, string message)
+        public TransactionException(IPortfolioTransaction transcation, string message)
             : base(message)
         {
             Transacation = transcation;
@@ -38,7 +38,7 @@ namespace Booth.PortfolioManager.Domain
     */
     public class NoParcelsForTransaction : TransactionException 
     {
-        public NoParcelsForTransaction(Transaction transcation, string message)
+        public NoParcelsForTransaction(IPortfolioTransaction transcation, string message)
             : base(transcation, message)
         {
 
@@ -47,7 +47,7 @@ namespace Booth.PortfolioManager.Domain
     
     public class NotEnoughSharesForDisposal : TransactionException
     {
-        public NotEnoughSharesForDisposal(Transaction transcation, string message)
+        public NotEnoughSharesForDisposal(IPortfolioTransaction transcation, string message)
             : base(transcation, message)
         {
         }

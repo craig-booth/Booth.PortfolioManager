@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
     public interface IParcel : IReadOnlyParcel
     {          
-        void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, Transaction transaction);
+        void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, IPortfolioTransaction transaction);
     }
 
     public class Parcel : EffectiveEntity, IParcel, IReadOnlyParcel
@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         private List<ParcelAudit> _Audit = new List<ParcelAudit>();
         public IEnumerable<ParcelAudit> Audit => _Audit;
 
-        public Parcel(Guid id, Date fromDate, Date aquisitionDate, ParcelProperties properties, Transaction transaction)
+        public Parcel(Guid id, Date fromDate, Date aquisitionDate, ParcelProperties properties, IPortfolioTransaction transaction)
             : base(id)
         {
             Start(fromDate);
@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _Audit.Add(new ParcelAudit(aquisitionDate, properties.Units, properties.CostBase, properties.Amount, transaction));
         }
 
-        public void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, Transaction transaction)
+        public void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, IPortfolioTransaction transaction)
         {
             var parcelProperties = _Properties[date];
 

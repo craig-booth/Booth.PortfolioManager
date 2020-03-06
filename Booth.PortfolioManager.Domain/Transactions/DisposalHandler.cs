@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             _CgtEvents = cgtEvents;
         }
 
-        public void ApplyTransaction(Transaction transaction)
+        public void ApplyTransaction(IPortfolioTransaction transaction)
         {
             var disposal = transaction as Disposal;
             if (disposal == null)

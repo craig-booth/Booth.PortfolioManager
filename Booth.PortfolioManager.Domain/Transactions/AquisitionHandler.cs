@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             _CashAccount = cashAccount;
         }
 
-        public void ApplyTransaction(Transaction transaction)
+        public void ApplyTransaction(IPortfolioTransaction transaction)
         {
             var aquisition = transaction as Aquisition;
             if (aquisition == null)

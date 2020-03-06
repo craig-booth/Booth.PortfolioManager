@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using Booth.Common;
 
@@ -22,16 +22,33 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             NewUnits = newUnits;
         }
 
-        public override IEnumerable<Transaction> GetTransactionList(IReadOnlyHolding holding)
+        public IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
         {
-            var transactions = new List<Transaction>();
+            var transactions = new List<IPortfolioTransaction>();
+
+            var holdingProperties = holding.Properties[Date];
+            if (holdingProperties.Units == 0)
+                return transactions;
+
+            var dividendRules = Stock.DividendRules[Date];
+
+            var returnOfCapital = new UnitCountAdjustment()
+            {
+                Id = Guid.NewGuid(),
+                Date = Date,
+                Stock = Stock,
+                NewUnits = NewUnits,
+                OriginalUnits = OriginalUnits,
+                Comment = Description
+            };
+            transactions.Add(returnOfCapital);
 
             return transactions;
         }
 
-        public override bool HasBeenApplied(ITransactionCollection transactions)
+        public bool HasBeenApplied(IPortfolioTransactionList transactions)
         {
-            return false;
+            return transactions.ForHolding(Stock.Id, Date).OfType<UnitCountAdjustment>().Any();
         }
     }
 }

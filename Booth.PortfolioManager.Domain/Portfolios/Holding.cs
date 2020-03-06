@@ -25,8 +25,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
     {
         IEnumerable<IParcel> this[Date date] { get; }
 
-        IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, Transaction transaction);
-        void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, Transaction transaction);
+        IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, IPortfolioTransaction transaction);
+        void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, IPortfolioTransaction transaction);
 
         void AddDrpAccountAmount(Date date, decimal amount);
 
@@ -70,7 +70,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             return this[date];
         }
 
-        public IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, Transaction transaction)
+        public IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, IPortfolioTransaction transaction)
         {
             var parcel = new Parcel(Guid.NewGuid(), date, aquisitionDate, new ParcelProperties(units, amount, costBase), transaction);
 
@@ -83,7 +83,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             return parcel;
         }
 
-        public void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, Transaction transaction)
+        public void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, IPortfolioTransaction transaction)
         {        
             var parcelProperties = parcel.Properties[date];
 
