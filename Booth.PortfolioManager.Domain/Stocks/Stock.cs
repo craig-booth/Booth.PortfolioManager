@@ -24,18 +24,19 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public bool Trust { get; private set; }
 
-        protected EffectiveProperties<StockProperties> _Properties { get; } = new EffectiveProperties<StockProperties>();
+        protected EffectiveProperties<StockProperties> _Properties = new EffectiveProperties<StockProperties>();
         public IEffectiveProperties<StockProperties> Properties => _Properties;
 
-        protected EffectiveProperties<DividendRules> _DividendRules { get; } = new EffectiveProperties<DividendRules>();
+        protected EffectiveProperties<DividendRules> _DividendRules = new EffectiveProperties<DividendRules>();
         public IEffectiveProperties<DividendRules> DividendRules => _DividendRules;
 
-        public CorporateActionCollection CorporateActions { get; }
+        protected CorporateActionList _CorporateActions;
+        public ICorporateActionList CorporateActions => _CorporateActions;
 
         public Stock(Guid id)
             : base(id)
         {
-            CorporateActions = new CorporateActionCollection(this, this._Events);
+            _CorporateActions = new CorporateActionList(this, this._Events);
         }
 
         public override string ToString()
@@ -99,7 +100,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             Version++;
 
             dynamic dynamicEvent = @event;
-            CorporateActions.Apply(dynamicEvent);
+            _CorporateActions.Apply(dynamicEvent);
         }
 
         public decimal GetPrice(Date date)

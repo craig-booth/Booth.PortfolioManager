@@ -11,12 +11,19 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
-    public class CorporateActionCollection : TransactionList<ICorporateAction>, ITransactionList<ICorporateAction>
+    public interface ICorporateActionList : ITransactionList<ICorporateAction>
+    {
+        void AddCapitalReturn(Guid id, Date recordDate, string description, Date paymentDate, decimal amount);
+        void AddDividend(Guid id, Date recordDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice);
+        void AddTransformation(Guid id, Date recordDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<Transformation.ResultingStock> resultingStocks);
+    }
+
+    public class CorporateActionList : TransactionList<ICorporateAction>, ICorporateActionList
     {
         private EventList _Events;
         public Stock Stock { get; }
 
-        internal CorporateActionCollection(Stock stock, EventList eventList)
+        internal CorporateActionList(Stock stock, EventList eventList)
         {
             Stock = stock;
             _Events = eventList;
