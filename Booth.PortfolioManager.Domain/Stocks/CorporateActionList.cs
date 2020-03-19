@@ -37,6 +37,28 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _Events.Add(@event);
         }
 
+        public void Apply(CorporateActionAddedEvent @event)
+        {
+            var corporateAction = CorporateActionFromEvent(@event);
+
+            Add(corporateAction);
+        }
+        private ICorporateAction CorporateActionFromEvent(CorporateActionAddedEvent @event)
+        {
+            if (@event is CapitalReturnAddedEvent capitalReturnEvent)
+                return CorporateActionFromEvent(capitalReturnEvent);
+            else if (@event is DividendAddedEvent dividendEvent)
+                return CorporateActionFromEvent(dividendEvent);
+            else if (@event is SplitConsolidationAddedEvent splitEvent)
+                return CorporateActionFromEvent(splitEvent);
+            else if (@event is TransformationAddedEvent transformEvent)
+                return CorporateActionFromEvent(transformEvent);
+            else if (@event is CompositeActionAddedEvent compositeEvent)
+                return CorporateActionFromEvent(compositeEvent);
+            else
+                return null;
+        }
+        
         public void AddCapitalReturn(Guid id, Date recordDate, string description, Date paymentDate, decimal amount)
         {
             if (description == "")
@@ -48,11 +70,11 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        public void Apply(CapitalReturnAddedEvent @event)
+        private ICorporateAction CorporateActionFromEvent(CapitalReturnAddedEvent @event)
         {
             var capitalReturn = new CapitalReturn(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.PaymentDate, @event.Amount);
 
-            Add(capitalReturn);
+            return capitalReturn;
         }
 
         public void AddDividend(Guid id, Date recordDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
@@ -66,54 +88,72 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        public void Apply(DividendAddedEvent @event)
+        private ICorporateAction CorporateActionFromEvent(DividendAddedEvent @event)
         {
             var dividend = new Dividend(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.PaymentDate, @event.DividendAmount, @event.PercentFranked, @event.DRPPrice);
 
-            Add(dividend);
+            return dividend;
         }
 
         public void AddTransformation(Guid id, Date recordDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<Transformation.ResultingStock> resultingStocks)
         {
-            var eventResultingStocks = resultingStocks.Select(x => new TransformationAddedEvent.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBasePercentage, x.AquisitionDate));
+            if (description == "")
+                description = "Transformation";
 
+            var eventResultingStocks = resultingStocks.Select(x => new TransformationAddedEvent.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBasePercentage, x.AquisitionDate));
             var @event = new TransformationAddedEvent(Stock.Id, Stock.Version, id, recordDate, description, implementationDate, cashComponent, rolloverReliefApplies, eventResultingStocks);                
 
             Apply(@event);
             PublishEvent(@event);
         }
 
-        public void Apply(TransformationAddedEvent @event)
+        private ICorporateAction CorporateActionFromEvent(TransformationAddedEvent @event)
         {
             var transformationResultingStocks = @event.ResultingStocks.Select(x => new Transformation.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBasePercentage, x.AquisitionDate));
             var transformation = new Transformation(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.ImplementationDate, @event.CashComponent, @event.RolloverRefliefApplies, transformationResultingStocks);
 
-            Add(transformation);
+            return transformation;
         }
 
         public void AddSplitConsolidation(Guid id, Date recordDate, string description, int originalUnits, int newUnits)
         {
+            if (description == "")
+            {
+                if (originalUnits <= newUnits)
+                    description = String.Format("{0} for {1} Stock Split", originalUnits, newUnits);
+                else
+                    description = String.Format("{0} for {1} Stock Comsolication", originalUnits, newUnits);
+            }           
 
+            var @event = new SplitConsolidationAddedEvent(Stock.Id, Stock.Version, id, recordDate, description, originalUnits, newUnits);
+
+            Apply(@event);
+            PublishEvent(@event);
         }
 
-        public void Apply(SplitConsolidationAddedEvent @event)
+        private ICorporateAction CorporateActionFromEvent(SplitConsolidationAddedEvent @event)
         {
+            var splitConsolidation = new SplitConsolidation(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.OriginalUnits, @event.NewUnits);
 
+            return splitConsolidation;
         }
 
         public ICompositeActionBuilder StartCompositeAction(Guid id, Date recordDate, string description)
         {
             if (description == "")
-                description = "Complex corporate action ";
+                description = "Complex corporate action";
 
             var builder = new CompositeActionBuilder(Stock, id, recordDate, description, x => { Apply(x); PublishEvent(x); });
 
             return builder;
         }
 
-        public void Apply(CompositeActionAddedEvent @event)
+        private ICorporateAction CorporateActionFromEvent(CompositeActionAddedEvent @event)
         {
+            var childActions = @event.ChildActions.Select(x => CorporateActionFromEvent(x));
+            var compositeAction = new CompositeAction(@event.ActionId, Stock, @event.ActionDate, @event.Description, childActions);
 
+            return compositeAction; 
         }
     }
 

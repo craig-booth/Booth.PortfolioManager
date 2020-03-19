@@ -103,7 +103,7 @@ namespace Booth.PortfolioManager.Domain.Test
 
             Assert.That(entities, Is.Empty);
 
-            mockRepository.Verify();
+            mockRepository.Verify(); 
         }
 
         [TestCase]

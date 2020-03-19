@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
@@ -22,12 +22,12 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     {
         private CompositeActionAddedEvent _Event;
         private Action<CompositeActionAddedEvent> _Callback;
-        private IEventList _Events;
+        private IEventList _ChildEvents;
         private CorporateActionList _ChildActions;
         public CompositeActionBuilder(Stock stock, Guid id, Date recordDate, string description, Action<CompositeActionAddedEvent> callback)
         {
-            _Events = new EventList();
-            _ChildActions = new CorporateActionList(stock, _Events);
+            _ChildEvents = new EventList();
+            _ChildActions = new CorporateActionList(stock, _ChildEvents);
 
             _Event = new CompositeActionAddedEvent(stock.Id, stock.Version, id, recordDate, description);
             _Callback = callback;
@@ -35,36 +35,36 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
 
         public void Finish()
         {
-            if (_Callback != null)
-            {
-                _Callback(_Event);
-            }
+            var childActions = _ChildEvents.Fetch().Select(x => (CorporateActionAddedEvent)x);
+            _Event.ChildActions.AddRange(childActions);
+
+            _Callback?.Invoke(_Event);
         }
 
         public ICompositeActionBuilder AddCapitalReturn(string description, Date paymentDate, decimal amount)
         {
-            _ChildActions.AddCapitalReturn(_Event.ActionId, _Event.ActionDate, description, paymentDate, amount);
+            _ChildActions.AddCapitalReturn(Guid.NewGuid(), _Event.ActionDate, description, paymentDate, amount);
 
             return this;
         }
 
         public ICompositeActionBuilder AddDividend(string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
         {
-            _ChildActions.AddDividend(_Event.ActionId, _Event.ActionDate, description, paymentDate, dividendAmount, percentFranked, drpPrice);
+            _ChildActions.AddDividend(Guid.NewGuid(), _Event.ActionDate, description, paymentDate, dividendAmount, percentFranked, drpPrice);
 
             return this;
         }
 
         public ICompositeActionBuilder AddSplitConsolidation(string description, int originalUnits, int newUnits)
         {
-            _ChildActions.AddSplitConsolidation(_Event.ActionId, _Event.ActionDate, description, originalUnits, newUnits);
+            _ChildActions.AddSplitConsolidation(Guid.NewGuid(), _Event.ActionDate, description, originalUnits, newUnits);
 
             return this;
         }
 
         public ICompositeActionBuilder AddTransformation(string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<Transformation.ResultingStock> resultingStocks)
         {
-            _ChildActions.AddTransformation(_Event.ActionId, _Event.ActionDate, description, implementationDate, cashComponent, rolloverReliefApplies, resultingStocks);
+            _ChildActions.AddTransformation(Guid.NewGuid(), _Event.ActionDate, description, implementationDate, cashComponent, rolloverReliefApplies, resultingStocks);
 
             return this;
         }
