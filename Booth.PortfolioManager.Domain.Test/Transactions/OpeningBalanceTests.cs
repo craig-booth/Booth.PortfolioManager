@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void NoExistingHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new OpeningBalance()
             {
@@ -51,7 +51,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void ExistingHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new OpeningBalance()
             {

@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new CostBaseAdjustment()
             {
@@ -46,7 +46,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void SingleParcelOwned()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new CostBaseAdjustment()
             {
@@ -81,7 +81,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void MultipleParcelsOwned()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new CostBaseAdjustment()
             {

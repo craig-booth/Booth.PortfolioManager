@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new IncomeReceived()
             {
@@ -55,7 +55,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void NoSharesAtRecordDated()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new IncomeReceived()
             {
@@ -92,7 +92,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void DoNotCreateCashTransaction()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new IncomeReceived()
             {
@@ -134,7 +134,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void CreateCashTransaction()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new IncomeReceived()
             {
@@ -177,7 +177,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void OutstandingDrpBalance()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new IncomeReceived()
             {
@@ -220,7 +220,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
         public void TaxDeferredAmount()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var transaction = new IncomeReceived()
             {

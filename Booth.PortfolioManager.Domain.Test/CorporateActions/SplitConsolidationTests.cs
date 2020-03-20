@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var splitConsolidation = new SplitConsolidation(Guid.NewGuid(), stock, new Date(2020, 01, 01), "Test SplitConsolidation", 1, 2);
 
@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var splitConsolidation = new SplitConsolidation(Guid.NewGuid(), stock, new Date(2020, 01, 01), "Test SplitConsolidation", 1, 2);
 
@@ -77,7 +77,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var splitConsolidation = new SplitConsolidation(Guid.NewGuid(), stock, new Date(2020, 01, 01), "Test SplitConsolidation", 1, 2);
 
@@ -106,7 +106,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -129,7 +129,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
             stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DRPMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
@@ -170,7 +170,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
             stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DRPMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();

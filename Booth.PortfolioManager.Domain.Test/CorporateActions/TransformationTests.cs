@@ -22,7 +22,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var resultStocks = new Transformation.ResultingStock[] { };
             var transformation = new Transformation(Guid.NewGuid(), stock, new Date(2020, 01, 01), "Test Transformation", new Date(2020, 02, 01), 0.00m, true, resultStocks);
@@ -43,7 +43,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var resultStocks = new Transformation.ResultingStock[] { };
             var transformation = new Transformation(Guid.NewGuid(), stock, new Date(2020, 01, 01), "Test Transformation", new Date(2020, 02, 01), 10.00m, true, resultStocks);
@@ -80,7 +80,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var resultStocks = new Transformation.ResultingStock[] { };
             var transformation = new Transformation(Guid.NewGuid(), stock, new Date(2020, 01, 01), "Test Transformation", new Date(2020, 02, 01), 10.00m, true, resultStocks);
@@ -114,10 +114,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var resultStocks = new Transformation.ResultingStock[] {
                 new Transformation.ResultingStock(stock2.Id, 1, 1, 10.00m, new Date(2020, 02, 01))
@@ -140,10 +140,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var resultStocks = new Transformation.ResultingStock[] {
                 new Transformation.ResultingStock(stock2.Id, 1, 1, 10.00m, new Date(2020, 02, 01))
@@ -182,10 +182,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var resultStocks = new Transformation.ResultingStock[] {
                 new Transformation.ResultingStock(stock2.Id, 1, 1, 10.00m, new Date(2020, 02, 01))
@@ -218,10 +218,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -248,7 +248,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -272,7 +272,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -315,10 +315,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -392,10 +392,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -484,7 +484,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -508,7 +508,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -554,10 +554,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -619,10 +619,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);

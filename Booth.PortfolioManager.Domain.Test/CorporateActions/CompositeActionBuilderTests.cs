@@ -19,7 +19,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
         public void NoChildActions()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             CompositeActionAddedEvent @event = null;
             var id = Guid.NewGuid();
@@ -45,7 +45,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
         public void AddCapitalReturn()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             CompositeActionAddedEvent @event = null;
             var id = Guid.NewGuid();
@@ -85,7 +85,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
         public void AddDividend()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             CompositeActionAddedEvent @event = null;
             var id = Guid.NewGuid();
@@ -128,10 +128,10 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
         public void AddTransformation()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             CompositeActionAddedEvent @event = null;
             var id = Guid.NewGuid();
@@ -177,7 +177,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
         public void AddSplitConsolidation()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             CompositeActionAddedEvent @event = null;
             var id = Guid.NewGuid();
@@ -217,7 +217,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
         public void AddOneOfEachTypeOfChildAction()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             CompositeActionAddedEvent @event = null;
             var id = Guid.NewGuid();
@@ -254,7 +254,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
         public void AddMultipleOfTheSameTypeOfChildAction()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
             CompositeActionAddedEvent @event = null;
             var id = Guid.NewGuid();
