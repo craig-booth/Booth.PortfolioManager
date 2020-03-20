@@ -55,9 +55,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _Events.Add(@event);
         }
 
-        public void List(string asxCode, string name, bool trust, AssetCategory category)
+        public void List(string asxCode, string name, Date date, bool trust, AssetCategory category)
         {
-            var @event = new StockListedEvent(Id, Version, asxCode, name, EffectivePeriod.FromDate, category, trust);
+            var @event = new StockListedEvent(Id, Version, asxCode, name, date, category, trust);
             Apply(@event);
 
             PublishEvent(@event);
@@ -128,7 +128,10 @@ namespace Booth.PortfolioManager.Domain.Stocks
         }
 
         public void ChangeProperties(Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory)
-        {           
+        {
+            if (!IsEffectiveAt(changeDate))
+                throw new EffectiveDateException(String.Format("Stock not active at {0}", changeDate));
+
             var properties = Properties[changeDate];
 
             var @event = new StockPropertiesChangedEvent(Id, Version, changeDate, newAsxCode, newName, newAssetCategory);
@@ -139,6 +142,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public void ChangeDividendRules(Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DRPMethod newDrpMethod)
         {
+            if (!IsEffectiveAt(changeDate))
+                throw new EffectiveDateException(String.Format("Stock not active at {0}", changeDate));
+
             var properties = Properties[changeDate];
 
             var @event = new ChangeDividendRulesEvent(Id, Version, changeDate, companyTaxRate, newDividendRoundingRule, drpActive, newDrpMethod);

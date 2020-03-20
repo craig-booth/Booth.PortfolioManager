@@ -41,7 +41,9 @@ namespace Booth.PortfolioManager.Domain
 
         public T ClosestTo(Date date)
         {
-            if (date >= _Properties.First().EffectivePeriod.FromDate)
+            if (!_Properties.Any())
+                return default(T);
+            else if (date >= _Properties.First().EffectivePeriod.FromDate)
                 return _Properties.First().Properties;
             else if (date <= _Properties.Last().EffectivePeriod.ToDate)
                 return _Properties.Last().Properties;

@@ -28,9 +28,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
         }
 
 
-        public void List(string asxCode, string name, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
+        public void List(string asxCode, string name, Date date, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
         {
-            var @event = new StapledSecurityListedEvent(Id, Version, asxCode, name, EffectivePeriod.FromDate, category, childSecurities?.ToArray());
+            var @event = new StapledSecurityListedEvent(Id, Version, asxCode, name, date, category, childSecurities?.ToArray());
             Apply(@event);
 
             PublishEvent(@event);
