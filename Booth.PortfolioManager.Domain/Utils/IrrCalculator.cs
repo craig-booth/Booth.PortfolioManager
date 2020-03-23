@@ -6,49 +6,10 @@ using Booth.Common;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    public class CashFlows
-    {
-        private Dictionary<Date, decimal> _Amounts;
-
-        public CashFlows()
-        {
-            _Amounts = new Dictionary<Date, decimal>();
-        }
-
-        public void Add(Date date, decimal amount)
-        {
-            if (_Amounts.ContainsKey(date))
-                _Amounts[date] += amount;
-            else
-                _Amounts.Add(date, amount);
-        }
-
-        public void GetCashFlows(out double[] values, out double[] periods)
-        {
-            values = new double[_Amounts.Count];
-            periods = new double[_Amounts.Count];
-
-            int i = 0;
-            var startDate = _Amounts.First().Key;
-            foreach (var amount in _Amounts)
-            {
-                if (amount.Value != 0.00m)
-                {
-                    values[i] = (double)amount.Value;
-                    periods[i] = (amount.Key - startDate).Days / 365.0;
-                }
-
-                i++;
-            }
-
-        }
-
-    }
-
     public class IrrCalculator
     {
         private const double RequiredPrecision = 0.000001;
-        private const int MaximumIterations = 50;
+        private const int MaximumIterations = 100;
 
         private static double CalculateResult(double[] values, double[] period, double guess)
         {
@@ -105,22 +66,13 @@ namespace Booth.PortfolioManager.Domain.Utils
             return irr;
         }
 
-        public static double CalculateIrr(CashFlows cashFlows)
+        public static double CalculateIrr(Date startDate, decimal initialnvestment, Date finalDate, decimal finalValue, CashFlows cashFlows)
         {
-            return CalculateIrr(cashFlows, 0.10);
-        }
+            cashFlows.GetCashFlows(startDate, initialnvestment, finalDate, finalValue, out var values, out var periods);
 
-        public static double CalculateIrr(CashFlows cashFlows, double guess)
-        {
-            double[] values;
-            double[] periods;
+            var irr = Calculate(values, periods, 0.10);
 
-            cashFlows.GetCashFlows(out values, out periods);
-
-            if (periods.Count() <= 1)
-                return 0.00;
-
-            return Calculate(values, periods, guess);
+            return irr;
         }
 
     }

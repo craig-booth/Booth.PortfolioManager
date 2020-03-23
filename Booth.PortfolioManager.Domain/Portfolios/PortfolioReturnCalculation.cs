@@ -50,9 +50,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             var finalValue = finalHoldingsValue + finalCashBalance;
             cashFlows.Add(dateRange.ToDate, finalValue);
 
-            var irr = IrrCalculator.CalculateIrr(cashFlows);
+            //   var irr = IrrCalculator.CalculateIrr(cashFlows);
 
-            return (decimal)Math.Round(irr, 5);
+            //  return (decimal)Math.Round(irr, 5);
+
+            return 0.00m;
         }
     }
 }
