@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             var result = factory.Create(id, "Stock");
 
-            Assert.That(result, Is.InstanceOf<Stock>());
+            Assert.That(result, Is.TypeOf<Stock>());
             Assert.That(result.Id, Is.EqualTo(id));
         }
 
@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             var result = factory.Create(id, "StapledSecurity");
 
-            Assert.That(result, Is.InstanceOf<StapledSecurity>());
+            Assert.That(result, Is.TypeOf<StapledSecurity>());
             Assert.That(result.Id, Is.EqualTo(id));
         }
 

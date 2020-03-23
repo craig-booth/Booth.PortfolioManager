@@ -47,7 +47,7 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
                 new NonTradingDay(new Date(2020, 12, 25), "Christmas Day")
             };
 
-            Assert.That(() => tradingCalander.SetNonTradingDays(2019, nonTradingDays), Throws.InstanceOf(typeof(ArgumentException)));
+            Assert.That(() => tradingCalander.SetNonTradingDays(2019, nonTradingDays), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]

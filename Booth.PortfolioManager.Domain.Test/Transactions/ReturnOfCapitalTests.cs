@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.Exception.InstanceOf(typeof(NoParcelsForTransaction)));
+            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NoParcelsForTransaction)));
 
             mockRepository.Verify();
         }

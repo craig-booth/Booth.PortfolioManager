@@ -27,6 +27,11 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         }
 
+        [Obsolete]
+        public new void List(string asxCode, string name, Date date, bool trust, AssetCategory category)
+        {
+            throw new NotSupportedException();
+        }
 
         public void List(string asxCode, string name, Date date, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
         {
@@ -52,11 +57,12 @@ namespace Booth.PortfolioManager.Domain.Stocks
             var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DRPMethod.Round);
             _DividendRules.Change(@event.ListingDate, dividendRules);
 
-            var percentages = new decimal[_ChildSecurities.Length];
+            var percentages = new ApportionedCurrencyValue[_ChildSecurities.Length];
             for (var i = 0; i < @event.ChildSecurities.Length; i++)
-                percentages[i] = 1 / _ChildSecurities.Length;
+                percentages[i].Units = 1;
+            MathUtils.ApportionAmount(1.00m, percentages);
 
-            _RelativeNTAs.Change(@event.ListingDate, new RelativeNTA(percentages));
+            _RelativeNTAs.Change(@event.ListingDate, new RelativeNTA(percentages.Select(x => x.Amount).ToArray()));
         }
 
         public override void Apply(StockDelistedEvent @event)
@@ -68,14 +74,17 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public void SetRelativeNTAs(Date date, IEnumerable<decimal> percentages)
         {
+            if (!IsEffectiveAt(date))
+                throw new EffectiveDateException(String.Format("Stock not active at {0}", date));
+
             var percentagesArray = percentages.ToArray();
 
             if (percentagesArray.Length != _ChildSecurities.Length)
-                throw new Exception(String.Format("Expecting {0} values but received {1}", _ChildSecurities.Length, percentagesArray.Length));
+                throw new ArgumentException(String.Format("Expecting {0} values but received {1}", _ChildSecurities.Length, percentagesArray.Length));
 
             var total = percentagesArray.Sum();
             if (total != 1.00m)
-                throw new Exception(String.Format("Total percentage must add up to 1.00 but was {0}", total));
+                throw new ArgumentException(String.Format("Total percentage must add up to 1.00 but was {0}", total));
 
             var @event = new RelativeNTAChangedEvent(Id, Version, date, percentagesArray);
             Apply(@event);

@@ -44,7 +44,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.Exception.InstanceOf(typeof(NoParcelsForTransaction)));
+            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NoParcelsForTransaction)));
 
             mockRepository.Verify();
         }
@@ -86,7 +86,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.Exception.InstanceOf(typeof(NotEnoughSharesForDisposal)));
+            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
 
             mockRepository.Verify();
         }

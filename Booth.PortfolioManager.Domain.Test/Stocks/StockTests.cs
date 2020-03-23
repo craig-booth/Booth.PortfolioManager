@@ -106,7 +106,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
 
-            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty), Throws.Exception.InstanceOf(typeof(EffectiveDateException)));
+            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
         }
 
 
@@ -120,7 +120,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.List("ABC", "ABC Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
             stock.DeList(delistingDate);
 
-            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty), Throws.Exception.InstanceOf(typeof(EffectiveDateException)));
+            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
         }
 
         [TestCase]
@@ -142,6 +142,9 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
                 var propertyValues = stock.Properties.Values.ToList();
                 Assert.That(propertyValues.Last().EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
+
+                var dividendRules = stock.DividendRules.Values.ToList();
+                Assert.That(dividendRules.Last().EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
             });
         }
 
@@ -153,7 +156,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             var stock = new Stock(Guid.NewGuid());
 
-            Assert.That(() => stock.DeList(delistingDate), Throws.Exception.InstanceOf(typeof(EffectiveDateException)));
+            Assert.That(() => stock.DeList(delistingDate), Throws.TypeOf(typeof(EffectiveDateException)));
 
         }
 
@@ -284,7 +287,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
-            Assert.That(() => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty), Throws.Exception.InstanceOf(typeof(EffectiveDateException)));
+            Assert.That(() => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
         }
 
         [TestCase]
@@ -298,7 +301,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
             stock.DeList(delistingDate);
-            Assert.That(() => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty), Throws.Exception.InstanceOf(typeof(EffectiveDateException)));
+            Assert.That(() => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
         }
 
         [TestCase]
@@ -355,7 +358,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
-            Assert.That(() => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance), Throws.Exception.InstanceOf(typeof(EffectiveDateException)));
+            Assert.That(() => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance), Throws.TypeOf(typeof(EffectiveDateException)));
         }
 
         [TestCase]
@@ -369,7 +372,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
             stock.DeList(delistingDate);
-            Assert.That(() => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance), Throws.Exception.InstanceOf(typeof(EffectiveDateException)));
+            Assert.That(() => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance), Throws.TypeOf(typeof(EffectiveDateException)));
         }
 
         [TestCase]

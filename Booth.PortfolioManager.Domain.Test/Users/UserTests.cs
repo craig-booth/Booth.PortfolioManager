@@ -19,14 +19,14 @@ namespace Booth.PortfolioManager.Domain.Test.Users
         public void CreateUserWithBlankUserName()
         {
             var user = new User(Guid.NewGuid());
-            Assert.That(() => user.Create("", "secret"), Throws.InstanceOf(typeof(ArgumentException)));
+            Assert.That(() => user.Create("", "secret"), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]
         public void CreateUserWithBlankPassword()
         {
             var user = new User(Guid.NewGuid());
-            Assert.That(() => user.Create("john", ""), Throws.InstanceOf(typeof(ArgumentException)));
+            Assert.That(() => user.Create("john", ""), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]
@@ -74,7 +74,7 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             var user = new User(Guid.NewGuid());
             user.Create("john", "secret");
 
-            Assert.That(() => user.ChangeUserName(""), Throws.InstanceOf(typeof(ArgumentException)));
+            Assert.That(() => user.ChangeUserName(""), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]
@@ -110,7 +110,7 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             var user = new User(Guid.NewGuid());
             user.Create("john", "secret");
 
-            Assert.That(() => user.ChangePassword(""), Throws.InstanceOf(typeof(ArgumentException)));
+            Assert.That(() => user.ChangePassword(""), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]
@@ -119,7 +119,7 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             var user = new User(Guid.NewGuid());
             user.Create("john", "secret");
 
-            Assert.That(() => user.ChangePassword("secret"), Throws.InstanceOf(typeof(ArgumentException)));
+            Assert.That(() => user.ChangePassword("secret"), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]
