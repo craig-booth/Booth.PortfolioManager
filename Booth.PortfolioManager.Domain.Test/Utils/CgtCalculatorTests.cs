@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using NUnit.Framework;
 
@@ -11,6 +12,83 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 {
     class CgtCalculatorTests
     {
+        [TestCase]
+        public void SellOrderEmptyParcelList()
+        {
+            var parcels = new List<Parcel>();
+
+            var result = CgtCalculator.ParcelsInSellOrder(parcels, new CgtComparer(new Date(2010, 01, 01), CGTCalculationMethod.FirstInFirstOut)).Select(x => x.Id).ToArray();
+
+            Assert.That(result, Is.Empty);
+        }
+
+        [TestCase]
+        public void SellOrderOnlyIncludeParcelsPurchasedBeforeSaleDate()
+        {
+            var parcels = new List<Parcel>();
+
+            var parcel1 = new Parcel(Guid.NewGuid(), new Date(2000, 01, 01), new Date(2000, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel1);
+
+            var parcel2 = new Parcel(Guid.NewGuid(), new Date(2002, 01, 01), new Date(2002, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel2);
+
+            var parcel3 = new Parcel(Guid.NewGuid(), new Date(2001, 01, 01), new Date(2001, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel3);
+
+            var parcel4 = new Parcel(Guid.NewGuid(), new Date(2003, 01, 01), new Date(2003, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel4);
+
+            var result = CgtCalculator.ParcelsInSellOrder(parcels, new CgtComparer(new Date(2002, 06, 30), CGTCalculationMethod.FirstInFirstOut)).Select(x => x.Id).ToArray();
+
+            Assert.That(result, Is.EqualTo(new Guid[] { parcel1.Id, parcel3.Id, parcel2.Id }));
+        }
+
+        [TestCase]
+        public void SellOrderOnlyIncludeParcelsNotSold()
+        {
+            var parcels = new List<Parcel>();
+
+            var parcel1 = new Parcel(Guid.NewGuid(), new Date(2000, 01, 01), new Date(2000, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel1);
+
+            var parcel2 = new Parcel(Guid.NewGuid(), new Date(2002, 01, 01), new Date(2002, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel2);
+
+            var parcel3 = new Parcel(Guid.NewGuid(), new Date(2001, 01, 01), new Date(2001, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcel3.Change(new Date(2005, 01, 01), -100, -100.00m, -100.00m, null);
+            parcels.Add(parcel3);
+
+            var parcel4 = new Parcel(Guid.NewGuid(), new Date(2003, 01, 01), new Date(2003, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel4);
+
+            var result = CgtCalculator.ParcelsInSellOrder(parcels, new CgtComparer(new Date(2010, 01, 01), CGTCalculationMethod.FirstInFirstOut)).Select(x => x.Id).ToArray();
+
+            Assert.That(result, Is.EqualTo(new Guid[] { parcel1.Id, parcel2.Id, parcel4.Id }));
+        }
+
+        [TestCase]
+        public void SellOrderIncludeAll()
+        {
+            var parcels = new List<Parcel>();
+
+            var parcel1 = new Parcel(Guid.NewGuid(), new Date(2000, 01, 01), new Date(2000, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel1);
+
+            var parcel2 = new Parcel(Guid.NewGuid(), new Date(2002, 01, 01), new Date(2002, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel2);
+
+            var parcel3 = new Parcel(Guid.NewGuid(), new Date(2001, 01, 01), new Date(2001, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcel3.Change(new Date(2015, 01, 01), -50, -100.00m, -100.00m, null);
+            parcels.Add(parcel3);
+
+            var parcel4 = new Parcel(Guid.NewGuid(), new Date(2003, 01, 01), new Date(2003, 01, 01), new ParcelProperties(100, 100.00m, 100.00m), null);
+            parcels.Add(parcel4);
+
+            var result = CgtCalculator.ParcelsInSellOrder(parcels, new CgtComparer(new Date(2010, 01, 01), CGTCalculationMethod.FirstInFirstOut)).Select(x => x.Id).ToArray();
+
+            Assert.That(result, Is.EqualTo(new Guid[] { parcel1.Id, parcel3.Id, parcel2.Id, parcel4.Id }));
+        }
 
         [TestCaseSource(nameof(CgtMethodCalculationData))]
         public CGTMethod CgtMethodCalculation(Date aquisitionDate)
