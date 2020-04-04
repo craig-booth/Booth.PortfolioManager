@@ -8,12 +8,12 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    public class CgtComparer : Comparer<Parcel>
+    public class CgtComparerOld : Comparer<Parcel>
     {
         public Date DisposalDate { get; private set; }
         public CGTCalculationMethod Method { get; private set; }
 
-        public CgtComparer(Date disposalDate, CGTCalculationMethod method)
+        public CgtComparerOld(Date disposalDate, CGTCalculationMethod method)
         {
             DisposalDate = disposalDate;
             Method = method;
@@ -27,8 +27,8 @@ namespace Booth.PortfolioManager.Domain.Utils
                 return b.AquisitionDate.CompareTo(a.AquisitionDate);
             else
             {
-                var discountAppliesA = (CgtCalculator.CgtMethodForParcel(a.AquisitionDate, DisposalDate) == CGTMethod.Discount);
-                var discountAppliesB = (CgtCalculator.CgtMethodForParcel(b.AquisitionDate, DisposalDate) == CGTMethod.Discount);
+                var discountAppliesA = (CgtCalculatorOld.CgtMethodForParcel(a.AquisitionDate, DisposalDate) == CGTMethod.Discount);
+                var discountAppliesB = (CgtCalculatorOld.CgtMethodForParcel(b.AquisitionDate, DisposalDate) == CGTMethod.Discount);
 
                 if (discountAppliesA && !discountAppliesB)
                     return -1;

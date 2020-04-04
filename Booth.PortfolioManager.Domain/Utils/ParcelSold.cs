@@ -1,0 +1,30 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using Booth.Common;
+
+using Booth.PortfolioManager.Domain.Portfolios;
+
+namespace Booth.PortfolioManager.Domain.Utils
+{
+    public struct ParcelSold
+    {
+        public Parcel Parcel { get; private set; }
+        public int UnitsSold { get; private set; }
+        public decimal CostBase { get; private set; }
+        public decimal AmountReceived { get; private set; }
+        public decimal CapitalGain { get; private set; }
+        public decimal DiscountedGain { get; private set; }
+
+        public ParcelSold(Parcel parcel, int unitsSold, decimal costBase, decimal amountReceived, decimal capitalGain, decimal discountedGain)
+        {
+            Parcel = parcel;
+            UnitsSold = unitsSold;
+            CostBase = costBase;
+            AmountReceived = amountReceived;
+            CapitalGain = capitalGain;
+            DiscountedGain = discountedGain;
+        }
+    }
+}

@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.FirstInFirstOut })]
         public int FirstInFirstOut(Date disposalDate,  Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparer(disposalDate, CGTCalculationMethod.FirstInFirstOut);
+            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.FirstInFirstOut);
 
             return comparer.Compare(parcel1, parcel2);    
         }
@@ -24,7 +24,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.LastInFirstOut })]
         public int LastInFirstOut(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparer(disposalDate, CGTCalculationMethod.LastInFirstOut);
+            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.LastInFirstOut);
 
             return comparer.Compare(parcel1, parcel2);
         }
@@ -32,7 +32,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.MaximizeGain })]
         public int MaximizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparer(disposalDate, CGTCalculationMethod.MaximizeGain);
+            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.MaximizeGain);
 
             return comparer.Compare(parcel1, parcel2);
         }
@@ -40,7 +40,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.MinimizeGain })]
         public int MinimizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparer(disposalDate, CGTCalculationMethod.MinimizeGain);
+            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.MinimizeGain);
 
             return comparer.Compare(parcel1, parcel2);
         }

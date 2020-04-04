@@ -29,7 +29,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 
             // Determine which parcels to sell based on CGT method 
             decimal amountReceived = (disposal.Units * disposal.AveragePrice) - disposal.TransactionCosts;
-            var cgtCalculation = CgtCalculator.CalculateCapitalGain(holding.Parcels(disposal.Date), disposal.Date, disposal.Units, amountReceived, disposal.CGTMethod);
+            var cgtCalculation = CgtCalculatorOld.CalculateCapitalGain(holding.Parcels(disposal.Date), disposal.Date, disposal.Units, amountReceived, disposal.CGTMethod);
 
             if (cgtCalculation.UnitsSold == 0)
                 throw new NoParcelsForTransaction(disposal, "No parcels found for transaction");
@@ -61,7 +61,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             } 
             else
             {
-                foreach (ParcelSold parcelSold in cgtCalculation.ParcelsSold)
+                foreach (ParcelSoldOld parcelSold in cgtCalculation.ParcelsSold)
                 {
                     holding.DisposeOfParcel(parcelSold.Parcel, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, transaction);
 
