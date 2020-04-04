@@ -8,18 +8,28 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
+    public enum CGTCalculationMethod { MinimizeGain, MaximizeGain, FirstInFirstOut, LastInFirstOut }
+
     class CgtCalculator
     {
         public static Date IndexationEndDate = new Date(1999, 09, 21);
 
         public static CGTMethod CgtMethodForParcel(Date aquisitionDate, Date eventDate)
         {
-            return CgtCalculatorOld.CgtMethodForParcel(aquisitionDate, eventDate);
+            if (aquisitionDate < IndexationEndDate)
+                return CGTMethod.Indexation;
+            else if ((eventDate - aquisitionDate).Days > 365)
+                return CGTMethod.Discount;
+            else
+                return CGTMethod.Other;
         }
 
-        public static decimal DiscountedCgt(decimal cgtAmount, Date aquisitionDate, Date eventDate)
+        public static decimal DiscountedCgt(decimal cgtAmount, CGTMethod cgtMethod)
         {
-            return CgtCalculatorOld.DiscountedCgt(cgtAmount, aquisitionDate, eventDate);
+            if ((cgtMethod == CGTMethod.Discount) && (cgtAmount > 0.00m))
+                return (cgtAmount / 2).ToCurrency(RoundingRule.Round);
+            
+            return cgtAmount;
         }
 
         public static IComparer<Parcel> GetCgtComparer(Date disposalDate, CGTCalculationMethod method)
@@ -39,23 +49,45 @@ namespace Booth.PortfolioManager.Domain.Utils
             }
         }
 
-        public IEnumerable<ParcelSold> CalculateParcelCgt(IEnumerable<Parcel> parcelsOwned, Date disposalDate, int unitsSold, decimal amountReceived, IComparer<Parcel> cgtComparer)
+        public IEnumerable<ParcelSold> Calculate(IEnumerable<Parcel> parcelsOwned, Date disposalDate, int unitsSold, decimal amountReceived, IComparer<Parcel> cgtComparer)
         {
-            var calculation = CgtCalculatorOld.CalculateCapitalGain(parcelsOwned, disposalDate, unitsSold, amountReceived, cgtComparer, CGTCalculationMethod.FirstInFirstOut);
+            var parcelsInSellOrder = parcelsOwned.Where(x => x.EffectivePeriod.ToDate == Date.MaxValue).OrderBy(x => x, cgtComparer);
 
-            if (calculation.ParcelsSold.Sum(x => x.UnitsSold) < unitsSold)
-                throw new ArgumentException("Not enough units");
+            // Create list of parcels sold
+            foreach (var parcel in parcelsInSellOrder)
+            {
+                var parcelProperties = parcel.Properties[disposalDate];
 
-            return calculation.ParcelsSold.Select(x => new ParcelSold(x.Parcel, x.UnitsSold, x.CostBase, x.AmountReceived, x.CapitalGain, x.DiscountedGain));
+                var units = Math.Min(parcelProperties.Units, unitsSold);
+                var amount = ((units / (decimal)unitsSold) * amountReceived).ToCurrency(RoundingRule.Round);
+
+                yield return CalculateParcelCgt(parcel, disposalDate, units, amount);
+
+                unitsSold -= units;
+                amountReceived -= amount;
+
+                if (unitsSold == 0)
+                    yield break;
+            }
+
+            throw new ArgumentException("Not enough units");
         }
 
         public ParcelSold CalculateParcelCgt(Parcel parcel, Date disposalDate, int unitsSold, decimal amountReceived)
         {
-            var parcelSold = new ParcelSoldOld(parcel, unitsSold, disposalDate);
+            decimal costBase;
 
-            parcelSold.CalculateCapitalGain(amountReceived);
+            var properties = parcel.Properties[disposalDate];
+            if (unitsSold == properties.Units)
+                costBase = properties.CostBase;
+            else
+                costBase = (properties.CostBase * ((decimal)unitsSold / properties.Units)).ToCurrency(RoundingRule.Round);
 
-            return new ParcelSold(parcel, unitsSold, parcelSold.CostBase, amountReceived, parcelSold.CapitalGain, parcelSold.DiscountedGain);
+            var capitalGain = amountReceived - costBase;
+            var cgtMethod = CgtMethodForParcel(parcel.AquisitionDate, disposalDate);
+            var discountedGain = DiscountedCgt(capitalGain, cgtMethod);       
+
+            return new ParcelSold(parcel, unitsSold, costBase, amountReceived, capitalGain, cgtMethod, discountedGain);
         }
     }
 }

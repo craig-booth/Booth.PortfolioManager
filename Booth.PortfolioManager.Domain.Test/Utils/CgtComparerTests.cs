@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.FirstInFirstOut })]
         public int FirstInFirstOut(Date disposalDate,  Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.FirstInFirstOut);
+            var comparer = new FirstInFirstOutCgtComparer();
 
             return comparer.Compare(parcel1, parcel2);    
         }
@@ -24,7 +24,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.LastInFirstOut })]
         public int LastInFirstOut(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.LastInFirstOut);
+            var comparer = new LastInFirstOutCgtComparer();
 
             return comparer.Compare(parcel1, parcel2);
         }
@@ -32,7 +32,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.MaximizeGain })]
         public int MaximizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.MaximizeGain);
+            var comparer = new MaximizeGainCgtComparer(disposalDate);
 
             return comparer.Compare(parcel1, parcel2);
         }
@@ -40,7 +40,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.MinimizeGain })]
         public int MinimizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
-            var comparer = new CgtComparerOld(disposalDate, CGTCalculationMethod.MinimizeGain);
+            var comparer = new MinimizeGainCgtComparer(disposalDate);
 
             return comparer.Compare(parcel1, parcel2);
         }

@@ -44,14 +44,6 @@ namespace Booth.PortfolioManager.Domain
 
         }
     } 
-    
-    public class NotEnoughSharesForDisposal : TransactionException
-    {
-        public NotEnoughSharesForDisposal(Transaction transcation, string message)
-            : base(transcation, message)
-        {
-        }
-    } 
 
  /*   public class AttemptToModifyPreviousParcelVersion : Exception
     {

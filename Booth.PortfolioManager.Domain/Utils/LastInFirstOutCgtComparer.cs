@@ -10,15 +10,9 @@ namespace Booth.PortfolioManager.Domain.Utils
 {
     class LastInFirstOutCgtComparer : Comparer<Parcel>
     {
-        private CgtComparerOld _CgtComparer;
-        public LastInFirstOutCgtComparer()
-        {
-            _CgtComparer = new CgtComparerOld(Date.MinValue, CGTCalculationMethod.LastInFirstOut);
-        }
-
         public override int Compare(Parcel a, Parcel b)
         {
-            return _CgtComparer.Compare(a, b);
+            return b.AquisitionDate.CompareTo(a.AquisitionDate);
         }
     }
 }
