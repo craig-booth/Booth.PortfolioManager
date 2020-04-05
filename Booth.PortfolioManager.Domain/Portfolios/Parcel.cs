@@ -51,15 +51,19 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
             if (newUnits < 0)
                 throw new Exception("Not enough shares in parcel");
-            else if (newUnits == 0)
-            {              
+
+            ParcelProperties newParcelProperties;
+            if (newUnits == 0)
+            {
                 End(date);
+                newParcelProperties = new ParcelProperties(0, 0.00m, 0.00m);
             }
             else
-            {              
-                var newParcelProperties = new ParcelProperties(newUnits, newAmount, newCostBase);
-                _Properties.Change(date, newParcelProperties);
+            {
+                newParcelProperties = new ParcelProperties(newUnits, newAmount, newCostBase);
             }
+
+            _Properties.Change(date, newParcelProperties);
 
             _Audit.Add(new ParcelAudit(date, unitChange, costBaseChange, amountChange, transaction));
         }

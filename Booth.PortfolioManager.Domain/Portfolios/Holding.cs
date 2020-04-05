@@ -16,8 +16,9 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         IEffectiveProperties<HoldingProperties> Properties { get; }
         HoldingSettings Settings { get; }
         IReadOnlyCashAccount DrpAccount { get; }
+        IEnumerable<IReadOnlyParcel> Parcels();
         IEnumerable<IReadOnlyParcel> Parcels(Date date);
-
+        IEnumerable<IReadOnlyParcel> Parcels(DateRange dateRange);
         decimal Value(Date date);
     }
 
@@ -64,10 +65,19 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             }
         }
 
+        public IEnumerable<IReadOnlyParcel> Parcels()
+        {
+            return _Parcels.Values;
+        }
 
         public IEnumerable<IReadOnlyParcel> Parcels(Date date)
         {
             return this[date];
+        }
+
+        public IEnumerable<IReadOnlyParcel> Parcels(DateRange dateRange)
+        {
+            return _Parcels.Values.Where(x => x.IsEffectiveDuring(dateRange));
         }
 
         public IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, IPortfolioTransaction transaction)
@@ -86,28 +96,40 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, IPortfolioTransaction transaction)
         {        
             var parcelProperties = parcel.Properties[date];
-
             if (units > parcelProperties.Units)
-                throw new Exception("Not enough shares in parcel");
+                throw new NotEnoughSharesForDisposal(transaction, "Not enough shares in parcel");
 
-            var costBase = 0.00m;
+            if (!_Parcels.ContainsKey(parcel.Id))
+                throw new ArgumentException("Parcel is not part of this holding");
+
+            // Adjust Parcel
+            decimal costBaseChange;
+            decimal amountChange;
             if (units == parcelProperties.Units)
-                costBase = parcelProperties.CostBase;
+            {
+                amountChange = parcelProperties.Amount;
+                costBaseChange = parcelProperties.CostBase;
+            }
             else
-                costBase = (parcelProperties.CostBase * ((decimal)units / parcelProperties.Units)).ToCurrency(RoundingRule.Round);
+            {
+                amountChange = (parcelProperties.Amount * ((decimal)units / parcelProperties.Units)).ToCurrency(RoundingRule.Round);
+                costBaseChange = (parcelProperties.CostBase * ((decimal)units / parcelProperties.Units)).ToCurrency(RoundingRule.Round);
+            }
+            parcel.Change(date, -units, -amountChange, -costBaseChange, transaction);
 
-            parcel.Change(date, -units, -amount, -costBase, transaction);
-
-            var existingProperties = Properties[date];
-            if (units == existingProperties.Units)
+            // Adjust holding          
+            var holdingProperties = Properties[date];
+            HoldingProperties newProperties;
+            if (units == holdingProperties.Units)
             {
                 End(date);
+                newProperties = new HoldingProperties(0, 0.00m, 0.00m);
             }
             else
-            {                
-                var newProperties = new HoldingProperties(existingProperties.Units - units, existingProperties.Amount - amount, existingProperties.CostBase - costBase);
-                _Properties.Change(date, newProperties);
+            {
+                newProperties = new HoldingProperties(holdingProperties.Units - units, holdingProperties.Amount - amountChange, holdingProperties.CostBase - costBaseChange);
             }
+            _Properties.Change(date, newProperties);
         }
 
         public decimal Value(Date date)
