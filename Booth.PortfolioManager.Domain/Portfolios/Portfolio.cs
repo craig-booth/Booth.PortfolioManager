@@ -22,17 +22,17 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         private IStockResolver _StockResolver;
 
-        private HoldingCollection _Holdings = new HoldingCollection();
-        public IHoldingCollection Holdings => _Holdings;
+        private IHoldingCollection _Holdings = new HoldingCollection();
+        public IReadOnlyHoldingCollection Holdings => _Holdings;
 
-        private TransactionCollection _Transactions = new TransactionCollection();
-        public ITransactionCollection Transactions => _Transactions;
+        private PortfolioTransactionList _Transactions = new PortfolioTransactionList();
+        public IPortfolioTransactionList Transactions => _Transactions;
 
-        private CashAccount _CashAccount = new CashAccount();
-        public ICashAccount CashAccount => _CashAccount;
+        private ICashAccount _CashAccount = new CashAccount();
+        public IReadOnlyCashAccount CashAccount => _CashAccount;
 
         private CgtEventCollection _CgtEvents = new CgtEventCollection();
-        public ICgtEventCollection CgtEvents => _CgtEvents;
+        public ITransactionList<CgtEvent> CgtEvents => _CgtEvents;
 
         public Date StartDate
         {
@@ -85,9 +85,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         {
             Version++;
 
-            var holding = _Holdings.Get(@event.Holding);
-            if (holding != null)
-                holding.ChangeDrpParticipation(@event.ParticipateInDrp);
+            var holding = _Holdings[@event.Holding];
+            holding.ChangeDrpParticipation(@event.ParticipateInDrp);
         }
 
         public void MakeCashTransaction(Date transactionDate, BankAccountTransactionType type, decimal amount, string comment, Guid transactionId)
@@ -105,7 +104,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public void Apply(CashTransactionOccurredEvent @event)
         {
             var cashTransaction = new CashTransaction();
-            MapFieldsFromEvent(cashTransaction, @event);
+            cashTransaction.Id = @event.TransactionId;
+            cashTransaction.Date = @event.Date;
+            cashTransaction.Stock = _StockResolver.GetStock(@event.Stock);
+            cashTransaction.Comment = @event.Comment;
             cashTransaction.CashTransactionType = @event.CashTransactionType;
             cashTransaction.Amount = @event.Amount;
 
@@ -131,7 +133,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public void Apply(AquisitionOccurredEvent @event)
         {
             var aquisition = new Aquisition();
-            MapFieldsFromEvent(aquisition, @event);
+            aquisition.Id = @event.TransactionId;
+            aquisition.Date = @event.Date;
+            aquisition.Stock = _StockResolver.GetStock(@event.Stock);
+            aquisition.Comment = @event.Comment;
             aquisition.Units = @event.Units;
             aquisition.AveragePrice = @event.AveragePrice;
             aquisition.TransactionCosts = @event.TransactionCosts;
@@ -160,7 +165,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public void Apply(DisposalOccurredEvent @event)
         {
             var disposal = new Disposal();
-            MapFieldsFromEvent(disposal, @event);
+            disposal.Id = @event.TransactionId;
+            disposal.Date = @event.Date;
+            disposal.Stock = _StockResolver.GetStock(@event.Stock);
+            disposal.Comment = @event.Comment;
             disposal.Units = @event.Units;
             disposal.AveragePrice = @event.AveragePrice;
             disposal.TransactionCosts = @event.TransactionCosts;
@@ -192,7 +200,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public void Apply(IncomeOccurredEvent @event)
         {
             var incomeReceived = new IncomeReceived();
-            MapFieldsFromEvent(incomeReceived, @event);
+            incomeReceived.Id = @event.TransactionId;
+            incomeReceived.Date = @event.Date;
+            incomeReceived.Stock = _StockResolver.GetStock(@event.Stock);
+            incomeReceived.Comment = @event.Comment;
             incomeReceived.RecordDate = @event.RecordDate;
             incomeReceived.FrankedAmount = @event.FrankedAmount;
             incomeReceived.UnfrankedAmount = @event.UnfrankedAmount;
@@ -223,7 +234,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public void Apply(OpeningBalanceOccurredEvent @event)
         {
             var openingBalance = new OpeningBalance();
-            MapFieldsFromEvent(openingBalance, @event);
+            openingBalance.Id = @event.TransactionId;
+            openingBalance.Date = @event.Date;
+            openingBalance.Stock = _StockResolver.GetStock(@event.Stock);
+            openingBalance.Comment = @event.Comment;
             openingBalance.AquisitionDate = @event.AquisitionDate;
             openingBalance.Units = @event.Units;
             openingBalance.CostBase = @event.CostBase;
@@ -243,12 +257,14 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         }
 
-        private void MapFieldsFromEvent(Transaction transaction, TransactionOccurredEvent @event)
+        public void AdjustUnitCount(Date date, Stock stock, int oldCount, int NewCount, string comment, Guid transactionId)
         {
-            transaction.Id = @event.TransactionId;
-            transaction.Date = @event.Date;
-            transaction.Stock = _StockResolver.GetStock(@event.Stock);
-            transaction.Comment = @event.Comment;
+
+        }
+
+        public void Apply(UnitCountAdjustmentOccurredEvent @event)
+        {
+
         }
     }
 }

@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Text;
 
 using Booth.Common;
+using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    public class IncomeReceived : Transaction
+    public class IncomeReceived : IPortfolioTransaction
     {
+        public Guid Id { get; set; }
+        public Date Date { get; set; }
+        public Stock Stock { get; set; }
+        public string Comment { get; set; }
         public Date RecordDate { get; set; }
         public decimal FrankedAmount { get; set; }
         public decimal UnfrankedAmount { get; set; }
@@ -17,7 +22,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
         public bool CreateCashTransaction { get; set; }
         public decimal DRPCashBalance { get; set; }
 
-        public override string Description
+        public string Description
         {
             get
             {

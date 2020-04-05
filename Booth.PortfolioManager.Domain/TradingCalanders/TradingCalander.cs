@@ -37,14 +37,13 @@ namespace Booth.PortfolioManager.Domain.TradingCalanders
             // Check that each day is in the correct year
             var invalidDate = nonTradingDays.FirstOrDefault(x => x.Date.Year != year);
             if (invalidDate != null)
-                throw new Exception(String.Format("Date {0} is not in calander year {1}", invalidDate, year));
+                throw new ArgumentException(String.Format("Date {0} is not in calander year {1}", invalidDate, year));
 
             var @event = new NonTradingDaysSetEvent(Id, Version, year, nonTradingDays);
             Apply(@event);
 
             PublishEvent(@event);
         }
-
         public void Apply(NonTradingDaysSetEvent @event)
         {
             Version++;

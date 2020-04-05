@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Text;
 
 using Booth.Common;
+using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
     public enum BankAccountTransactionType { Deposit, Withdrawl, Transfer, Fee, Interest }
 
-    public class CashTransaction :Transaction
+    public class CashTransaction : IPortfolioTransaction
     {
+        public Guid Id { get; set; }
+        public Date Date { get; set; }
+        public Stock Stock { get; set; }
+        public string Comment { get; set; }
         public BankAccountTransactionType CashTransactionType { get; set; }
         public decimal Amount { get; set; }
-
-        public override string Description
+        public string Description
         {
             get
             {

@@ -11,7 +11,7 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class Dividend : CorporateAction
+    public class Dividend : CorporateAction, ICorporateAction
     {
         public Date PaymentDate { get; private set; }
         public decimal DividendAmount { get; private set; }
@@ -27,9 +27,9 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             DRPPrice = drpPrice;
         }
 
-        public override IEnumerable<Transaction> GetTransactionList(Holding holding)
+        public IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
         {
-            var transactions = new List<Transaction>();
+            var transactions = new List<IPortfolioTransaction>();
 
             var holdingProperties = holding.Properties[Date];        
             if (holdingProperties.Units == 0)
@@ -37,10 +37,12 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
 
             var dividendRules = Stock.DividendRules[Date];
 
-            var amountPaid = (holdingProperties.Units * DividendAmount).ToCurrency(dividendRules.DividendRoundingRule);
-            var franked = (amountPaid * PercentFranked).ToCurrency(dividendRules.DividendRoundingRule);
-            var unFranked = (amountPaid * (1 - PercentFranked)).ToCurrency(dividendRules.DividendRoundingRule);
-            var frankingCredits = (((amountPaid / (1 - dividendRules.CompanyTaxRate)) - amountPaid) * PercentFranked).ToCurrency(dividendRules.DividendRoundingRule);
+            var totalAmount = holdingProperties.Units * DividendAmount;
+
+            var amountPaid = totalAmount.ToCurrency(dividendRules.DividendRoundingRule);
+            var franked = (totalAmount * PercentFranked).ToCurrency(dividendRules.DividendRoundingRule);
+            var unFranked = (totalAmount * (1 - PercentFranked)).ToCurrency(dividendRules.DividendRoundingRule);
+            var frankingCredits = (((totalAmount / (1 - dividendRules.CompanyTaxRate)) - totalAmount) * PercentFranked).ToCurrency(dividendRules.DividendRoundingRule);
             
             var incomeReceived = new IncomeReceived()
             {
@@ -105,15 +107,15 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
                         AquisitionDate = PaymentDate,
                         Comment = "DRP " + MathUtils.FormatCurrency(DRPPrice, false, true)
                     });
-                }
+                } 
             } 
 
             return transactions;
         }
 
-        public override bool HasBeenApplied(ITransactionCollection transactions)
+        public bool HasBeenApplied(IPortfolioTransactionList transactions)
         {
-            return transactions.ForHolding(Stock.Id, new DateRange(PaymentDate, PaymentDate)).OfType<IncomeReceived>().Any();
+            return transactions.ForHolding(Stock.Id, PaymentDate).OfType<IncomeReceived>().Any();
         }
     }
 }

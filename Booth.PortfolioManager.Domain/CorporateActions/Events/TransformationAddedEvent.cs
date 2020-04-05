@@ -29,15 +29,15 @@ namespace Booth.PortfolioManager.Domain.CorporateActions.Events
             public Guid Stock { get; set; }
             public int OriginalUnits { get; set; }
             public int NewUnits { get; set; }
-            public decimal CostBase { get; set; }
+            public decimal CostBasePercentage { get; set; }
             public Date AquisitionDate { get; set; }
 
-            public ResultingStock(Guid stock, int originalUnits, int newUnits, decimal costBase, Date aquisitionDate)
+            public ResultingStock(Guid stock, int originalUnits, int newUnits, decimal costBasePercentage, Date aquisitionDate)
             {
                 Stock = stock;
                 OriginalUnits = originalUnits;
                 NewUnits = newUnits;
-                CostBase = costBase;
+                CostBasePercentage = costBasePercentage;
                 AquisitionDate = aquisitionDate;
             }
         }

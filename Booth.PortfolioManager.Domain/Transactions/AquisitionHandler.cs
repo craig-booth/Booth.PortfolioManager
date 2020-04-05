@@ -8,20 +8,22 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public class AquisitionHandler : ITransactionHandler
     {
-        private HoldingCollection _Holdings;
-        private CashAccount _CashAccount;
+        private IHoldingCollection _Holdings;
+        private ICashAccount _CashAccount;
 
-        public AquisitionHandler(HoldingCollection holdings, CashAccount cashAccount)
+        public AquisitionHandler(IHoldingCollection holdings, ICashAccount cashAccount)
         {
             _Holdings = holdings;
             _CashAccount = cashAccount;
         }
 
-        public void ApplyTransaction(Transaction transaction)
+        public void ApplyTransaction(IPortfolioTransaction transaction)
         {
             var aquisition = transaction as Aquisition;
+            if (aquisition == null)
+                throw new ArgumentException("Expected transaction to be an Aquisition");
 
-            var holding = _Holdings.Get(aquisition.Stock.Id);
+            var holding = _Holdings[aquisition.Stock.Id];
             if (holding == null)
             {
                 holding = _Holdings.Add(aquisition.Stock, aquisition.Date);
@@ -40,7 +42,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 
                 if (aquisition.TransactionCosts > 0.00m)
                     _CashAccount.FeeDeducted(aquisition.Date, aquisition.TransactionCosts, String.Format("Brokerage for purchase of {0}", asxCode));
-            }
+            }  
         }
 
 

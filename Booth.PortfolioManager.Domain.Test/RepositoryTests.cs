@@ -15,42 +15,51 @@ namespace Booth.PortfolioManager.Domain.Test
 
         [TestCase]
         public void GetWithMatchingId()
-        {
+        {          
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var id = Guid.NewGuid();
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.Get(id)).Returns(new StoredEntity() { EntityId = id, Type = "" });
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.Get(id)).Returns(new StoredEntity() { EntityId = id, Type = "" });
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(entityFactory).Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
-
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
             
             var entity = repository.Get(id);
 
             Assert.That(entity.Id, Is.EqualTo(id));
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void GetWithoutMatchingId()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var id = Guid.NewGuid();
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.Get(id)).Returns<StoredEntity>(null);
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.Get(id)).Returns<StoredEntity>(null);
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(entityFactory).Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entity = repository.Get(id);
 
             Assert.That(entity, Is.Null);
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void GetAll()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
             var id3 = Guid.NewGuid();
@@ -62,38 +71,46 @@ namespace Booth.PortfolioManager.Domain.Test
                 new StoredEntity() { EntityId = id3, Type = "" }
             };
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.GetAll()).Returns(storedEntities);
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.GetAll()).Returns(storedEntities);
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(entityFactory).Setup(x => x.Create(id1, "")).Returns(new TrackedEntityTestClass(id1));
-            Mock.Get(entityFactory).Setup(x => x.Create(id2, "")).Returns(new TrackedEntityTestClass(id2));
-            Mock.Get(entityFactory).Setup(x => x.Create(id3, "")).Returns(new TrackedEntityTestClass(id3));
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            entityFactory.Setup(x => x.Create(id1, "")).Returns(new TrackedEntityTestClass(id1));
+            entityFactory.Setup(x => x.Create(id2, "")).Returns(new TrackedEntityTestClass(id2));
+            entityFactory.Setup(x => x.Create(id3, "")).Returns(new TrackedEntityTestClass(id3));
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
 
             var entities = repository.All().Select(x => x.Id).ToList();
             
             Assert.That(entities, Is.EqualTo( new Guid[] { id1, id2, id3 }));
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void GetAllReturningEmptyList()
         {
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.GetAll()).Returns(new StoredEntity[] { });
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.GetAll()).Returns(new StoredEntity[] { });
+
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entities = repository.All();
 
             Assert.That(entities, Is.Empty);
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void AddEntity()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var entityId = Guid.NewGuid();
             var events = new Event[]
             {
@@ -102,21 +119,23 @@ namespace Booth.PortfolioManager.Domain.Test
             var trackedEntity = new TrackedEntityTestClass(entityId);
             trackedEntity.AddEvent(events[0]);
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.Add(entityId, "TrackedEntityTestClass", events));
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.Add(entityId, "TrackedEntityTestClass", events));
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
 
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             repository.Add(trackedEntity);
 
-            Mock.VerifyAll();
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void AddEntityWithProperties()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var entityId = Guid.NewGuid();
             var events = new Event[]
             {
@@ -126,21 +145,23 @@ namespace Booth.PortfolioManager.Domain.Test
             trackedEntity.Properties.Add("Name1", "Value1");
             trackedEntity.AddEvent(events[0]);
   
-            var eventStream = Mock.Of<IEventStream<TrackedEntityWithPropertiesTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.Add(entityId, "TrackedEntityWithPropertiesTestClass", trackedEntity.Properties, events));
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityWithPropertiesTestClass>>();
+            eventStream.Setup(x => x.Add(entityId, "TrackedEntityWithPropertiesTestClass", trackedEntity.Properties, events));
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityWithPropertiesTestClass>>(MockBehavior.Strict);
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityWithPropertiesTestClass>>();
 
-            var repository = new Repository<TrackedEntityWithPropertiesTestClass>(eventStream, entityFactory);
+            var repository = new Repository<TrackedEntityWithPropertiesTestClass>(eventStream.Object, entityFactory.Object);
 
             repository.Add(trackedEntity);
 
-            Mock.VerifyAll();
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void UpdateExistingEntity()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var entityId = Guid.NewGuid();
             var events = new Event[]
             {
@@ -149,78 +170,89 @@ namespace Booth.PortfolioManager.Domain.Test
             var trackedEntity = new TrackedEntityTestClass(entityId);
             trackedEntity.AddEvent(events[0]);
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.AppendEvents(entityId, events));
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.AppendEvents(entityId, events));
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
 
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             repository.Update(trackedEntity);
 
-            Mock.VerifyAll();
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void FindFirstOnlyMatchingEntity()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var id = Guid.NewGuid();
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.FindFirst("Property", "Value")).Returns(new StoredEntity() { EntityId = id, Type = "" });
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.FindFirst("Property", "Value")).Returns(new StoredEntity() { EntityId = id, Type = "" });
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(entityFactory).Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
 
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entity = repository.FindFirst("Property", "Value");
 
             Assert.That(entity.Id, Is.EqualTo(id));
-            Mock.VerifyAll();
+
+            mockRepository.Verify();
         }
 
 
         [TestCase]
         public void FindFirstNoMatchingEntities()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var id = Guid.NewGuid();
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.FindFirst("Property", "Value")).Returns<StoredEntity>(null);
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.FindFirst("Property", "Value")).Returns<StoredEntity>(null);
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
 
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entity = repository.FindFirst("Property", "Value");
 
             Assert.That(entity, Is.Null);
-            Mock.VerifyAll();
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void FindSingleMatchingEntity()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var id = Guid.NewGuid();
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.Find("Property", "Value")).Returns(new StoredEntity[] { new StoredEntity() { EntityId = id, Type = "" } });
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.Find("Property", "Value")).Returns(new StoredEntity[] { new StoredEntity() { EntityId = id, Type = "" } });
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(entityFactory).Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
 
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entities = repository.Find("Property", "Value");
 
             Assert.That(entities.Count(), Is.EqualTo(1));
-            Mock.VerifyAll();
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void FindMultipleMatchingEntities()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var id1 = Guid.NewGuid();
             var id2 = Guid.NewGuid();
             var storedEntities = new StoredEntity[]
@@ -229,35 +261,39 @@ namespace Booth.PortfolioManager.Domain.Test
                 new StoredEntity() { EntityId = id2, Type = "" }
             };
 
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.Find("Property", "Value")).Returns(storedEntities);
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.Find("Property", "Value")).Returns(storedEntities);
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(entityFactory).Setup(x => x.Create(id1, "")).Returns(new TrackedEntityTestClass(id1));
-            Mock.Get(entityFactory).Setup(x => x.Create(id2, "")).Returns(new TrackedEntityTestClass(id2));
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            entityFactory.Setup(x => x.Create(id1, "")).Returns(new TrackedEntityTestClass(id1));
+            entityFactory.Setup(x => x.Create(id2, "")).Returns(new TrackedEntityTestClass(id2));
 
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entity = repository.Find("Property", "Value");
 
             Assert.That(entity.Count(), Is.EqualTo(2));
-            Mock.VerifyAll();
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void FindNoMatchingEntities()
         {
-            var eventStream = Mock.Of<IEventStream<TrackedEntityTestClass>>(MockBehavior.Strict);
-            Mock.Get(eventStream).Setup(x => x.Find("Property", "Value")).Returns(new StoredEntity[] { });
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var entityFactory = Mock.Of<IEntityFactory<TrackedEntityTestClass>>(MockBehavior.Strict);
+            var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
+            eventStream.Setup(x => x.Find("Property", "Value")).Returns(new StoredEntity[] { });
 
-            var repository = new Repository<TrackedEntityTestClass>(eventStream, entityFactory);
+            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+
+            var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entities = repository.Find("Property", "Value");
 
             Assert.That(entities, Is.Empty);
-            Mock.VerifyAll();
+
+            mockRepository.Verify();
         }
     }
 }

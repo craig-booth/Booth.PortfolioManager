@@ -9,48 +9,64 @@ using Booth.PortfolioManager.Domain.Stocks;
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
 
-    public interface IHoldingCollection
+    public interface IReadOnlyHoldingCollection
     {
-        Holding Get(Guid stockId);
-
-        IEnumerable<Holding> All();
-        IEnumerable<Holding> All(Date date);
-        IEnumerable<Holding> All(DateRange dateRange);
-        IEnumerable<Holding> Find(Date date, Func<HoldingProperties, bool> predicate);
-        IEnumerable<Holding> Find(DateRange dateRange, Func<HoldingProperties, bool> predicate);
+        IReadOnlyHolding Get(Guid stockId);
+        IEnumerable<IReadOnlyHolding> All();
+        IEnumerable<IReadOnlyHolding> All(Date date);
+        IEnumerable<IReadOnlyHolding> All(DateRange dateRange);
+        IEnumerable<IReadOnlyHolding> Find(Date date, Func<HoldingProperties, bool> predicate);
+        IEnumerable<IReadOnlyHolding> Find(DateRange dateRange, Func<HoldingProperties, bool> predicate);
     }
 
-    public class HoldingCollection : IHoldingCollection
+    public interface IHoldingCollection : IReadOnlyHoldingCollection
+    {
+        IHolding this[Guid stockId] { get; }
+
+        IHolding Add(Stock stock, Date fromDate);
+    }
+
+    public class HoldingCollection : IHoldingCollection, IReadOnlyHoldingCollection
     {
         private Dictionary<Guid, Holding> _Holdings = new Dictionary<Guid, Holding>();
 
+        public IHolding this[Guid stockId]
+        {
+            get
+            {
+                if (_Holdings.ContainsKey(stockId))
+                    return _Holdings[stockId];
+                else
+                    return null;
+            }
+        }
 
-        public IEnumerable<Holding> All()
+        public IEnumerable<IReadOnlyHolding> All()
         {
             return _Holdings.Values;
         }
 
-        public IEnumerable<Holding> All(Date date)
+        public IEnumerable<IReadOnlyHolding> All(Date date)
         {
             return _Holdings.Values.Where(x => x.IsEffectiveAt(date));
         }
 
-        public IEnumerable<Holding> All(DateRange dateRange)
+        public IEnumerable<IReadOnlyHolding> All(DateRange dateRange)
         {
             return _Holdings.Values.Where(x => x.IsEffectiveDuring(dateRange));
         }
 
-        public IEnumerable<Holding> Find(Date date, Func<HoldingProperties, bool> predicate)
+        public IEnumerable<IReadOnlyHolding> Find(Date date, Func<HoldingProperties, bool> predicate)
         {
             return _Holdings.Values.Where(x => x.IsEffectiveAt(date) && x.Properties.Matches(predicate));
         }
 
-        public IEnumerable<Holding> Find(DateRange dateRange, Func<HoldingProperties, bool> predicate)
+        public IEnumerable<IReadOnlyHolding> Find(DateRange dateRange, Func<HoldingProperties, bool> predicate)
         {
             return _Holdings.Values.Where(x => x.IsEffectiveDuring(dateRange) && x.Properties.Matches(predicate));
         }
 
-        public Holding Get(Guid stockId)
+        public IReadOnlyHolding Get(Guid stockId)
         {
             if (_Holdings.ContainsKey(stockId))
                 return _Holdings[stockId];
@@ -58,7 +74,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 return null;
         }
 
-        public Holding Add(Stock stock, Date fromDate)
+        public IHolding Add(Stock stock, Date fromDate)
         {
             var holding = new Holding(stock, fromDate);
             _Holdings.Add(stock.Id, holding);

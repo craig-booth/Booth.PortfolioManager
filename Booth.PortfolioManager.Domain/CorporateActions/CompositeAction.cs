@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using Booth.Common;
 
@@ -12,22 +12,33 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
 {
     public class CompositeAction : CorporateAction
     {
-        internal CompositeAction(Guid id, Stock stock, Date actionDate, string description)
+        IEnumerable<ICorporateAction> _ChildActions;
+
+        internal CompositeAction(Guid id, Stock stock, Date actionDate, string description, IEnumerable<ICorporateAction> childActions)
             : base(id, stock, CorporateActionType.Composite, actionDate, description)
         {
-
+            _ChildActions = childActions;
         }
 
-        public override IEnumerable<Transaction> GetTransactionList(Holding holding)
+        public IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
         {
-            var transactions = new List<Transaction>();
+            var transactions = new List<IPortfolioTransaction>();
 
-            return transactions;
+            foreach (var action in _ChildActions)
+            {
+                var childTransactions = action.GetTransactionList(holding, stockResolver);
+                transactions.AddRange(childTransactions);
+            }         
+
+            return transactions; 
         }
 
-        public override bool HasBeenApplied(ITransactionCollection transactions)
+        public bool HasBeenApplied(IPortfolioTransactionList transactions)
         {
-            return false;
+            if (_ChildActions.Any())
+                return _ChildActions.First().HasBeenApplied(transactions);
+            else
+                return false; 
         }
     }
 }

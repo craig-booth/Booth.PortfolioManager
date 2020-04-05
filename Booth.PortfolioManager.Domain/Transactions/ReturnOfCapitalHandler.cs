@@ -8,36 +8,31 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class ReturnOfCapitalHandler : ITransactionHandler
     {
-        private HoldingCollection _Holdings;
-        private CashAccount _CashAccount;
+        private IHoldingCollection _Holdings;
+        private ICashAccount _CashAccount;
 
-        public ReturnOfCapitalHandler(HoldingCollection holdings, CashAccount cashAccount)
+        public ReturnOfCapitalHandler(IHoldingCollection holdings, ICashAccount cashAccount)
         {
             _Holdings = holdings;
             _CashAccount = cashAccount;
         }
 
-        public void ApplyTransaction(Transaction transaction)
+        public void ApplyTransaction(IPortfolioTransaction transaction)
         {
             var returnOfCapital = transaction as ReturnOfCapital;
+            if (returnOfCapital == null)
+                throw new ArgumentException("Expected transaction to be an ReturnOfCapital");
 
-            var holding = _Holdings.Get(returnOfCapital.Stock.Id);
+            var holding = _Holdings[returnOfCapital.Stock.Id];
             if ((holding == null) || (!holding.IsEffectiveAt(returnOfCapital.RecordDate)))
                 throw new NoParcelsForTransaction(returnOfCapital, "No parcels found for transaction");
 
-            var holdingProperties = holding.Properties[returnOfCapital.RecordDate];
-
             /* Reduce cost base of parcels */
             decimal totalAmount = 0;
-            foreach (var parcel in holding.Parcels(returnOfCapital.RecordDate))
+            foreach (var parcel in holding[returnOfCapital.RecordDate])
             {
-                var parcelProperties = parcel.Properties[returnOfCapital.RecordDate];
-
-                var costBaseReduction = parcelProperties.Units * returnOfCapital.Amount;
-
-              /*  parcel.
-                ReduceParcelCostBase(unitOfWork, parcel, returnOfCapital.RecordDate, costBaseReduction, transaction.Id);
-                */
+                var costBaseReduction = parcel.Properties[returnOfCapital.RecordDate].Units * returnOfCapital.Amount;
+                parcel.Change(returnOfCapital.RecordDate, 0, 0.00m, costBaseReduction, transaction);
 
                 totalAmount += costBaseReduction;
             } 

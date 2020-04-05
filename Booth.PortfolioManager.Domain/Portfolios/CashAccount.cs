@@ -10,7 +10,7 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public interface ICashAccount
+    public interface IReadOnlyCashAccount
     {
         ITransactionList<CashAccount.Transaction> Transactions { get; }
 
@@ -20,9 +20,18 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         IEnumerable<CashAccount.EffectiveBalance> EffectiveBalances(DateRange dateRange);
     }
 
-
-    public class CashAccount : ICashAccount
+    public interface ICashAccount :  IReadOnlyCashAccount
     {
+        void Deposit(Date date, decimal amount, string description);
+        void Withdraw(Date date, decimal amount, string description);
+        void Transfer(Date date, decimal amount, string description);
+        void FeeDeducted(Date date, decimal amount, string description);
+        void InterestPaid(Date date, decimal amount, string description);
+        void AddTransaction(Date date, decimal amount, string description, BankAccountTransactionType type);
+    }
+
+    public class CashAccount : ICashAccount, IReadOnlyCashAccount
+{
         private CashTransactionList _Transactions;
         public ITransactionList<Transaction> Transactions
         {

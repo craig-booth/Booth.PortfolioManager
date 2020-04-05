@@ -10,16 +10,18 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public class CashTransactionHandler : ITransactionHandler
     {
-        private CashAccount _CashAccount;
+        private ICashAccount _CashAccount;
 
-        public CashTransactionHandler(CashAccount cashAccount)
+        public CashTransactionHandler(ICashAccount cashAccount)
         {
             _CashAccount = cashAccount;
         }
 
-        public void ApplyTransaction(Transaction transaction)
+        public void ApplyTransaction(IPortfolioTransaction transaction)
         {
             var cashTransaction = transaction as CashTransaction;
+            if (cashTransaction == null)
+                throw new ArgumentException("Expected transaction to be a CashTransaction");
 
             var description = "";
             if (cashTransaction.Comment != "")
