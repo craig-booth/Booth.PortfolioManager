@@ -67,7 +67,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
             {
                 foreach (var parcelSold in parcelsSold)
                 {
-                    holding.DisposeOfParcel(parcelSold.Parcel, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, transaction);
+                    var parcel = parcelSold.Parcel as IParcel;
+                    holding.DisposeOfParcel(parcel, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, transaction);
 
                     _CgtEvents.Add(disposal.Date, disposal.Stock, parcelSold.UnitsSold, parcelSold.CostBase, parcelSold.AmountReceived, parcelSold.CapitalGain, parcelSold.CgtMethod);
                 }

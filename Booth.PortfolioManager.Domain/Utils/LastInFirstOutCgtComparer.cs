@@ -8,9 +8,9 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    class LastInFirstOutCgtComparer : Comparer<Parcel>
+    class LastInFirstOutCgtComparer : Comparer<IReadOnlyParcel>
     {
-        public override int Compare(Parcel a, Parcel b)
+        public override int Compare(IReadOnlyParcel a, IReadOnlyParcel b)
         {
             return b.AquisitionDate.CompareTo(a.AquisitionDate);
         }

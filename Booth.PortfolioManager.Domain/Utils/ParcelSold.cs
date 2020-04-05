@@ -10,7 +10,7 @@ namespace Booth.PortfolioManager.Domain.Utils
 {
     public struct ParcelSold
     {
-        public Parcel Parcel { get; private set; }
+        public IReadOnlyParcel Parcel { get; private set; }
         public int UnitsSold { get; private set; }
         public decimal CostBase { get; private set; }
         public decimal AmountReceived { get; private set; }
@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Utils
         public CGTMethod CgtMethod { get; private set; }
         public decimal DiscountedGain { get; private set; }
 
-        public ParcelSold(Parcel parcel, int unitsSold, decimal costBase, decimal amountReceived, decimal capitalGain, CGTMethod cgtMethod, decimal discountedGain)
+        public ParcelSold(IReadOnlyParcel parcel, int unitsSold, decimal costBase, decimal amountReceived, decimal capitalGain, CGTMethod cgtMethod, decimal discountedGain)
         {
             Parcel = parcel;
             UnitsSold = unitsSold;

@@ -119,7 +119,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(100, 1000.00m, 1000.00m));
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel.Object });
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
             holding.Setup(x => x.DisposeOfParcel(parcel.Object, new Date(2020, 02, 01), 100, 1980.05m, transaction)).Verifiable();
 
             var holdings = mockRepository.Create<IHoldingCollection>();
@@ -166,7 +166,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(200, 1000.00m, 1000.00m));
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel.Object });
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
             holding.Setup(x => x.DisposeOfParcel(parcel.Object, new Date(2020, 02, 01), 100, 1980.05m, transaction)).Verifiable();
 
             var holdings = mockRepository.Create<IHoldingCollection>();
@@ -224,7 +224,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(350, 2700.00m, 3800.00m));
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
             holding.Setup(x => x.DisposeOfParcel(parcel1.Object, new Date(2020, 02, 01), 100, 1994.30m, transaction)).Verifiable();
             holding.Setup(x => x.DisposeOfParcel(parcel2.Object, new Date(2020, 02, 01), 50, 997.15m, transaction)).Verifiable();
             holding.Setup(x => x.DisposeOfParcel(parcel3.Object, new Date(2020, 02, 01), 200, 3988.60m, transaction)).Verifiable();
@@ -286,7 +286,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(350, 2700.00m, 3800.00m));
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
             holding.Setup(x => x.DisposeOfParcel(parcel1.Object, new Date(2020, 02, 01), 100, 1988.92m, transaction)).Verifiable();
             holding.Setup(x => x.DisposeOfParcel(parcel2.Object, new Date(2020, 02, 01), 50, 994.46m, transaction)).Verifiable();
             holding.Setup(x => x.DisposeOfParcel(parcel3.Object, new Date(2020, 02, 01), 30, 596.67m, transaction)).Verifiable();
@@ -337,7 +337,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(200, 1000.00m, 1000.00m));
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel.Object });
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
             holding.Setup(x => x.DisposeOfParcel(parcel.Object, new Date(2020, 02, 01), 100, 1980.05m, transaction)).Verifiable();
 
             var holdings = mockRepository.Create<IHoldingCollection>();
