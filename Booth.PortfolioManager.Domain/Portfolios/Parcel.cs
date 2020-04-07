@@ -38,11 +38,14 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             AquisitionDate = aquisitionDate;
             _Properties.Change(fromDate, properties);
 
-            _Audit.Add(new ParcelAudit(aquisitionDate, properties.Units, properties.CostBase, properties.Amount, transaction));
+            _Audit.Add(new ParcelAudit(fromDate, properties.Units, properties.CostBase, properties.Amount, transaction));
         }
 
         public void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, IPortfolioTransaction transaction)
         {
+            if (!EffectivePeriod.Contains(date))
+                throw new EffectiveDateException("The parcel is not effective at that date");
+
             var parcelProperties = _Properties[date];
 
             var newUnits = parcelProperties.Units + unitChange;
@@ -50,7 +53,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             var newCostBase = parcelProperties.CostBase + costBaseChange;
 
             if (newUnits < 0)
-                throw new Exception("Not enough shares in parcel");
+                throw new ArgumentException("Units cannot be changed to be less than 0");
+            if (newAmount < 0)
+                throw new ArgumentException("Amount cannot be changed to be less than 0");
+            if (newCostBase < 0)
+                throw new ArgumentException("Costbase cannot be changed to be less than 0");
 
             ParcelProperties newParcelProperties;
             if (newUnits == 0)

@@ -35,12 +35,11 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new NotEnoughSharesForDisposal(disposal, "Not enough shares for disposal");
 
             // Determine which parcels to sell based on CGT method 
-            var parcels = holding[disposal.Date];
-            var amountReceived = (disposal.Units * disposal.AveragePrice) - disposal.TransactionCosts;
-            var cgtCalculation = CgtCalculator.CalculateCapitalGain(parcels, disposal.Date, disposal.Units, amountReceived, disposal.CGTMethod);
-            if (cgtCalculation.UnitsSold < disposal.Units)
-                throw new NotEnoughSharesForDisposal(disposal, "Not enough shares for disposal");
-                   
+            decimal amountReceived = (disposal.Units * disposal.AveragePrice) - disposal.TransactionCosts;
+
+            var cgtCalculator = new CgtCalculator();
+            var parcelsSold = cgtCalculator.Calculate(holding.Parcels(disposal.Date), disposal.Date, disposal.Units, amountReceived, CgtCalculator.GetCgtComparer(disposal.Date, disposal.CGTMethod));
+                            
             // Dispose of select parcels 
             if (disposal.Stock is StapledSecurity)
             {
@@ -66,9 +65,10 @@ namespace Booth.PortfolioManager.Domain.Transactions
             } 
             else
             {
-                foreach (var parcelSold in cgtCalculation.ParcelsSold)
+                foreach (var parcelSold in parcelsSold)
                 {
-                    holding.DisposeOfParcel(parcelSold.Parcel, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, transaction);
+                    var parcel = parcelSold.Parcel as IParcel;
+                    holding.DisposeOfParcel(parcel, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, transaction);
 
                     _CgtEvents.Add(disposal.Date, disposal.Stock, parcelSold.UnitsSold, parcelSold.CostBase, parcelSold.AmountReceived, parcelSold.CapitalGain, parcelSold.CgtMethod);
                 }

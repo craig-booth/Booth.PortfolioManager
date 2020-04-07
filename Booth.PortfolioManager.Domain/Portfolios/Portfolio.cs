@@ -12,8 +12,28 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
+    public interface IPortfolio
+    {
+        IReadOnlyCashAccount CashAccount { get; }
+        ITransactionList<CgtEvent> CgtEvents { get; }
+        Date EndDate { get; }
+        IReadOnlyHoldingCollection Holdings { get; }
+        string Name { get; }
+        Guid Owner { get; }
+        Date StartDate { get; }
+        IPortfolioTransactionList Transactions { get; }
 
-    public class Portfolio : TrackedEntity
+        void AddOpeningBalance(Date transactionDate, Date aquisitionDate, Stock stock, int units, decimal costBase, string comment, Guid transactionId);
+        void AdjustUnitCount(Date date, Stock stock, int oldCount, int NewCount, string comment, Guid transactionId);
+        void AquireShares(Date aquisitionDate, Stock stock, int units, decimal averagePrice, decimal transactionCosts, bool createCashTransaction, string comment, Guid transactionId);
+        void ChangeDrpParticipation(Guid holding, bool participateInDrp);
+        void DisposeOfShares(Date disposalDate, Stock stock, int units, decimal averagePrice, decimal transactionCosts, CGTCalculationMethod cgtMethod, bool createCashTransaction, string comment, Guid transactionId);
+        void IncomeReceived(Date recordDate, Date paymentDate, Stock stock, decimal frankedAmount, decimal unfrankedAmount, decimal frankingCredits, decimal interest, decimal taxDeferred, decimal drpCashBalance, bool createCashTransaction, string comment, Guid transactionId);
+        void MakeCashTransaction(Date transactionDate, BankAccountTransactionType type, decimal amount, string comment, Guid transactionId);
+        void ReturnOfCapitalReceived(Date paymentDate, Date recordDate, Stock stock, decimal amount, bool createCashTransaction, string comment, Guid transactionId);
+    }
+
+    public class Portfolio : TrackedEntity, IPortfolio
     {
         private ServiceFactory<ITransactionHandler> _TransactionHandlers = new ServiceFactory<ITransactionHandler>();
 

@@ -8,11 +8,10 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public class ParcelAudit
+    public struct ParcelAudit
     {
         public Date Date { get; }
-
-        public int UnitCountChange { get; }
+        public int UnitCountChange { get;  }
         public decimal CostBaseChange { get; }
         public decimal AmountChange { get; }
 

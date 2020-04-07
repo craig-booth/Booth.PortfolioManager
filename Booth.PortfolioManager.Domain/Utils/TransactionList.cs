@@ -34,7 +34,7 @@ namespace Booth.PortfolioManager.Domain.Utils
         Date Latest { get; }
     }
 
-    public class TransactionRange<T> : ITransactionRange<T> where T : ITransaction
+    class TransactionRange<T> : ITransactionRange<T> where T : ITransaction
     {
         private ITransactionList<T> _TransactionList;
         private int _FromIndex;
@@ -242,9 +242,7 @@ namespace Booth.PortfolioManager.Domain.Utils
         {
             var end = IndexOf(date, TransationListPosition.Last);
             if (end < 0)
-                end = ~end;
-            else
-                end = end + 1;
+                end = ~end - 1;
 
             return new TransactionRange<T>(this, 0, end);
         }
@@ -270,7 +268,7 @@ namespace Booth.PortfolioManager.Domain.Utils
 
             var end = IndexOf(dateRange.ToDate, TransationListPosition.Last);
             if (end < 0)
-                end = ~end - 1;
+                end = ~end - 1; 
 
             return new TransactionRange<T>(this, start, end);
         }
