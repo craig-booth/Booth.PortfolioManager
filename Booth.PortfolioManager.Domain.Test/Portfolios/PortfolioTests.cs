@@ -36,57 +36,57 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         }
 
         [TestCase]
-        void ChangeDrpParticipationHoldingNotOwned()
+        public void ChangeDrpParticipationHoldingNotOwned()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void ChangeDrpParticipation()
+        public void ChangeDrpParticipation()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void AddOpeningBalance()
+        public void AddOpeningBalance()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void AdjustUnitCount()
+        public void AdjustUnitCount()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void AquireShares()
+        public void AquireShares()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void DisposeOfShares()
+        public void DisposeOfShares()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void IncomeReceived()
+        public void IncomeReceived()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void MakeCashTransaction()
+        public void MakeCashTransaction()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
 
         [TestCase]
-        void ReturnOfCapitalReceived()
+        public void ReturnOfCapitalReceived()
         {
-            Assert.Fail();
+            Assert.Inconclusive();
         }
     }
 }

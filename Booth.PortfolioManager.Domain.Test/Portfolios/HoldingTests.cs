@@ -193,7 +193,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var parcel = new Parcel(Guid.NewGuid(), new Date(2000, 01, 01), new Date(2000, 01, 01), new ParcelProperties(100, 1000.00m, 1200.00m), null);
 
-            Assert.That(() => holding.DisposeOfParcel(parcel, new Date(2001, 01, 01), 100, 1000.00m, null), Throws.TypeOf(typeof(ArgumentException)));
+            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 1000.00m, null), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]
@@ -206,7 +206,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            holding.DisposeOfParcel(parcel, new Date(2001, 01, 01), 99, 500.00m, null);
+            holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 99, 500.00m, null);
 
             Assert.Multiple(() =>
             {
@@ -234,7 +234,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            holding.DisposeOfParcel(parcel, new Date(2002, 01, 01), 100, 500.00m, null);
+            holding.DisposeOfParcel(parcel.Id, new Date(2002, 01, 01), 100, 500.00m, null);
 
             Assert.Multiple(() =>
             {
@@ -260,7 +260,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var holding = new Holding(stock, new Date(2000, 01, 01));
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
 
-            Assert.That(() => holding.DisposeOfParcel(parcel, new Date(2001, 01, 01), 200, 1000.00m, null), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
+            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 200, 1000.00m, null), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
         }
 
         [TestCase]
@@ -272,7 +272,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var holding = new Holding(stock, new Date(2000, 01, 01));
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
 
-            holding.DisposeOfParcel(parcel, new Date(2001, 01, 01), 100, 500.00m, null);
+            holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 500.00m, null);
 
             Assert.Multiple(() =>
             {

@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.EventStore.MongoDB", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.EventStore.MongoDB.Test", "Booth.EventStore.MongoDB.Test\Booth.EventStore.MongoDB.Test.csproj", "{26922A98-C791-4389-BA50-DC1D534C4086}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booth.PortfolioManager.Domain.Test", "Booth.PortfolioManager.Domain.Test\Booth.PortfolioManager.Domain.Test.csproj", "{B6669529-91CD-41BA-9F81-354B0E6E8BD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Domain.Test", "Booth.PortfolioManager.Domain.Test\Booth.PortfolioManager.Domain.Test.csproj", "{B6669529-91CD-41BA-9F81-354B0E6E8BD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioExample", "PortfolioExample\PortfolioExample.csproj", "{43A3448C-03D1-4140-BA67-04B0BBE3C9C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B6669529-91CD-41BA-9F81-354B0E6E8BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6669529-91CD-41BA-9F81-354B0E6E8BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6669529-91CD-41BA-9F81-354B0E6E8BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43A3448C-03D1-4140-BA67-04B0BBE3C9C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43A3448C-03D1-4140-BA67-04B0BBE3C9C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43A3448C-03D1-4140-BA67-04B0BBE3C9C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43A3448C-03D1-4140-BA67-04B0BBE3C9C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

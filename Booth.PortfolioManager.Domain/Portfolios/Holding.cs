@@ -27,7 +27,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         IEnumerable<IParcel> this[Date date] { get; }
 
         IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, IPortfolioTransaction transaction);
-        void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, IPortfolioTransaction transaction);
+        void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, IPortfolioTransaction transaction);
 
         void AddDrpAccountAmount(Date date, decimal amount);
 
@@ -93,14 +93,14 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             return parcel;
         }
 
-        public void DisposeOfParcel(IParcel parcel, Date date, int units, decimal amount, IPortfolioTransaction transaction)
+        public void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, IPortfolioTransaction transaction)
         {        
+            if (!_Parcels.TryGetValue(parcelId, out var parcel))
+                throw new ArgumentException("Parcel is not part of this holding");
+
             var parcelProperties = parcel.Properties[date];
             if (units > parcelProperties.Units)
                 throw new NotEnoughSharesForDisposal(transaction, "Not enough shares in parcel");
-
-            if (!_Parcels.ContainsKey(parcel.Id))
-                throw new ArgumentException("Parcel is not part of this holding");
 
             // Adjust Parcel
             decimal costBaseChange;

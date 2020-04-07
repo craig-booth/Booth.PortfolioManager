@@ -12,6 +12,26 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
+
+    public class PortfolioFactory
+    {
+
+        private IStockResolver _StockResolver;
+        public PortfolioFactory(IStockResolver stockResolver)
+        {
+            _StockResolver = stockResolver;
+        }
+
+        public IPortfolio CreatePortfolio(Guid id, string name, Guid owner)
+        {
+            var portfolio = new Portfolio(id, _StockResolver);
+            portfolio.Create(name, owner);
+
+            return portfolio;
+
+        }
+    }
+
     public interface IPortfolio
     {
         IReadOnlyCashAccount CashAccount { get; }
