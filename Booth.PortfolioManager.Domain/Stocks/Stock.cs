@@ -8,14 +8,37 @@ using Booth.EventStore;
 
 using Booth.PortfolioManager.Domain.Stocks.Events;
 using Booth.PortfolioManager.Domain.CorporateActions.Events;
+using Booth.PortfolioManager.Domain.Utils;
+using Booth.PortfolioManager.Domain.CorporateActions;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
     public enum AssetCategory { AustralianStocks, InternationalStocks, AustralianProperty, InternationalProperty, AustralianFixedInterest, InternationlFixedInterest, Cash }
     public enum DRPMethod { Round, RoundDown, RoundUp, RetainCashBalance }
 
+    public interface IReadOnlyStock : IEffectiveEntity
+    {
+        ITransactionList<ICorporateAction> CorporateActions { get; }
+        IEffectiveProperties<DividendRules> DividendRules { get; }
+        IEffectiveProperties<StockProperties> Properties { get; }
+        bool Trust { get; }
+        Date DateOfLastestPrice();
+        decimal GetPrice(Date date);
+        IEnumerable<StockPrice> GetPrices(DateRange dateRange);
+        string ToString();
+    }
 
-    public class Stock : EffectiveEntity, ITrackedEntity
+    public interface IStock : IReadOnlyStock
+    {
+        new ICorporateActionList CorporateActions { get; }
+        void ChangeDividendRules(Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DRPMethod newDrpMethod);
+        void ChangeProperties(Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory);
+        void DeList(Date date);
+        void List(string asxCode, string name, Date date, bool trust, AssetCategory category);
+        void SetPriceHistory(IStockPriceHistory stockPriceHistory);
+    }
+
+    public class Stock : EffectiveEntity, ITrackedEntity, IStock, IReadOnlyStock
     {
         public int Version { get; protected set; } = 0;
         private EventList _Events = new EventList();
@@ -32,6 +55,8 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         protected CorporateActionList _CorporateActions;
         public ICorporateActionList CorporateActions => _CorporateActions;
+
+        ITransactionList<ICorporateAction> IReadOnlyStock.CorporateActions => _CorporateActions;
 
         public Stock(Guid id)
             : base(id)
@@ -189,7 +214,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             {
                 dynamic dynamicEvent = @event;
                 Apply(dynamicEvent);
-            }              
+            }
         }
     }
 

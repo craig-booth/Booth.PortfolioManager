@@ -6,6 +6,6 @@ namespace Booth.PortfolioManager.Domain.Stocks
 {
     public interface IStockResolver
     {
-        Stock GetStock(Guid id);
+        IReadOnlyStock GetStock(Guid id);
     }
 }

@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.Get(id)).Returns(new StoredEntity() { EntityId = id, Type = "" });
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
             entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
             
@@ -44,7 +44,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.Get(id)).Returns<StoredEntity>(null);
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
             entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
@@ -74,7 +74,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.GetAll()).Returns(storedEntities);
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
             entityFactory.Setup(x => x.Create(id1, "")).Returns(new TrackedEntityTestClass(id1));
             entityFactory.Setup(x => x.Create(id2, "")).Returns(new TrackedEntityTestClass(id2));
             entityFactory.Setup(x => x.Create(id3, "")).Returns(new TrackedEntityTestClass(id3));
@@ -96,7 +96,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.GetAll()).Returns(new StoredEntity[] { });
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
             var entities = repository.All();
@@ -122,7 +122,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.Add(entityId, "TrackedEntityTestClass", events));
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
 
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
@@ -148,7 +148,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityWithPropertiesTestClass>>();
             eventStream.Setup(x => x.Add(entityId, "TrackedEntityWithPropertiesTestClass", trackedEntity.Properties, events));
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityWithPropertiesTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityWithPropertiesTestClass>>();
 
             var repository = new Repository<TrackedEntityWithPropertiesTestClass>(eventStream.Object, entityFactory.Object);
 
@@ -173,7 +173,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.AppendEvents(entityId, events));
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
 
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
@@ -192,7 +192,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.FindFirst("Property", "Value")).Returns(new StoredEntity() { EntityId = id, Type = "" });
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
             entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
 
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
@@ -215,7 +215,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.FindFirst("Property", "Value")).Returns<StoredEntity>(null);
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
 
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 
@@ -236,7 +236,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.Find("Property", "Value")).Returns(new StoredEntity[] { new StoredEntity() { EntityId = id, Type = "" } });
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
             entityFactory.Setup(x => x.Create(id, "")).Returns(new TrackedEntityTestClass(id));
 
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
@@ -264,7 +264,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.Find("Property", "Value")).Returns(storedEntities);
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
             entityFactory.Setup(x => x.Create(id1, "")).Returns(new TrackedEntityTestClass(id1));
             entityFactory.Setup(x => x.Create(id2, "")).Returns(new TrackedEntityTestClass(id2));
 
@@ -285,7 +285,7 @@ namespace Booth.PortfolioManager.Domain.Test
             var eventStream = mockRepository.Create<IEventStream<TrackedEntityTestClass>>();
             eventStream.Setup(x => x.Find("Property", "Value")).Returns(new StoredEntity[] { });
 
-            var entityFactory = mockRepository.Create<IEntityFactory<TrackedEntityTestClass>>();
+            var entityFactory = mockRepository.Create<ITrackedEntityFactory<TrackedEntityTestClass>>();
 
             var repository = new Repository<TrackedEntityTestClass>(eventStream.Object, entityFactory.Object);
 

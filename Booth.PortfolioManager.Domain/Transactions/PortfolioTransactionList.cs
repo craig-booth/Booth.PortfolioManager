@@ -11,7 +11,6 @@ namespace Booth.PortfolioManager.Domain.Transactions
     public interface IPortfolioTransactionList : ITransactionList<IPortfolioTransaction>
     {
         IEnumerable<IPortfolioTransaction> ForHolding(Guid stockId);
-
         IEnumerable<IPortfolioTransaction> ForHolding(Guid stockId, Date date);
         IEnumerable<IPortfolioTransaction> ForHolding(Guid stockId, DateRange dateRange);
     }

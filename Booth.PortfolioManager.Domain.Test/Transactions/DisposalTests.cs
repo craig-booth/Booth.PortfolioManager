@@ -15,6 +15,30 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
     class DisposalTests
     {
         [TestCase]
+        public void IncorrectTransactionType()
+        {
+            var transaction = new CashTransaction()
+            {
+                Id = Guid.NewGuid(),
+                Date = new Date(2020, 01, 01),
+                Comment = "Test Deposit",
+                CashTransactionType = BankAccountTransactionType.Deposit,
+                Amount = 100.00m
+            };
+
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var holding = mockRepository.Create<IHolding>();
+            var cashAccount = mockRepository.Create<ICashAccount>();
+
+            var handler = new DisposalHandler();
+
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+
+            mockRepository.Verify();
+        }
+
+        [TestCase]
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -29,22 +53,20 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Units = 100,
                 AveragePrice = 10.00m,
                 TransactionCosts = 19.95m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = true
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(default(IHolding));
+            var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(false);
 
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var cgtEventCollection = mockRepository.Create<ICgtEventCollection>();
+            var handler = new DisposalHandler();
 
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NoParcelsForTransaction)));
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(NoSharesOwned)));
 
             mockRepository.Verify();
         }
@@ -64,7 +86,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Units = 100,
                 AveragePrice = 10.00m,
                 TransactionCosts = 19.95m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = true
             };
 
@@ -74,19 +96,15 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             parcel.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
 
             var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(50, 1000.00m, 1000.00m));
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel.Object });
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
 
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var cgtEventCollection = mockRepository.Create<ICgtEventCollection>();
+            var handler = new DisposalHandler();
 
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
+            Assert.That(() => handler.Apply(transaction, holding.Object,cashAccount.Object), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
 
             mockRepository.Verify();
         }
@@ -106,7 +124,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Units = 100,
                 AveragePrice = 20.00m,
                 TransactionCosts = 19.95m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = true
             };
 
@@ -120,22 +138,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             parcel.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new ParcelProperties(100, 1000.00m, 1500.00m));
 
             var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(100, 1000.00m, 1000.00m));
             holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
-            holding.Setup(x => x.DisposeOfParcel(parcelId, new Date(2020, 02, 01), 100, 1980.05m, transaction)).Verifiable();
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.DisposeOfParcel(parcelId, new Date(2020, 02, 01), 100, 1980.05m, 480.05m, CgtMethod.Discount, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 2000.00m, "Sale of ABC")).Verifiable();
             cashAccount.Setup(x => x.FeeDeducted(new Date(2020, 02, 01), 19.95m, "Brokerage for sale of ABC")).Verifiable();
 
-            var cgtEventCollection = mockRepository.Create<ICgtEventCollection>();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 100, 1500.00m, 1980.05m, 480.05m, CGTMethod.Discount)).Verifiable();
-
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new DisposalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -155,7 +168,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Units = 100,
                 AveragePrice = 20.00m,
                 TransactionCosts = 19.95m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = true
             };
 
@@ -169,22 +182,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             parcel.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new ParcelProperties(200, 1000.00m, 1500.00m));
 
             var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(200, 1000.00m, 1000.00m));
             holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
-            holding.Setup(x => x.DisposeOfParcel(parcelId, new Date(2020, 02, 01), 100, 1980.05m, transaction)).Verifiable();
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.DisposeOfParcel(parcelId, new Date(2020, 02, 01), 100, 1980.05m, 1230.05m, CgtMethod.Discount, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 2000.00m, "Sale of ABC")).Verifiable();
             cashAccount.Setup(x => x.FeeDeducted(new Date(2020, 02, 01), 19.95m, "Brokerage for sale of ABC")).Verifiable();
 
-            var cgtEventCollection = mockRepository.Create<ICgtEventCollection>();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 100, 750.00m, 1980.05m, 1230.05m, CGTMethod.Discount)).Verifiable();
-
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new DisposalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -204,7 +212,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Units = 350,
                 AveragePrice = 20.00m,
                 TransactionCosts = 19.95m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = true
             };
 
@@ -233,26 +241,19 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
 
             var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(350, 2700.00m, 3800.00m));
             holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
-            holding.Setup(x => x.DisposeOfParcel(parcel1Id, new Date(2020, 02, 01), 100, 1994.30m, transaction)).Verifiable();
-            holding.Setup(x => x.DisposeOfParcel(parcel2Id, new Date(2020, 02, 01), 50, 997.15m, transaction)).Verifiable();
-            holding.Setup(x => x.DisposeOfParcel(parcel3Id, new Date(2020, 02, 01), 200, 3988.60m, transaction)).Verifiable();
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.DisposeOfParcel(parcel1Id, new Date(2020, 02, 01), 100, 1994.30m, 494.30m, CgtMethod.Discount, transaction)).Verifiable();
+            holding.Setup(x => x.DisposeOfParcel(parcel2Id, new Date(2020, 02, 01), 50, 997.15m, 697.15m, CgtMethod.Discount, transaction)).Verifiable();
+            holding.Setup(x => x.DisposeOfParcel(parcel3Id, new Date(2020, 02, 01), 200, 3988.60m, 1988.60m, CgtMethod.Discount, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 7000.00m, "Sale of ABC")).Verifiable();
             cashAccount.Setup(x => x.FeeDeducted(new Date(2020, 02, 01), 19.95m, "Brokerage for sale of ABC")).Verifiable();
 
-            var cgtEventCollection = mockRepository.Create<ICgtEventCollection>();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 100, 1500.00m, 1994.30m, 494.30m, CGTMethod.Discount)).Verifiable();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 50, 300.00m, 997.15m, 697.15m, CGTMethod.Discount)).Verifiable();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 200, 2000.00m, 3988.60m, 1988.60m, CGTMethod.Discount)).Verifiable();
-
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
-            handler.ApplyTransaction(transaction);
+             var handler = new DisposalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -272,7 +273,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Units = 180,
                 AveragePrice = 20.00m,
                 TransactionCosts = 19.95m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = true
             };
 
@@ -300,26 +301,19 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             parcel3.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new ParcelProperties(200, 1500.00m, 2000.00m));
 
             var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(350, 2700.00m, 3800.00m));
             holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
-            holding.Setup(x => x.DisposeOfParcel(parcel1Id, new Date(2020, 02, 01), 100, 1988.92m, transaction)).Verifiable();
-            holding.Setup(x => x.DisposeOfParcel(parcel2Id, new Date(2020, 02, 01), 50, 994.46m, transaction)).Verifiable();
-            holding.Setup(x => x.DisposeOfParcel(parcel3Id, new Date(2020, 02, 01), 30, 596.67m, transaction)).Verifiable();
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.DisposeOfParcel(parcel1Id, new Date(2020, 02, 01), 100, 1988.92m, 488.92m, CgtMethod.Discount, transaction)).Verifiable();
+            holding.Setup(x => x.DisposeOfParcel(parcel2Id, new Date(2020, 02, 01), 50, 994.46m, 694.46m, CgtMethod.Discount, transaction)).Verifiable();
+            holding.Setup(x => x.DisposeOfParcel(parcel3Id, new Date(2020, 02, 01), 30, 596.67m, 296.67m, CgtMethod.Discount, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 3600.00m, "Sale of ABC")).Verifiable();
             cashAccount.Setup(x => x.FeeDeducted(new Date(2020, 02, 01), 19.95m, "Brokerage for sale of ABC")).Verifiable();
 
-            var cgtEventCollection = mockRepository.Create<ICgtEventCollection>();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 100, 1500.00m, 1988.92m, 488.92m, CGTMethod.Discount)).Verifiable();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 50, 300.00m, 994.46m, 694.46m, CGTMethod.Discount)).Verifiable();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 30, 300.00m, 596.67m, 296.67m, CGTMethod.Discount)).Verifiable();
-
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new DisposalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -339,7 +333,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Units = 100,
                 AveragePrice = 20.00m,
                 TransactionCosts = 19.95m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = false
             };
 
@@ -353,48 +347,17 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             parcel.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new ParcelProperties(200, 1000.00m, 1500.00m));
 
             var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
             holding.Setup(x => x.Properties[new Date(2020, 02, 01)]).Returns(new HoldingProperties(200, 1000.00m, 1000.00m));
             holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
-            holding.Setup(x => x.DisposeOfParcel(parcelId, new Date(2020, 02, 01), 100, 1980.05m, transaction)).Verifiable();
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.DisposeOfParcel(parcelId, new Date(2020, 02, 01), 100, 1980.05m, 1230.05m, CgtMethod.Discount, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var cgtEventCollection = mockRepository.Create<ICgtEventCollection>();
-            cgtEventCollection.Setup(x => x.Add(new Date(2020, 02, 01), stock, 100, 750.00m, 1980.05m, 1230.05m, CGTMethod.Discount)).Verifiable();
-
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEventCollection.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new DisposalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
-
-        [TestCase]
-        public void IncorrectTransactionType()
-        {
-            var transaction = new CashTransaction()
-            {
-                Id = Guid.NewGuid(),
-                Date = new Date(2020, 01, 01),
-                Comment = "Test Deposit",
-                CashTransactionType = BankAccountTransactionType.Deposit,
-                Amount = 100.00m
-            };
-
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            var cashAccount = mockRepository.Create<ICashAccount>();
-            var cgtEvents = mockRepository.Create<ICgtEventCollection>();
-
-            var handler = new DisposalHandler(holdings.Object, cashAccount.Object, cgtEvents.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException);
-
-            mockRepository.Verify();
-        }
-
     }
 }

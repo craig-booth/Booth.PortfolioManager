@@ -13,7 +13,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
     class CgtComparerTests
     {
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.FirstInFirstOut })]
+        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.FirstInFirstOut })]
         public int FirstInFirstOut(Date disposalDate,  Parcel parcel1, Parcel parcel2)
         {
             var comparer = new FirstInFirstOutCgtComparer();
@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             return comparer.Compare(parcel1, parcel2);    
         }
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.LastInFirstOut })]
+        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.LastInFirstOut })]
         public int LastInFirstOut(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
             var comparer = new LastInFirstOutCgtComparer();
@@ -29,7 +29,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             return comparer.Compare(parcel1, parcel2);
         }
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.MaximizeGain })]
+        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.MaximizeGain })]
         public int MaximizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
             var comparer = new MaximizeGainCgtComparer(disposalDate);
@@ -37,7 +37,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             return comparer.Compare(parcel1, parcel2);
         }
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CGTCalculationMethod.MinimizeGain })]
+        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.MinimizeGain })]
         public int MinimizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
         {
             var comparer = new MinimizeGainCgtComparer(disposalDate);
@@ -45,7 +45,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             return comparer.Compare(parcel1, parcel2);
         }
 
-        static IEnumerable<TestCaseData> CalculateCapitalGainData(CGTCalculationMethod method)
+        static IEnumerable<TestCaseData> CalculateCapitalGainData(CgtCalculationMethod method)
         {
             var p1 = new Parcel(Guid.NewGuid(), new Date(2010, 01, 01), new Date(2019, 01, 01), new ParcelProperties(1000, 1000.00m, 1000.00m), null);
             var p2 = new Parcel(Guid.NewGuid(), new Date(2010, 01, 01), new Date(2019, 01, 01), new ParcelProperties(1000, 2000.00m, 2000.00m), null);
@@ -99,17 +99,17 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
                 MinimizeGainResult = minimizeGainResult;
             }
 
-            public TestCaseData TestData(CGTCalculationMethod method)
+            public TestCaseData TestData(CgtCalculationMethod method)
             {
                 switch (method)
                 {
-                    case CGTCalculationMethod.FirstInFirstOut:
+                    case CgtCalculationMethod.FirstInFirstOut:
                         return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(FirstInFirstOutResult).SetName("FirstInFirstOut(" + Message + ")");
-                    case CGTCalculationMethod.LastInFirstOut:
+                    case CgtCalculationMethod.LastInFirstOut:
                         return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(LastInFirstOutResult).SetName("LastInFirstOut(" + Message + ")");
-                    case CGTCalculationMethod.MaximizeGain:
+                    case CgtCalculationMethod.MaximizeGain:
                         return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(MaximizeGainResult).SetName("MaximizeGain(" + Message + ")");
-                    case CGTCalculationMethod.MinimizeGain:
+                    case CgtCalculationMethod.MinimizeGain:
                         return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(MinimizeGainResult).SetName("MinimizeGain(" + Message + ")");
                     default:
                         return null;

@@ -12,7 +12,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
     public interface IReadOnlyHolding : IEffectiveEntity
     {
-        Stock Stock { get; }
+        IReadOnlyStock Stock { get; }
         IEffectiveProperties<HoldingProperties> Properties { get; }
         HoldingSettings Settings { get; }
         IReadOnlyCashAccount DrpAccount { get; }
@@ -22,21 +22,36 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         decimal Value(Date date);
     }
 
-    public interface IHolding : IReadOnlyHolding
+    public interface IHolding : IEffectiveEntity
     {
-        IEnumerable<IParcel> this[Date date] { get; }
+        IReadOnlyStock Stock { get; }
+        IEffectiveProperties<HoldingProperties> Properties { get; }
+        HoldingSettings Settings { get; }
+        IReadOnlyCashAccount DrpAccount { get; }
+        decimal Value(Date date);
+        IEnumerable<IParcel> Parcels();
+        IEnumerable<IParcel> Parcels(Date date);
+        IEnumerable<IParcel> Parcels(DateRange dateRange);
 
         IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, IPortfolioTransaction transaction);
-        void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, IPortfolioTransaction transaction);
-
+        void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, decimal capitalGain, CgtMethod cgtMethod, IPortfolioTransaction transaction);
         void AddDrpAccountAmount(Date date, decimal amount);
-
         void ChangeDrpParticipation(bool participateInDrp);
+    }
+
+    public class CgtEventArgs : EventArgs
+    {   
+        public Date EventDate { get; set; }
+        public IReadOnlyStock Stock { get; set; }
+        public decimal AmountReceived { get; set; }
+        public decimal CapitalGain { get; set; }
+        public CgtMethod CgtMethod { get; set; }
+        public IPortfolioTransaction Transaction { get; set; }
     }
 
     public class Holding : EffectiveEntity, IHolding, IReadOnlyHolding
     {
-        public Stock Stock { get; set; }
+        public IReadOnlyStock Stock { get; set; }
 
         private EffectiveProperties<HoldingProperties> _Properties = new EffectiveProperties<HoldingProperties>();
         public IEffectiveProperties<HoldingProperties> Properties => _Properties;
@@ -48,7 +63,9 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         private CashAccount _DrpAccount = new CashAccount();
         public IReadOnlyCashAccount DrpAccount => _DrpAccount;
 
-        public Holding(Stock stock, Date fromDate)
+        public event EventHandler<CgtEventArgs> CgtEventOccurred;
+
+        public Holding(IReadOnlyStock stock, Date fromDate)
             : base(stock.Id)
         {
             Stock = stock;
@@ -57,25 +74,37 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _Properties.Change(fromDate, new HoldingProperties(0, 0.00m, 0.00m));
         }
 
-        public IEnumerable<IParcel> this[Date date] 
+        public HoldingProperties this[Date date] 
         { 
-            get
-            {
-                return _Parcels.Values.Where(x => x.IsEffectiveAt(date));
-            }
+            get { return _Properties[date]; }
         }
 
-        public IEnumerable<IReadOnlyParcel> Parcels()
+        IEnumerable<IReadOnlyParcel> IReadOnlyHolding.Parcels()
+        {
+            return Parcels();
+        }
+
+        public IEnumerable<IParcel> Parcels()
         {
             return _Parcels.Values;
         }
 
-        public IEnumerable<IReadOnlyParcel> Parcels(Date date)
+        IEnumerable<IReadOnlyParcel> IReadOnlyHolding.Parcels(Date date)
         {
-            return this[date];
+            return Parcels(date);
         }
 
-        public IEnumerable<IReadOnlyParcel> Parcels(DateRange dateRange)
+        public IEnumerable<IParcel> Parcels(Date date)
+        {
+            return _Parcels.Values.Where(x => x.IsEffectiveAt(date));
+        }
+
+        IEnumerable<IReadOnlyParcel> IReadOnlyHolding.Parcels(DateRange dateRange)
+        {
+            return Parcels(dateRange);
+        }
+
+        public IEnumerable<IParcel> Parcels(DateRange dateRange)
         {
             return _Parcels.Values.Where(x => x.IsEffectiveDuring(dateRange));
         }
@@ -93,14 +122,14 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             return parcel;
         }
 
-        public void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, IPortfolioTransaction transaction)
+        public void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, decimal capitalGain, CgtMethod cgtMethod, IPortfolioTransaction transaction)
         {        
             if (!_Parcels.TryGetValue(parcelId, out var parcel))
                 throw new ArgumentException("Parcel is not part of this holding");
 
             var parcelProperties = parcel.Properties[date];
             if (units > parcelProperties.Units)
-                throw new NotEnoughSharesForDisposal(transaction, "Not enough shares in parcel");
+                throw new NotEnoughSharesForDisposal("Not enough shares in parcel");
 
             // Adjust Parcel
             decimal costBaseChange;
@@ -130,6 +159,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 newProperties = new HoldingProperties(holdingProperties.Units - units, holdingProperties.Amount - amountChange, holdingProperties.CostBase - costBaseChange);
             }
             _Properties.Change(date, newProperties);
+
+            OnCgtEventOccured(date, Stock, amount, capitalGain, cgtMethod, transaction);    
         }
 
         public decimal Value(Date date)
@@ -151,6 +182,29 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public void ChangeDrpParticipation(bool participateInDrp)
         {
             Settings.ParticipateInDrp = participateInDrp;
+        }
+
+        private void OnCgtEventOccured(Date eventDate, IReadOnlyStock stock, decimal amountReceived, decimal capitalGain, CgtMethod cgtMethod, IPortfolioTransaction transaction)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = CgtEventOccurred;
+
+            if (handler != null)
+            {
+                var e = new CgtEventArgs()
+                {
+                    EventDate = eventDate,
+                    Stock = stock,
+                    AmountReceived = amountReceived,
+                    CapitalGain = capitalGain,
+                    CgtMethod = cgtMethod,
+                    Transaction = transaction
+                };
+
+                handler(this, e);
+            }
         }
     }
 

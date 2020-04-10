@@ -13,14 +13,14 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     public class CompositeAction : ICorporateAction
     {
         public Guid Id { get; private set; }
-        public Stock Stock { get; private set; }
+        public IReadOnlyStock Stock { get; private set; }
         public Date Date { get; private set; }
         public CorporateActionType Type { get; private set; }
         public string Description { get; private set; }
 
         public IEnumerable<ICorporateAction> ChildActions;
 
-        internal CompositeAction(Guid id, Stock stock, Date actionDate, string description, IEnumerable<ICorporateAction> childActions)
+        internal CompositeAction(Guid id, IReadOnlyStock stock, Date actionDate, string description, IEnumerable<ICorporateAction> childActions)
         {
             Id = id;
             Stock = stock;

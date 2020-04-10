@@ -15,10 +15,10 @@ namespace Booth.PortfolioManager.Domain.Utils
         public decimal CostBase { get; private set; }
         public decimal AmountReceived { get; private set; }
         public decimal CapitalGain { get; private set; }
-        public CGTMethod CgtMethod { get; private set; }
+        public CgtMethod CgtMethod { get; private set; }
         public decimal DiscountedGain { get; private set; }
 
-        public ParcelSold(IReadOnlyParcel parcel, int unitsSold, decimal costBase, decimal amountReceived, decimal capitalGain, CGTMethod cgtMethod, decimal discountedGain)
+        public ParcelSold(IReadOnlyParcel parcel, int unitsSold, decimal costBase, decimal amountReceived, decimal capitalGain, CgtMethod cgtMethod, decimal discountedGain)
         {
             Parcel = parcel;
             UnitsSold = unitsSold;

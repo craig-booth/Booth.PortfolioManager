@@ -24,11 +24,14 @@ namespace Booth.PortfolioManager.Domain.Stocks
     public class CorporateActionList : TransactionList<ICorporateAction>, ICorporateActionList
     {
         private IEventList _Events;
-        public Stock Stock { get; }
+
+        private Stock _Stock;
+        public IReadOnlyStock Stock { get { return _Stock; } }
+
 
         internal CorporateActionList(Stock stock, IEventList eventList)
         {
-            Stock = stock;
+            _Stock = stock;
             _Events = eventList;
         }
 
@@ -64,7 +67,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             if (description == "")
                 description = "Capital Return " + amount.ToString("$#,##0.00###");
 
-            var @event = new CapitalReturnAddedEvent(Stock.Id, Stock.Version, id, recordDate, description, paymentDate, amount);
+            var @event = new CapitalReturnAddedEvent(_Stock.Id, _Stock.Version, id, recordDate, description, paymentDate, amount);
 
             Apply(@event);
             PublishEvent(@event);
@@ -82,7 +85,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             if (description == "")
                 description = "Dividend " + MathUtils.FormatCurrency(dividendAmount, false, true);
 
-            var @event = new DividendAddedEvent(Stock.Id, Stock.Version, id, recordDate, description, paymentDate, dividendAmount, percentFranked, drpPrice);
+            var @event = new DividendAddedEvent(_Stock.Id, _Stock.Version, id, recordDate, description, paymentDate, dividendAmount, percentFranked, drpPrice);
 
             Apply(@event);
             PublishEvent(@event);
@@ -101,7 +104,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
                 description = "Transformation";
 
             var eventResultingStocks = resultingStocks.Select(x => new TransformationAddedEvent.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBasePercentage, x.AquisitionDate));
-            var @event = new TransformationAddedEvent(Stock.Id, Stock.Version, id, recordDate, description, implementationDate, cashComponent, rolloverReliefApplies, eventResultingStocks);                
+            var @event = new TransformationAddedEvent(_Stock.Id, _Stock.Version, id, recordDate, description, implementationDate, cashComponent, rolloverReliefApplies, eventResultingStocks);                
 
             Apply(@event);
             PublishEvent(@event);
@@ -125,7 +128,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
                     description = String.Format("{0} for {1} Stock Comsolication", originalUnits, newUnits);
             }           
 
-            var @event = new SplitConsolidationAddedEvent(Stock.Id, Stock.Version, id, recordDate, description, originalUnits, newUnits);
+            var @event = new SplitConsolidationAddedEvent(_Stock.Id, _Stock.Version, id, recordDate, description, originalUnits, newUnits);
 
             Apply(@event);
             PublishEvent(@event);
@@ -143,7 +146,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             if (description == "")
                 description = "Complex corporate action";
 
-            var builder = new CompositeActionBuilder(Stock, id, recordDate, description, x => { Apply(x); PublishEvent(x); });
+            var builder = new CompositeActionBuilder(_Stock, id, recordDate, description, x => { Apply(x); PublishEvent(x); });
 
             return builder;
         }

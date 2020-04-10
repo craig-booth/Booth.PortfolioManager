@@ -14,45 +14,31 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
     class IncomeReceivedTests
     {
         [TestCase]
-        public void NoSharesOwned()
+        public void IncorrectTransactionType()
         {
-            var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-
-            var transaction = new IncomeReceived()
+            var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
-                Date = new Date(2020, 02, 01),
-                Stock = stock,
-                Comment = "Test Dividend",
-                RecordDate = new Date(2020, 01, 01),
-                FrankedAmount = 10.00m,
-                UnfrankedAmount = 20.00m,
-                FrankingCredits = 30.00m,
-                Interest = 40.00m,
-                TaxDeferred = 0.00m,
-                CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                Date = new Date(2020, 01, 01),
+                Comment = "Test Deposit",
+                CashTransactionType = BankAccountTransactionType.Deposit,
+                Amount = 100.00m
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var holding = mockRepository.Create<IHolding>();
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(default(IHolding));
-
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new IncomeReceivedHandler(holdings.Object, cashAccount.Object);
+            var handler = new IncomeReceivedHandler();
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NoParcelsForTransaction)));
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
 
             mockRepository.Verify();
         }
 
         [TestCase]
-        public void NoSharesAtRecordDated()
+        public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
@@ -78,14 +64,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(false);
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
-
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new IncomeReceivedHandler(holdings.Object, cashAccount.Object);
+            var handler = new IncomeReceivedHandler();
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NoParcelsForTransaction)));
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(NoSharesOwned)));
+
+            mockRepository.Verify();
         }
 
         [TestCase]
@@ -119,13 +104,10 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
             holding.Setup(x => x.DrpAccount).Returns(drpAccount.Object);
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
-
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new IncomeReceivedHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new IncomeReceivedHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -161,14 +143,12 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
             holding.Setup(x => x.DrpAccount).Returns(drpAccount.Object);
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 70.00m, "Distribution for ABC")).Verifiable();
 
-            var handler = new IncomeReceivedHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new IncomeReceivedHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -205,13 +185,10 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             holding.Setup(x => x.DrpAccount).Returns(drpAccount.Object);
             holding.Setup(x => x.AddDrpAccountAmount(new Date(2020, 02, 01), -50.00m)).Verifiable();
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
-
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new IncomeReceivedHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new IncomeReceivedHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -256,39 +233,12 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
             holding.Setup(x => x.DrpAccount).Returns(drpAccount.Object);
-            holding.Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
 
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new IncomeReceivedHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
-
-            mockRepository.Verify();
-        }
-
-        [TestCase]
-        public void IncorrectTransactionType()
-        {
-            var transaction = new CashTransaction()
-            {
-                Id = Guid.NewGuid(),
-                Date = new Date(2020, 01, 01),
-                Comment = "Test Deposit",
-                CashTransactionType = BankAccountTransactionType.Deposit,
-                Amount = 100.00m
-            };
-
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            var cashAccount = mockRepository.Create<ICashAccount>();
-
-            var handler = new IncomeReceivedHandler(holdings.Object, cashAccount.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException);
+            var handler = new IncomeReceivedHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }

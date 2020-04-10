@@ -35,7 +35,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             {
                 Assert.That(holding.Stock, Is.EqualTo(stock));
                 Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding.Properties[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
+                Assert.That(holding[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
             });
             
         }
@@ -58,7 +58,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             {
                 Assert.That(holding.Stock, Is.EqualTo(stock1));
                 Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding.Properties[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
+                Assert.That(holding[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
             });
         }
 
@@ -296,7 +296,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             {
                 Assert.That(holding.Stock, Is.EqualTo(stock1));
                 Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding.Properties[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
+                Assert.That(holding[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
             });
         }
 

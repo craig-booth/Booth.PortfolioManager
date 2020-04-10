@@ -6,8 +6,7 @@ using Booth.EventStore;
 
 namespace Booth.PortfolioManager.Domain
 {
-    public interface IRepository<T>
-        where T : ITrackedEntity
+    public interface IRepository<T> where T : ITrackedEntity
     {
         T Get(Guid id);
         IEnumerable<T> All();
@@ -22,7 +21,7 @@ namespace Booth.PortfolioManager.Domain
          where T : ITrackedEntity
     {
         protected IEventStream<T> _EventStream;
-        protected IEntityFactory<T> _EntityFactory;
+        protected ITrackedEntityFactory<T> _EntityFactory;
         protected Func<Guid, string, T> _CreateFunction;
 
         private Repository(IEventStream<T> eventStream)
@@ -30,7 +29,7 @@ namespace Booth.PortfolioManager.Domain
             _EventStream = eventStream;
         }
 
-        public Repository(IEventStream<T> eventStream, IEntityFactory<T> entityFactory)
+        public Repository(IEventStream<T> eventStream, ITrackedEntityFactory<T> entityFactory)
             : this(eventStream)
         {
             _EntityFactory = entityFactory;

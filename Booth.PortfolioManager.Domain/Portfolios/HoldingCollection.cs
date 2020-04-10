@@ -9,26 +9,24 @@ using Booth.PortfolioManager.Domain.Stocks;
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
 
-    public interface IReadOnlyHoldingCollection
+    public interface IHoldingCollection
     {
-        IReadOnlyHolding Get(Guid stockId);
+        IReadOnlyHolding this[Guid stockId] { get; }
         IEnumerable<IReadOnlyHolding> All();
         IEnumerable<IReadOnlyHolding> All(Date date);
         IEnumerable<IReadOnlyHolding> All(DateRange dateRange);
     }
 
-    public interface IHoldingCollection : IReadOnlyHoldingCollection
-    {
-        IHolding this[Guid stockId] { get; }
-
-        IHolding Add(Stock stock, Date fromDate);
-    }
-
-    public class HoldingCollection : IHoldingCollection, IReadOnlyHoldingCollection
+    public class HoldingCollection : IHoldingCollection
     {
         private Dictionary<Guid, Holding> _Holdings = new Dictionary<Guid, Holding>();
 
-        public IHolding this[Guid stockId]
+        IReadOnlyHolding IHoldingCollection.this[Guid stockId]
+        {
+            get { return this[stockId];  }
+        }
+
+        public Holding this[Guid stockId]
         {
             get
             {
@@ -59,7 +57,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             return this[stockId];
         }
 
-        public IHolding Add(Stock stock, Date fromDate)
+        public Holding Add(IReadOnlyStock stock, Date fromDate)
         {
             var holding = new Holding(stock, fromDate);
             _Holdings.Add(stock.Id, holding);

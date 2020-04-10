@@ -7,6 +7,7 @@ using Moq;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Stocks;
 
 
@@ -23,7 +24,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
-            Assert.That(holding[new Date(2000, 01, 01)].ToList(), Is.Empty);
+            Assert.That(holding.Parcels(new Date(2000, 01, 01)).ToList(), Is.Empty);
         }
 
         [TestCase]
@@ -36,7 +37,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding[new Date(1999, 01, 01)].ToList(), Is.Empty);
+            Assert.That(holding.Parcels(new Date(1999, 01, 01)).ToList(), Is.Empty);
         }
 
         [TestCase]
@@ -49,7 +50,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding[new Date(2002, 01, 01)].ToList(), Has.Count.EqualTo(2));
+            Assert.That(holding.Parcels(new Date(2002, 01, 01)).ToList(), Has.Count.EqualTo(2));
         }
 
         [TestCase]
@@ -161,7 +162,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             Assert.Multiple(() =>
             {
-                var properties = holding.Properties[new Date(2000, 01, 01)];
+                var properties = holding[new Date(2000, 01, 01)];
                 Assert.That(properties, Is.EqualTo(new HoldingProperties(100, 1000.00m, 1200.00m)));
 
                 Assert.That(holding.Settings.ParticipateInDrp, Is.EqualTo(false));
@@ -178,7 +179,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            var properties = holding.Properties[new Date(2001, 01, 01)];
+            var properties = holding[new Date(2001, 01, 01)];
             Assert.That(properties, Is.EqualTo(new HoldingProperties(300, 3000.00m, 3400.00m)));
         }
 
@@ -193,27 +194,38 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var parcel = new Parcel(Guid.NewGuid(), new Date(2000, 01, 01), new Date(2000, 01, 01), new ParcelProperties(100, 1000.00m, 1200.00m), null);
 
-            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 1000.00m, null), Throws.TypeOf(typeof(ArgumentException)));
+            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 1000.00m, 500.00m, CgtMethod.Other, null), Throws.TypeOf(typeof(ArgumentException)));
         }
 
         [TestCase]
         public void DisposeOfParcelPartialSale()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
+            var eventSink = mockRepository.Create<ICgtEventSink>();
+            CgtEventArgs cgtEvent = null;
+            eventSink.Setup(x => x.OnCgtEventOccured(It.IsAny<Holding>(), It.IsAny<CgtEventArgs>()))
+                .Callback<object, CgtEventArgs>((o, e) => cgtEvent = e)
+                .Verifiable();
+
             var holding = new Holding(stock, new Date(2000, 01, 01));
+            holding.CgtEventOccurred += eventSink.Object.OnCgtEventOccured;
+
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 99, 500.00m, null);
+            var transaction = new Disposal();
+            holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 99, 500.00m, 10.00m, CgtMethod.Discount, transaction);
 
             Assert.Multiple(() =>
             {
-                var holdingProperties = holding.Properties[new Date(2000, 12, 31)];
+                var holdingProperties = holding[new Date(2000, 12, 31)];
                 Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(300, 3000.00m, 3400.00m)));
 
-                holdingProperties = holding.Properties[new Date(2001, 01, 01)];
+                holdingProperties = holding[new Date(2001, 01, 01)];
                 Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(201, 2010.00m, 2212.00m)));
 
                 var parcelProperties = parcel.Properties[new Date(2000, 12, 31)];
@@ -221,20 +233,40 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
                 parcelProperties = parcel.Properties[new Date(2001, 01, 01)];
                 Assert.That(parcelProperties, Is.EqualTo(new ParcelProperties(1, 10.00m, 12.00m)));
+
+                Assert.That(cgtEvent.EventDate, Is.EqualTo(new Date(2001, 01, 01)));
+                Assert.That(cgtEvent.Stock, Is.EqualTo(stock));
+                Assert.That(cgtEvent.AmountReceived, Is.EqualTo(500.00m));
+                Assert.That(cgtEvent.CapitalGain, Is.EqualTo(10.00m));
+                Assert.That(cgtEvent.CgtMethod, Is.EqualTo(CgtMethod.Discount));
+                Assert.That(cgtEvent.Transaction, Is.EqualTo(transaction));
             });
+
+            mockRepository.Verify();
         }
 
         [TestCase]
         public void DisposeOfParcelFullSale()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
+            var eventSink = mockRepository.Create<ICgtEventSink>();
+            CgtEventArgs cgtEvent = null;
+            eventSink.Setup(x => x.OnCgtEventOccured(It.IsAny<Holding>(), It.IsAny<CgtEventArgs>()))
+                .Callback<object, CgtEventArgs>((o, e) => cgtEvent = e)
+                .Verifiable();
+
             var holding = new Holding(stock, new Date(2000, 01, 01));
+            holding.CgtEventOccurred += eventSink.Object.OnCgtEventOccured;
+
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            holding.DisposeOfParcel(parcel.Id, new Date(2002, 01, 01), 100, 500.00m, null);
+            var transaction = new Disposal();
+            holding.DisposeOfParcel(parcel.Id, new Date(2002, 01, 01), 100, 500.00m, 10.00m, CgtMethod.Discount, transaction);
 
             Assert.Multiple(() =>
             {
@@ -248,6 +280,13 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
                 Assert.That(parcelProperties, Is.EqualTo(new ParcelProperties(100, 1000.00m, 1200.00m)));
 
                 Assert.That(parcel.EffectivePeriod.ToDate, Is.EqualTo(new Date(2002, 01, 01)));
+
+                Assert.That(cgtEvent.EventDate, Is.EqualTo(new Date(2002, 01, 01)));
+                Assert.That(cgtEvent.Stock, Is.EqualTo(stock));
+                Assert.That(cgtEvent.AmountReceived, Is.EqualTo(500.00m));
+                Assert.That(cgtEvent.CapitalGain, Is.EqualTo(10.00m));
+                Assert.That(cgtEvent.CgtMethod, Is.EqualTo(CgtMethod.Discount));
+                Assert.That(cgtEvent.Transaction, Is.EqualTo(transaction));
             });
         }
 
@@ -260,19 +299,30 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var holding = new Holding(stock, new Date(2000, 01, 01));
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
 
-            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 200, 1000.00m, null), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
+            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 200, 1000.00m, 10.00m, CgtMethod.Discount, null), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
         }
 
         [TestCase]
         public void DisposeOfLastParcel()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
 
+            var eventSink = mockRepository.Create<ICgtEventSink>();
+            CgtEventArgs cgtEvent = null;
+            eventSink.Setup(x => x.OnCgtEventOccured(It.IsAny<Holding>(), It.IsAny<CgtEventArgs>()))
+                .Callback<object, CgtEventArgs>((o, e) => cgtEvent = e)
+                .Verifiable();
+
             var holding = new Holding(stock, new Date(2000, 01, 01));
+            holding.CgtEventOccurred += eventSink.Object.OnCgtEventOccured;
+
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
 
-            holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 500.00m, null);
+            var transaction = new Disposal();
+            holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 500.00m, 10.00m, CgtMethod.Discount, transaction);
 
             Assert.Multiple(() =>
             {
@@ -283,6 +333,13 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
                 Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
 
                 Assert.That(holding.EffectivePeriod.ToDate, Is.EqualTo(new Date(2001, 01, 01)));
+
+                Assert.That(cgtEvent.EventDate, Is.EqualTo(new Date(2001, 01, 01)));
+                Assert.That(cgtEvent.Stock, Is.EqualTo(stock));
+                Assert.That(cgtEvent.AmountReceived, Is.EqualTo(500.00m));
+                Assert.That(cgtEvent.CapitalGain, Is.EqualTo(10.00m));
+                Assert.That(cgtEvent.CgtMethod, Is.EqualTo(CgtMethod.Discount));
+                Assert.That(cgtEvent.Transaction, Is.EqualTo(transaction));
             });
 
         }
@@ -379,5 +436,11 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             Assert.That(holding.DrpAccount.Balance, Is.EqualTo(50.00m));
         }
+
+    }
+
+    public interface ICgtEventSink
+    {
+        void OnCgtEventOccured(object sender, CgtEventArgs e);
     }
 }

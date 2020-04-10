@@ -11,7 +11,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public interface IPortfolioTransaction : ITransaction
     {
-        Stock Stock { get; }
+        IReadOnlyStock Stock { get; }
         string Comment { get; }
         string Description { get; }
     }

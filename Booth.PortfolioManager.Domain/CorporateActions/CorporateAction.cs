@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
 
     public interface ICorporateAction : ITransaction
     {
-        Stock Stock { get; }
+        IReadOnlyStock Stock { get; }
         CorporateActionType Type { get; }
         string Description { get; }
         IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver);

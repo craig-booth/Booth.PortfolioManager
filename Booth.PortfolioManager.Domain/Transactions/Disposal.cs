@@ -13,12 +13,12 @@ namespace Booth.PortfolioManager.Domain.Transactions
     {
         public Guid Id { get; set; }
         public Date Date { get; set; }
-        public Stock Stock { get; set; }
+        public IReadOnlyStock Stock { get; set; }
         public string Comment { get; set; }
         public int Units { get; set; }
         public decimal AveragePrice { get; set; }
         public decimal TransactionCosts { get; set; }
-        public CGTCalculationMethod CGTMethod { get; set; }
+        public CgtCalculationMethod CgtMethod { get; set; }
         public bool CreateCashTransaction { get; set; }
 
         public string Description

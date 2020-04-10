@@ -8,39 +8,29 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class ReturnOfCapitalHandler : ITransactionHandler
     {
-        private IHoldingCollection _Holdings;
-        private ICashAccount _CashAccount;
-
-        public ReturnOfCapitalHandler(IHoldingCollection holdings, ICashAccount cashAccount)
-        {
-            _Holdings = holdings;
-            _CashAccount = cashAccount;
-        }
-
-        public void ApplyTransaction(IPortfolioTransaction transaction)
+        public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var returnOfCapital = transaction as ReturnOfCapital;
             if (returnOfCapital == null)
                 throw new ArgumentException("Expected transaction to be an ReturnOfCapital");
 
-            var holding = _Holdings[returnOfCapital.Stock.Id];
-            if ((holding == null) || (!holding.IsEffectiveAt(returnOfCapital.RecordDate)))
-                throw new NoParcelsForTransaction(returnOfCapital, "No parcels found for transaction");
+            if (!holding.IsEffectiveAt(returnOfCapital.RecordDate))
+                throw new NoSharesOwned("No holdings");
 
-            /* Reduce cost base of parcels */
+            // Reduce cost base of parcels 
             decimal totalAmount = 0;
-            foreach (var parcel in holding[returnOfCapital.RecordDate])
+            foreach (var parcel in holding.Parcels(returnOfCapital.RecordDate))
             {
                 var costBaseReduction = parcel.Properties[returnOfCapital.RecordDate].Units * returnOfCapital.Amount;
                 parcel.Change(returnOfCapital.RecordDate, 0, 0.00m, costBaseReduction, transaction);
 
                 totalAmount += costBaseReduction;
-            } 
+            }
 
             if (returnOfCapital.CreateCashTransaction)
             {
                 var asxCode = returnOfCapital.Stock.Properties[returnOfCapital.RecordDate].ASXCode;
-                _CashAccount.Transfer(returnOfCapital.Date, totalAmount, String.Format("Return of capital for {0}", asxCode));
+                cashAccount.Transfer(returnOfCapital.Date, totalAmount, String.Format("Return of capital for {0}", asxCode));
             }
         }
     }

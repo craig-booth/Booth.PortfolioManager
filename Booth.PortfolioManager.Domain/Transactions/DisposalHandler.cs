@@ -9,79 +9,63 @@ using Booth.PortfolioManager.Domain.Utils;
 namespace Booth.PortfolioManager.Domain.Transactions
 {
     public class DisposalHandler : ITransactionHandler
-    { 
-        private IHoldingCollection _Holdings;
-        private ICashAccount _CashAccount;
-        private ICgtEventCollection _CgtEvents;
-
-        public DisposalHandler(IHoldingCollection holdings, ICashAccount cashAccount, ICgtEventCollection cgtEvents)
-        {
-            _Holdings = holdings;
-            _CashAccount = cashAccount;
-            _CgtEvents = cgtEvents;
-        }
-
-        public void ApplyTransaction(IPortfolioTransaction transaction)
+    {
+        public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var disposal = transaction as Disposal;
             if (disposal == null)
                 throw new ArgumentException("Expected transaction to be a Disposal");
 
-            var holding = _Holdings[disposal.Stock.Id];
-            if (holding == null)
-                throw new NoParcelsForTransaction(disposal, "No parcels found for transaction");
+            if (!holding.IsEffectiveAt(disposal.Date))
+                throw new NoSharesOwned("No holdings");
 
             if (holding.Properties[disposal.Date].Units < disposal.Units)
-                throw new NotEnoughSharesForDisposal(disposal, "Not enough shares for disposal");
+                throw new NotEnoughSharesForDisposal("Not enough shares for disposal");
 
             // Determine which parcels to sell based on CGT method 
             decimal amountReceived = (disposal.Units * disposal.AveragePrice) - disposal.TransactionCosts;
 
             var cgtCalculator = new CgtCalculator();
-            var parcelsSold = cgtCalculator.Calculate(holding.Parcels(disposal.Date), disposal.Date, disposal.Units, amountReceived, CgtCalculator.GetCgtComparer(disposal.Date, disposal.CGTMethod));
-                            
+            var parcelsSold = cgtCalculator.Calculate(holding.Parcels(disposal.Date), disposal.Date, disposal.Units, amountReceived, CgtCalculator.GetCgtComparer(disposal.Date, disposal.CgtMethod));
+
             // Dispose of select parcels 
             if (disposal.Stock is StapledSecurity)
             {
-             /*     foreach (ParcelSold parcelSold in cgtCalculation.ParcelsSold)
-                  {
-                      var childStocks = _StockQuery.GetChildStocks(stock.Id, disposal.TransactionDate);
+                /*     foreach (ParcelSold parcelSold in cgtCalculation.ParcelsSold)
+                     {
+                         var childStocks = _StockQuery.GetChildStocks(stock.Id, disposal.TransactionDate);
 
-                      // Apportion amount based on NTA of child stocks
-                      var amountsReceived = PortfolioUtils.ApportionAmountOverChildStocks(childStocks, disposal.TransactionDate, parcelSold.AmountReceived, _StockQuery);
+                         // Apportion amount based on NTA of child stocks
+                         var amountsReceived = PortfolioUtils.ApportionAmountOverChildStocks(childStocks, disposal.TransactionDate, parcelSold.AmountReceived, _StockQuery);
 
-                      int i = 0;
-                      foreach (var childStock in childStocks)
-                      {
-                          var childParcels = _PortfolioQuery.GetParcelsForStock(childStock.Id, disposal.TransactionDate, disposal.TransactionDate);
+                         int i = 0;
+                         foreach (var childStock in childStocks)
+                         {
+                             var childParcels = _PortfolioQuery.GetParcelsForStock(childStock.Id, disposal.TransactionDate, disposal.TransactionDate);
 
-                          var childParcel = childParcels.First(x => x.PurchaseId == parcelSold.Parcel.PurchaseId);
-                          DisposeOfParcel(unitOfWork, childParcel, disposal.TransactionDate, parcelSold.UnitsSold, amountsReceived[i].Amount, transaction.Id);
+                             var childParcel = childParcels.First(x => x.PurchaseId == parcelSold.Parcel.PurchaseId);
+                             DisposeOfParcel(unitOfWork, childParcel, disposal.TransactionDate, parcelSold.UnitsSold, amountsReceived[i].Amount, transaction.Id);
 
-                          i++;
-                      }
+                             i++;
+                         }
 
-                  };  */
-            } 
+                     };  */
+            }
             else
             {
                 foreach (var parcelSold in parcelsSold)
-                {
-                    holding.DisposeOfParcel(parcelSold.Parcel.Id, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, transaction);
+                    holding.DisposeOfParcel(parcelSold.Parcel.Id, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, parcelSold.CapitalGain, parcelSold.CgtMethod, transaction);
+            }
 
-                    _CgtEvents.Add(disposal.Date, disposal.Stock, parcelSold.UnitsSold, parcelSold.CostBase, parcelSold.AmountReceived, parcelSold.CapitalGain, parcelSold.CgtMethod);
-                }
-            } 
-            
             if (disposal.CreateCashTransaction)
             {
                 var cost = disposal.Units * disposal.AveragePrice;
 
                 var asxCode = disposal.Stock.Properties[disposal.Date].ASXCode;
-                _CashAccount.Transfer(disposal.Date, cost, String.Format("Sale of {0}", asxCode));
+                cashAccount.Transfer(disposal.Date, cost, String.Format("Sale of {0}", asxCode));
 
                 if (disposal.TransactionCosts > 0.00m)
-                    _CashAccount.FeeDeducted(disposal.Date, disposal.TransactionCosts, String.Format("Brokerage for sale of {0}", asxCode));
+                    cashAccount.FeeDeducted(disposal.Date, disposal.TransactionCosts, String.Format("Brokerage for sale of {0}", asxCode));
             }
         }
     }

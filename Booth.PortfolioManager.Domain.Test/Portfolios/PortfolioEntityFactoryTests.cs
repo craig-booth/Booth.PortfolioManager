@@ -18,12 +18,13 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var stockResolver = mockRepository.Create<IStockResolver>();
-
-            var factory = new PortfolioEntityFactory(stockResolver.Object);
-
             var id = Guid.NewGuid();
-            var portfolio = factory.Create(id, "test");
+            var createdPortfolio = new Portfolio(id, null, null);
+            var portfolioFactory = mockRepository.Create<IPortfolioFactory>();
+            portfolioFactory.Setup(x => x.CreatePortfolio(id, "", Guid.Empty)).Returns(createdPortfolio).Verifiable();
+            var entityFactory = new PortfolioEntityFactory(portfolioFactory.Object);
+
+            var portfolio = entityFactory.Create(id, "test");
 
             Assert.That(portfolio.Id, Is.EqualTo(id));
 

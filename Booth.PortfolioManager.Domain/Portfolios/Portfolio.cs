@@ -12,58 +12,73 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
+    public interface IPortfolioFactory
+    {
+        Portfolio CreatePortfolio(Guid id, string name, Guid owner);
+    }
 
-    public class PortfolioFactory
+    public class PortfolioFactory : IPortfolioFactory
     {
 
         private IStockResolver _StockResolver;
+        private IServiceFactory<ITransactionHandler> _TransactionHandlers = new ServiceFactory<ITransactionHandler>();
         public PortfolioFactory(IStockResolver stockResolver)
         {
             _StockResolver = stockResolver;
+
+            _TransactionHandlers.Register<Aquisition>(() => new AquisitionHandler());
+            _TransactionHandlers.Register<Disposal>(() => new DisposalHandler());
+            _TransactionHandlers.Register<CashTransaction>(() => new CashTransactionHandler());
+            _TransactionHandlers.Register<OpeningBalance>(() => new OpeningBalanceHandler());
+            _TransactionHandlers.Register<IncomeReceived>(() => new IncomeReceivedHandler());
+            _TransactionHandlers.Register<ReturnOfCapital>(() => new ReturnOfCapitalHandler()); 
         }
 
-        public IPortfolio CreatePortfolio(Guid id, string name, Guid owner)
+        public Portfolio CreatePortfolio(Guid id, string name, Guid owner)
         {
-            var portfolio = new Portfolio(id, _StockResolver);
+            var portfolio = new Portfolio(id, _StockResolver, _TransactionHandlers);
             portfolio.Create(name, owner);
 
             return portfolio;
-
         }
     }
 
-    public interface IPortfolio
+    public interface IReadOnlyPortfolio
     {
+        Guid Id { get; }
         IReadOnlyCashAccount CashAccount { get; }
         ITransactionList<CgtEvent> CgtEvents { get; }
         Date EndDate { get; }
-        IReadOnlyHoldingCollection Holdings { get; }
+        IHoldingCollection Holdings { get; }
         string Name { get; }
         Guid Owner { get; }
         Date StartDate { get; }
         IPortfolioTransactionList Transactions { get; }
-
-        void AddOpeningBalance(Date transactionDate, Date aquisitionDate, Stock stock, int units, decimal costBase, string comment, Guid transactionId);
-        void AdjustUnitCount(Date date, Stock stock, int oldCount, int NewCount, string comment, Guid transactionId);
-        void AquireShares(Date aquisitionDate, Stock stock, int units, decimal averagePrice, decimal transactionCosts, bool createCashTransaction, string comment, Guid transactionId);
-        void ChangeDrpParticipation(Guid holding, bool participateInDrp);
-        void DisposeOfShares(Date disposalDate, Stock stock, int units, decimal averagePrice, decimal transactionCosts, CGTCalculationMethod cgtMethod, bool createCashTransaction, string comment, Guid transactionId);
-        void IncomeReceived(Date recordDate, Date paymentDate, Stock stock, decimal frankedAmount, decimal unfrankedAmount, decimal frankingCredits, decimal interest, decimal taxDeferred, decimal drpCashBalance, bool createCashTransaction, string comment, Guid transactionId);
-        void MakeCashTransaction(Date transactionDate, BankAccountTransactionType type, decimal amount, string comment, Guid transactionId);
-        void ReturnOfCapitalReceived(Date paymentDate, Date recordDate, Stock stock, decimal amount, bool createCashTransaction, string comment, Guid transactionId);
     }
 
-    public class Portfolio : TrackedEntity, IPortfolio
+    public interface IPortfolio : IReadOnlyPortfolio
     {
-        private ServiceFactory<ITransactionHandler> _TransactionHandlers = new ServiceFactory<ITransactionHandler>();
+        void ChangeDrpParticipation(Guid stockId, bool participateInDrp);
+        void AddOpeningBalance(Guid stockId, Date transactionDate, Date aquisitionDate, int units, decimal costBase, string comment, Guid transactionId);
+        void AdjustUnitCount(Guid stockId, Date date,int oldCount, int NewCount, string comment, Guid transactionId);
+        void AquireShares(Guid stockId, Date aquisitionDate, int units, decimal averagePrice, decimal transactionCosts, bool createCashTransaction, string comment, Guid transactionId);
+        void DisposeOfShares(Guid stockId, Date disposalDate, int units, decimal averagePrice, decimal transactionCosts, CgtCalculationMethod cgtMethod, bool createCashTransaction, string comment, Guid transactionId);
+        void IncomeReceived(Guid stockId, Date recordDate, Date paymentDate, decimal frankedAmount, decimal unfrankedAmount, decimal frankingCredits, decimal interest, decimal taxDeferred, decimal drpCashBalance, bool createCashTransaction, string comment, Guid transactionId);
+        void MakeCashTransaction(Date transactionDate, BankAccountTransactionType type, decimal amount, string comment, Guid transactionId);
+        void ReturnOfCapitalReceived(Guid stockId, Date paymentDate, Date recordDate, decimal amount, bool createCashTransaction, string comment, Guid transactionId);
+    }
+
+    public class Portfolio : TrackedEntity, IPortfolio, IReadOnlyPortfolio
+    {
+        private IServiceFactory<ITransactionHandler> _TransactionHandlers;
 
         public string Name { get; private set; }
         public Guid Owner { get; private set; }
 
         private IStockResolver _StockResolver;
 
-        private IHoldingCollection _Holdings = new HoldingCollection();
-        public IReadOnlyHoldingCollection Holdings => _Holdings;
+        private HoldingCollection _Holdings = new HoldingCollection();
+        public IHoldingCollection Holdings => _Holdings;
 
         private PortfolioTransactionList _Transactions = new PortfolioTransactionList();
         public IPortfolioTransactionList Transactions => _Transactions;
@@ -84,17 +99,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             get { return Date.MaxValue; }
         }
 
-        public Portfolio(Guid id, IStockResolver stockResolver)
+        public Portfolio(Guid id, IStockResolver stockResolver, IServiceFactory<ITransactionHandler> transactionHandlers)
             : base(id)
         {
             _StockResolver = stockResolver;
-
-            _TransactionHandlers.Register<Aquisition>(() => new AquisitionHandler(_Holdings, _CashAccount));
-            _TransactionHandlers.Register<Disposal>(() => new DisposalHandler(_Holdings, _CashAccount, _CgtEvents));
-            _TransactionHandlers.Register<CashTransaction>(() => new CashTransactionHandler(_CashAccount));
-            _TransactionHandlers.Register<OpeningBalance>(() => new OpeningBalanceHandler(_Holdings, _CashAccount));
-            _TransactionHandlers.Register<IncomeReceived>(() => new IncomeReceivedHandler(_Holdings, _CashAccount));
-            _TransactionHandlers.Register<ReturnOfCapital>(() => new ReturnOfCapitalHandler(_Holdings, _CashAccount));
+            _TransactionHandlers = transactionHandlers;
         }
 
         public void Create(string name, Guid owner)
@@ -113,9 +122,13 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             Owner = @event.Owner;
         }
 
-        public void ChangeDrpParticipation(Guid holding, bool participateInDrp)
+        public void ChangeDrpParticipation(Guid stockId, bool participateInDrp)
         {
-            var @event = new DrpParticipationChangedEvent(Id, Version, holding, participateInDrp);
+            var holding = _Holdings[stockId];
+            if (holding == null)
+                throw new ArgumentException("No holding found");
+
+            var @event = new DrpParticipationChangedEvent(Id, Version, holding.Id, participateInDrp);
             Apply(@event);
 
             PublishEvent(@event);
@@ -143,22 +156,24 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public void Apply(CashTransactionOccurredEvent @event)
         {
-            var cashTransaction = new CashTransaction();
-            cashTransaction.Id = @event.TransactionId;
-            cashTransaction.Date = @event.Date;
-            cashTransaction.Stock = _StockResolver.GetStock(@event.Stock);
-            cashTransaction.Comment = @event.Comment;
-            cashTransaction.CashTransactionType = @event.CashTransactionType;
-            cashTransaction.Amount = @event.Amount;
+            var cashTransaction = new CashTransaction
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = null,
+                Comment = @event.Comment,
+                CashTransactionType = @event.CashTransactionType,
+                Amount = @event.Amount
+            };
 
             var handler = _TransactionHandlers.GetService<CashTransaction>();
-            handler.ApplyTransaction(cashTransaction);
+            handler.Apply(cashTransaction, null, _CashAccount);
             _Transactions.Add(cashTransaction);
         }
 
-        public void AquireShares(Date aquisitionDate, Stock stock, int units, decimal averagePrice, decimal transactionCosts, bool createCashTransaction, string comment, Guid transactionId)
+        public void AquireShares(Guid stockId, Date aquisitionDate, int units, decimal averagePrice, decimal transactionCosts, bool createCashTransaction, string comment, Guid transactionId)
         {
-            var @event = new AquisitionOccurredEvent(Id, Version, transactionId, aquisitionDate, stock.Id, comment)
+            var @event = new AquisitionOccurredEvent(Id, Version, transactionId, aquisitionDate, stockId, comment)
             {
                 Units = units,
                 AveragePrice = averagePrice,
@@ -171,30 +186,39 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         }
 
         public void Apply(AquisitionOccurredEvent @event)
-        {
-            var aquisition = new Aquisition();
-            aquisition.Id = @event.TransactionId;
-            aquisition.Date = @event.Date;
-            aquisition.Stock = _StockResolver.GetStock(@event.Stock);
-            aquisition.Comment = @event.Comment;
-            aquisition.Units = @event.Units;
-            aquisition.AveragePrice = @event.AveragePrice;
-            aquisition.TransactionCosts = @event.TransactionCosts;
-            aquisition.CreateCashTransaction = @event.CreateCashTransaction;
+        {         
+            var holding = _Holdings[@event.Stock];
+            if (holding == null)
+            {
+                var stock = _StockResolver.GetStock(@event.Stock);
+                holding = _Holdings.Add(stock, @event.Date);
+            }
+
+            var aquisition = new Aquisition
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = holding.Stock,
+                Comment = @event.Comment,
+                Units = @event.Units,
+                AveragePrice = @event.AveragePrice,
+                TransactionCosts = @event.TransactionCosts,
+                CreateCashTransaction = @event.CreateCashTransaction
+            };
 
             var handler = _TransactionHandlers.GetService<Aquisition>();
-            handler.ApplyTransaction(aquisition);
+            handler.Apply(aquisition, holding, _CashAccount);
             _Transactions.Add(aquisition);
         }
 
-        public void DisposeOfShares(Date disposalDate, Stock stock, int units, decimal averagePrice, decimal transactionCosts, CGTCalculationMethod cgtMethod, bool createCashTransaction, string comment, Guid transactionId)
+        public void DisposeOfShares(Guid stockId, Date disposalDate, int units, decimal averagePrice, decimal transactionCosts, CgtCalculationMethod cgtMethod, bool createCashTransaction, string comment, Guid transactionId)
         {
-            var @event = new DisposalOccurredEvent(Id, Version, transactionId, disposalDate, stock.Id, comment)
+            var @event = new DisposalOccurredEvent(Id, Version, transactionId, disposalDate, stockId, comment)
             {
                 Units = units,
                 AveragePrice = averagePrice,
                 TransactionCosts = transactionCosts,
-                CGTMethod = cgtMethod,
+                CgtMethod = cgtMethod,
                 CreateCashTransaction = createCashTransaction
             };
             Apply(@event);
@@ -204,24 +228,30 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public void Apply(DisposalOccurredEvent @event)
         {
-            var disposal = new Disposal();
-            disposal.Id = @event.TransactionId;
-            disposal.Date = @event.Date;
-            disposal.Stock = _StockResolver.GetStock(@event.Stock);
-            disposal.Comment = @event.Comment;
-            disposal.Units = @event.Units;
-            disposal.AveragePrice = @event.AveragePrice;
-            disposal.TransactionCosts = @event.TransactionCosts;
-            disposal.CreateCashTransaction = @event.CreateCashTransaction;
+            var holding = _Holdings[@event.Stock];
+            if (holding == null)
+                throw new NoSharesOwned("No shares owned");
+
+            var disposal = new Disposal
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = holding.Stock,
+                Comment = @event.Comment,
+                Units = @event.Units,
+                AveragePrice = @event.AveragePrice,
+                TransactionCosts = @event.TransactionCosts,
+                CreateCashTransaction = @event.CreateCashTransaction
+            };
 
             var handler = _TransactionHandlers.GetService<Disposal>();
-            handler.ApplyTransaction(disposal);
+            handler.Apply(disposal, holding, _CashAccount);
             _Transactions.Add(disposal);
         }
 
-        public void IncomeReceived(Date recordDate, Date paymentDate, Stock stock, decimal frankedAmount, decimal unfrankedAmount, decimal frankingCredits, decimal interest, decimal taxDeferred, decimal drpCashBalance, bool createCashTransaction, string comment, Guid transactionId)
+        public void IncomeReceived(Guid stockId, Date recordDate, Date paymentDate, decimal frankedAmount, decimal unfrankedAmount, decimal frankingCredits, decimal interest, decimal taxDeferred, decimal drpCashBalance, bool createCashTransaction, string comment, Guid transactionId)
         {
-            var @event = new IncomeOccurredEvent(Id, Version, transactionId, paymentDate, stock.Id, comment)
+            var @event = new IncomeOccurredEvent(Id, Version, transactionId, paymentDate, stockId, comment)
             {
                 RecordDate = recordDate,
                 FrankedAmount = frankedAmount,
@@ -239,28 +269,34 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public void Apply(IncomeOccurredEvent @event)
         {
-            var incomeReceived = new IncomeReceived();
-            incomeReceived.Id = @event.TransactionId;
-            incomeReceived.Date = @event.Date;
-            incomeReceived.Stock = _StockResolver.GetStock(@event.Stock);
-            incomeReceived.Comment = @event.Comment;
-            incomeReceived.RecordDate = @event.RecordDate;
-            incomeReceived.FrankedAmount = @event.FrankedAmount;
-            incomeReceived.UnfrankedAmount = @event.UnfrankedAmount;
-            incomeReceived.FrankingCredits = @event.FrankingCredits;
-            incomeReceived.Interest = @event.Interest;
-            incomeReceived.TaxDeferred = @event.TaxDeferred;
-            incomeReceived.CreateCashTransaction = @event.CreateCashTransaction;
-            incomeReceived.DRPCashBalance = @event.DRPCashBalance;
+            var holding = _Holdings[@event.Stock];
+            if (holding == null)
+                throw new NoSharesOwned("No shares owned");
+
+            var incomeReceived = new IncomeReceived
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = holding.Stock,
+                Comment = @event.Comment,
+                RecordDate = @event.RecordDate,
+                FrankedAmount = @event.FrankedAmount,
+                UnfrankedAmount = @event.UnfrankedAmount,
+                FrankingCredits = @event.FrankingCredits,
+                Interest = @event.Interest,
+                TaxDeferred = @event.TaxDeferred,
+                CreateCashTransaction = @event.CreateCashTransaction,
+                DRPCashBalance = @event.DRPCashBalance
+            };
 
             var handler = _TransactionHandlers.GetService<IncomeReceived>();
-            handler.ApplyTransaction(incomeReceived);
+            handler.Apply(incomeReceived, holding, _CashAccount);
             _Transactions.Add(incomeReceived);
         }
 
-        public void AddOpeningBalance(Date transactionDate, Date aquisitionDate, Stock stock, int units, decimal costBase, string comment, Guid transactionId)
+        public void AddOpeningBalance(Guid stockId, Date transactionDate, Date aquisitionDate, int units, decimal costBase, string comment, Guid transactionId)
         {
-            var @event = new OpeningBalanceOccurredEvent(Id, Version, transactionId, transactionDate, stock.Id, comment)
+            var @event = new OpeningBalanceOccurredEvent(Id, Version, transactionId, transactionDate, stockId, comment)
             {
                 AquisitionDate = aquisitionDate,
                 Units = units,
@@ -273,38 +309,95 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public void Apply(OpeningBalanceOccurredEvent @event)
         {
-            var openingBalance = new OpeningBalance();
-            openingBalance.Id = @event.TransactionId;
-            openingBalance.Date = @event.Date;
-            openingBalance.Stock = _StockResolver.GetStock(@event.Stock);
-            openingBalance.Comment = @event.Comment;
-            openingBalance.AquisitionDate = @event.AquisitionDate;
-            openingBalance.Units = @event.Units;
-            openingBalance.CostBase = @event.CostBase;
+            var holding = _Holdings[@event.Stock];
+            if (holding == null)
+            {
+                var stock = _StockResolver.GetStock(@event.Stock);
+                holding = _Holdings.Add(stock, @event.Date);
+            }
+
+            var openingBalance = new OpeningBalance
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = holding.Stock,
+                Comment = @event.Comment,
+                AquisitionDate = @event.AquisitionDate,
+                Units = @event.Units,
+                CostBase = @event.CostBase
+            };
 
             var handler = _TransactionHandlers.GetService<OpeningBalance>();
-            handler.ApplyTransaction(openingBalance);
+            handler.Apply(openingBalance, holding, _CashAccount);
             _Transactions.Add(openingBalance);
         }
 
-        public void ReturnOfCapitalReceived(Date paymentDate, Date recordDate, Stock stock, decimal amount, bool createCashTransaction, string comment, Guid transactionId)
+        public void ReturnOfCapitalReceived(Guid stockId, Date paymentDate, Date recordDate, decimal amount, bool createCashTransaction, string comment, Guid transactionId)
         {
+            var @event = new ReturnOfCapitalOccurredEvent(Id, Version, transactionId, paymentDate, stockId, comment)
+            {
+                RecordDate = recordDate,
+                Amount = amount,
+                CreateCashTransaction = createCashTransaction
+            };
+            Apply(@event);
 
+            PublishEvent(@event);
         }
 
         public void Apply(ReturnOfCapitalOccurredEvent @event)
         {
+            var holding = _Holdings[@event.Stock];
+            if (holding == null)
+                throw new NoSharesOwned("No shares owned");
 
+            var returnOfCapital = new ReturnOfCapital
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = holding.Stock,
+                Comment = @event.Comment,
+                RecordDate = @event.RecordDate,
+                Amount = @event.Amount,
+                CreateCashTransaction = @event.CreateCashTransaction
+            };
+
+            var handler = _TransactionHandlers.GetService<ReturnOfCapital>();
+            handler.Apply(returnOfCapital, holding, _CashAccount);
+            _Transactions.Add(returnOfCapital);
         }
 
-        public void AdjustUnitCount(Date date, Stock stock, int oldCount, int NewCount, string comment, Guid transactionId)
+        public void AdjustUnitCount(Guid stockId, Date date, int oldCount, int newCount, string comment, Guid transactionId)
         {
+            var @event = new UnitCountAdjustmentOccurredEvent(Id, Version, transactionId, date, stockId, comment)
+            {
+                OriginalUnitCount = oldCount,
+                NewUnitCount = newCount
+            };
+            Apply(@event);
 
+            PublishEvent(@event);
         }
 
         public void Apply(UnitCountAdjustmentOccurredEvent @event)
         {
+            var holding = _Holdings[@event.Stock];
+            if (holding == null)
+                throw new NoSharesOwned("No shares owned");
 
+            var unitCountAdjustment = new UnitCountAdjustment
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = holding.Stock,
+                Comment = @event.Comment,
+                OriginalUnits = @event.OriginalUnitCount,
+                NewUnits = @event.NewUnitCount
+            };
+
+            var handler = _TransactionHandlers.GetService<UnitCountAdjustment>();
+            handler.Apply(unitCountAdjustment, holding, _CashAccount);
+            _Transactions.Add(unitCountAdjustment);
         }
     }
 }

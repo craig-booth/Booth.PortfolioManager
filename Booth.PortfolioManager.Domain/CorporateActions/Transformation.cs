@@ -14,7 +14,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     public class Transformation : ICorporateAction
     {
         public Guid Id { get; private set; }
-        public Stock Stock { get; private set; }
+        public IReadOnlyStock Stock { get; private set; }
         public Date Date { get; private set; }
         public CorporateActionType Type { get; private set; }
         public string Description { get; private set; }
@@ -28,7 +28,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             get { return _ResultingStocks; }
         }
 
-        internal Transformation(Guid id, Stock stock, Date actionDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<ResultingStock> resultingStocks)
+        internal Transformation(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<ResultingStock> resultingStocks)
         {
             Id = id;
             Stock = stock;
@@ -117,7 +117,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
                     Units = holdingProperties.Units,
                     AveragePrice = CashComponent,
                     TransactionCosts = 0.00m,
-                    CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                    CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                     CreateCashTransaction = true,
                     Comment = Description
                 });

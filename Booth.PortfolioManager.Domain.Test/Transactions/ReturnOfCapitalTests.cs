@@ -13,6 +13,29 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
     class ReturnOfCapitalTests
     {
+        [TestCase]
+        public void IncorrectTransactionType()
+        {
+            var transaction = new CashTransaction()
+            {
+                Id = Guid.NewGuid(),
+                Date = new Date(2020, 01, 01),
+                Comment = "Test Deposit",
+                CashTransactionType = BankAccountTransactionType.Deposit,
+                Amount = 100.00m
+            };
+
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var holding = mockRepository.Create<IHolding>();
+            var cashAccount = mockRepository.Create<ICashAccount>();
+
+            var handler = new ReturnOfCapitalHandler();
+
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+
+            mockRepository.Verify();
+        }
 
         [TestCase]
         public void NoSharesOwned()
@@ -34,15 +57,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var holding = mockRepository.Create<IHolding>();
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(default(IHolding));
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(false);
 
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
+            var handler = new ReturnOfCapitalHandler();
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NoParcelsForTransaction)));
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(NoSharesOwned)));
 
             mockRepository.Verify();
         }
@@ -72,16 +93,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
-            holding.Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel.Object });
-    
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel.Object });
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 100.00m, "Return of capital for ABC")).Verifiable(); 
 
-            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new ReturnOfCapitalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -117,16 +135,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
-            holding.Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 700.00m, "Return of capital for ABC")).Verifiable();
 
-            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new ReturnOfCapitalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -157,40 +172,12 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
-            holding.Setup(x => x[new Date(2020, 01, 01)]).Returns(new IParcel[] { parcel.Object });
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel.Object });
 
             var cashAccount = mockRepository.Create<ICashAccount>();
   
-            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
-
-            mockRepository.Verify();
-        }
-
-
-        [TestCase]
-        public void IncorrectTransactionType()
-        {
-            var transaction = new CashTransaction()
-            {
-                Id = Guid.NewGuid(),
-                Date = new Date(2020, 01, 01),
-                Comment = "Test Deposit",
-                CashTransactionType = BankAccountTransactionType.Deposit,
-                Amount = 100.00m
-            };
-
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            var cashAccount = mockRepository.Create<ICashAccount>();
-
-            var handler = new ReturnOfCapitalHandler(holdings.Object, cashAccount.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException);
+            var handler = new ReturnOfCapitalHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }

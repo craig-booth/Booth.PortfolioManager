@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Booth.PortfolioManager.Domain
 {
-    public interface IEntityFactory<T> where T : IEntity
+    public interface ITrackedEntityFactory<T> where T : ITrackedEntity
     {
         T Create(Guid id, string storedEntityType);
     }
 
-    public class DefaultEntityFactory<T> : IEntityFactory<T> where T : IEntity
+    public class DefaultTrackedEntityFactory<T> : ITrackedEntityFactory<T> where T : ITrackedEntity
     {
         public T Create(Guid id, string storedEntityType)
         {

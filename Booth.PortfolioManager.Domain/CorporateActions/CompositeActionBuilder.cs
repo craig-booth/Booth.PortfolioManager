@@ -24,6 +24,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         private Action<CompositeActionAddedEvent> _Callback;
         private IEventList _ChildEvents;
         private CorporateActionList _ChildActions;
+
         public CompositeActionBuilder(Stock stock, Guid id, Date recordDate, string description, Action<CompositeActionAddedEvent> callback)
         {
             _ChildEvents = new EventList();

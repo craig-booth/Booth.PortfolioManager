@@ -14,7 +14,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     public class Dividend : ICorporateAction
     {
         public Guid Id { get; private set; }
-        public Stock Stock { get; private set; }
+        public IReadOnlyStock Stock { get; private set; }
         public Date Date { get; private set; }
         public CorporateActionType Type { get; private set; }
         public string Description { get; private set; }
@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         public decimal PercentFranked { get; private set; }
         public decimal DRPPrice { get; private set; }
 
-        internal Dividend(Guid id, Stock stock, Date actionDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
+        internal Dividend(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
         {
             Id = id;
             Stock = stock;

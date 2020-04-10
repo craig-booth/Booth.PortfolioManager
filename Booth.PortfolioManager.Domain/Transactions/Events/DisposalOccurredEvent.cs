@@ -13,7 +13,7 @@ namespace Booth.PortfolioManager.Domain.Transactions.Events
         public int Units { get; set; }
         public decimal AveragePrice { get; set; }
         public decimal TransactionCosts { get; set; }
-        public CGTCalculationMethod CGTMethod { get; set; }
+        public CgtCalculationMethod CgtMethod { get; set; }
         public bool CreateCashTransaction { get; set; }
 
         public DisposalOccurredEvent(Guid entityId, int version, Guid transactionId, Date date, Guid stock, string comment)

@@ -8,7 +8,7 @@ namespace Booth.PortfolioManager.Domain.Transactions.Events
 {
     public class ReturnOfCapitalOccurredEvent : TransactionOccurredEvent
     {
-        public DateTime RecordDate { get; set; }
+        public Date RecordDate { get; set; }
         public decimal Amount { get; set; }
         public bool CreateCashTransaction { get; set; }
 

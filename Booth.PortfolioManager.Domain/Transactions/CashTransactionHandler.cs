@@ -10,14 +10,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public class CashTransactionHandler : ITransactionHandler
     {
-        private ICashAccount _CashAccount;
-
-        public CashTransactionHandler(ICashAccount cashAccount)
-        {
-            _CashAccount = cashAccount;
-        }
-
-        public void ApplyTransaction(IPortfolioTransaction transaction)
+        public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var cashTransaction = transaction as CashTransaction;
             if (cashTransaction == null)
@@ -37,7 +30,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             else if (cashTransaction.CashTransactionType == BankAccountTransactionType.Withdrawl)
                 description = "Withdrawl";
 
-            _CashAccount.AddTransaction(cashTransaction.Date, cashTransaction.Amount, description, cashTransaction.CashTransactionType);
+            cashAccount.AddTransaction(cashTransaction.Date, cashTransaction.Amount, description, cashTransaction.CashTransactionType);
         }
     }
 }

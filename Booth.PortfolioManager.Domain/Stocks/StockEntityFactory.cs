@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
-    public class StockEntityFactory : IEntityFactory<Stock>
+    public class StockEntityFactory : ITrackedEntityFactory<Stock>
     {
 
         public Stock Create(Guid id, string storedEntityType)

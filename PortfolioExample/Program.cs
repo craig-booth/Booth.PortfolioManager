@@ -11,6 +11,9 @@ namespace PortfolioExample
     {
         static void Main(string[] args)
         {
+
+            
+
          /*   var portfolioFactory = new PortfolioFactory(new ExampleStockResolver());
 
             var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid(), "test", Guid.NewGuid());
@@ -56,7 +59,7 @@ namespace PortfolioExample
 
     class ExampleStockResolver : IStockResolver
     {
-        public Stock GetStock(Guid id)
+        public IReadOnlyStock GetStock(Guid id)
         {
             return new Stock(id);
         }

@@ -6,18 +6,18 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public class PortfolioEntityFactory : IEntityFactory<Portfolio>
+    public class PortfolioEntityFactory : ITrackedEntityFactory<Portfolio>
     {
-        private IStockResolver _StockResolver;
+        private IPortfolioFactory _PortfolioFactory;
 
-        public PortfolioEntityFactory(IStockResolver stockResolver)
+        public PortfolioEntityFactory(IPortfolioFactory portfolioFactory)
         {
-            _StockResolver = stockResolver;
+            _PortfolioFactory = portfolioFactory;
         }
 
         public Portfolio Create(Guid id, string storedEntityType)
         {
-            return new Portfolio(id, _StockResolver);
+            return _PortfolioFactory.CreatePortfolio(id, "", Guid.Empty);
         }
     }
 }

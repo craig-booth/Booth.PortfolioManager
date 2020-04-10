@@ -13,6 +13,27 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
     class CashTransactionTests
     {
+        [TestCase]
+        public void IncorrectTransactionType()
+        {
+            var transaction = new Aquisition()
+            {
+                Id = Guid.NewGuid(),
+                Date = new Date(2020, 01, 01),
+                Comment = ""
+            };
+
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var holding = mockRepository.Create<IHolding>();
+            var cashAccount = mockRepository.Create<ICashAccount>();
+
+            var handler = new CashTransactionHandler();
+
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+
+            mockRepository.Verify();
+        }
 
         [TestCase]
         public void Deposit()
@@ -31,8 +52,8 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 100.00m, "Test Deposit", BankAccountTransactionType.Deposit)).Verifiable();
 
-            var handler = new CashTransactionHandler(cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new CashTransactionHandler();
+            handler.Apply(transaction, null, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -54,8 +75,8 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 20.00m, "Test Fee", BankAccountTransactionType.Fee)).Verifiable();
 
-            var handler = new CashTransactionHandler(cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new CashTransactionHandler();
+            handler.Apply(transaction, null, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -77,8 +98,8 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 20.00m, "Test Interest", BankAccountTransactionType.Interest)).Verifiable();
 
-            var handler = new CashTransactionHandler(cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new CashTransactionHandler();
+            handler.Apply(transaction, null, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -100,8 +121,8 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 120.00m, "Test Transfer", BankAccountTransactionType.Transfer)).Verifiable();
 
-            var handler = new CashTransactionHandler(cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new CashTransactionHandler();
+            handler.Apply(transaction, null, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -123,8 +144,8 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 200.00m, "Test Withdrawl", BankAccountTransactionType.Withdrawl)).Verifiable();
 
-            var handler = new CashTransactionHandler(cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new CashTransactionHandler();
+            handler.Apply(transaction, null, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -144,7 +165,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new CashTransactionHandler(cashAccount.Object);
+            var handler = new CashTransactionHandler();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Deposit", BankAccountTransactionType.Deposit)).Verifiable();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Fee", BankAccountTransactionType.Fee)).Verifiable();
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Interest", BankAccountTransactionType.Interest)).Verifiable();
@@ -152,43 +173,23 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             cashAccount.Setup(x => x.AddTransaction(new Date(2020, 01, 01), 240.00m, "Withdrawl", BankAccountTransactionType.Withdrawl)).Verifiable();
 
             transaction.CashTransactionType = BankAccountTransactionType.Deposit;
-            handler.ApplyTransaction(transaction);
+            handler.Apply(transaction, null, cashAccount.Object);
 
             transaction.CashTransactionType = BankAccountTransactionType.Fee;
-            handler.ApplyTransaction(transaction);
+            handler.Apply(transaction, null, cashAccount.Object);
 
             transaction.CashTransactionType = BankAccountTransactionType.Interest;
-            handler.ApplyTransaction(transaction);
+            handler.Apply(transaction, null, cashAccount.Object);
 
             transaction.CashTransactionType = BankAccountTransactionType.Transfer;
-            handler.ApplyTransaction(transaction);
+            handler.Apply(transaction, null, cashAccount.Object);
 
             transaction.CashTransactionType = BankAccountTransactionType.Withdrawl;
-            handler.ApplyTransaction(transaction);
+            handler.Apply(transaction, null, cashAccount.Object);
 
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void IncorrectTransactionType()
-        {
-            var transaction = new Aquisition()
-            {
-                Id = Guid.NewGuid(),
-                Date = new Date(2020, 01, 01),
-                Comment = ""
-            };
-
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var cashAccount = mockRepository.Create<ICashAccount>();
-
-            var handler = new CashTransactionHandler(cashAccount.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException);
-
-            mockRepository.Verify();
-        }
     }
 }

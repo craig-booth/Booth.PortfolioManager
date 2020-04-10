@@ -8,26 +8,14 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public class AquisitionHandler : ITransactionHandler
     {
-        private IHoldingCollection _Holdings;
-        private ICashAccount _CashAccount;
-
-        public AquisitionHandler(IHoldingCollection holdings, ICashAccount cashAccount)
-        {
-            _Holdings = holdings;
-            _CashAccount = cashAccount;
-        }
-
-        public void ApplyTransaction(IPortfolioTransaction transaction)
+        public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var aquisition = transaction as Aquisition;
             if (aquisition == null)
                 throw new ArgumentException("Expected transaction to be an Aquisition");
 
-            var holding = _Holdings[aquisition.Stock.Id];
-            if (holding == null)
-            {
-                holding = _Holdings.Add(aquisition.Stock, aquisition.Date);
-            }
+            if (!aquisition.Stock.IsEffectiveAt(aquisition.Date))
+                throw new StockNotActive("Stock is not active");
 
             decimal cost = aquisition.Units * aquisition.AveragePrice;
             decimal amountPaid = cost + aquisition.TransactionCosts;
@@ -38,13 +26,11 @@ namespace Booth.PortfolioManager.Domain.Transactions
             if (aquisition.CreateCashTransaction)
             {
                 var asxCode = aquisition.Stock.Properties[aquisition.Date].ASXCode;
-                _CashAccount.Transfer(aquisition.Date, -cost, String.Format("Purchase of {0}", asxCode));
+                cashAccount.Transfer(aquisition.Date, -cost, String.Format("Purchase of {0}", asxCode));
 
                 if (aquisition.TransactionCosts > 0.00m)
-                    _CashAccount.FeeDeducted(aquisition.Date, aquisition.TransactionCosts, String.Format("Brokerage for purchase of {0}", asxCode));
-            }  
+                    cashAccount.FeeDeducted(aquisition.Date, aquisition.TransactionCosts, String.Format("Brokerage for purchase of {0}", asxCode));
+            }
         }
-
-
     }
 }

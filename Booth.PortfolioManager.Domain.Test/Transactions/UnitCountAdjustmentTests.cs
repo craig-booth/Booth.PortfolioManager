@@ -14,6 +14,30 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
     class UnitCountAdjustmentTests
     {
         [TestCase]
+        public void IncorrectTransactionType()
+        {
+            var transaction = new CashTransaction()
+            {
+                Id = Guid.NewGuid(),
+                Date = new Date(2020, 01, 01),
+                Comment = "Test Deposit",
+                CashTransactionType = BankAccountTransactionType.Deposit,
+                Amount = 100.00m
+            };
+
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var holding = mockRepository.Create<IHolding>();
+            var cashAccount = mockRepository.Create<ICashAccount>();
+
+            var handler = new UnitCountAdjustmentHandler();
+
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+
+            mockRepository.Verify();
+        }
+
+        [TestCase]
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -32,13 +56,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var holding = mockRepository.Create<IHolding>();
+            holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(false);
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(default(IHolding));
+            var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new UnitCountAdjustmentHandler(holdings.Object);
+            var handler = new UnitCountAdjustmentHandler();
 
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.TypeOf(typeof(NoParcelsForTransaction)));
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(NoSharesOwned)));
 
             mockRepository.Verify();
         }
@@ -67,14 +91,12 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel.Object });
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel.Object });
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            var cashAccount = mockRepository.Create<ICashAccount>();
 
-
-            var handler = new UnitCountAdjustmentHandler(holdings.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new UnitCountAdjustmentHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
@@ -109,38 +131,16 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
-            holding.Setup(x => x[new Date(2020, 02, 01)]).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
+            holding.Setup(x => x.Parcels(new Date(2020, 02, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
+            var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new UnitCountAdjustmentHandler(holdings.Object);
-            handler.ApplyTransaction(transaction);
-
-            mockRepository.Verify();
-        }
-
-        [TestCase]
-        public void IncorrectTransactionType()
-        {
-            var transaction = new CashTransaction()
-            {
-                Id = Guid.NewGuid(),
-                Date = new Date(2020, 01, 01),
-                Comment = "Test Deposit",
-                CashTransactionType = BankAccountTransactionType.Deposit,
-                Amount = 100.00m
-            };
-
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-
-            var handler = new UnitCountAdjustmentHandler(holdings.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException);
+            var handler = new UnitCountAdjustmentHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
+
+       
     }
 }

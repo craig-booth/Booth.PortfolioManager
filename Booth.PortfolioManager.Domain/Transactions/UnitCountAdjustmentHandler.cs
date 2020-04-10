@@ -6,32 +6,25 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class UnitCountAdjustmentHandler
+    public class UnitCountAdjustmentHandler : ITransactionHandler
     {
-        private IHoldingCollection _Holdings;
 
-        public UnitCountAdjustmentHandler(IHoldingCollection holdings)
-        {
-            _Holdings = holdings;
-        }
-
-        public void ApplyTransaction(IPortfolioTransaction transaction)
+        public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var unitCountAdjustment = transaction as UnitCountAdjustment;
-            if (unitCountAdjustment == null) 
-                throw new ArgumentException("Expected transaction to be an UnitCountAdjustment"); 
+            if (unitCountAdjustment == null)
+                throw new ArgumentException("Expected transaction to be an UnitCountAdjustment");
 
-            var holding = _Holdings[unitCountAdjustment.Stock.Id];
-            if ((holding == null) || (!holding.IsEffectiveAt(unitCountAdjustment.Date)))
-                throw new NoParcelsForTransaction(unitCountAdjustment, "No parcels found for transaction");
+            if (!holding.IsEffectiveAt(unitCountAdjustment.Date))
+                throw new NoSharesOwned("No holdings");
 
             // Adjust unit count of parcels
             var ratio = (decimal)unitCountAdjustment.NewUnits / (decimal)unitCountAdjustment.OriginalUnits;
-            foreach (var parcel in holding[unitCountAdjustment.Date])
+            foreach (var parcel in holding.Parcels(unitCountAdjustment.Date))
             {
                 var units = (int)Math.Ceiling(parcel.Properties[unitCountAdjustment.Date].Units * ratio);
                 parcel.Change(unitCountAdjustment.Date, units, 0.00m, 0.00m, transaction);
-            } 
+            }
         }
     }
 }

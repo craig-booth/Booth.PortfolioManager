@@ -8,26 +8,14 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public class OpeningBalanceHandler : ITransactionHandler
     {
-        private IHoldingCollection _Holdings;
-        private ICashAccount _CashAccount;
-
-        public OpeningBalanceHandler(IHoldingCollection holdings, ICashAccount cashAccount)
-        {
-            _Holdings = holdings;
-            _CashAccount = cashAccount;
-        }
-
-        public void ApplyTransaction(IPortfolioTransaction transaction)
+        public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var openingBalance = transaction as OpeningBalance;
             if (openingBalance == null)
                 throw new ArgumentException("Expected transaction to be an OpeningBalance");
 
-            var holding = _Holdings[openingBalance.Stock.Id];
-            if (holding == null)
-            {
-                holding = _Holdings.Add(openingBalance.Stock, openingBalance.Date);
-            }
+            if (!openingBalance.Stock.IsEffectiveAt(openingBalance.Date))
+                throw new StockNotActive("Stock is not active");
 
             holding.AddParcel(openingBalance.Date, openingBalance.AquisitionDate, openingBalance.Units, openingBalance.CostBase, openingBalance.CostBase, transaction);
         }

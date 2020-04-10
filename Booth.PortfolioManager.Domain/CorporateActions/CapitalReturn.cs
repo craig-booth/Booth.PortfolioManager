@@ -14,14 +14,14 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     public class CapitalReturn : ICorporateAction
     {
         public Guid Id { get; private set; }
-        public Stock Stock { get; private set; }
+        public IReadOnlyStock Stock { get; private set; }
         public Date Date { get; private set; }
         public CorporateActionType Type { get; private set; }
         public string Description { get; private set; }
         public Date PaymentDate { get; private set; }
         public decimal Amount { get; private set; }
 
-        internal CapitalReturn(Guid id, Stock stock, Date actionDate, string description, Date paymentDate, decimal amount)
+        internal CapitalReturn(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal amount)
         {
             Id = id;
             Stock = stock;

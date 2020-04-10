@@ -8,41 +8,41 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    public enum CGTCalculationMethod { MinimizeGain, MaximizeGain, FirstInFirstOut, LastInFirstOut }
+    public enum CgtCalculationMethod { MinimizeGain, MaximizeGain, FirstInFirstOut, LastInFirstOut }
 
     class CgtCalculator
     {
         public static Date IndexationEndDate = new Date(1999, 09, 21);
 
-        public static CGTMethod CgtMethodForParcel(Date aquisitionDate, Date eventDate)
+        public static CgtMethod CgtMethodForParcel(Date aquisitionDate, Date eventDate)
         {
             if (aquisitionDate < IndexationEndDate)
-                return CGTMethod.Indexation;
+                return CgtMethod.Indexation;
             else if ((eventDate - aquisitionDate).Days > 365)
-                return CGTMethod.Discount;
+                return CgtMethod.Discount;
             else
-                return CGTMethod.Other;
+                return CgtMethod.Other;
         }
 
-        public static decimal DiscountedCgt(decimal cgtAmount, CGTMethod cgtMethod)
+        public static decimal DiscountedCgt(decimal cgtAmount, CgtMethod cgtMethod)
         {
-            if ((cgtMethod == CGTMethod.Discount) && (cgtAmount > 0.00m))
+            if ((cgtMethod == CgtMethod.Discount) && (cgtAmount > 0.00m))
                 return (cgtAmount / 2).ToCurrency(RoundingRule.Round);
             
             return cgtAmount;
         }
 
-        public static IComparer<IReadOnlyParcel> GetCgtComparer(Date disposalDate, CGTCalculationMethod method)
+        public static IComparer<IReadOnlyParcel> GetCgtComparer(Date disposalDate, CgtCalculationMethod method)
         {
             switch (method)
             {
-                case CGTCalculationMethod.FirstInFirstOut:
+                case CgtCalculationMethod.FirstInFirstOut:
                     return new FirstInFirstOutCgtComparer();
-                case CGTCalculationMethod.LastInFirstOut:
+                case CgtCalculationMethod.LastInFirstOut:
                     return new LastInFirstOutCgtComparer();
-                case CGTCalculationMethod.MaximizeGain:
+                case CgtCalculationMethod.MaximizeGain:
                     return new MaximizeGainCgtComparer(disposalDate);
-                case CGTCalculationMethod.MinimizeGain:
+                case CgtCalculationMethod.MinimizeGain:
                     return new MinimizeGainCgtComparer(disposalDate);
                 default:
                     throw new ArgumentException();

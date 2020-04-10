@@ -94,7 +94,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                 Units = 100,
                 AveragePrice = 10.00m,
                 TransactionCosts = 0.00m,
-                CGTMethod = CGTCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = true
             };
 

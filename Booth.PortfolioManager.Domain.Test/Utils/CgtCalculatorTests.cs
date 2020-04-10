@@ -14,7 +14,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
     {
 
         [TestCaseSource(nameof(CgtMethodCalculationData))]
-        public CGTMethod CgtMethodCalculation(Date aquisitionDate)
+        public CgtMethod CgtMethodCalculation(Date aquisitionDate)
         {
             var saleDate = new Date(2020, 01, 01);
              
@@ -24,17 +24,17 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
         static IEnumerable<TestCaseData> CgtMethodCalculationData()
         {
-            yield return new TestCaseData(new Date(1997, 01, 01)).Returns(CGTMethod.Indexation).SetName("CgtMethodCalculation(Before Indexation Date)");
-            yield return new TestCaseData(new Date(2018, 01, 01)).Returns(CGTMethod.Discount).SetName("CgtMethodCalculation(Held More Than 12 Months)");
-            yield return new TestCaseData(new Date(2019, 01, 01)).Returns(CGTMethod.Other).SetName("CgtMethodCalculation(Held 12 Months)");
-            yield return new TestCaseData(new Date(2020, 06, 01)).Returns(CGTMethod.Other).SetName("CgtMethodCalculation(Held Less Than 12 Months)");
-            yield return new TestCaseData(new Date(2020, 01, 01)).Returns(CGTMethod.Other).SetName("CgtMethodCalculation(Sold On Same Day)");
+            yield return new TestCaseData(new Date(1997, 01, 01)).Returns(CgtMethod.Indexation).SetName("CgtMethodCalculation(Before Indexation Date)");
+            yield return new TestCaseData(new Date(2018, 01, 01)).Returns(CgtMethod.Discount).SetName("CgtMethodCalculation(Held More Than 12 Months)");
+            yield return new TestCaseData(new Date(2019, 01, 01)).Returns(CgtMethod.Other).SetName("CgtMethodCalculation(Held 12 Months)");
+            yield return new TestCaseData(new Date(2020, 06, 01)).Returns(CgtMethod.Other).SetName("CgtMethodCalculation(Held Less Than 12 Months)");
+            yield return new TestCaseData(new Date(2020, 01, 01)).Returns(CgtMethod.Other).SetName("CgtMethodCalculation(Sold On Same Day)");
         }
 
         [TestCase]
         public void DiscountedCgtCalculationPositiveAmount()
         {
-            var discountedGain = CgtCalculator.DiscountedCgt(1000.00m ,CGTMethod.Discount);
+            var discountedGain = CgtCalculator.DiscountedCgt(1000.00m, CgtMethod.Discount);
 
             Assert.That(discountedGain, Is.EqualTo(500.00m));
         }
@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCase]
         public void DiscountedCgtCalculationNegativeAmount()
         {
-            var discountedGain = CgtCalculator.DiscountedCgt(-1000.00m, CGTMethod.Discount);
+            var discountedGain = CgtCalculator.DiscountedCgt(-1000.00m, CgtMethod.Discount);
 
             Assert.That(discountedGain, Is.EqualTo(-1000.00m));
         }
@@ -50,14 +50,14 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [TestCase]
         public void DiscountedCgtCalculationZeroAmount()
         {
-            var discountedGain = CgtCalculator.DiscountedCgt(0.00m, CGTMethod.Discount);
+            var discountedGain = CgtCalculator.DiscountedCgt(0.00m, CgtMethod.Discount);
 
             Assert.That(discountedGain, Is.EqualTo(0.00m));
         }
 
-        public static CGTCalculationMethod[] CgtMethods = (CGTCalculationMethod[])Enum.GetValues(typeof(CGTCalculationMethod));
+        public static CgtCalculationMethod[] CgtMethods = (CgtCalculationMethod[])Enum.GetValues(typeof(CgtCalculationMethod));
         [TestCaseSource(nameof(CgtMethods))]
-        public void CheckAllCgtMethodsHaveAComparere(CGTCalculationMethod method)
+        public void CheckAllCgtMethodsHaveAComparere(CgtCalculationMethod method)
         {
             var comparer = CgtCalculator.GetCgtComparer(Date.MinValue, method);
 
@@ -125,9 +125,9 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
             var expectedResult = new ParcelSold[]
             {
-                new ParcelSold(parcel1, 100, 110.00m, 333.33m, 223.33m, CGTMethod.Discount, 111.67m),
-                new ParcelSold(parcel4, 100, 150.00m, 333.34m, 183.34m, CGTMethod.Discount,  91.67m),
-                new ParcelSold(parcel2, 100, 130.00m, 333.33m, 203.33m, CGTMethod.Other   , 203.33m),
+                new ParcelSold(parcel1, 100, 110.00m, 333.33m, 223.33m, CgtMethod.Discount, 111.67m),
+                new ParcelSold(parcel4, 100, 150.00m, 333.34m, 183.34m, CgtMethod.Discount,  91.67m),
+                new ParcelSold(parcel2, 100, 130.00m, 333.33m, 203.33m, CgtMethod.Other   , 203.33m),
             };
 
             Assert.That(parcelsSold, Is.EqualTo(expectedResult));
@@ -157,16 +157,16 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
             var expectedResult = new ParcelSold[]
             {
-                new ParcelSold(parcel1, 100, 110.00m, 400.00m, 290.00m, CGTMethod.Discount, 145.00m),
-                new ParcelSold(parcel4, 100, 150.00m, 400.00m, 250.00m, CGTMethod.Discount, 125.00m),
-                new ParcelSold(parcel2,  50,  65.00m, 200.00m, 135.00m, CGTMethod.Other,    135.00m),
+                new ParcelSold(parcel1, 100, 110.00m, 400.00m, 290.00m, CgtMethod.Discount, 145.00m),
+                new ParcelSold(parcel4, 100, 150.00m, 400.00m, 250.00m, CgtMethod.Discount, 125.00m),
+                new ParcelSold(parcel2,  50,  65.00m, 200.00m, 135.00m, CgtMethod.Other,    135.00m),
             };
 
             Assert.That(parcelsSold, Is.EqualTo(expectedResult));
         }
 
         [TestCaseSource(nameof(CalculateParcelCgtData))]
-        public void CalculateParcelCgt(Date disposalDate, int unitsSold, decimal saleAmount, decimal expectedCostBase, decimal expectedCapitalGain, decimal expectedDiscountedGain, CGTMethod expectedCgtMethod)
+        public void CalculateParcelCgt(Date disposalDate, int unitsSold, decimal saleAmount, decimal expectedCostBase, decimal expectedCapitalGain, decimal expectedDiscountedGain, CgtMethod expectedCgtMethod)
         {
             var aquisitionDate = new Date(2017, 01, 01);
             var properties = new ParcelProperties(1000, 1000.00m, 2000.00m);
@@ -189,11 +189,11 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
         static IEnumerable<TestCaseData> CalculateParcelCgtData()
         {
-            yield return new TestCaseData(new Date(2017, 06, 30), 1000, 4000.00m, 2000.00m, 2000.00m, 2000.00m, CGTMethod.Other).SetName("CalculateParcelCgt(All units sold from first period)");
-            yield return new TestCaseData(new Date(2017, 06, 30), 500, 4000.00m, 1000.00m, 3000.00m, 3000.00m, CGTMethod.Other).SetName("CalculateParcelCgt(Half units sold from first period)");
-            yield return new TestCaseData(new Date(2017, 09, 30), 2000, 4000.00m, 4000.00m, 0.00m, 0.00m, CGTMethod.Other).SetName("CalculateParcelCgt(All units sold from current period)");
-            yield return new TestCaseData(new Date(2017, 09, 30), 1000, 4000.00m, 2000.00m, 2000.00m, 2000.00m, CGTMethod.Other).SetName("CalculateParcelCgt(Half units sold from current period)");
-            yield return new TestCaseData(new Date(2019, 09, 30), 500, 5000.00m, 1000.00m, 4000.00m, 2000.00m, CGTMethod.Discount).SetName("CalculateParcelCgt(More than 12 months)");
+            yield return new TestCaseData(new Date(2017, 06, 30), 1000, 4000.00m, 2000.00m, 2000.00m, 2000.00m, CgtMethod.Other).SetName("CalculateParcelCgt(All units sold from first period)");
+            yield return new TestCaseData(new Date(2017, 06, 30), 500, 4000.00m, 1000.00m, 3000.00m, 3000.00m, CgtMethod.Other).SetName("CalculateParcelCgt(Half units sold from first period)");
+            yield return new TestCaseData(new Date(2017, 09, 30), 2000, 4000.00m, 4000.00m, 0.00m, 0.00m, CgtMethod.Other).SetName("CalculateParcelCgt(All units sold from current period)");
+            yield return new TestCaseData(new Date(2017, 09, 30), 1000, 4000.00m, 2000.00m, 2000.00m, 2000.00m, CgtMethod.Other).SetName("CalculateParcelCgt(Half units sold from current period)");
+            yield return new TestCaseData(new Date(2019, 09, 30), 500, 5000.00m, 1000.00m, 4000.00m, 2000.00m, CgtMethod.Discount).SetName("CalculateParcelCgt(More than 12 months)");
         }
     }
 }

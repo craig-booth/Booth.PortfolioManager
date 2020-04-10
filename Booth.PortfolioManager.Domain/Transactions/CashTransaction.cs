@@ -13,7 +13,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
     {
         public Guid Id { get; set; }
         public Date Date { get; set; }
-        public Stock Stock { get; set; }
+        public IReadOnlyStock Stock { get; set; }
         public string Comment { get; set; }
         public BankAccountTransactionType CashTransactionType { get; set; }
         public decimal Amount { get; set; }

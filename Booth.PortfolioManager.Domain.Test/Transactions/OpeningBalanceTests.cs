@@ -14,41 +14,59 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
     class OpeningBalanceTests
     {
         [TestCase]
-        public void NoExistingHoldings()
+        public void IncorrectTransactionType()
         {
-            var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-
-            var transaction = new OpeningBalance()
+            var transaction = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
                 Date = new Date(2020, 01, 01),
-                Stock = stock,
-                Comment = "Test Opening Balance",
-                Units = 100,
-                AquisitionDate = new Date(2020, 02, 01),
-                CostBase = 4500.00m,    
+                Comment = "Test Deposit",
+                CashTransactionType = BankAccountTransactionType.Deposit,
+                Amount = 100.00m
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var holding = mockRepository.Create<IHolding>();
-            holding.Setup(x => x.AddParcel(new Date(2020, 01, 01), new Date(2020, 02, 01), 100, 4500.00m, 4500.00m, transaction)).Returns(default(IParcel));
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(default(IHolding));
-            holdings.Setup(x => x.Add(stock, new Date(2020, 01, 01))).Returns(holding.Object);
-
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new OpeningBalanceHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
+            var handler = new OpeningBalanceHandler();
+
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
 
             mockRepository.Verify();
         }
 
         [TestCase]
-        public void ExistingHoldings()
+        public void StockNotActive()
+        {
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(2020, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var transaction = new OpeningBalance()
+            {
+                Id = Guid.NewGuid(),
+                Date = new Date(2000, 01, 01),
+                Stock = stock,
+                Comment = "Test Opening Balance",
+                Units = 100,
+                AquisitionDate = new Date(2020, 02, 01),
+                CostBase = 4500.00m,
+            };
+
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var holding = mockRepository.Create<IHolding>();
+            var cashAccount = mockRepository.Create<ICashAccount>();
+
+            var handler = new OpeningBalanceHandler();
+            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(StockNotActive)));
+
+            mockRepository.Verify();
+        }
+
+        [TestCase]
+        public void OpeningBalance()
         {
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
@@ -69,37 +87,10 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.AddParcel(new Date(2020, 01, 01), new Date(2020, 02, 01), 100, 4500.00m, 4500.00m, transaction)).Returns(default(IParcel));
 
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            holdings.Setup(x => x[stock.Id]).Returns(holding.Object);
-
             var cashAccount = mockRepository.Create<ICashAccount>();
 
-            var handler = new OpeningBalanceHandler(holdings.Object, cashAccount.Object);
-            handler.ApplyTransaction(transaction);
-
-            mockRepository.Verify();
-        }
-
-        [TestCase]
-        public void IncorrectTransactionType()
-        {
-            var transaction = new CashTransaction()
-            {
-                Id = Guid.NewGuid(),
-                Date = new Date(2020, 01, 01),
-                Comment = "Test Deposit",
-                CashTransactionType = BankAccountTransactionType.Deposit,
-                Amount = 100.00m
-            };
-
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var holdings = mockRepository.Create<IHoldingCollection>();
-            var cashAccount = mockRepository.Create<ICashAccount>();
-
-            var handler = new OpeningBalanceHandler(holdings.Object, cashAccount.Object);
-
-            Assert.That(() => handler.ApplyTransaction(transaction), Throws.ArgumentException);
+            var handler = new OpeningBalanceHandler();
+            handler.Apply(transaction, holding.Object, cashAccount.Object);
 
             mockRepository.Verify();
         }
