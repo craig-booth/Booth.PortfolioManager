@@ -6,11 +6,8 @@
 
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.7" />
+    <PackageReference Include="Booth.EventStore.MongoDB" Version="1.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Booth.EventStore\Booth.EventStore.csproj" />
   </ItemGroup>
 
 </Project>
