@@ -4,12 +4,10 @@ using System.Linq;
 using NUnit.Framework;
 using Moq;
 
-using Booth.Common;
-using Booth.PortfolioManager.Domain;
 using Booth.EventStore;
 using System.Collections.Generic;
 
-namespace Booth.PortfolioManager.Domain.Test
+namespace Booth.EventStore.Test
 {
     class TrackedEntityTests
     {

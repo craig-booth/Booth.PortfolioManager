@@ -6,7 +6,7 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    public class UnitCountAdjustmentHandler : ITransactionHandler
+    class UnitCountAdjustmentHandler : ITransactionHandler
     {
 
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)

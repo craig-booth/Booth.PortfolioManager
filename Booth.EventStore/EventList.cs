@@ -3,11 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-using Booth.EventStore;
-
-[assembly: InternalsVisibleToAttribute("Booth.PortfolioManager.Domain.Test")]
-
-namespace Booth.PortfolioManager.Domain
+namespace Booth.EventStore
 {
 
     public interface IEventList
@@ -17,7 +13,7 @@ namespace Booth.PortfolioManager.Domain
         IEnumerable<Event> Fetch();
     }
 
-    class EventList : IEventList
+    public class EventList : IEventList
     {
         private Queue<Event> _Events = new Queue<Event>();
 

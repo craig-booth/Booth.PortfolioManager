@@ -7,7 +7,7 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    public class OpeningBalance : IPortfolioTransaction
+    class OpeningBalance : IPortfolioTransaction
     {
         public Guid Id { get; set; }
         public Date Date { get; set; }

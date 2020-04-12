@@ -6,7 +6,7 @@ using Booth.Common;
 using Booth.EventStore;
 
 namespace Booth.PortfolioManager.Domain.Stocks.Events
-{ 
+{
     public class ChangeDividendRulesEvent : Event
     {
         public Date ChangeDate { get; set; }

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Booth.PortfolioManager.Domain.Stocks
+using Booth.PortfolioManager.Domain.Stocks;
+
+namespace Booth.PortfolioManager.Domain.Portfolios
 {
     public interface IStockResolver
     {

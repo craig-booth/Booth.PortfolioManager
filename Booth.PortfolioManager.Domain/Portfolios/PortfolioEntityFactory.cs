@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Portfolios

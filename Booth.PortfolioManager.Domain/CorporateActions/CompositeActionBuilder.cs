@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Booth.Common;
+using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions.Events;
 
@@ -18,7 +19,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         void Finish();
     }
 
-    public class CompositeActionBuilder : ICompositeActionBuilder
+    class CompositeActionBuilder : ICompositeActionBuilder
     {
         private CompositeActionAddedEvent _Event;
         private Action<CompositeActionAddedEvent> _Callback;

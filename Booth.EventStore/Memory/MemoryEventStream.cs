@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Booth.EventStore.Memory
 {
-    public class MemoryEventStream<T> :
+    class MemoryEventStream<T> :
         IEventStream,
         IEventStream<T>
     {

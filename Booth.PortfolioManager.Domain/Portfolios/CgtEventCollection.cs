@@ -10,12 +10,12 @@ using Booth.PortfolioManager.Domain.Utils;
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
 
-    public interface ICgtEventCollection : ITransactionList<CgtEvent>
+    interface ICgtEventCollection : ITransactionList<CgtEvent>
     {
         void Add(Date date, IReadOnlyStock stock, int units, decimal costBase, decimal amountReceived, decimal capitalGain, CgtMethod cgtMethod);
     }
 
-    public class CgtEventCollection : TransactionList<CgtEvent>, ICgtEventCollection
+    class CgtEventCollection : TransactionList<CgtEvent>, ICgtEventCollection
     {
         public void Add(Date date, IReadOnlyStock stock, int units, decimal costBase, decimal amountReceived, decimal capitalGain, CgtMethod cgtMethod)
         {

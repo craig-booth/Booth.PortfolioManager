@@ -8,7 +8,7 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    public struct ParcelSold
+    struct ParcelSold
     {
         public IReadOnlyParcel Parcel { get; private set; }
         public int UnitsSold { get; private set; }

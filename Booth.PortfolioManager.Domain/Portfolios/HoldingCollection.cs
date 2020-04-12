@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         IEnumerable<IReadOnlyHolding> All(DateRange dateRange);
     }
 
-    public class HoldingCollection : IHoldingCollection
+    class HoldingCollection : IHoldingCollection
     {
         private Dictionary<Guid, Holding> _Holdings = new Dictionary<Guid, Holding>();
 

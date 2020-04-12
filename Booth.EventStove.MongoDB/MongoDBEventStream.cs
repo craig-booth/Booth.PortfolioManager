@@ -9,7 +9,7 @@ using Booth.EventStore;
 
 namespace Booth.EventStore.MongoDB
 {
-    public class MongodbEventStream<T> :
+    class MongodbEventStream<T> :
        IEventStream,
        IEventStream<T>
     {

@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.7" />
-    <PackageReference Include="MongoDB.Driver" Version="2.10.2" />
+    <PackageReference Include="MongoDB.Driver" Version="2.10.3" />
   </ItemGroup>
 
   <ItemGroup>

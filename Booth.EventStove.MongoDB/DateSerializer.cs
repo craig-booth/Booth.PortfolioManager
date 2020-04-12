@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -9,11 +10,12 @@ using MongoDB.Bson.Serialization.Attributes;
 
 using Booth.Common;
 
+[assembly: InternalsVisibleToAttribute("Booth.EventStore.MongoDB.Test")]
 
 namespace Booth.EventStore.MongoDB
 {
     [BsonSerializer(typeof(DateSerializer))]
-    public class DateSerializer : SerializerBase<Date>
+    class DateSerializer : SerializerBase<Date>
     {
         public override Date Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {

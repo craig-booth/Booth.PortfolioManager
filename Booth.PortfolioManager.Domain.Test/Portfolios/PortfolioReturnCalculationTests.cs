@@ -40,16 +40,16 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Setup(x => x.All(dateRange.FromDate)).Returns(initialHoldings);
             holdings.Setup(x => x.All(dateRange.ToDate)).Returns(finalHoldings);
 
-            var transactions = new List<CashAccount.Transaction>();
-            transactions.Add(new CashAccount.Transaction(Guid.NewGuid(), new Date(2001, 01, 01), "", 200.00m, BankAccountTransactionType.Deposit, 300.00m));
-            transactions.Add(new CashAccount.Transaction(Guid.NewGuid(), new Date(2002, 01, 01), "", 100.00m, BankAccountTransactionType.Withdrawl, 200.00m));
-            transactions.Add(new CashAccount.Transaction(Guid.NewGuid(), new Date(2004, 01, 01), "", 200.00m, BankAccountTransactionType.Deposit, 500.00m));
-            transactions.Add(new CashAccount.Transaction(Guid.NewGuid(), new Date(2005, 01, 01), "", 450.00m, BankAccountTransactionType.Withdrawl, 50.00m));
+            var transactions = new List<CashAccountTransaction>();
+            transactions.Add(new CashAccountTransaction(Guid.NewGuid(), new Date(2001, 01, 01), "", 200.00m, BankAccountTransactionType.Deposit, 300.00m));
+            transactions.Add(new CashAccountTransaction(Guid.NewGuid(), new Date(2002, 01, 01), "", 100.00m, BankAccountTransactionType.Withdrawl, 200.00m));
+            transactions.Add(new CashAccountTransaction(Guid.NewGuid(), new Date(2004, 01, 01), "", 200.00m, BankAccountTransactionType.Deposit, 500.00m));
+            transactions.Add(new CashAccountTransaction(Guid.NewGuid(), new Date(2005, 01, 01), "", 450.00m, BankAccountTransactionType.Withdrawl, 50.00m));
 
-            var transactionRange = mockRepository.Create<ITransactionRange<CashAccount.Transaction>>();
+            var transactionRange = mockRepository.Create<ITransactionRange<CashAccountTransaction>>();
             transactionRange.Setup(x => x.GetEnumerator()).Returns(transactions.GetEnumerator());
 
-            var transactionList = mockRepository.Create<ITransactionList<CashAccount.Transaction>>();
+            var transactionList = mockRepository.Create<ITransactionList<CashAccountTransaction>>();
             transactionList.Setup(x => x.InDateRange(new DateRange(dateRange.FromDate.AddDays(1), dateRange.ToDate))).Returns(transactionRange.Object);
             
 

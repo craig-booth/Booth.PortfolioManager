@@ -6,7 +6,7 @@ using Booth.Common;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    public class CashFlows
+    class CashFlows
     {
         private Dictionary<Date, decimal> _Amounts;
 

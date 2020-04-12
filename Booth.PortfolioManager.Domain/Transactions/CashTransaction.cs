@@ -9,7 +9,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public enum BankAccountTransactionType { Deposit, Withdrawl, Transfer, Fee, Interest }
 
-    public class CashTransaction : IPortfolioTransaction
+    class CashTransaction : IPortfolioTransaction
     {
         public Guid Id { get; set; }
         public Date Date { get; set; }

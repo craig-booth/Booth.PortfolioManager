@@ -4,9 +4,8 @@ using NUnit.Framework;
 
 using Booth.Common;
 using Booth.EventStore;
-using Booth.PortfolioManager.Domain;
 
-namespace Booth.PortfolioManager.Domain.Test
+namespace Booth.EventStore.Test
 {
     class EventListTests
     {

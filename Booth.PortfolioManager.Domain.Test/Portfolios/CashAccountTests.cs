@@ -95,9 +95,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.EffectiveBalances(new DateRange(new Date(2000, 01, 01), new Date(2010, 01, 01))).ToArray();
 
-            var expectedResult = new CashAccount.EffectiveBalance[]
+            var expectedResult = new CashAccountEffectiveBalance[]
             {
-                new CashAccount.EffectiveBalance(new Date(2000, 01, 01), new Date(2010, 01, 01), 0.00m)
+                new CashAccountEffectiveBalance(new Date(2000, 01, 01), new Date(2010, 01, 01), 0.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new EffectiveBalanceComparer()));
@@ -114,11 +114,11 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.EffectiveBalances(new DateRange(new Date(2000, 01, 01), new Date(2000, 03, 01))).ToArray();
 
-            var expectedResult = new CashAccount.EffectiveBalance[]
+            var expectedResult = new CashAccountEffectiveBalance[]
             {
-                new CashAccount.EffectiveBalance(new Date(2000, 01, 01), new Date(2000, 01, 31), 100.00m),
-                new CashAccount.EffectiveBalance(new Date(2000, 02, 01), new Date(2000, 02, 29), 360.00m),
-                new CashAccount.EffectiveBalance(new Date(2000, 03, 01), new Date(2000, 03, 01), 310.00m)
+                new CashAccountEffectiveBalance(new Date(2000, 01, 01), new Date(2000, 01, 31), 100.00m),
+                new CashAccountEffectiveBalance(new Date(2000, 02, 01), new Date(2000, 02, 29), 360.00m),
+                new CashAccountEffectiveBalance(new Date(2000, 03, 01), new Date(2000, 03, 01), 310.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new EffectiveBalanceComparer()));
@@ -135,10 +135,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.EffectiveBalances(new DateRange(new Date(2000, 01, 15), new Date(2000, 02, 15))).ToArray();
 
-            var expectedResult = new CashAccount.EffectiveBalance[]
+            var expectedResult = new CashAccountEffectiveBalance[]
             {
-                new CashAccount.EffectiveBalance(new Date(2000, 01, 15), new Date(2000, 01, 31), 100.00m),
-                new CashAccount.EffectiveBalance(new Date(2000, 02, 01), new Date(2000, 02, 15), 360.00m),
+                new CashAccountEffectiveBalance(new Date(2000, 01, 15), new Date(2000, 01, 31), 100.00m),
+                new CashAccountEffectiveBalance(new Date(2000, 02, 01), new Date(2000, 02, 15), 360.00m),
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new EffectiveBalanceComparer()));
@@ -153,9 +153,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test", 100.00m, BankAccountTransactionType.Deposit, 100.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test", 100.00m, BankAccountTransactionType.Deposit, 100.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -170,9 +170,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test", -100.00m, BankAccountTransactionType.Withdrawl, -100.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test", -100.00m, BankAccountTransactionType.Withdrawl, -100.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -187,9 +187,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test", 100.00m, BankAccountTransactionType.Transfer, 100.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test", 100.00m, BankAccountTransactionType.Transfer, 100.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -204,9 +204,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test", -100.00m, BankAccountTransactionType.Fee, -100.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test", -100.00m, BankAccountTransactionType.Fee, -100.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -221,9 +221,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test", 100.00m, BankAccountTransactionType.Interest, 100.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test", 100.00m, BankAccountTransactionType.Interest, 100.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -239,10 +239,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 200.00m),
-                new CashAccount.Transaction(Guid.Empty, new Date(2001, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 300.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 200.00m),
+                new CashAccountTransaction(Guid.Empty, new Date(2001, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 300.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -258,10 +258,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2001, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 100.00m),
-                new CashAccount.Transaction(Guid.Empty, new Date(2001, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 300.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2001, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 100.00m),
+                new CashAccountTransaction(Guid.Empty, new Date(2001, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 300.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -278,11 +278,11 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 100.00m),
-                new CashAccount.Transaction(Guid.Empty, new Date(2001, 01, 01), "test3", -50.00m, BankAccountTransactionType.Deposit, 50.00m),
-                new CashAccount.Transaction(Guid.Empty, new Date(2002, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 250.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 100.00m),
+                new CashAccountTransaction(Guid.Empty, new Date(2001, 01, 01), "test3", -50.00m, BankAccountTransactionType.Deposit, 50.00m),
+                new CashAccountTransaction(Guid.Empty, new Date(2002, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 250.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
@@ -299,38 +299,38 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var result = account.Transactions.ToArray();
 
-            var expectedResult = new CashAccount.Transaction[]
+            var expectedResult = new CashAccountTransaction[]
             {
-                new CashAccount.Transaction(Guid.Empty, new Date(2000, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 100.00m),
-                new CashAccount.Transaction(Guid.Empty, new Date(2001, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 300.00m),
-                new CashAccount.Transaction(Guid.Empty, new Date(2002, 01, 01), "test3", -50.00m, BankAccountTransactionType.Deposit, 250.00m)
+                new CashAccountTransaction(Guid.Empty, new Date(2000, 01, 01), "test1", 100.00m, BankAccountTransactionType.Interest, 100.00m),
+                new CashAccountTransaction(Guid.Empty, new Date(2001, 01, 01), "test2", 200.00m, BankAccountTransactionType.Deposit, 300.00m),
+                new CashAccountTransaction(Guid.Empty, new Date(2002, 01, 01), "test3", -50.00m, BankAccountTransactionType.Deposit, 250.00m)
             };
 
             Assert.That(result, Is.EqualTo(expectedResult).Using(new CashTransactionComparer()));
         }
 
 
-        private class EffectiveBalanceComparer : IEqualityComparer<CashAccount.EffectiveBalance>
+        private class EffectiveBalanceComparer : IEqualityComparer<CashAccountEffectiveBalance>
         {
-            public bool Equals(CashAccount.EffectiveBalance x, CashAccount.EffectiveBalance y)
+            public bool Equals(CashAccountEffectiveBalance x, CashAccountEffectiveBalance y)
             {
                 return (x.EffectivePeriod == y.EffectivePeriod) && (x.Balance == y.Balance);
             }
 
-            public int GetHashCode(CashAccount.EffectiveBalance obj)
+            public int GetHashCode(CashAccountEffectiveBalance obj)
             {
                 throw new NotImplementedException();
             }
         }
 
-        private class CashTransactionComparer : IEqualityComparer<CashAccount.Transaction>
+        private class CashTransactionComparer : IEqualityComparer<CashAccountTransaction>
         {
-            public bool Equals(CashAccount.Transaction x, CashAccount.Transaction y)
+            public bool Equals(CashAccountTransaction x, CashAccountTransaction y)
             {
                 return (x.Date == y.Date) && (x.Description == y.Description) && (x.Amount == y.Amount) && (x.Balance == y.Balance);
             }
 
-            public int GetHashCode(CashAccount.Transaction obj)
+            public int GetHashCode(CashAccountTransaction obj)
             {
                 throw new NotImplementedException();
             }

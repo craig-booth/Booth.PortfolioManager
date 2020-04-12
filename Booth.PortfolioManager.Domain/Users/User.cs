@@ -3,6 +3,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Collections.Generic;
 
+using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Users.Events;
 
 namespace Booth.PortfolioManager.Domain.Users

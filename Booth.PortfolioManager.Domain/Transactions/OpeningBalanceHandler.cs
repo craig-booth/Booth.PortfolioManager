@@ -6,7 +6,7 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    public class OpeningBalanceHandler : ITransactionHandler
+    class OpeningBalanceHandler : ITransactionHandler
     {
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {

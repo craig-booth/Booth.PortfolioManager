@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Booth.EventStore;
+
 namespace Booth.PortfolioManager.Domain.Stocks
 {
     public class StockEntityFactory : ITrackedEntityFactory<Stock>

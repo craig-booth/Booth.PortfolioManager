@@ -8,7 +8,7 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    public class DisposalHandler : ITransactionHandler
+    class DisposalHandler : ITransactionHandler
     {
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {

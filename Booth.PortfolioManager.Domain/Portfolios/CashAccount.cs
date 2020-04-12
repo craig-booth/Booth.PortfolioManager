@@ -12,12 +12,12 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 {
     public interface IReadOnlyCashAccount
     {
-        ITransactionList<CashAccount.Transaction> Transactions { get; }
+        ITransactionList<CashAccountTransaction> Transactions { get; }
 
         decimal Balance();
         decimal Balance(Date date);
 
-        IEnumerable<CashAccount.EffectiveBalance> EffectiveBalances(DateRange dateRange);
+        IEnumerable<CashAccountEffectiveBalance> EffectiveBalances(DateRange dateRange);
     }
 
     public interface ICashAccount :  IReadOnlyCashAccount
@@ -30,10 +30,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         void AddTransaction(Date date, decimal amount, string description, BankAccountTransactionType type);
     }
 
-    public class CashAccount : ICashAccount, IReadOnlyCashAccount
-{
+    class CashAccount : ICashAccount, IReadOnlyCashAccount
+    {
         private CashTransactionList _Transactions;
-        public ITransactionList<Transaction> Transactions
+        public ITransactionList<CashAccountTransaction> Transactions
         {
             get { return _Transactions; }
         }
@@ -66,7 +66,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         }
 
-        public IEnumerable<EffectiveBalance> EffectiveBalances(DateRange dateRange)
+        public IEnumerable<CashAccountEffectiveBalance> EffectiveBalances(DateRange dateRange)
         {
             var fromDate = dateRange.FromDate;
             var toDate = Date.MaxValue;
@@ -82,7 +82,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 {
                     toDate = transaction.Date.AddDays(-1);
 
-                    yield return new EffectiveBalance(fromDate, toDate, balance);
+                    yield return new CashAccountEffectiveBalance(fromDate, toDate, balance);
 
                     fromDate = transaction.Date;
                     toDate = transaction.Date;
@@ -90,7 +90,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 }
             }
 
-            yield return new EffectiveBalance(fromDate, dateRange.ToDate, balance);
+            yield return new CashAccountEffectiveBalance(fromDate, dateRange.ToDate, balance);
         } 
 
         public void Deposit(Date date, decimal amount, string description)
@@ -127,7 +127,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         }
 
         private class CashTransactionList
-            : TransactionList<Transaction>
+            : TransactionList<CashAccountTransaction>
         {
             private CashAccount _CashAccount;
             public CashTransactionList(CashAccount cashAccount)
@@ -139,12 +139,12 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             {
                 if ((Count == 0) || (date >= Latest))
                 {
-                    var transaction = new Transaction(Guid.NewGuid(), date, description, amount, type, _CashAccount.Balance() + amount);
+                    var transaction = new CashAccountTransaction(Guid.NewGuid(), date, description, amount, type, _CashAccount.Balance() + amount);
                     Add(transaction);
                 }
                 else
                 {
-                    var transaction = new Transaction(Guid.NewGuid(), date, description, amount, type, _CashAccount.Balance(date) + amount);
+                    var transaction = new CashAccountTransaction(Guid.NewGuid(), date, description, amount, type, _CashAccount.Balance(date) + amount);
                     Add(transaction);
 
                     // Update balance on subsequent transactions
@@ -153,39 +153,38 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                         this[i].Balance += amount;
                 }
             }
-        }
+        }   
+    }
 
-        public class Transaction : ITransaction
+    public class CashAccountTransaction : ITransaction
+    {
+        public Guid Id { get; }
+        public Date Date { get; }
+        public string Description { get; }
+        public decimal Amount { get; }
+        public BankAccountTransactionType Type { get; }
+        public decimal Balance { get; internal set; }
+
+        internal CashAccountTransaction(Guid id, Date date, string description, decimal amount, BankAccountTransactionType type, decimal balance)
         {
-            public Guid Id { get; }
-            public Date Date { get; }
-            public string Description { get; }
-            public decimal Amount { get; }
-            public BankAccountTransactionType Type { get; }
-            public decimal Balance { get; internal set; }
-
-            public Transaction(Guid id, Date date, string description, decimal amount, BankAccountTransactionType type, decimal balance)
-            {
-                Id = id;
-                Date = date;
-                Description = description;
-                Amount = amount;
-                Type = type;
-                Balance = balance;
-            }
+            Id = id;
+            Date = date;
+            Description = description;
+            Amount = amount;
+            Type = type;
+            Balance = balance;
         }
+    }
 
+    public class CashAccountEffectiveBalance
+    {
+        public DateRange EffectivePeriod { get; set; }
+        public decimal Balance { get; set; }
 
-        public class EffectiveBalance
+        public CashAccountEffectiveBalance(Date fromDate, Date toDate, decimal balance)
         {
-            public DateRange EffectivePeriod { get; set; }
-            public decimal Balance { get; set; }
-
-            public EffectiveBalance(Date fromDate, Date toDate, decimal balance)
-            {
-                EffectivePeriod = new DateRange(fromDate, toDate);
-                Balance = balance;
-            }
+            EffectivePeriod = new DateRange(fromDate, toDate);
+            Balance = balance;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Booth.Common;
-
+using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Stocks.Events;
 
 namespace Booth.PortfolioManager.Domain.Stocks
@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
         IEnumerable<StockPrice> GetPrices(DateRange dateRange);
     }
 
-    public class StockPriceHistory : TrackedEntity, IStockPriceHistory
+    class StockPriceHistory : TrackedEntity, IStockPriceHistory
     {
         private List<StockPrice> _Prices { get; } = new List<StockPrice>();
 

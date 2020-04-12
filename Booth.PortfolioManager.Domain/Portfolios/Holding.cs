@@ -49,7 +49,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public IPortfolioTransaction Transaction { get; set; }
     }
 
-    public class Holding : EffectiveEntity, IHolding, IReadOnlyHolding
+    class Holding : EffectiveEntity, IHolding, IReadOnlyHolding
     {
         public IReadOnlyStock Stock { get; set; }
 

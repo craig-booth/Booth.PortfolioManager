@@ -20,7 +20,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, IPortfolioTransaction transaction);
     }
 
-    public class Parcel : EffectiveEntity, IParcel, IReadOnlyParcel
+    class Parcel : EffectiveEntity, IParcel, IReadOnlyParcel
     {
         public Date AquisitionDate { get; private set; }
 

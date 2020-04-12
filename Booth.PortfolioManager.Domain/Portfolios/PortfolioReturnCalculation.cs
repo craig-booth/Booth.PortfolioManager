@@ -9,7 +9,7 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public static class PortfolioReturnCalculation
+    static class PortfolioReturnCalculation
     {
         public static decimal CalculateIRR(this IPortfolio portfolio, DateRange dateRange)
         {

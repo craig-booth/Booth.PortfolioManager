@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.CSharp;
 
-using Booth.EventStore;
-
-namespace Booth.PortfolioManager.Domain
+namespace Booth.EventStore
 {
     public interface ITrackedEntity : IEntity
     {

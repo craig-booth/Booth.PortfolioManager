@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Moq;
 
 using Booth.Common;
+using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.CorporateActions.Events;

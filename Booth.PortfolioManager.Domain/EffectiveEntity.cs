@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 using Booth.Common;
+using Booth.EventStore;
+
+[assembly: InternalsVisibleToAttribute("Booth.PortfolioManager.Domain.Test")]
 
 namespace Booth.PortfolioManager.Domain
 {

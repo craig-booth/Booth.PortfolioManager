@@ -9,7 +9,7 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    public class Disposal : IPortfolioTransaction
+    class Disposal : IPortfolioTransaction
     {
         public Guid Id { get; set; }
         public Date Date { get; set; }

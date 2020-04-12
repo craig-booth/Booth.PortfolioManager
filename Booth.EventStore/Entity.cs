@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
-using Booth.Common;
+[assembly: InternalsVisibleToAttribute("Booth.EventStore.Test")]
 
-namespace Booth.PortfolioManager.Domain
+namespace Booth.EventStore
 {
     public interface IEntity
     {
