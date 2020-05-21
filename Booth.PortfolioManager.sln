@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Doma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Domain.Test", "Booth.PortfolioManager.Domain.Test\Booth.PortfolioManager.Domain.Test.csproj", "{B6669529-91CD-41BA-9F81-354B0E6E8BD0}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.DataServices", "Booth.PortfolioManager.DataServices\Booth.PortfolioManager.DataServices.csproj", "{A3C74F44-869A-4465-9E28-9C1C0E5B8717}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booth.PortfolioManager.DataServices.Test", "Booth.PortfolioManager.DataServices.Test\Booth.PortfolioManager.DataServices.Test.csproj", "{F6D01E4A-FB05-4D2D-9399-17617672D6C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{B6669529-91CD-41BA-9F81-354B0E6E8BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6669529-91CD-41BA-9F81-354B0E6E8BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6669529-91CD-41BA-9F81-354B0E6E8BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3C74F44-869A-4465-9E28-9C1C0E5B8717}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3C74F44-869A-4465-9E28-9C1C0E5B8717}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3C74F44-869A-4465-9E28-9C1C0E5B8717}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3C74F44-869A-4465-9E28-9C1C0E5B8717}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6D01E4A-FB05-4D2D-9399-17617672D6C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6D01E4A-FB05-4D2D-9399-17617672D6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6D01E4A-FB05-4D2D-9399-17617672D6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6D01E4A-FB05-4D2D-9399-17617672D6C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
