@@ -100,7 +100,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public void Withdraw(Date date, decimal amount, string description)
         {
-            AddTransaction(date, -amount, description, BankAccountTransactionType.Deposit);
+            AddTransaction(date, -amount, description, BankAccountTransactionType.Withdrawl);
         }
 
         public void Transfer(Date date, decimal amount, string description)

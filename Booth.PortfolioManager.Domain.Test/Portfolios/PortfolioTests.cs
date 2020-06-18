@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Moq;
 
 using Booth.Common;
@@ -13,9 +15,9 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Test.Portfolios
 {
-    class PortfolioTests
+    public class PortfolioTests
     {
-        [TestCase]
+        [Fact]
         public void Create()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -28,18 +30,13 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var owner = Guid.NewGuid();
             portfolio.Create("Test", owner);
-           
-            Assert.Multiple(() =>
-            {
-                Assert.That(portfolio.Id, Is.EqualTo(id));
-                Assert.That(portfolio.Name, Is.EqualTo("Test"));
-                Assert.That(portfolio.Owner, Is.EqualTo(owner));
-            });
+
+            portfolio.Should().BeEquivalentTo(new { Id = id, Name = "Test", Owner = owner });
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeDrpParticipationHoldingNotOwned()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -54,12 +51,14 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
 
-            Assert.That(() => portfolio.ChangeDrpParticipation(stock.Id, true), Throws.ArgumentException);
+            Action a = () => portfolio.ChangeDrpParticipation(stock.Id, true);
+            
+            a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeDrpParticipation()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -78,12 +77,12 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             portfolio.ChangeDrpParticipation(stock.Id, true);
 
-            Assert.That(portfolio.Holdings[stock.Id].Settings.ParticipateInDrp, Is.True);
+            portfolio.Holdings[stock.Id].Settings.ParticipateInDrp.Should().BeTrue();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddOpeningBalanceNoExistingHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -108,24 +107,26 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.AddOpeningBalance(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 100, 1000.00m, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                var holding = portfolio.Holdings[stock.Id];
-                Assert.That(holding.EffectivePeriod.FromDate, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(holding.EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
+                portfolio.Holdings[stock.Id].EffectivePeriod.Should().Be(new DateRange(new Date(2000, 01, 01), Date.MaxValue));
 
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.Units, Is.EqualTo(100));
-                Assert.That(transaction.CostBase, Is.EqualTo(1000.00m));
+                transaction.Should().BeEquivalentTo(new
+                {
+                    Id = transaction.Id,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    Units = 100,
+                    CostBase = 1000.00m
             });
+
+            }
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddOpeningBalanceExistingHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -151,20 +152,20 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1998, 01, 01), 10, 100.00m, "Existing", Guid.Empty);
             portfolio.AddOpeningBalance(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 100, 1000.00m, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            transaction.Should().BeEquivalentTo(new
             {
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.Units, Is.EqualTo(100));
-                Assert.That(transaction.CostBase, Is.EqualTo(1000.00m));
+                Id = transaction.Id,
+                Date = new Date(2000, 01, 01),
+                Stock = stock,
+                Comment = "Comment",
+                Units = 100,
+                CostBase = 1000.00m
             });
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AdjustUnitCountNoHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -180,12 +181,14 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
 
             var transactionId = Guid.NewGuid();
-            Assert.That(() => portfolio.AdjustUnitCount(stock.Id, new Date(2000, 01, 01), 1, 2, "Comment", transactionId), Throws.TypeOf(typeof(NoSharesOwned)));
+            Action a = () => portfolio.AdjustUnitCount(stock.Id, new Date(2000, 01, 01), 1, 2, "Comment", transactionId);
+            
+            a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AdjustUnitCount()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -212,20 +215,20 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.AdjustUnitCount(stock.Id, new Date(2000, 01, 01), 1, 2, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            transaction.Should().BeEquivalentTo(new
             {
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.OriginalUnits, Is.EqualTo(1));
-                Assert.That(transaction.NewUnits, Is.EqualTo(2));
+                Id = transaction.Id,
+                Date = new Date(2000, 01, 01),
+                Stock = stock,
+                Comment = "Comment",
+                OriginalUnits = 1,
+                NewUnits = 2
             });
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AquireSharesNoExistingHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -250,26 +253,27 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.AquireShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, true, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                var holding = portfolio.Holdings[stock.Id];
-                Assert.That(holding.EffectivePeriod.FromDate, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(holding.EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
+                portfolio.Holdings[stock.Id].EffectivePeriod.Should().Be(new DateRange(new Date(2000, 01, 01), Date.MaxValue));            
 
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.Units, Is.EqualTo(100));
-                Assert.That(transaction.AveragePrice, Is.EqualTo(10.00m));
-                Assert.That(transaction.TransactionCosts, Is.EqualTo(19.95m));
-                Assert.That(transaction.CreateCashTransaction, Is.EqualTo(true));
-            });
+                transaction.Should().BeEquivalentTo(new
+                {
+                    Id = transaction.Id,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    Units = 100,
+                    AveragePrice = 10.00m,
+                    TransactionCosts = 19.95m,
+                    CreateCashTransaction = true
+                });
+            }
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AquireSharesExistingHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -296,22 +300,22 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.AquireShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, true, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            transaction.Should().BeEquivalentTo(new
             {
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.Units, Is.EqualTo(100));
-                Assert.That(transaction.AveragePrice, Is.EqualTo(10.00m));
-                Assert.That(transaction.TransactionCosts, Is.EqualTo(19.95m));
-                Assert.That(transaction.CreateCashTransaction, Is.EqualTo(true));
+                Id = transaction.Id,
+                Date = new Date(2000, 01, 01),
+                Stock = stock,
+                Comment = "Comment",
+                Units = 100,
+                AveragePrice = 10.00m,
+                TransactionCosts = 19.95m,
+                CreateCashTransaction = true
             });
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void DisposeOfSharesNoHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -327,12 +331,14 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
 
             var transactionId = Guid.NewGuid();
-            Assert.That(() => portfolio.DisposeOfShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, CgtCalculationMethod.MinimizeGain, true, "Comment", transactionId), Throws.TypeOf(typeof(NoSharesOwned)));
+            Action a = () => portfolio.DisposeOfShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, CgtCalculationMethod.MinimizeGain, true, "Comment", transactionId);
+            
+            a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void DisposeOfShares()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -359,23 +365,23 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.DisposeOfShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, CgtCalculationMethod.MinimizeGain, true, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            transaction.Should().BeEquivalentTo(new
             {
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.Units, Is.EqualTo(100));
-                Assert.That(transaction.AveragePrice, Is.EqualTo(10.00m));
-                Assert.That(transaction.TransactionCosts, Is.EqualTo(19.95m));
-                Assert.That(transaction.CreateCashTransaction, Is.EqualTo(true));
-                Assert.That(transaction.CgtMethod, Is.EqualTo(CgtCalculationMethod.MinimizeGain));
+                Id = transaction.Id,
+                Date = new Date(2000, 01, 01),
+                Stock = stock,
+                Comment = "Comment",
+                Units = 100,
+                AveragePrice = 10.00m,
+                TransactionCosts = 19.95m,
+                CreateCashTransaction = true,
+                CgtMethod = CgtCalculationMethod.MinimizeGain
             });
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void IncomeReceivedNoHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -391,12 +397,14 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
 
             var transactionId = Guid.NewGuid();
-            Assert.That(() => portfolio.IncomeReceived(stock.Id, new Date(2000, 01, 01), new Date(2000, 02, 01), 100.00m, 101.00m, 30.00m, 2.00m, 3.00m, 20.00m, true, "Comment", transactionId), Throws.TypeOf(typeof(NoSharesOwned)));
+            Action a = () => portfolio.IncomeReceived(stock.Id, new Date(2000, 01, 01), new Date(2000, 02, 01), 100.00m, 101.00m, 30.00m, 2.00m, 3.00m, 20.00m, true, "Comment", transactionId);
+            
+            a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void IncomeReceived()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -423,26 +431,26 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.IncomeReceived(stock.Id, new Date(2000, 01, 01), new Date(2000, 02, 01), 100.00m, 101.00m, 30.00m, 2.00m, 3.00m, 20.00m, true, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            transaction.Should().BeEquivalentTo(new
             {
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 02, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.RecordDate, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.FrankedAmount, Is.EqualTo(100.00m));
-                Assert.That(transaction.UnfrankedAmount, Is.EqualTo(101.00m));
-                Assert.That(transaction.FrankingCredits, Is.EqualTo(30.00m));
-                Assert.That(transaction.Interest, Is.EqualTo(2.00m));
-                Assert.That(transaction.TaxDeferred, Is.EqualTo(3.00m));
-                Assert.That(transaction.DRPCashBalance, Is.EqualTo(20.00m));
-                Assert.That(transaction.CreateCashTransaction, Is.EqualTo(true));
+                Id = transaction.Id,
+                Date = new Date(2000, 02, 01),
+                Stock = stock,
+                Comment = "Comment",
+                RecordDate = new Date(2000, 01, 01),
+                FrankedAmount = 100.00m,
+                UnfrankedAmount = 101.00m,
+                FrankingCredits = 30.00m,
+                Interest = 2.00m,
+                TaxDeferred = 3.00m,
+                DrpCashBalance = 20.00m,
+                CreateCashTransaction = true
             });
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void MakeCashTransaction()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -463,20 +471,19 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), BankAccountTransactionType.Transfer, 100.00m, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            transaction.Should().BeEquivalentTo(new
             {
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.Null);
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.CashTransactionType, Is.EqualTo(BankAccountTransactionType.Transfer));
-                Assert.That(transaction.Amount, Is.EqualTo(100.00m));
+                Id = transaction.Id,
+                Date = new Date(2000, 01, 01),
+                Comment = "Comment",
+                CashTransactionType = BankAccountTransactionType.Transfer,
+                Amount = 100.00m
             });
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ReturnOfCapitalReceivedNoHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -492,12 +499,14 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
 
             var transactionId = Guid.NewGuid();
-            Assert.That(() => portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 10.00m, true, "Comment", transactionId), Throws.TypeOf(typeof(NoSharesOwned)));
+            Action a = () => portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 10.00m, true, "Comment", transactionId);
+            
+            a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ReturnOfCapitalReceived()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -524,15 +533,15 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transactionId = Guid.NewGuid();
             portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 10.00m, true, "Comment", transactionId);
 
-            Assert.Multiple(() =>
+            transaction.Should().BeEquivalentTo(new
             {
-                Assert.That(transaction.Id, Is.EqualTo(transaction.Id));
-                Assert.That(transaction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transaction.Stock, Is.EqualTo(stock));
-                Assert.That(transaction.Comment, Is.EqualTo("Comment"));
-                Assert.That(transaction.RecordDate, Is.EqualTo(new Date(1999, 01, 01)));
-                Assert.That(transaction.Amount, Is.EqualTo(10.00m));
-                Assert.That(transaction.CreateCashTransaction, Is.EqualTo(true));
+                Id = transaction.Id,
+                Date = new Date(2000, 01, 01),
+                Stock = stock,
+                Comment = "Comment",
+                RecordDate = new Date(1999, 01, 01),
+                Amount = 10.00m,
+                CreateCashTransaction = true
             });
 
             mockRepository.Verify();

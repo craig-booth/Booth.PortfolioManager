@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new ArgumentException("Expected transaction to be an CostBaseAdjustment");
 
             if (!holding.IsEffectiveAt(costBaseAdjustment.Date))
-                throw new NoSharesOwned("No holdings");
+                throw new NoSharesOwnedException("No holdings");
 
             // Adjust cost base of parcels
             foreach (var parcel in holding.Parcels(costBaseAdjustment.Date))

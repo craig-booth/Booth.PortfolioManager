@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Test.Stocks
 {
-    class StockEntityFactoryTests
+    public class StockEntityFactoryTests
     {
 
-        [TestCase]
+        [Fact]
         public void CreateStock()
         {
             var factory = new StockEntityFactory();
@@ -18,11 +19,10 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             var result = factory.Create(id, "Stock");
 
-            Assert.That(result, Is.TypeOf<Stock>());
-            Assert.That(result.Id, Is.EqualTo(id));
+            result.Should().BeOfType<Stock>().Which.Id.Should().Be(id);
         }
 
-        [TestCase]
+        [Fact]
         public void CreateStapledSecurity()
         {
             var factory = new StockEntityFactory();
@@ -30,18 +30,19 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             var result = factory.Create(id, "StapledSecurity");
 
-            Assert.That(result, Is.TypeOf<StapledSecurity>());
-            Assert.That(result.Id, Is.EqualTo(id));
+            result.Should().BeOfType<StapledSecurity>().Which.Id.Should().Be(id);
         }
 
-        [TestCase]
+        [Fact]
         public void CreateUnknownType()
         {
             var factory = new StockEntityFactory();
 
             var id = Guid.NewGuid();
 
-            Assert.That(() => factory.Create(id, "xxx"), Throws.ArgumentException);
+            Action a = () => factory.Create(id, "xxx");
+            
+            a.Should().Throw<ArgumentException>();
         }
     }
 }

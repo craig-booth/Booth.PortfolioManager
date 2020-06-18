@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain;
 
 namespace Booth.PortfolioManager.Domain.Test
 {
-    class EffectivePropertiesTests
+    public class EffectivePropertiesTests
     {
-        [TestCase]
+        [Fact]
         public void ChangeWithNoExistingProperties()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -19,17 +20,17 @@ namespace Booth.PortfolioManager.Domain.Test
             var start = new Date(2019, 12, 01);
             properties.Change(start, new EffectivePropertyTestClass("InitialValue"));
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(properties.Values.Count(), Is.EqualTo(1));
-                Assert.That(properties.Values.First().EffectivePeriod.FromDate, Is.EqualTo(start));
-                Assert.That(properties.Values.First().EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
-                Assert.That(properties.Values.First().Properties.Value, Is.EqualTo("InitialValue"));
-            });
+            properties.Values.Should().SatisfyRespectively(
+                first =>
+                {
+                    first.EffectivePeriod.Should().Be(new DateRange(start, Date.MaxValue));
+                    first.Properties.Value.Should().Be("InitialValue");
+                }
+            );
         }
 
 
-        [TestCase]
+        [Fact]
         public void ChangeWithExistingProperty()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -40,20 +41,21 @@ namespace Booth.PortfolioManager.Domain.Test
             var change = new Date(2019, 12, 31);
             properties.Change(change, new EffectivePropertyTestClass("Change1"));
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(properties.Values.Count(), Is.EqualTo(2));
-                Assert.That(properties.Values.Last().EffectivePeriod.FromDate, Is.EqualTo(start));
-                Assert.That(properties.Values.Last().EffectivePeriod.ToDate, Is.EqualTo(change.AddDays(-1)));
-                Assert.That(properties.Values.Last().Properties.Value, Is.EqualTo("InitialValue"));
-
-                Assert.That(properties.Values.First().EffectivePeriod.FromDate, Is.EqualTo(change));
-                Assert.That(properties.Values.First().EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
-                Assert.That(properties.Values.First().Properties.Value, Is.EqualTo("Change1"));
-            });
+            properties.Values.Should().SatisfyRespectively(
+                first =>
+                {
+                    first.EffectivePeriod.Should().Be(new DateRange(change, Date.MaxValue));
+                    first.Properties.Value.Should().Be("Change1");
+                },
+                second =>
+                {
+                    second.EffectivePeriod.Should().Be(new DateRange(start, change.AddDays(-1)));
+                    second.Properties.Value.Should().Be("InitialValue");
+                }
+            );
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeOnSameDateAsExistingProperty()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -66,20 +68,21 @@ namespace Booth.PortfolioManager.Domain.Test
 
             properties.Change(change, new EffectivePropertyTestClass("Change2"));
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(properties.Values.Count(), Is.EqualTo(2));
-                Assert.That(properties.Values.Last().EffectivePeriod.FromDate, Is.EqualTo(start));
-                Assert.That(properties.Values.Last().EffectivePeriod.ToDate, Is.EqualTo(change.AddDays(-1)));
-                Assert.That(properties.Values.Last().Properties.Value, Is.EqualTo("InitialValue"));
-
-                Assert.That(properties.Values.First().EffectivePeriod.FromDate, Is.EqualTo(change));
-                Assert.That(properties.Values.First().EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
-                Assert.That(properties.Values.First().Properties.Value, Is.EqualTo("Change2"));
-            });
+            properties.Values.Should().SatisfyRespectively(
+                first =>
+                {
+                    first.EffectivePeriod.Should().Be(new DateRange(change, Date.MaxValue));
+                    first.Properties.Value.Should().Be("Change2");
+                },
+                second =>
+                {
+                    second.EffectivePeriod.Should().Be(new DateRange(start, change.AddDays(-1)));
+                    second.Properties.Value.Should().Be("InitialValue");
+                }
+            );
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeNonCurrentProperty()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -91,10 +94,13 @@ namespace Booth.PortfolioManager.Domain.Test
             properties.Change(change1, new EffectivePropertyTestClass("Change1"));
 
             var change2 = new Date(2019, 12, 15);
-            Assert.That(() => properties.Change(change2, new EffectivePropertyTestClass("Change2")), Throws.TypeOf(typeof(EffectiveDateException)));
+
+            Action a = () => properties.Change(change2, new EffectivePropertyTestClass("Change2"));
+            
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeOutsideOfEffectivePeriod()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -106,20 +112,23 @@ namespace Booth.PortfolioManager.Domain.Test
             properties.Change(change1, new EffectivePropertyTestClass("Change1"));
 
             var change2 = new Date(2019, 11, 15);
-            Assert.That(() => properties.Change(change2, new EffectivePropertyTestClass("Change2")), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => properties.Change(change2, new EffectivePropertyTestClass("Change2"));
 
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void EndWithNoExistingProperties()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
 
             var end = new Date(2019, 11, 15);
-            Assert.That(() => properties.End(end), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => properties.End(end);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void EndWithProperties()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -133,20 +142,21 @@ namespace Booth.PortfolioManager.Domain.Test
             var end = new Date(2020, 01, 15);
             properties.End(end);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(properties.Values.Count(), Is.EqualTo(2));
-                Assert.That(properties.Values.Last().EffectivePeriod.FromDate, Is.EqualTo(start));
-                Assert.That(properties.Values.Last().EffectivePeriod.ToDate, Is.EqualTo(change.AddDays(-1)));
-                Assert.That(properties.Values.Last().Properties.Value, Is.EqualTo("InitialValue"));
-
-                Assert.That(properties.Values.First().EffectivePeriod.FromDate, Is.EqualTo(change));
-                Assert.That(properties.Values.First().EffectivePeriod.ToDate, Is.EqualTo(end));
-                Assert.That(properties.Values.First().Properties.Value, Is.EqualTo("Change1"));
-            });
+            properties.Values.Should().SatisfyRespectively(
+                first =>
+                {
+                    first.EffectivePeriod.Should().Be(new DateRange(change, end));
+                    first.Properties.Value.Should().Be("Change1");
+                },
+                second =>
+                {
+                    second.EffectivePeriod.Should().Be(new DateRange(start, change.AddDays(-1)));
+                    second.Properties.Value.Should().Be("InitialValue");
+                }
+            );
         }
 
-        [TestCase]
+        [Fact]
         public void EndOnStartDate()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -156,16 +166,16 @@ namespace Booth.PortfolioManager.Domain.Test
 
             properties.End(start);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(properties.Values.Count(), Is.EqualTo(1));
-                Assert.That(properties.Values.First().EffectivePeriod.FromDate, Is.EqualTo(start));
-                Assert.That(properties.Values.First().EffectivePeriod.ToDate, Is.EqualTo(start));
-                Assert.That(properties.Values.First().Properties.Value, Is.EqualTo("InitialValue"));
-            });
+            properties.Values.Should().SatisfyRespectively(
+                first =>
+                {
+                    first.EffectivePeriod.Should().Be(new DateRange(start, start));
+                    first.Properties.Value.Should().Be("InitialValue");
+                }
+            );
         }
 
-        [TestCase]
+        [Fact]
         public void EndInNonCurrentPeriod()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -180,10 +190,12 @@ namespace Booth.PortfolioManager.Domain.Test
             properties.Change(change2, new EffectivePropertyTestClass("Change2"));
 
             var end = new Date(2019, 12, 17);
-            Assert.That(() => properties.End(end), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => properties.End(end);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void EndAnAlreadyEndedProperty()
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -200,11 +212,14 @@ namespace Booth.PortfolioManager.Domain.Test
             var end = new Date(2020, 01, 17);
             properties.End(end);
 
-            Assert.That(() => properties.End(end), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => properties.End(end);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
 
-        [TestCaseSource(nameof(PropertyAtDateData))]
+        [Theory]
+        [MemberData(nameof(PropertyAtDateData))]
         public void PropertyAtDate(Date date, string result, bool exception)
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -222,12 +237,16 @@ namespace Booth.PortfolioManager.Domain.Test
             properties.End(end);
 
             if (!exception)
-                Assert.That(properties[date].Value, Is.EqualTo(result));
+                properties[date].Value.Should().Be(result);
             else
-                Assert.That(() => properties[date], Throws.TypeOf(typeof(KeyNotFoundException)));
+            {
+                Action a = () => { var x = properties[date]; };
+                a.Should().Throw<KeyNotFoundException>();
+            }
+                
         }
 
-        static IEnumerable<object[]> PropertyAtDateData()
+        public static IEnumerable<object[]> PropertyAtDateData()
         {
             yield return new object[] { new Date(2019, 11, 01), "", true };
             yield return new object[] { new Date(2019, 12, 01), "InitialValue", false };
@@ -241,7 +260,28 @@ namespace Booth.PortfolioManager.Domain.Test
             yield return new object[] { new Date(2020, 01, 20), "", true };
         }
 
-        [TestCaseSource(nameof(ClosestToDateData))]
+        [Fact]
+        public void Value()
+        {
+            var properties = new EffectiveProperties<EffectivePropertyTestClass>();
+
+            var start = new Date(2019, 12, 01);
+            properties.Change(start, new EffectivePropertyTestClass("InitialValue"));
+
+            var change1 = new Date(2019, 12, 15);
+            properties.Change(change1, new EffectivePropertyTestClass("Change1"));
+
+            var change2 = new Date(2019, 12, 31);
+            properties.Change(change2, new EffectivePropertyTestClass("Change2"));
+
+            var end = new Date(2020, 01, 17);
+            properties.End(end);
+
+            properties.Value(new Date(2019, 12, 17)).EffectivePeriod.Should().Be(new DateRange(new Date(2019, 12, 15), new Date(2019, 12, 30)));
+        }
+
+        [Theory]
+        [MemberData(nameof(ClosestToDateData))]
         public void ClosestToDate(Date date, string result)
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -258,10 +298,10 @@ namespace Booth.PortfolioManager.Domain.Test
             var end = new Date(2020, 01, 17);
             properties.End(end);
 
-            Assert.That(properties.ClosestTo(date).Value, Is.EqualTo(result));
+            properties.ClosestTo(date).Value.Should().Be(result);
         }
 
-        static IEnumerable<object[]> ClosestToDateData()
+        public static IEnumerable<object[]> ClosestToDateData()
         {
             yield return new object[] { new Date(2019, 11, 01), "InitialValue" };
             yield return new object[] { new Date(2019, 12, 01), "InitialValue" };
@@ -275,7 +315,8 @@ namespace Booth.PortfolioManager.Domain.Test
             yield return new object[] { new Date(2020, 01, 20), "Change2" };
         }
 
-        [TestCaseSource(nameof(MatchesNoDateData))]
+        [Theory]
+        [MemberData(nameof(MatchesNoDateData))]
         public void MatchesNoDate(string value, bool result)
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -292,10 +333,10 @@ namespace Booth.PortfolioManager.Domain.Test
             var end = new Date(2020, 01, 17);
             properties.End(end);
 
-            Assert.That(properties.Matches(x => x.Value == value), Is.EqualTo(result));
+            properties.Matches(x => x.Value == value).Should().Be(result);
         }
 
-        static IEnumerable<object[]> MatchesNoDateData()
+        public static IEnumerable<object[]> MatchesNoDateData()
         {
             yield return new object[] { "InitialValue", true };
             yield return new object[] { "Change1", true };
@@ -303,7 +344,8 @@ namespace Booth.PortfolioManager.Domain.Test
             yield return new object[] { "Change3", false };
         }
 
-        [TestCaseSource(nameof(MatchesWithDateData))]
+        [Theory]
+        [MemberData(nameof(MatchesWithDateData))]
         public void MatchesWithDate(Date date, string value, bool result)
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -320,10 +362,10 @@ namespace Booth.PortfolioManager.Domain.Test
             var end = new Date(2020, 01, 17);
             properties.End(end);
 
-            Assert.That(properties.Matches(date, x => x.Value == value), Is.EqualTo(result));
+            properties.Matches(date, x => x.Value == value).Should().Be(result);
         }
 
-        static IEnumerable<object[]> MatchesWithDateData()
+        public static IEnumerable<object[]> MatchesWithDateData()
         {
             yield return new object[] { new Date(2019, 11, 01), "InitialValue", false };
             yield return new object[] { new Date(2019, 12, 01), "InitialValue", true };
@@ -340,7 +382,8 @@ namespace Booth.PortfolioManager.Domain.Test
         }
 
 
-        [TestCaseSource(nameof(MatchesWithDateRangeData))]
+        [Theory]
+        [MemberData(nameof(MatchesWithDateRangeData))]
         public void MatchesWithDateRange(DateRange dateRange, string value, bool result)
         {
             var properties = new EffectiveProperties<EffectivePropertyTestClass>();
@@ -357,10 +400,10 @@ namespace Booth.PortfolioManager.Domain.Test
             var end = new Date(2020, 01, 17);
             properties.End(end);
 
-            Assert.That(properties.Matches(dateRange, x => x.Value == value), Is.EqualTo(result));
+            properties.Matches(dateRange, x => x.Value == value).Should().Be(result);
         }
 
-        static IEnumerable<object[]> MatchesWithDateRangeData()
+        public static IEnumerable<object[]> MatchesWithDateRangeData()
         {
             yield return new object[] { new DateRange(new Date(2019, 11, 01), new Date(2020, 01, 20)), "InitialValue", true };
             yield return new object[] { new DateRange(new Date(2019, 11, 01), new Date(2020, 01, 20)), "Change1", true };

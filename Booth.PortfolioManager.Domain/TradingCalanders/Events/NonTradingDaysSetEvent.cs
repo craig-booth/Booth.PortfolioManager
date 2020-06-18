@@ -15,12 +15,12 @@ namespace Booth.PortfolioManager.Domain.TradingCalanders.Events
         public class NonTradingDay
         {
             public Date Date { get; set; }
-            public string Desciption { get; set; }
+            public string Description { get; set; }
 
             public NonTradingDay(Date date, string description)
             {
                 Date = date;
-                Desciption = description;
+                Description = description;
             }
         }
 

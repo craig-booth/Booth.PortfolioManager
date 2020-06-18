@@ -12,17 +12,17 @@ namespace Booth.PortfolioManager.Domain.Stocks.Events
         public Date ChangeDate { get; set; }
         public decimal CompanyTaxRate { get; set; }
         public RoundingRule DividendRoundingRule { get; set; }
-        public bool DRPActive { get; set; }
-        public DRPMethod DRPMethod { get; set; }
+        public bool DrpActive { get; set; }
+        public DrpMethod DrpMethod { get; set; }
 
-        public ChangeDividendRulesEvent(Guid entityId, int version, Date changeDate, decimal companyTaxRate, RoundingRule dividendRoundingRule, bool drpActive, DRPMethod drpMethod)
+        public ChangeDividendRulesEvent(Guid entityId, int version, Date changeDate, decimal companyTaxRate, RoundingRule dividendRoundingRule, bool drpActive, DrpMethod drpMethod)
             :base(entityId, version)
         {
             ChangeDate = changeDate;
             CompanyTaxRate = companyTaxRate;
             DividendRoundingRule = dividendRoundingRule;
-            DRPActive = drpActive;
-            DRPMethod = drpMethod;
+            DrpActive = drpActive;
+            DrpMethod = drpMethod;
         }
     }
 }

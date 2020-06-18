@@ -15,7 +15,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new ArgumentException("Expected transaction to be an OpeningBalance");
 
             if (!openingBalance.Stock.IsEffectiveAt(openingBalance.Date))
-                throw new StockNotActive("Stock is not active");
+                throw new StockNotActiveException("Stock is not active");
 
             holding.AddParcel(openingBalance.Date, openingBalance.AquisitionDate, openingBalance.Units, openingBalance.CostBase, openingBalance.CostBase, transaction);
         }

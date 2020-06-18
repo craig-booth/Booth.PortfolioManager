@@ -53,7 +53,7 @@ namespace Booth.PortfolioManager.Domain.TradingCalanders
 
             foreach (var nonTradingDay in @event.NonTradingDays)
             {
-                var newNonTradingDay = new NonTradingDay(nonTradingDay.Date, nonTradingDay.Desciption);
+                var newNonTradingDay = new NonTradingDay(nonTradingDay.Date, nonTradingDay.Description);
                 var index = _NonTradingDays.BinarySearch(newNonTradingDay);
                 if (index < 0)
                     _NonTradingDays.Insert(~index, newNonTradingDay);

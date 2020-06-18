@@ -9,6 +9,7 @@ namespace Booth.PortfolioManager.Domain
     public interface IEffectiveProperties<T>
         where T : struct
     {
+        IEffectivePropertyValues<T> Value(Date date);
         IEnumerable<IEffectivePropertyValues<T>> Values { get; }
         T this[Date date] { get; }
         T ClosestTo(Date date);
@@ -21,6 +22,16 @@ namespace Booth.PortfolioManager.Domain
         where T : struct
     {
         protected Stack<EffectivePropertyValues<T>> _Properties = new Stack<EffectivePropertyValues<T>>();
+
+        public IEffectivePropertyValues<T> Value(Date date)
+        {
+            var property = _Properties.FirstOrDefault(x => x.IsEffectiveAt(date));
+            if (property == null)
+                throw new KeyNotFoundException();
+
+            return property;
+        }
+
         public IEnumerable<IEffectivePropertyValues<T>> Values
         {
             get { return _Properties.AsEnumerable(); }
@@ -30,12 +41,7 @@ namespace Booth.PortfolioManager.Domain
         {
             get
             {
-                var property = _Properties.FirstOrDefault(x => x.IsEffectiveAt(date));
-
-                if (property == null)
-                    throw new KeyNotFoundException();
-
-                return property.Properties;
+                return Value(date).Properties;
             }
         }
 
@@ -48,7 +54,7 @@ namespace Booth.PortfolioManager.Domain
             else if (date <= _Properties.Last().EffectivePeriod.ToDate)
                 return _Properties.Last().Properties;
             else
-                return _Properties.First(x => x.IsEffectiveAt(date)).Properties;
+                return this[date];
         }
 
         public bool Matches(Func<T, bool> predicate)

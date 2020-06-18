@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -11,9 +12,9 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
-    class AquisitionTests
+    public class AquisitionTests
     {
-        [TestCase]
+        [Fact]
         public void IncorrectTransactionType()
         {
             var transaction = new CashTransaction()
@@ -31,12 +32,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new AquisitionHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void StockNotActiveAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -60,12 +62,14 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = mockRepository.Create<ICashAccount>();
             
             var handler = new AquisitionHandler();
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(StockNotActive)));
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+
+            a.Should().Throw<StockNotActiveException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoCashTransactionNoTransactionCosts()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -96,7 +100,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoCashTransactionWithTransactionCosts()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -127,7 +131,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void WithCashTransactionNoTransactionCosts()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -159,7 +163,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void WithCashTransactionWithTransactionCosts()
         {
             var stock = new Stock(Guid.NewGuid());

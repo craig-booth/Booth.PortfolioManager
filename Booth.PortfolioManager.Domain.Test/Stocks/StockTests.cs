@@ -2,74 +2,76 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
+using FluentAssertions.Execution;
 
 namespace Booth.PortfolioManager.Domain.Test.Stocks
 {
-    class StockTests
+    public class StockTests
     {
-        [TestCase]
+        [Fact]
         public void ToStringNoProperties()
         {
             var stock = new Stock(Guid.NewGuid());
 
-            Assert.That(stock.ToString(), Is.EqualTo(" - "));
+            stock.ToString().Should().Be(" - ");
         }
 
-        [TestCase]
+        [Fact]
         public void ToStringBeforeStartDate()
         {
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MaxValue, false, AssetCategory.AustralianStocks);
 
-            Assert.That(stock.ToString(), Is.EqualTo("ABC - ABC Pty Ltd"));
+            stock.ToString().Should().Be("ABC - ABC Pty Ltd");
         }
 
-        [TestCase]
+        [Fact]
         public void ToStringAfterEndDate()
         {
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
             stock.DeList(new Date(2000, 01, 01));
 
-            Assert.That(stock.ToString(), Is.EqualTo("ABC - ABC Pty Ltd"));
+            stock.ToString().Should().Be("ABC - ABC Pty Ltd");
         }
 
-        [TestCase]
+        [Fact]
         public void ToStringPropertiesChangedToday()
         {
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(Date.Today, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianStocks);
 
-            Assert.That(stock.ToString(), Is.EqualTo("XYZ - XYZ Pty Ltd"));
+            stock.ToString().Should().Be("XYZ - XYZ Pty Ltd");
         }
 
-        [TestCase]
+        [Fact]
         public void ToStringPropertiesChangedBeforeToday()
         { 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(Date.Today.AddDays(-1), "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianStocks);
 
-            Assert.That(stock.ToString(), Is.EqualTo("XYZ - XYZ Pty Ltd"));
+            stock.ToString().Should().Be("XYZ - XYZ Pty Ltd");
         }
 
-        [TestCase]
+        [Fact]
         public void ToStringPropertiesChangedAfterToday()
         {
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(Date.Today.AddDays(1), "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianStocks);
 
-            Assert.That(stock.ToString(), Is.EqualTo("ABC - ABC Pty Ltd"));
+            stock.ToString().Should().Be("ABC - ABC Pty Ltd");
         }
 
-        [TestCase]
+        [Fact]
         public void List()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -77,28 +79,33 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.Trust, Is.True);
+                stock.Should().BeEquivalentTo(new
+                {
+                    Trust = true,
+                    EffectivePeriod = new DateRange(listingDate, Date.MaxValue)
+                }); ;
 
-                Assert.That(stock.EffectivePeriod.FromDate, Is.EqualTo(listingDate));
-                Assert.That(stock.EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
-
-                var properties = stock.Properties[listingDate];
-                Assert.That(properties.ASXCode, Is.EqualTo("ABC"));
-                Assert.That(properties.Name, Is.EqualTo("ABC Pty Ltd"));
-                Assert.That(properties.Category, Is.EqualTo(AssetCategory.AustralianProperty));
+                stock.Properties[listingDate].Should().BeEquivalentTo(new {
+                    AsxCode = "ABC",
+                    Name = "ABC Pty Ltd",
+                    Category = AssetCategory.AustralianProperty
+                });
 
                 // Check default values are set
-                var dividendRules = stock.DividendRules[listingDate];
-                Assert.That(dividendRules.CompanyTaxRate, Is.EqualTo(0.30m));
-                Assert.That(dividendRules.DividendRoundingRule, Is.EqualTo(RoundingRule.Round));
-                Assert.That(dividendRules.DRPActive, Is.EqualTo(false));
-                Assert.That(dividendRules.DRPMethod, Is.EqualTo(DRPMethod.Round));
-            });
+                stock.DividendRules[listingDate].Should().BeEquivalentTo(new
+                {
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = DrpMethod.Round
+                });
+
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void ListWhenAlreadyListed()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -106,11 +113,13 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
 
-            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
 
-        [TestCase]
+        [Fact]
         public void ListWhenDelisted()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -120,10 +129,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.List("ABC", "ABC Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
             stock.DeList(delistingDate);
 
-            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void DeList()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -133,22 +144,20 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.List("ABC", "ABC Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
             stock.DeList(delistingDate);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.Trust, Is.True);
+                stock.Should().BeEquivalentTo(new
+                {
+                    Trust = true,
+                    EffectivePeriod = new DateRange(listingDate, delistingDate)
+                }); ;
 
-                Assert.That(stock.EffectivePeriod.FromDate, Is.EqualTo(listingDate));
-                Assert.That(stock.EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
-
-                var propertyValues = stock.Properties.Values.ToList();
-                Assert.That(propertyValues.Last().EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
-
-                var dividendRules = stock.DividendRules.Values.ToList();
-                Assert.That(dividendRules.Last().EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
-            });
+                stock.Properties.Values.Last().EffectivePeriod.ToDate.Should().Be(delistingDate);
+                stock.DividendRules.Values.Last().EffectivePeriod.ToDate.Should().Be(delistingDate);
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void DeListWithoutBeingListed()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -156,11 +165,13 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             var stock = new Stock(Guid.NewGuid());
 
-            Assert.That(() => stock.DeList(delistingDate), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.DeList(delistingDate);
+
+            a.Should().Throw<EffectiveDateException>();
 
         }
 
-        [TestCase]
+        [Fact]
         public void GetPrice()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -173,12 +184,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             var price = stock.GetPrice(new Date(2000, 01, 01));
 
-            Assert.That(price, Is.EqualTo(10.00m));
+            price.Should().Be(10.00m);
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void GetPricePriceHistoryNotSet()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -186,7 +197,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var price = stock.GetPrice(new Date(2000, 01, 01));
         }
 
-        [TestCase]
+        [Fact]
         public void GetPrices()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -214,12 +225,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             var prices = stock.GetPrices(new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10)));
 
-            Assert.That(prices, Is.EqualTo(historicPrices));
+            prices.Should().Equal(historicPrices);
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void GetPricesPriceHistoryNotSet()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -227,7 +238,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var prices = stock.GetPrices(new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10)));
         }
 
-        [TestCase]
+        [Fact]
         public void DateOfLastestPrice()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -240,22 +251,22 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             var date = stock.DateOfLastestPrice();
 
-            Assert.That(date, Is.EqualTo(new Date(2000, 01, 10)));
+            date.Should().Be(new Date(2000, 01, 10));
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void DateOfLastestPricePriceHistoryNotSet()
         {
             var stock = new Stock(Guid.NewGuid());
 
             var date = stock.DateOfLastestPrice();
 
-            Assert.That(date, Is.EqualTo(Date.MinValue));
+            date.Should().Be(Date.MinValue);
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeProperties()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -266,19 +277,26 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty);
 
-            Assert.Multiple(() => 
+            using (new AssertionScope())
             {
-                Assert.That(stock.Properties[changeDate.AddDays(-1)].ASXCode, Is.EqualTo("ABC"));
-                Assert.That(stock.Properties[changeDate.AddDays(-1)].Name, Is.EqualTo("ABC Pty Ltd"));
-                Assert.That(stock.Properties[changeDate.AddDays(-1)].Category, Is.EqualTo(AssetCategory.AustralianStocks));
+                stock.Properties[changeDate.AddDays(-1)].Should().BeEquivalentTo(new
+                {
+                    AsxCode = "ABC",
+                    Name = "ABC Pty Ltd",
+                    Category = AssetCategory.AustralianStocks
+                });
 
-                Assert.That(stock.Properties[changeDate].ASXCode, Is.EqualTo("XYZ"));
-                Assert.That(stock.Properties[changeDate].Name, Is.EqualTo("XYZ Pty Ltd"));
-                Assert.That(stock.Properties[changeDate].Category, Is.EqualTo(AssetCategory.AustralianProperty));
-            });
+                stock.Properties[changeDate].Should().BeEquivalentTo(new
+                {
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    Category = AssetCategory.AustralianProperty
+                });
+            }
+
         }
 
-        [TestCase]
+        [Fact]
         public void ChangePropertiesBeforeListing()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -287,10 +305,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
-            Assert.That(() => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void ChangePropertiesAfterDeListing()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -301,10 +321,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
             stock.DeList(delistingDate);
-            Assert.That(() => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void ChangePropertiesTwiceOnSameDate()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -316,15 +338,15 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.ChangeProperties(changeDate, "DEF", "DEF Pty Ltd", AssetCategory.InternationalProperty);
             stock.ChangeProperties(changeDate, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianProperty);
 
-            Assert.Multiple(() =>
+            stock.Properties[changeDate].Should().BeEquivalentTo(new
             {
-                Assert.That(stock.Properties[changeDate].ASXCode, Is.EqualTo("XYZ"));
-                Assert.That(stock.Properties[changeDate].Name, Is.EqualTo("XYZ Pty Ltd"));
-                Assert.That(stock.Properties[changeDate].Category, Is.EqualTo(AssetCategory.AustralianProperty));
+                AsxCode = "XYZ",
+                Name = "XYZ Pty Ltd",
+                Category = AssetCategory.AustralianProperty
             });
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeDividendRules()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -333,23 +355,29 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance);
+            stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DrpMethod.RetainCashBalance);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.DividendRules[changeDate.AddDays(-1)].CompanyTaxRate, Is.EqualTo(0.30m));
-                Assert.That(stock.DividendRules[changeDate.AddDays(-1)].DividendRoundingRule, Is.EqualTo(RoundingRule.Round));
-                Assert.That(stock.DividendRules[changeDate.AddDays(-1)].DRPActive, Is.EqualTo(false));
-                Assert.That(stock.DividendRules[changeDate.AddDays(-1)].DRPMethod, Is.EqualTo(DRPMethod.Round));
+                stock.DividendRules[changeDate.AddDays(-1)].Should().BeEquivalentTo(new
+                {
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = DrpMethod.Round
+                });
 
-                Assert.That(stock.DividendRules[changeDate].CompanyTaxRate, Is.EqualTo(0.40m));
-                Assert.That(stock.DividendRules[changeDate].DividendRoundingRule, Is.EqualTo(RoundingRule.Truncate));
-                Assert.That(stock.DividendRules[changeDate].DRPActive, Is.EqualTo(true));
-                Assert.That(stock.DividendRules[changeDate].DRPMethod, Is.EqualTo(DRPMethod.RetainCashBalance));
-            });
+                stock.DividendRules[changeDate].Should().BeEquivalentTo(new
+                {
+                    CompanyTaxRate = 0.40m,
+                    DividendRoundingRule = RoundingRule.Truncate,
+                    DrpActive = true,
+                    DrpMethod = DrpMethod.RetainCashBalance
+                });
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeDividendRulesBeforeListing()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -358,10 +386,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
-            Assert.That(() => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DrpMethod.RetainCashBalance);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeDividendRulesAfterDeListing()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -372,10 +402,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
             stock.DeList(delistingDate);
-            Assert.That(() => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DrpMethod.RetainCashBalance);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeDividendRulesTwiceOnSameDate()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -384,15 +416,15 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new Stock(Guid.NewGuid());
 
             stock.List("ABC", "ABC Pty Ltd", listingDate, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(changeDate, 0.50m, RoundingRule.Round, true, DRPMethod.RoundDown);
-            stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DRPMethod.RetainCashBalance);
+            stock.ChangeDividendRules(changeDate, 0.50m, RoundingRule.Round, true, DrpMethod.RoundDown);
+            stock.ChangeDividendRules(changeDate, 0.40m, RoundingRule.Truncate, true, DrpMethod.RetainCashBalance);
 
-            Assert.Multiple(() =>
+            stock.DividendRules[changeDate].Should().BeEquivalentTo(new
             {
-                Assert.That(stock.DividendRules[changeDate].CompanyTaxRate, Is.EqualTo(0.40m));
-                Assert.That(stock.DividendRules[changeDate].DividendRoundingRule, Is.EqualTo(RoundingRule.Truncate));
-                Assert.That(stock.DividendRules[changeDate].DRPActive, Is.EqualTo(true));
-                Assert.That(stock.DividendRules[changeDate].DRPMethod, Is.EqualTo(DRPMethod.RetainCashBalance));
+                CompanyTaxRate = 0.40m,
+                DividendRoundingRule = RoundingRule.Truncate,
+                DrpActive = true,
+                DrpMethod = DrpMethod.RetainCashBalance
             });
         }
     }

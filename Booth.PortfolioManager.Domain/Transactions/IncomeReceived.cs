@@ -20,7 +20,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
         public decimal Interest { get; set; }
         public decimal TaxDeferred { get; set; }
         public bool CreateCashTransaction { get; set; }
-        public decimal DRPCashBalance { get; set; }
+        public decimal DrpCashBalance { get; set; }
 
         public string Description
         {

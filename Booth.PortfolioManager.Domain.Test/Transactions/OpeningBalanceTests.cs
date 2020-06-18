@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -11,9 +12,9 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
-    class OpeningBalanceTests
+    public class OpeningBalanceTests
     {
-        [TestCase]
+        [Fact]
         public void IncorrectTransactionType()
         {
             var transaction = new CashTransaction()
@@ -32,12 +33,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new OpeningBalanceHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void StockNotActive()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -60,12 +62,14 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var cashAccount = mockRepository.Create<ICashAccount>();
 
             var handler = new OpeningBalanceHandler();
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(StockNotActive)));
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+
+            a.Should().Throw<StockNotActiveException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void OpeningBalance()
         {
             var stock = new Stock(Guid.NewGuid());

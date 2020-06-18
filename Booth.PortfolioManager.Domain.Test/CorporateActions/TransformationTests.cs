@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -12,11 +13,12 @@ using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Portfolios;
 
+
 namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 {
-    class TransformationTests
+    public class TransformationTests
     {
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoResultStockNoTransactionsAtImplementationDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -32,12 +34,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoResultStockNoDisposalsAtImplementationDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -61,7 +63,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var transactions = mockRepository.Create<IPortfolioTransactionList>();
@@ -69,12 +71,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoResultStock()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -103,12 +105,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.True);
+            result.Should().BeTrue();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedResultStocksNoTransactionsAtImplementationDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -129,12 +131,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedResultStocksNoDisposalsAtImplementationDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -163,7 +165,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var transactions = mockRepository.Create<IPortfolioTransactionList>();
@@ -171,12 +173,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedResultStocks()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -207,12 +209,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.True);
+            result.Should().BeTrue();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoParcelsAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -237,12 +239,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Is.Empty);
+            result.Should().BeEmpty();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void RolloverReliefNoResultStocksNoCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -261,12 +263,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Is.Empty);
+            result.Should().BeEmpty();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void RolloverReliefNoResultStocksCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -289,27 +291,28 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Has.Count.EqualTo(1));
-            if (result.Count >= 1)
-            {
-                Assert.Multiple(() =>
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(Disposal)));
-                    var disposal = result[0] as Disposal;
-                    Assert.That(disposal.Date, Is.EqualTo(transformation.ImplementationDate));
-                    Assert.That(disposal.Stock, Is.EqualTo(transformation.Stock));
-                    Assert.That(disposal.Comment, Is.EqualTo("Test Transformation"));
-                    Assert.That(disposal.Units, Is.EqualTo(100));
-                    Assert.That(disposal.AveragePrice, Is.EqualTo(1.20m));
-                    Assert.That(disposal.TransactionCosts, Is.EqualTo(0.00m));
-                    Assert.That(disposal.CreateCashTransaction, Is.EqualTo(true));
-                });
-            }
+                    first.Should().BeOfType<Disposal>();
+
+                    if (first is Disposal disposal)
+                    {
+                        disposal.Date.Should().Be(transformation.ImplementationDate);
+                        disposal.Stock.Should().Be(transformation.Stock);
+                        disposal.Comment.Should().Be("Test Transformation");
+                        disposal.Units.Should().Be(100);
+                        disposal.AveragePrice.Should().Be(1.20m);
+                        disposal.TransactionCosts.Should().Be(0.00m);
+                        disposal.CreateCashTransaction.Should().BeTrue();
+                    }
+                }
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void RolloverReliefResultStocksNoCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -338,55 +341,49 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() => {
-                Assert.That(result, Has.Count.EqualTo(3));
-
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(OpeningBalance)), "Transaction 1");
-                    if (result[0] is OpeningBalance openingBalance)
+                    first.Should().BeOfType<OpeningBalance>();
+                    if (first is OpeningBalance openingBalance)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 1");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(stock2), "Transaction 1");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("Test Transformation"), "Transaction 1");
-                        Assert.That(openingBalance.Units, Is.EqualTo(160), "Transaction 1");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(320.00m), "Transaction 1");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(parcel1.AquisitionDate), "Transaction 1");
+                        openingBalance.Date.Should().Be(transformation.ImplementationDate);
+                        openingBalance.Stock.Should().Be(stock2);
+                        openingBalance.Comment.Should().Be("Test Transformation");
+                        openingBalance.Units.Should().Be(160);
+                        openingBalance.CostBase.Should().Be(320.00m);
+                        openingBalance.AquisitionDate.Should().Be(parcel1.AquisitionDate);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<OpeningBalance>();
+                    if (second is OpeningBalance openingBalance)
+                    {
+                        openingBalance.Date.Should().Be(transformation.ImplementationDate);
+                        openingBalance.Stock.Should().Be(stock2);
+                        openingBalance.Comment.Should().Be("Test Transformation");
+                        openingBalance.Units.Should().Be(40);
+                        openingBalance.CostBase.Should().Be(80.00m);
+                        openingBalance.AquisitionDate.Should().Be(parcel2.AquisitionDate);
+                    }
+                },
+                third =>
+                {
+                    third.Should().BeOfType<CostBaseAdjustment>();
+                    if (third is CostBaseAdjustment costBaseAdjustment)
+                    {
+                        costBaseAdjustment.Date.Should().Be(transformation.ImplementationDate);
+                        costBaseAdjustment.Stock.Should().Be(stock);
+                        costBaseAdjustment.Comment.Should().Be("Test Transformation");
                     }
                 }
-
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(OpeningBalance)), "Transaction 2");
-                    if (result[1] is OpeningBalance openingBalance)
-                    {
-                        Assert.That(openingBalance.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 2");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(stock2), "Transaction 2");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("Test Transformation"), "Transaction 2");
-                        Assert.That(openingBalance.Units, Is.EqualTo(40), "Transaction 2");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(80.00m), "Transaction 2");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(parcel2.AquisitionDate), "Transaction 2");
-                    }
-                }
-
-                if (result.Count >= 3)
-                {
-                    Assert.That(result[2], Is.TypeOf(typeof(CostBaseAdjustment)), "Transaction 3");
-                    if (result[2] is CostBaseAdjustment costBaseAdjustment)
-                    {
-                        Assert.That(costBaseAdjustment.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 3");
-                        Assert.That(costBaseAdjustment.Stock, Is.EqualTo(stock), "Transaction 3");
-                        Assert.That(costBaseAdjustment.Comment, Is.EqualTo("Test Transformation"), "Transaction 3");
-                        Assert.That(costBaseAdjustment.Percentage, Is.EqualTo(0.60m), "Transaction 3");
-                    }
-                }
-
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void RolloverReliefResultStocksCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -415,70 +412,63 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(4));
-
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(OpeningBalance)), "Transaction 1");
-                    if (result[0] is OpeningBalance openingBalance)
+                    first.Should().BeOfType<OpeningBalance>();
+                    if (first is OpeningBalance openingBalance)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 1");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(stock2), "Transaction 1");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("Test Transformation"), "Transaction 1");
-                        Assert.That(openingBalance.Units, Is.EqualTo(160), "Transaction 1");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(320.00m), "Transaction 1");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(parcel1.AquisitionDate), "Transaction 1");
+                        openingBalance.Date.Should().Be(transformation.ImplementationDate);
+                        openingBalance.Stock.Should().Be(stock2);
+                        openingBalance.Comment.Should().Be("Test Transformation");
+                        openingBalance.Units.Should().Be(160);
+                        openingBalance.CostBase.Should().Be(320.00m);
+                        openingBalance.AquisitionDate.Should().Be(parcel1.AquisitionDate);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<OpeningBalance>();
+                    if (second is OpeningBalance openingBalance)
+                    {
+                        openingBalance.Date.Should().Be(transformation.ImplementationDate);
+                        openingBalance.Stock.Should().Be(stock2);
+                        openingBalance.Comment.Should().Be("Test Transformation");
+                        openingBalance.Units.Should().Be(40);
+                        openingBalance.CostBase.Should().Be(80.00m);
+                        openingBalance.AquisitionDate.Should().Be(parcel2.AquisitionDate);
+                    }
+                },
+                third =>
+                {
+                    third.Should().BeOfType<CostBaseAdjustment>();
+                    if (third is CostBaseAdjustment costBaseAdjustment)
+                    {
+                        costBaseAdjustment.Date.Should().Be(transformation.ImplementationDate);
+                        costBaseAdjustment.Stock.Should().Be(stock);
+                        costBaseAdjustment.Comment.Should().Be("Test Transformation");
+                    }
+                },
+                fourth =>
+                {
+                    fourth.Should().BeOfType<Disposal>();
+                    if (fourth is Disposal disposal)
+                    {
+                        disposal.Date.Should().Be(transformation.ImplementationDate);
+                        disposal.Stock.Should().Be(stock);
+                        disposal.Comment.Should().Be("Test Transformation");
+                        disposal.Units.Should().Be(100);
+                        disposal.AveragePrice.Should().Be(1.20m);
+                        disposal.TransactionCosts.Should().Be(.00m);
+                        disposal.CreateCashTransaction.Should().BeTrue();
                     }
                 }
-
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(OpeningBalance)), "Transaction 2");
-                    if (result[1] is OpeningBalance openingBalance)
-                    {
-                        Assert.That(openingBalance.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 2");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(stock2), "Transaction 2");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("Test Transformation"), "Transaction 2");
-                        Assert.That(openingBalance.Units, Is.EqualTo(40), "Transaction 2");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(80.00m), "Transaction 2");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(parcel2.AquisitionDate), "Transaction 2");
-                    }
-                }
-
-                if (result.Count >= 3)
-                {
-                    Assert.That(result[2], Is.TypeOf(typeof(CostBaseAdjustment)), "Transaction 3");
-                    if (result[2] is CostBaseAdjustment costBaseAdjustment)
-                    {
-                        Assert.That(costBaseAdjustment.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 3");
-                        Assert.That(costBaseAdjustment.Stock, Is.EqualTo(stock), "Transaction 3");
-                        Assert.That(costBaseAdjustment.Comment, Is.EqualTo("Test Transformation"), "Transaction 3");
-                        Assert.That(costBaseAdjustment.Percentage, Is.EqualTo(0.60m), "Transaction 3");
-                    }
-                }
-
-                if (result.Count >= 4)
-                {
-                    Assert.That(result[3], Is.TypeOf(typeof(Disposal)), "Transaction 4");
-                    if (result[3] is Disposal disposal)
-                    {
-                        Assert.That(disposal.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 4");
-                        Assert.That(disposal.Stock, Is.EqualTo(stock), "Transaction 4");
-                        Assert.That(disposal.Comment, Is.EqualTo("Test Transformation"), "Transaction 4");
-                        Assert.That(disposal.Units, Is.EqualTo(100), "Transaction 4");
-                        Assert.That(disposal.AveragePrice, Is.EqualTo(1.20m), "Transaction 4");
-                        Assert.That(disposal.TransactionCosts, Is.EqualTo(0.00m), "Transaction 4");
-                        Assert.That(disposal.CreateCashTransaction, Is.EqualTo(true), "Transaction 4");
-                    }
-                }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoRolloverReliefNoResultStocksNoCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -497,12 +487,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Is.Empty);
+            result.Should().BeEmpty();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoRolloverReliefNoResultStocksCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -525,30 +515,27 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(         
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(Disposal)), "Transaction 1");
-                    if (result[0] is Disposal disposal)
+                    first.Should().BeOfType<Disposal>();
+                    if (first is Disposal disposal)
                     {
-                        Assert.That(disposal.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 1");
-                        Assert.That(disposal.Stock, Is.EqualTo(transformation.Stock), "Transaction 1");
-                        Assert.That(disposal.Comment, Is.EqualTo("Test Transformation"), "Transaction 1");
-                        Assert.That(disposal.Units, Is.EqualTo(100), "Transaction 1");
-                        Assert.That(disposal.AveragePrice, Is.EqualTo(1.20m), "Transaction 1");
-                        Assert.That(disposal.TransactionCosts, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(disposal.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
+                        disposal.Date.Should().Be(transformation.ImplementationDate);
+                        disposal.Stock.Should().Be(transformation.Stock);
+                        disposal.Comment.Should().Be("Test Transformation");
+                        disposal.Units.Should().Be(100);
+                        disposal.AveragePrice.Should().Be(1.20m);
+                        disposal.TransactionCosts.Should().Be(.00m);
+                        disposal.CreateCashTransaction.Should().BeTrue();
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoRolloverReliefResultStocksNoCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -577,43 +564,39 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(2));
-
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(OpeningBalance)), "Transaction 1");
-                    if (result[0] is OpeningBalance openingBalance)
+                    first.Should().BeOfType<OpeningBalance>();
+                    if (first is OpeningBalance openingBalance)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 1");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(stock2), "Transaction 1");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("Test Transformation"), "Transaction 1");
-                        Assert.That(openingBalance.Units, Is.EqualTo(200), "Transaction 1");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(400.00m), "Transaction 1");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(transformation.ImplementationDate), "Transaction 1");
+                        openingBalance.Date.Should().Be(transformation.ImplementationDate);
+                        openingBalance.Stock.Should().Be(stock2);
+                        openingBalance.Comment.Should().Be("Test Transformation");
+                        openingBalance.Units.Should().Be(200);
+                        openingBalance.CostBase.Should().Be(400.00m);
+                        openingBalance.AquisitionDate.Should().Be(transformation.ImplementationDate);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<ReturnOfCapital>();
+                    if (second is ReturnOfCapital returnOfCapital)
+                    {
+                        returnOfCapital.Date.Should().Be(transformation.ImplementationDate);
+                        returnOfCapital.Stock.Should().Be(stock);
+                        returnOfCapital.Comment.Should().Be("Test Transformation");
+                        returnOfCapital.RecordDate.Should().Be(transformation.Date);
+                        returnOfCapital.Amount.Should().Be(400.00m);
+                        returnOfCapital.CreateCashTransaction.Should().BeFalse();
                     }
                 }
-
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(ReturnOfCapital)), "Transaction 2");
-                    if (result[1] is ReturnOfCapital returnOfCapital)
-                    {
-                        Assert.That(returnOfCapital.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 2");
-                        Assert.That(returnOfCapital.Stock, Is.EqualTo(stock), "Transaction 2");
-                        Assert.That(returnOfCapital.Comment, Is.EqualTo("Test Transformation"), "Transaction 2");
-                        Assert.That(returnOfCapital.RecordDate, Is.EqualTo(transformation.Date), "Transaction 2");
-                        Assert.That(returnOfCapital.Amount, Is.EqualTo(400.00m), "Transaction 2");
-                        Assert.That(returnOfCapital.CreateCashTransaction, Is.EqualTo(false), "Transaction 2");
-                    }
-                }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoRolloverReliefResultStocksCashComponent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -642,53 +625,48 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = transformation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(3));
-
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(OpeningBalance)), "Transaction 1");
-                    if (result[0] is OpeningBalance openingBalance)
+                    first.Should().BeOfType<OpeningBalance>();
+                    if (first is OpeningBalance openingBalance)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 1");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(stock2), "Transaction 1");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("Test Transformation"), "Transaction 1");
-                        Assert.That(openingBalance.Units, Is.EqualTo(200), "Transaction 1");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(400.00m), "Transaction 1");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(transformation.ImplementationDate), "Transaction 1");
+                        openingBalance.Date.Should().Be(transformation.ImplementationDate);
+                        openingBalance.Stock.Should().Be(stock2);
+                        openingBalance.Comment.Should().Be("Test Transformation");
+                        openingBalance.Units.Should().Be(200);
+                        openingBalance.CostBase.Should().Be(400.00m);
+                        openingBalance.AquisitionDate.Should().Be(transformation.ImplementationDate);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<ReturnOfCapital>();
+                    if (second is ReturnOfCapital returnOfCapital)
+                    {
+                        returnOfCapital.Date.Should().Be(transformation.ImplementationDate);
+                        returnOfCapital.Stock.Should().Be(stock);
+                        returnOfCapital.Comment.Should().Be("Test Transformation");
+                        returnOfCapital.RecordDate.Should().Be(transformation.Date);
+                        returnOfCapital.Amount.Should().Be(400.00m);
+                        returnOfCapital.CreateCashTransaction.Should().BeFalse();
+                    }
+                }, 
+                third =>
+                {
+                    third.Should().BeOfType<Disposal>();
+                    if (third is Disposal disposal)
+                    {
+                        disposal.Date.Should().Be(transformation.ImplementationDate);
+                        disposal.Stock.Should().Be(stock);
+                        disposal.Comment.Should().Be("Test Transformation");
+                        disposal.Units.Should().Be(100);
+                        disposal.AveragePrice.Should().Be(1.20m);
+                        disposal.TransactionCosts.Should().Be(0.00m);
+                        disposal.CreateCashTransaction.Should().BeTrue();
                     }
                 }
-
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(ReturnOfCapital)), "Transaction 2");
-                    if (result[1] is ReturnOfCapital returnOfCapital)
-                    {
-                        Assert.That(returnOfCapital.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 2");
-                        Assert.That(returnOfCapital.Stock, Is.EqualTo(stock), "Transaction 2");
-                        Assert.That(returnOfCapital.Comment, Is.EqualTo("Test Transformation"), "Transaction 2");
-                        Assert.That(returnOfCapital.RecordDate, Is.EqualTo(transformation.Date), "Transaction 2");
-                        Assert.That(returnOfCapital.Amount, Is.EqualTo(400.00m), "Transaction 2");
-                        Assert.That(returnOfCapital.CreateCashTransaction, Is.EqualTo(false), "Transaction 2");
-                    }
-                }
-
-                if (result.Count >= 3)
-                {
-                    Assert.That(result[2], Is.TypeOf(typeof(Disposal)), "Transaction 3");
-                    if (result[2] is Disposal disposal)
-                    {
-                        Assert.That(disposal.Date, Is.EqualTo(transformation.ImplementationDate), "Transaction 3");
-                        Assert.That(disposal.Stock, Is.EqualTo(stock), "Transaction 3");
-                        Assert.That(disposal.Comment, Is.EqualTo("Test Transformation"), "Transaction 3");
-                        Assert.That(disposal.Units, Is.EqualTo(100), "Transaction 3");
-                        Assert.That(disposal.AveragePrice, Is.EqualTo(1.20m), "Transaction 3");
-                        Assert.That(disposal.TransactionCosts, Is.EqualTo(0.00m), "Transaction 3");
-                        Assert.That(disposal.CreateCashTransaction, Is.EqualTo(true), "Transaction 3");
-                    }
-                }
-            });
+            );
 
             mockRepository.Verify();
         }

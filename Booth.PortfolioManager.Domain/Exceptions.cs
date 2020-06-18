@@ -10,9 +10,9 @@ namespace Booth.PortfolioManager.Domain
         public EffectiveDateException(string message) : base(message) { }
     }
 
-    public class NoSharesOwned : Exception
+    public class NoSharesOwnedException : Exception
     {
-        public NoSharesOwned(string message) : base(message) { }
+        public NoSharesOwnedException(string message) : base(message) { }
     }
 
     public class NotEnoughSharesForDisposal : Exception
@@ -20,14 +20,14 @@ namespace Booth.PortfolioManager.Domain
         public NotEnoughSharesForDisposal(string message) : base(message) { }
     }
 
-    public class StockNotActive : Exception
+    public class StockNotActiveException : Exception
     {
-        public StockNotActive(string message) : base(message) { }
+        public StockNotActiveException(string message) : base(message) { }
     }
 
-    public class StockNotFound : Exception
+    public class StockNotFoundException : Exception
     {
-        public StockNotFound(string message) : base(message) { }
+        public StockNotFoundException(string message) : base(message) { }
     }
 
 }

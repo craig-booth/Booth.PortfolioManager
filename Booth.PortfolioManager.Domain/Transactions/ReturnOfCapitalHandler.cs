@@ -15,7 +15,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new ArgumentException("Expected transaction to be an ReturnOfCapital");
 
             if (!holding.IsEffectiveAt(returnOfCapital.RecordDate))
-                throw new NoSharesOwned("No holdings");
+                throw new NoSharesOwnedException("No holdings");
 
             // Reduce cost base of parcels 
             decimal totalAmount = 0;
@@ -29,7 +29,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 
             if (returnOfCapital.CreateCashTransaction)
             {
-                var asxCode = returnOfCapital.Stock.Properties[returnOfCapital.RecordDate].ASXCode;
+                var asxCode = returnOfCapital.Stock.Properties[returnOfCapital.RecordDate].AsxCode;
                 cashAccount.Transfer(returnOfCapital.Date, totalAmount, String.Format("Return of capital for {0}", asxCode));
             }
         }

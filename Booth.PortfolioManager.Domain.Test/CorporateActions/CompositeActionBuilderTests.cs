@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Moq;
 
 using Booth.Common;
@@ -12,10 +14,10 @@ using Booth.PortfolioManager.Domain.CorporateActions.Events;
 
 namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 {
-    class CompositeActionBuilderTests
+    public class CompositeActionBuilderTests
     {
 
-        [TestCase]
+        [Fact]
         public void NoChildActions()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -26,22 +28,22 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var builder = new CompositeActionBuilder(stock, id, new Date(2000, 01, 01), "Test Composite Action", (x) => { @event = x; });
             builder.Finish();
 
-            Assert.That(@event, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(@event.EntityId, Is.EqualTo(stock.Id), "Parent");
-                Assert.That(@event.Version, Is.EqualTo(1), "Parent");
-                Assert.That(@event.ActionId, Is.EqualTo(id), "Parent");
-                Assert.That(@event.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Parent");
-                Assert.That(@event.Description, Is.EqualTo("Test Composite Action"), "Parent");
-
-                var childActions = @event.ChildActions.ToList();
-                Assert.That(childActions, Is.Empty, "Parent");
-            });
-
+                @event.Should().BeEquivalentTo(
+                    new
+                    {
+                        EntityId = stock.Id,
+                        Version = 1,
+                        ActionId = id,
+                        ActionDate = new Date(2000, 01, 01),
+                        Description = "Test Composite Action"
+                    });
+                @event.ChildActions.Should().BeEmpty();
+            };
         }
 
-        [TestCase]
+        [Fact]
         public void AddCapitalReturn()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -53,35 +55,37 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             builder.AddCapitalReturn("Test Capital Return", new Date(2000, 02, 01), 10.00m)
                    .Finish();
 
-            Assert.That(@event, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(@event.EntityId, Is.EqualTo(stock.Id), "Parent");
-                Assert.That(@event.Version, Is.EqualTo(1), "Parent");
-                Assert.That(@event.ActionId, Is.EqualTo(id), "Parent");
-                Assert.That(@event.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Parent");
-                Assert.That(@event.Description, Is.EqualTo("Test Composite Action"), "Parent");
-
-                var childActions = @event.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(1), "Parent");
-
-                if (childActions.Count >= 1)
-                {
-                    Assert.That(childActions[0], Is.TypeOf(typeof(CapitalReturnAddedEvent)), "Child 1");
-                    if (childActions[0] is CapitalReturnAddedEvent capitalReturn)
+                @event.Should().BeEquivalentTo(
+                    new
                     {
-                        Assert.That(capitalReturn.EntityId, Is.EqualTo(stock.Id), "Child 1");
-                        Assert.That(capitalReturn.Version, Is.EqualTo(1), "Child 1");
-                        Assert.That(capitalReturn.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Child 1");
-                        Assert.That(capitalReturn.Description, Is.EqualTo("Test Capital Return"), "Child 1");
-                        Assert.That(capitalReturn.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)), "Child 1");
-                        Assert.That(capitalReturn.Amount, Is.EqualTo(10.00m), "Child 1");
+                        EntityId = stock.Id,
+                        Version = 1,
+                        ActionId = id,
+                        ActionDate = new Date(2000, 01, 01),
+                        Description = "Test Composite Action"
+                    });
+                @event.ChildActions.Should().SatisfyRespectively(
+
+                    first =>
+                    {
+                        first.Should().BeOfType<CapitalReturnAddedEvent>();
+                        if (first is CapitalReturnAddedEvent capitalReturn)
+                        {
+                            capitalReturn.EntityId.Should().Be(stock.Id);
+                            capitalReturn.Version.Should().Be(1);
+                            capitalReturn.ActionDate.Should().Be(new Date(2000, 01, 01));
+                            capitalReturn.Description.Should().Be("Test Capital Return");
+                            capitalReturn.PaymentDate.Should().Be(new Date(2000, 02, 01));
+                            capitalReturn.Amount.Should().Be(10.00m);
+                        }
                     }
-                }
-            });
+                );
+            };
         }
 
-        [TestCase]
+        [Fact]
         public void AddDividend()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -93,38 +97,41 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             builder.AddDividend("Test Dividend", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m)
                    .Finish();
 
-            Assert.That(@event, Is.Not.Null);
-            Assert.Multiple(() =>
+
+            using (new AssertionScope())
             {
-                Assert.That(@event.EntityId, Is.EqualTo(stock.Id), "Parent");
-                Assert.That(@event.Version, Is.EqualTo(1), "Parent");
-                Assert.That(@event.ActionId, Is.EqualTo(id), "Parent");
-                Assert.That(@event.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Parent");
-                Assert.That(@event.Description, Is.EqualTo("Test Composite Action"), "Parent");
-
-                var childActions = @event.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(1), "Parent");
-
-                if (childActions.Count >= 1)
-                {
-                    Assert.That(childActions[0], Is.TypeOf(typeof(DividendAddedEvent)), "Child 1");
-                    if (childActions[0] is DividendAddedEvent dividend)
+                @event.Should().BeEquivalentTo(
+                    new
                     {
-                        Assert.That(dividend.EntityId, Is.EqualTo(stock.Id), "Child 1");
-                        Assert.That(dividend.Version, Is.EqualTo(1), "Child 1");
-                        Assert.That(dividend.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Child 1");
-                        Assert.That(dividend.Description, Is.EqualTo("Test Dividend"), "Child 1");
-                        Assert.That(dividend.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)), "Child 1");
-                        Assert.That(dividend.DividendAmount, Is.EqualTo(1.20m), "Child 1");
-                        Assert.That(dividend.PercentFranked, Is.EqualTo(1.00m), "Child 1");
-                        Assert.That(dividend.DRPPrice, Is.EqualTo(2.50m), "Child 1");
+                        EntityId = stock.Id,
+                        Version = 1,
+                        ActionId = id,
+                        ActionDate = new Date(2000, 01, 01),
+                        Description = "Test Composite Action"
+                    });
+                @event.ChildActions.Should().SatisfyRespectively(
+
+                    first =>
+                    {
+                        first.Should().BeOfType<DividendAddedEvent>();
+                        if (first is DividendAddedEvent dividend)
+                        {
+                            dividend.EntityId.Should().Be(stock.Id);
+                            dividend.Version.Should().Be(1);
+                            dividend.ActionDate.Should().Be(new Date(2000, 01, 01));
+                            dividend.Description.Should().Be("Test Dividend");
+                            dividend.PaymentDate.Should().Be(new Date(2000, 02, 01));
+                            dividend.DividendAmount.Should().Be(1.20m);
+                            dividend.PercentFranked.Should().Be(1.00m);
+                            dividend.DrpPrice.Should().Be(2.50m);
+                        }
                     }
-                }
-            });
+                );
+            };
         }
 
        
-        [TestCase]
+        [Fact]
         public void AddTransformation()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -143,37 +150,39 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             builder.AddTransformation("Test Transformation", new Date(2000, 02, 01), 1.20m, false, resultStocks)
                    .Finish();
 
-            Assert.That(@event, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(@event.EntityId, Is.EqualTo(stock.Id), "Parent");
-                Assert.That(@event.Version, Is.EqualTo(1), "Parent");
-                Assert.That(@event.ActionId, Is.EqualTo(id), "Parent");
-                Assert.That(@event.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Parent");
-                Assert.That(@event.Description, Is.EqualTo("Test Composite Action"), "Parent");
-
-                var childActions = @event.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(1), "Parent");
-
-                if (childActions.Count >= 1)
-                {
-                    Assert.That(childActions[0], Is.TypeOf(typeof(TransformationAddedEvent)), "Child 1");
-                    if (childActions[0] is TransformationAddedEvent transformation)
+                @event.Should().BeEquivalentTo(
+                    new
                     {
-                        Assert.That(transformation.EntityId, Is.EqualTo(stock.Id), "Child 1");
-                        Assert.That(transformation.Version, Is.EqualTo(1), "Child 1");
-                        Assert.That(transformation.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Child 1");
-                        Assert.That(transformation.Description, Is.EqualTo("Test Transformation"), "Child 1");
-                        Assert.That(transformation.ImplementationDate, Is.EqualTo(new Date(2000, 02, 01)), "Child 1");
-                        Assert.That(transformation.CashComponent, Is.EqualTo(1.20m), "Child 1");
-                        Assert.That(transformation.RolloverRefliefApplies, Is.EqualTo(false), "Child 1");
-                        Assert.That(transformation.ResultingStocks.Count(), Is.EqualTo(1), "Child 1");
+                        EntityId = stock.Id,
+                        Version = 1,
+                        ActionId = id,
+                        ActionDate = new Date(2000, 01, 01),
+                        Description = "Test Composite Action"
+                    });
+                @event.ChildActions.Should().SatisfyRespectively(
+
+                    first =>
+                    {
+                        first.Should().BeOfType<TransformationAddedEvent>();
+                        if (first is TransformationAddedEvent transformation)
+                        {
+                            transformation.EntityId.Should().Be(stock.Id);
+                            transformation.Version.Should().Be(1);
+                            transformation.ActionDate.Should().Be(new Date(2000, 01, 01));
+                            transformation.Description.Should().Be("Test Transformation");
+                            transformation.ImplementationDate.Should().Be(new Date(2000, 02, 01));
+                            transformation.CashComponent.Should().Be(1.20m);
+                            transformation.RolloverRefliefApplies.Should().BeFalse();
+                            transformation.ResultingStocks.Should().HaveCount(1);
+                        }
                     }
-                }
-            });
+                );
+            };
         }
 
-        [TestCase]
+        [Fact]
         public void AddSplitConsolidation()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -185,35 +194,38 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             builder.AddSplitConsolidation("Test Split", 1, 2)
                    .Finish();
 
-            Assert.That(@event, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(@event.EntityId, Is.EqualTo(stock.Id), "Parent");
-                Assert.That(@event.Version, Is.EqualTo(1), "Parent");
-                Assert.That(@event.ActionId, Is.EqualTo(id), "Parent");
-                Assert.That(@event.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Parent");
-                Assert.That(@event.Description, Is.EqualTo("Test Composite Action"), "Parent");
-
-                var childActions = @event.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(1), "Parent");
-
-                if (childActions.Count >= 1)
-                {
-                    Assert.That(childActions[0], Is.TypeOf(typeof(SplitConsolidationAddedEvent)), "Child 1");
-                    if (childActions[0] is SplitConsolidationAddedEvent splitConsolidation)
+                @event.Should().BeEquivalentTo(
+                    new
                     {
-                        Assert.That(splitConsolidation.EntityId, Is.EqualTo(stock.Id), "Child 1");
-                        Assert.That(splitConsolidation.Version, Is.EqualTo(1), "Child 1");
-                        Assert.That(splitConsolidation.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Child 1");
-                        Assert.That(splitConsolidation.Description, Is.EqualTo("Test Split"), "Child 1");
-                        Assert.That(splitConsolidation.OriginalUnits, Is.EqualTo(1), "Child 1");
-                        Assert.That(splitConsolidation.NewUnits, Is.EqualTo(2), "Child 1");
+                        EntityId = stock.Id,
+                        Version = 1,
+                        ActionId = id,
+                        ActionDate = new Date(2000, 01, 01),
+                        Description = "Test Composite Action"
+                    });
+                @event.ChildActions.Should().SatisfyRespectively(
+
+                    first =>
+                    {
+                        first.Should().BeOfType<SplitConsolidationAddedEvent>();
+                        if (first is SplitConsolidationAddedEvent splitConsolidation)
+                        {
+                            splitConsolidation.EntityId.Should().Be(stock.Id);
+                            splitConsolidation.Version.Should().Be(1);
+                            splitConsolidation.ActionDate.Should().Be(new Date(2000, 01, 01));
+                            splitConsolidation.Description.Should().Be("Test Split");
+                            splitConsolidation.OriginalUnits.Should().Be(1);
+                            splitConsolidation.NewUnits.Should().Be(2);
+                        }
                     }
-                }
-            });
+                );
+            };
+
         }
 
-        [TestCase]
+        [Fact]
         public void AddOneOfEachTypeOfChildAction()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -227,30 +239,27 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                    .AddDividend("Test Dividend", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m)
                    .Finish();
 
-            Assert.That(@event, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(@event.EntityId, Is.EqualTo(stock.Id), "Parent");
-                Assert.That(@event.Version, Is.EqualTo(1), "Parent");
-                Assert.That(@event.ActionId, Is.EqualTo(id), "Parent");
-                Assert.That(@event.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Parent");
-                Assert.That(@event.Description, Is.EqualTo("Test Composite Action"), "Parent");
+                @event.Should().BeEquivalentTo(
+                    new
+                    {
+                        EntityId = stock.Id,
+                        Version = 1,
+                        ActionId = id,
+                        ActionDate = new Date(2000, 01, 01),
+                        Description = "Test Composite Action"
+                    });
+                @event.ChildActions.Should().SatisfyRespectively(
+                    first => first.Should().BeOfType<SplitConsolidationAddedEvent>(),
+                    second => second.Should().BeOfType<CapitalReturnAddedEvent>(),
+                    third => third.Should().BeOfType<DividendAddedEvent>()
+                );
+            };
 
-                var childActions = @event.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(3), "Parent");
-
-                if (childActions.Count >= 1)
-                    Assert.That(childActions[0], Is.TypeOf(typeof(SplitConsolidationAddedEvent)), "Child 1");       
-
-                if (childActions.Count >= 2)
-                    Assert.That(childActions[1], Is.TypeOf(typeof(CapitalReturnAddedEvent)), "Child 1");
-
-                if (childActions.Count >= 3)
-                    Assert.That(childActions[2], Is.TypeOf(typeof(DividendAddedEvent)), "Child 1");
-            });
         }
 
-        [TestCase]
+        [Fact]
         public void AddMultipleOfTheSameTypeOfChildAction()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -263,46 +272,48 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                    .AddCapitalReturn("Test Capital Return 2", new Date(2000, 02, 01), 12.00m)
                    .Finish();
 
-            Assert.That(@event, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(@event.EntityId, Is.EqualTo(stock.Id), "Parent");
-                Assert.That(@event.Version, Is.EqualTo(1), "Parent");
-                Assert.That(@event.ActionId, Is.EqualTo(id), "Parent");
-                Assert.That(@event.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Parent");
-                Assert.That(@event.Description, Is.EqualTo("Test Composite Action"), "Parent");
-
-                var childActions = @event.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(2), "Parent");
-
-                if (childActions.Count >= 1)
-                {
-                    Assert.That(childActions[0], Is.TypeOf(typeof(CapitalReturnAddedEvent)), "Child 1");
-                    if (childActions[0] is CapitalReturnAddedEvent capitalReturn)
+                @event.Should().BeEquivalentTo(
+                    new
                     {
-                        Assert.That(capitalReturn.EntityId, Is.EqualTo(stock.Id), "Child 1");
-                        Assert.That(capitalReturn.Version, Is.EqualTo(1), "Child 1");
-                        Assert.That(capitalReturn.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Child 1");
-                        Assert.That(capitalReturn.Description, Is.EqualTo("Test Capital Return 1"), "Child 1");
-                        Assert.That(capitalReturn.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)), "Child 1");
-                        Assert.That(capitalReturn.Amount, Is.EqualTo(10.00m), "Child 1");
-                    }
-                }
+                        EntityId = stock.Id,
+                        Version = 1,
+                        ActionId = id,
+                        ActionDate = new Date(2000, 01, 01),
+                        Description = "Test Composite Action"
+                    });
+                @event.ChildActions.Should().SatisfyRespectively(
 
-                if (childActions.Count >= 2)
-                {
-                    Assert.That(childActions[1], Is.TypeOf(typeof(CapitalReturnAddedEvent)), "Child 2");
-                    if (childActions[1] is CapitalReturnAddedEvent capitalReturn)
+                    first =>
                     {
-                        Assert.That(capitalReturn.EntityId, Is.EqualTo(stock.Id), "Child 2");
-                        Assert.That(capitalReturn.Version, Is.EqualTo(1), "Child 2");
-                        Assert.That(capitalReturn.ActionDate, Is.EqualTo(new Date(2000, 01, 01)), "Child 2");
-                        Assert.That(capitalReturn.Description, Is.EqualTo("Test Capital Return 2"), "Child 2");
-                        Assert.That(capitalReturn.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)), "Child 2");
-                        Assert.That(capitalReturn.Amount, Is.EqualTo(12.00m), "Child 2");
+                        first.Should().BeOfType<CapitalReturnAddedEvent>();
+                        if (first is CapitalReturnAddedEvent capitalReturn)
+                        {
+                            capitalReturn.EntityId.Should().Be(stock.Id);
+                            capitalReturn.Version.Should().Be(1);
+                            capitalReturn.ActionDate.Should().Be(new Date(2000, 01, 01));
+                            capitalReturn.Description.Should().Be("Test Capital Return 1");
+                            capitalReturn.PaymentDate.Should().Be(new Date(2000, 02, 01));
+                            capitalReturn.Amount.Should().Be(10.00m);
+                        }
+                    },
+
+                    second =>
+                    {
+                        second.Should().BeOfType<CapitalReturnAddedEvent>();
+                        if (second is CapitalReturnAddedEvent capitalReturn)
+                        {
+                            capitalReturn.EntityId.Should().Be(stock.Id);
+                            capitalReturn.Version.Should().Be(1);
+                            capitalReturn.ActionDate.Should().Be(new Date(2000, 01, 01));
+                            capitalReturn.Description.Should().Be("Test Capital Return 2");
+                            capitalReturn.PaymentDate.Should().Be(new Date(2000, 02, 01));
+                            capitalReturn.Amount.Should().Be(12.00m);
+                        }
                     }
-                }
-            });
+                );
+            };
         }
 
     }

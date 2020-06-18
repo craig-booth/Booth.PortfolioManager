@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
         IEnumerable<StockPrice> GetPrices(DateRange dateRange);
     }
 
-    class StockPriceHistory : TrackedEntity, IStockPriceHistory
+    public class StockPriceHistory : TrackedEntity, IStockPriceHistory
     {
         private List<StockPrice> _Prices { get; } = new List<StockPrice>();
 
@@ -87,9 +87,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        public void UpdateClosingPrices(IEnumerable<Tuple<Date, decimal>> closingPrices)
+        public void UpdateClosingPrices(IEnumerable<StockPrice> closingPrices)
         {
-            var @event = new ClosingPricesAddedEvent(Id, Version, closingPrices.Select(x => new ClosingPricesAddedEvent.ClosingPrice(x.Item1, x.Item2)));
+            var @event = new ClosingPricesAddedEvent(Id, Version, closingPrices.Select(x => new ClosingPricesAddedEvent.ClosingPrice(x.Date, x.Price)));
             Apply(@event);
 
             PublishEvent(@event);

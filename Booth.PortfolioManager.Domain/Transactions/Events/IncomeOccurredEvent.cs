@@ -15,7 +15,7 @@ namespace Booth.PortfolioManager.Domain.Transactions.Events
         public decimal Interest { get; set; }
         public decimal TaxDeferred { get; set; }
         public bool CreateCashTransaction { get; set; }
-        public decimal DRPCashBalance { get; set; }
+        public decimal DrpCashBalance { get; set; }
 
         public IncomeOccurredEvent(Guid entityId, int version, Guid transactionId, Date date, Guid stock, string comment)
             : base(entityId, version, transactionId, date, stock, comment)

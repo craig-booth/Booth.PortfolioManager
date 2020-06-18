@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new ArgumentException("Expected transaction to be an IncomeReceived");
 
             if (!holding.IsEffectiveAt(incomeReceived.RecordDate))
-                throw new NoSharesOwned("No holdings");
+                throw new NoSharesOwnedException("No holdings");
 
             // Handle any tax deferred amount recieved 
             if (incomeReceived.TaxDeferred > 0)
@@ -35,13 +35,13 @@ namespace Booth.PortfolioManager.Domain.Transactions
 
             if (incomeReceived.CreateCashTransaction)
             {
-                var asxCode = incomeReceived.Stock.Properties[incomeReceived.RecordDate].ASXCode;
+                var asxCode = incomeReceived.Stock.Properties[incomeReceived.RecordDate].AsxCode;
                 cashAccount.Transfer(incomeReceived.Date, incomeReceived.CashIncome, String.Format("Distribution for {0}", asxCode));
             }
 
             var drpCashBalance = holding.DrpAccount.Balance(incomeReceived.Date);
 
-            var drpAccountCredit = incomeReceived.DRPCashBalance - drpCashBalance;
+            var drpAccountCredit = incomeReceived.DrpCashBalance - drpCashBalance;
             if (drpAccountCredit != 0.00m)
                 holding.AddDrpAccountAmount(incomeReceived.Date, drpAccountCredit);
         }

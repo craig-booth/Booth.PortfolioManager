@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new ArgumentException("Expected transaction to be a Disposal");
 
             if (!holding.IsEffectiveAt(disposal.Date))
-                throw new NoSharesOwned("No holdings");
+                throw new NoSharesOwnedException("No holdings");
 
             if (holding.Properties[disposal.Date].Units < disposal.Units)
                 throw new NotEnoughSharesForDisposal("Not enough shares for disposal");
@@ -61,7 +61,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             {
                 var cost = disposal.Units * disposal.AveragePrice;
 
-                var asxCode = disposal.Stock.Properties[disposal.Date].ASXCode;
+                var asxCode = disposal.Stock.Properties[disposal.Date].AsxCode;
                 cashAccount.Transfer(disposal.Date, cost, String.Format("Sale of {0}", asxCode));
 
                 if (disposal.TransactionCosts > 0.00m)

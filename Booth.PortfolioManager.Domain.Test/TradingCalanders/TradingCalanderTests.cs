@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
 
 using Booth.Common;
 using Booth.EventStore;
@@ -10,10 +12,10 @@ using Booth.PortfolioManager.Domain.TradingCalanders.Events;
 
 namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
 {
-    class TradingCalanderTests
+    public class TradingCalanderTests
     {
 
-        [TestCase]
+        [Fact]
         public void SetNewTradingDays()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -26,18 +28,16 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
 
             var events = tradingCalander.FetchEvents().ToList();
 
-            Assert.Multiple(() => {
-                Assert.That(events, Has.Count.EqualTo(1));
-                var e1 = events[0] as NonTradingDaysSetEvent;
-                Assert.That(e1.NonTradingDays.Count(), Is.EqualTo(2));
-                Assert.That(e1.NonTradingDays[0].Date, Is.EqualTo(new Date(2019, 01, 01)));
-                Assert.That(e1.NonTradingDays[0].Desciption, Is.EqualTo("New Years Day"));
-                Assert.That(e1.NonTradingDays[1].Date, Is.EqualTo(new Date(2019, 12, 25)));
-                Assert.That(e1.NonTradingDays[1].Desciption, Is.EqualTo("Christmas Day"));
-            });
+            events.Should().SatisfyRespectively(
+
+                first => first.Should().BeOfType<NonTradingDaysSetEvent>().Which.NonTradingDays.Should().SatisfyRespectively(
+                    day1 => day1.Should().BeEquivalentTo(new { Date = new Date(2019, 01, 01), Description = "New Years Day" }),
+                    day2 => day2.Should().BeEquivalentTo(new { Date = new Date(2019, 12, 25), Description = "Christmas Day" })
+                    )
+               );
         }
 
-        [TestCase]
+        [Fact]
         public void SetNewTradingDaysForInvalidYear()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -47,10 +47,12 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
                 new NonTradingDay(new Date(2020, 12, 25), "Christmas Day")
             };
 
-            Assert.That(() => tradingCalander.SetNonTradingDays(2019, nonTradingDays), Throws.TypeOf(typeof(ArgumentException)));
+            Action a = () => tradingCalander.SetNonTradingDays(2019, nonTradingDays);
+
+            a.Should().Throw<ArgumentException>();
         }
 
-        [TestCase]
+        [Fact]
         public void ApplyNonTradingDaysSetEvent()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -63,14 +65,15 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
 
             tradingCalander.ApplyEvents(new Event[] { @event });
 
-            Assert.Multiple(() => {
-                Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 01)), Is.False);
-                Assert.That(tradingCalander.IsTradingDay(new Date(2019, 12, 25)), Is.False);
-                Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 02)), Is.True);
-            });
+            using (new AssertionScope())
+            {
+                tradingCalander.IsTradingDay(new Date(2019, 01, 01)).Should().BeFalse();
+                tradingCalander.IsTradingDay(new Date(2019, 12, 25)).Should().BeFalse();
+                tradingCalander.IsTradingDay(new Date(2019, 01, 02)).Should().BeTrue();
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void ApplyNonTradingDaysSetEventReplaceExisting()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -88,15 +91,16 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
 
             tradingCalander.ApplyEvents(new Event[] { @event1, @event2 });
 
-            Assert.Multiple(() => {
-                Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 01)), Is.True);
-                Assert.That(tradingCalander.IsTradingDay(new Date(2019, 12, 25)), Is.True);
-                Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 02)), Is.False);
-            });
+            using (new AssertionScope())
+            { 
+                tradingCalander.IsTradingDay(new Date(2019, 01, 01)).Should().BeTrue();
+                tradingCalander.IsTradingDay(new Date(2019, 12, 25)).Should().BeTrue();
+                tradingCalander.IsTradingDay(new Date(2019, 01, 02)).Should().BeFalse();
+            }
         }
 
 
-        [TestCase]
+        [Fact]
         public void RetriveNonTradingDaysForYear()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -107,10 +111,10 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
                 };
             tradingCalander.SetNonTradingDays(2019, nonTradingDays);
 
-            Assert.That(tradingCalander.NonTradingDays(2019).Count(), Is.EqualTo(2));
+            tradingCalander.NonTradingDays(2019).Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void RetriveNonTradingDaysForYearWithNoData()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -121,10 +125,10 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
                 };
             tradingCalander.SetNonTradingDays(2019, nonTradingDays);
 
-            Assert.That(tradingCalander.NonTradingDays(2020), Is.Empty);
+            tradingCalander.NonTradingDays(2020).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void CheckIfDateIsATradingDayReturnTrue()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -137,10 +141,10 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
 
             tradingCalander.ApplyEvents(new Event[] { @event });
 
-            Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 02)), Is.True);
+            tradingCalander.IsTradingDay(new Date(2019, 01, 02)).Should().BeTrue();
         }
 
-        [TestCase]
+        [Fact]
         public void CheckIfDateIsAtradingDayReturnFalse()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -153,10 +157,10 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
 
             tradingCalander.ApplyEvents(new Event[] { @event });
 
-            Assert.That(tradingCalander.IsTradingDay(new Date(2019, 01, 01)), Is.False);
+            tradingCalander.IsTradingDay(new Date(2019, 01, 01)).Should().BeFalse();
         }
 
-        [TestCase]
+        [Fact]
         public void EnumerateTradingDays()
         {
             var tradingCalander = new TradingCalander(Guid.NewGuid());
@@ -168,13 +172,8 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
             tradingCalander.SetNonTradingDays(2019, nonTradingDays);
 
             var tradingDays = tradingCalander.TradingDays(new DateRange(new Date(2019, 01, 01), new Date(2019, 01, 10))).ToList();
-            Assert.Multiple(() =>
-            {
-                Assert.That(tradingDays, Has.Count.EqualTo(7));
-                Assert.That(tradingDays, Is.Ordered);
-                Assert.That(tradingDays, Is.Unique);
-            });
-            
+
+            tradingDays.Should().HaveCount(7).And.BeInAscendingOrder().And.OnlyHaveUniqueItems();           
         }
     }
 }

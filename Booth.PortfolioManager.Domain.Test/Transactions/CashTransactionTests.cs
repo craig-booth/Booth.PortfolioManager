@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -11,9 +12,9 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
-    class CashTransactionTests
+    public class CashTransactionTests
     {
-        [TestCase]
+        [Fact]
         public void IncorrectTransactionType()
         {
             var transaction = new Aquisition()
@@ -30,12 +31,14 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new CashTransactionHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+
+            a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void Deposit()
         {
             var transaction = new CashTransaction()
@@ -58,7 +61,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void Fee()
         {
             var transaction = new CashTransaction()
@@ -81,7 +84,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void Interest()
         {
             var transaction = new CashTransaction()
@@ -104,7 +107,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void Transfer()
         {
             var transaction = new CashTransaction()
@@ -127,7 +130,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void Withdrawl()
         {
             var transaction = new CashTransaction()
@@ -150,7 +153,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void MissingCommnet()
         {
             var transaction = new CashTransaction()

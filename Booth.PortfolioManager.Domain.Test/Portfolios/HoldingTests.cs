@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Moq;
 
 using Booth.Common;
@@ -13,10 +15,10 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Test.Portfolios
 {
-    class HoldingTests
+    public class HoldingTests
     {
 
-        [TestCase]
+        [Fact]
         public void AccessParcelsByDateNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -24,10 +26,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
-            Assert.That(holding.Parcels(new Date(2000, 01, 01)).ToList(), Is.Empty);
+            holding.Parcels(new Date(2000, 01, 01)).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void AccessParcelsByDateParcelsExistButNotAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -37,10 +39,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding.Parcels(new Date(1999, 01, 01)).ToList(), Is.Empty);
+            holding.Parcels(new Date(1999, 01, 01)).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void AccessParcelsByDateParcelsExistAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -50,10 +52,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding.Parcels(new Date(2002, 01, 01)).ToList(), Has.Count.EqualTo(2));
+            holding.Parcels(new Date(2002, 01, 01)).Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -61,10 +63,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
-            Assert.That(holding.Parcels().ToList(), Is.Empty);
+            holding.Parcels().Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsByDateParcelsExiste()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -74,10 +76,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding.Parcels().ToList(), Has.Count.EqualTo(2));
+            holding.Parcels().Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsByDateNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -85,10 +87,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
-            Assert.That(holding.Parcels(new Date(2000, 01, 01)).ToList(), Is.Empty);
+            holding.Parcels(new Date(2000, 01, 01)).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsByDateParcelsExistButNotAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -98,10 +100,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding.Parcels(new Date(1999, 01, 01)).ToList(), Is.Empty);
+            holding.Parcels(new Date(1999, 01, 01)).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsByDateParcelsExistAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -111,10 +113,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding.Parcels(new Date(2002, 01, 01)).ToList(), Has.Count.EqualTo(2));
+            holding.Parcels(new Date(2002, 01, 01)).Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsByDateRangeNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -122,10 +124,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
-            Assert.That(holding.Parcels(new DateRange(Date.MinValue, Date.MaxValue)).ToList(), Is.Empty);
+            holding.Parcels(new DateRange(Date.MinValue, Date.MaxValue)).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsByDateRangeParcelsExistButNotInRange()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -135,10 +137,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding.Parcels(new DateRange(new Date(1999, 01, 01), new Date(1999, 12, 31))).ToList(), Is.Empty);
+            holding.Parcels(new DateRange(new Date(1999, 01, 01), new Date(1999, 12, 31))).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void GetParcelsByDateParcelsExistInRange()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -148,10 +150,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
-            Assert.That(holding.Parcels(new DateRange(new Date(2001, 01, 01), Date.MaxValue)).ToList(), Has.Count.EqualTo(2));
+            holding.Parcels(new DateRange(new Date(2001, 01, 01), Date.MaxValue)).Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void AddParcelNoExistingHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -160,16 +162,16 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
                 var properties = holding[new Date(2000, 01, 01)];
-                Assert.That(properties, Is.EqualTo(new HoldingProperties(100, 1000.00m, 1200.00m)));
+                properties.Should().Be(new HoldingProperties(100, 1000.00m, 1200.00m));
 
-                Assert.That(holding.Settings.ParticipateInDrp, Is.EqualTo(false));
-            });
+                holding.Settings.ParticipateInDrp.Should().BeFalse();
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void AddParcelExistingHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -180,10 +182,11 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
 
             var properties = holding[new Date(2001, 01, 01)];
-            Assert.That(properties, Is.EqualTo(new HoldingProperties(300, 3000.00m, 3400.00m)));
+
+            properties.Should().Be(new HoldingProperties(300, 3000.00m, 3400.00m));
         }
 
-        [TestCase]
+        [Fact]
         public void DisposeOfParcelNotInHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -194,10 +197,12 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var parcel = new Parcel(Guid.NewGuid(), new Date(2000, 01, 01), new Date(2000, 01, 01), new ParcelProperties(100, 1000.00m, 1200.00m), null);
 
-            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 1000.00m, 500.00m, CgtMethod.Other, null), Throws.TypeOf(typeof(ArgumentException)));
+            Action a = () => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 1000.00m, 500.00m, CgtMethod.Other, null);
+            
+            a.Should().Throw<ArgumentException>();
         }
 
-        [TestCase]
+        [Fact]
         public void DisposeOfParcelPartialSale()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -220,32 +225,29 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transaction = new Disposal();
             holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 99, 500.00m, 10.00m, CgtMethod.Discount, transaction);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                var holdingProperties = holding[new Date(2000, 12, 31)];
-                Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(300, 3000.00m, 3400.00m)));
+                holding[new Date(2000, 12, 31)].Should().Be(new HoldingProperties(300, 3000.00m, 3400.00m));
+                holding[new Date(2001, 01, 01)].Should().Be(new HoldingProperties(201, 2010.00m, 2212.00m));
 
-                holdingProperties = holding[new Date(2001, 01, 01)];
-                Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(201, 2010.00m, 2212.00m)));
+                parcel.Properties[new Date(2000, 12, 31)].Should().Be(new ParcelProperties(100, 1000.00m, 1200.00m));
+                parcel.Properties[new Date(2001, 01, 01)].Should().Be(new ParcelProperties(1, 10.00m, 12.00m));
 
-                var parcelProperties = parcel.Properties[new Date(2000, 12, 31)];
-                Assert.That(parcelProperties, Is.EqualTo(new ParcelProperties(100, 1000.00m, 1200.00m)));
-
-                parcelProperties = parcel.Properties[new Date(2001, 01, 01)];
-                Assert.That(parcelProperties, Is.EqualTo(new ParcelProperties(1, 10.00m, 12.00m)));
-
-                Assert.That(cgtEvent.EventDate, Is.EqualTo(new Date(2001, 01, 01)));
-                Assert.That(cgtEvent.Stock, Is.EqualTo(stock));
-                Assert.That(cgtEvent.AmountReceived, Is.EqualTo(500.00m));
-                Assert.That(cgtEvent.CapitalGain, Is.EqualTo(10.00m));
-                Assert.That(cgtEvent.CgtMethod, Is.EqualTo(CgtMethod.Discount));
-                Assert.That(cgtEvent.Transaction, Is.EqualTo(transaction));
-            });
+                cgtEvent.Should().BeEquivalentTo(new
+                {
+                    EventDate= new Date(2001, 01, 01),
+                    Stock = stock,
+                    AmountReceived = 500.00m,
+                    CapitalGain = 10.00m,
+                    CgtMethod = CgtMethod.Discount,
+                    Transaction = transaction
+                });
+            }
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void DisposeOfParcelFullSale()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -268,29 +270,28 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transaction = new Disposal();
             holding.DisposeOfParcel(parcel.Id, new Date(2002, 01, 01), 100, 500.00m, 10.00m, CgtMethod.Discount, transaction);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                var holdingProperties = holding.Properties[new Date(2001, 12, 31)];
-                Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(300, 3000.00m, 3400.00m)));
+                holding.Properties[new Date(2001, 12, 31)].Should().Be(new HoldingProperties(300, 3000.00m, 3400.00m));
+                holding.Properties[new Date(2002, 01, 01)].Should().Be(new HoldingProperties(200, 2000.00m, 2200.00m));
 
-                holdingProperties = holding.Properties[new Date(2002, 01, 01)];
-                Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(200, 2000.00m, 2200.00m)));
+                parcel.Properties[new Date(2001, 12, 31)].Should().Be(new ParcelProperties(100, 1000.00m, 1200.00m));
 
-                var parcelProperties = parcel.Properties[new Date(2001, 12, 31)];
-                Assert.That(parcelProperties, Is.EqualTo(new ParcelProperties(100, 1000.00m, 1200.00m)));
+                parcel.EffectivePeriod.ToDate.Should().Be(new Date(2002, 01, 01));
 
-                Assert.That(parcel.EffectivePeriod.ToDate, Is.EqualTo(new Date(2002, 01, 01)));
-
-                Assert.That(cgtEvent.EventDate, Is.EqualTo(new Date(2002, 01, 01)));
-                Assert.That(cgtEvent.Stock, Is.EqualTo(stock));
-                Assert.That(cgtEvent.AmountReceived, Is.EqualTo(500.00m));
-                Assert.That(cgtEvent.CapitalGain, Is.EqualTo(10.00m));
-                Assert.That(cgtEvent.CgtMethod, Is.EqualTo(CgtMethod.Discount));
-                Assert.That(cgtEvent.Transaction, Is.EqualTo(transaction));
-            });
+                cgtEvent.Should().BeEquivalentTo(new
+                {
+                    EventDate = new Date(2002, 01, 01),
+                    Stock = stock,
+                    AmountReceived = 500.00m,
+                    CapitalGain = 10.00m,
+                    CgtMethod = CgtMethod.Discount,
+                    Transaction = transaction
+                });
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void DisposeOfParcelMoreUnitsThanInParcel()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -299,10 +300,12 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var holding = new Holding(stock, new Date(2000, 01, 01));
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
 
-            Assert.That(() => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 200, 1000.00m, 10.00m, CgtMethod.Discount, null), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
+            Action a = () => holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 200, 1000.00m, 10.00m, CgtMethod.Discount, null);
+
+            a.Should().Throw<NotEnoughSharesForDisposal>();
         }
 
-        [TestCase]
+        [Fact]
         public void DisposeOfLastParcel()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -324,27 +327,27 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var transaction = new Disposal();
             holding.DisposeOfParcel(parcel.Id, new Date(2001, 01, 01), 100, 500.00m, 10.00m, CgtMethod.Discount, transaction);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                var holdingProperties = holding.Properties[new Date(2000, 12, 31)];
-                Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(100, 1000.00m, 1200.00m)));
+                holding.Properties[new Date(2000, 12, 31)].Should().Be(new HoldingProperties(100, 1000.00m, 1200.00m));
+                holding.Properties[new Date(2001, 01, 01)].Should().Be(new HoldingProperties(0, 0.00m, 0.00m));
 
-                holdingProperties = holding.Properties[new Date(2001, 01, 01)];
-                Assert.That(holdingProperties, Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
+                holding.EffectivePeriod.ToDate.Should().Be(new Date(2001, 01, 01));
 
-                Assert.That(holding.EffectivePeriod.ToDate, Is.EqualTo(new Date(2001, 01, 01)));
-
-                Assert.That(cgtEvent.EventDate, Is.EqualTo(new Date(2001, 01, 01)));
-                Assert.That(cgtEvent.Stock, Is.EqualTo(stock));
-                Assert.That(cgtEvent.AmountReceived, Is.EqualTo(500.00m));
-                Assert.That(cgtEvent.CapitalGain, Is.EqualTo(10.00m));
-                Assert.That(cgtEvent.CgtMethod, Is.EqualTo(CgtMethod.Discount));
-                Assert.That(cgtEvent.Transaction, Is.EqualTo(transaction));
-            });
+                cgtEvent.Should().BeEquivalentTo(new
+                {
+                    EventDate = new Date(2001, 01, 01),
+                    Stock = stock,
+                    AmountReceived = 500.00m,
+                    CapitalGain = 10.00m,
+                    CgtMethod = CgtMethod.Discount,
+                    Transaction = transaction
+                });
+            }
 
         }
 
-        [TestCase]
+        [Fact]
         public void GetValueNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -354,10 +357,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var value = holding.Value(new Date(2001, 01, 01));
 
-            Assert.That(value, Is.EqualTo(0.00m));
+            value.Should().Be(0.00m);
         }
 
-        [TestCase]
+        [Fact]
         public void GetValueSingleParcel()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -374,10 +377,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var value = holding.Value(new Date(2001, 01, 01));
 
-            Assert.That(value, Is.EqualTo(1000.00m));
+            value.Should().Be(1000.00m);
         }
 
-        [TestCase]
+        [Fact]
         public void GetValueMultipleParcels()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -395,10 +398,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var value = holding.Value(new Date(2001, 01, 01));
 
-            Assert.That(value, Is.EqualTo(3000.00m));
+            value.Should().Be(3000.00m);
         }
 
-        [TestCase]
+        [Fact]
         public void ChangeDrpParticipation()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -408,10 +411,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             holding.ChangeDrpParticipation(true);
 
-            Assert.That(holding.Settings.ParticipateInDrp, Is.EqualTo(true));
+            holding.Settings.ParticipateInDrp.Should().BeTrue();
         }
 
-        [TestCase]
+        [Fact]
         public void AddDrpAmount()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -421,10 +424,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddDrpAccountAmount(new Date(2001, 01, 01), 100.00m);
             holding.AddDrpAccountAmount(new Date(2002, 01, 01), 100.00m);
 
-            Assert.That(holding.DrpAccount.Balance, Is.EqualTo(200.00m));
+            holding.DrpAccount.Balance().Should().Be(200.00m);
         }
 
-        [TestCase]
+        [Fact]
         public void AddDrpNegativeAmount()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -434,7 +437,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holding.AddDrpAccountAmount(new Date(2001, 01, 01), 100.00m);
             holding.AddDrpAccountAmount(new Date(2002, 01, 01), -50.00m);
 
-            Assert.That(holding.DrpAccount.Balance, Is.EqualTo(50.00m));
+            holding.DrpAccount.Balance().Should().Be(50.00m);
         }
 
     }

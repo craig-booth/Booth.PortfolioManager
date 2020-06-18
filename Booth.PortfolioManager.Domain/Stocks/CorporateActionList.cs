@@ -93,7 +93,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         private ICorporateAction CorporateActionFromEvent(DividendAddedEvent @event)
         {
-            var dividend = new Dividend(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.PaymentDate, @event.DividendAmount, @event.PercentFranked, @event.DRPPrice);
+            var dividend = new Dividend(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.PaymentDate, @event.DividendAmount, @event.PercentFranked, @event.DrpPrice);
 
             return dividend;
         }

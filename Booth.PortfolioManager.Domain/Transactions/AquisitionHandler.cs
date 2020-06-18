@@ -15,7 +15,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new ArgumentException("Expected transaction to be an Aquisition");
 
             if (!aquisition.Stock.IsEffectiveAt(aquisition.Date))
-                throw new StockNotActive("Stock is not active");
+                throw new StockNotActiveException("Stock is not active");
 
             decimal cost = aquisition.Units * aquisition.AveragePrice;
             decimal amountPaid = cost + aquisition.TransactionCosts;
@@ -25,7 +25,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 
             if (aquisition.CreateCashTransaction)
             {
-                var asxCode = aquisition.Stock.Properties[aquisition.Date].ASXCode;
+                var asxCode = aquisition.Stock.Properties[aquisition.Date].AsxCode;
                 cashAccount.Transfer(aquisition.Date, -cost, String.Format("Purchase of {0}", asxCode));
 
                 if (aquisition.TransactionCosts > 0.00m)

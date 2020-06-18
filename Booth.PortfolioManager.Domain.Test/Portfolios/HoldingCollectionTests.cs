@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
@@ -10,18 +12,18 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Test.Portfolios
 {
-    class HoldingCollectionTests
+    public class HoldingCollectionTests
     {
 
-        [TestCase]
+        [Fact]
         public void AccessHoldingsByStockNoEntries()
         {
             var holdings = new HoldingCollection();
 
-            Assert.That(() => holdings[Guid.NewGuid()], Is.Null);
+            holdings[Guid.NewGuid()].Should().BeNull();
         }
 
-        [TestCase]
+        [Fact]
         public void AccessHoldingsByStockSingleEntry()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -31,16 +33,21 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock, new Date(2000, 01, 01));
 
             var holding = holdings[stock.Id];
-            Assert.Multiple(() =>
+
+            using (new AssertionScope())
             {
-                Assert.That(holding.Stock, Is.EqualTo(stock));
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
-            });
-            
+                holding.Should().BeEquivalentTo(new
+                {
+                    Stock = stock,
+                    EffectivePeriod = new DateRange(new Date(2000, 01, 01), Date.MaxValue),
+                });
+
+                holding[new Date(2000, 01, 01)].Should().Be(new HoldingProperties(0, 0.00m, 0.00m));
+            }
+     
         }
 
-        [TestCase]
+        [Fact]
         public void AccessHoldingsByStockMultipleEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -54,15 +61,20 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock2, new Date(2000, 01, 01));
 
             var holding = holdings[stock1.Id];
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(holding.Stock, Is.EqualTo(stock1));
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
-            });
+                holding.Should().BeEquivalentTo(new
+                {
+                    Stock = stock1,
+                    EffectivePeriod = new DateRange(new Date(2000, 01, 01), Date.MaxValue),
+                });
+
+                holding[new Date(2000, 01, 01)].Should().Be(new HoldingProperties(0, 0.00m, 0.00m));
+            }
+  
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsNoEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -73,10 +85,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holdings = new HoldingCollection();
 
-            Assert.That(holdings.All().ToList(), Is.Empty);
+            holdings.All().Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsSingleEntry()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -88,10 +100,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
 
-            Assert.That(holdings.All().ToList(), Has.Count.EqualTo(1));
+            holdings.All().Should().HaveCount(1);
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsMultipleEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -104,10 +116,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
             holdings.Add(stock2, new Date(2000, 01, 01));
 
-            Assert.That(holdings.All().ToList(), Has.Count.EqualTo(2));
+            holdings.All().Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateNoEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -118,10 +130,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holdings = new HoldingCollection();
 
-            Assert.That(holdings.All(new Date(2000, 01, 01)).ToList(), Is.Empty);
+            holdings.All(new Date(2000, 01, 01)).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateNoEntriesAtDate()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -134,10 +146,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
             holdings.Add(stock2, new Date(2002, 01, 01));
 
-            Assert.That(holdings.All(new Date(1999, 01, 01)).ToList(), Is.Empty);
+            holdings.All(new Date(1999, 01, 01)).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateEntriesAtDate()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -150,10 +162,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
             holdings.Add(stock2, new Date(2002, 01, 01));
 
-            Assert.That(holdings.All(new Date(2003, 01, 01)).ToList(), Has.Count.EqualTo(2));
+            holdings.All(new Date(2003, 01, 01)).Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateSomeEntriesAtDate()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -166,10 +178,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
             holdings.Add(stock2, new Date(2002, 01, 01));
 
-            Assert.That(holdings.All(new Date(2001, 01, 01)).ToList(), Has.Count.EqualTo(1));
+            holdings.All(new Date(2001, 01, 01)).Should().HaveCount(1);
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateRangeNoEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -180,10 +192,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var holdings = new HoldingCollection();
 
-            Assert.That(holdings.All(new DateRange(new Date(2000, 01, 01), new Date(2005, 01, 01))).ToList(), Is.Empty);
+            holdings.All(new DateRange(new Date(2000, 01, 01), new Date(2005, 01, 01))).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateRangeNoEntriesInRange()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -196,10 +208,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
             holdings.Add(stock2, new Date(2002, 01, 01));
 
-            Assert.That(holdings.All(new DateRange(new Date(1999, 01, 01), new Date(1999, 12, 01))).ToList(), Is.Empty);
+            holdings.All(new DateRange(new Date(1999, 01, 01), new Date(1999, 12, 01))).Should().BeEmpty();
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateRangeEntriesInRange()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -212,10 +224,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
             holdings.Add(stock2, new Date(2002, 01, 01));
 
-            Assert.That(holdings.All(new DateRange(new Date(2000, 01, 01), new Date(2005, 12, 01))).ToList(), Has.Count.EqualTo(2));
+            holdings.All(new DateRange(new Date(2000, 01, 01), new Date(2005, 12, 01))).Should().HaveCount(2);
         }
 
-        [TestCase]
+        [Fact]
         public void AllHoldingsByDateRangeSomeEntriesInRange()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -228,18 +240,18 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
             holdings.Add(stock2, new Date(2002, 01, 01));
 
-            Assert.That(holdings.All(new DateRange(new Date(2000, 01, 01), new Date(2001, 12, 01))).ToList(), Has.Count.EqualTo(1));
+            holdings.All(new DateRange(new Date(2000, 01, 01), new Date(2001, 12, 01))).Should().HaveCount(1);
         }
 
-        [TestCase]
+        [Fact]
         public void GetHoldingsByStockNoEntries()
         {
             var holdings = new HoldingCollection();
 
-            Assert.That(() => holdings.Get(Guid.NewGuid()), Is.Null);
+            holdings.Get(Guid.NewGuid()).Should().BeNull();
         }
 
-        [TestCase]
+        [Fact]
         public void GetHoldingsByStockSingleEntry()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -249,15 +261,19 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
 
             var holding = holdings.Get(stock1.Id);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(holding.Stock, Is.EqualTo(stock1));
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding.Properties[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
-            });
+                holding.Should().BeEquivalentTo(new
+                {
+                    Stock = stock1,
+                    EffectivePeriod = new DateRange(new Date(2000, 01, 01), Date.MaxValue),
+                });
+
+                holding.Properties[new Date(2000, 01, 01)].Should().Be(new HoldingProperties(0, 0.00m, 0.00m));
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void GetHoldingsByStockMultipleEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -271,15 +287,19 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock2, new Date(2000, 01, 01));
 
             var holding = holdings.Get(stock1.Id);
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(holding.Stock, Is.EqualTo(stock1));
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding.Properties[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
-            });
+                holding.Should().BeEquivalentTo(new
+                {
+                    Stock = stock1,
+                    EffectivePeriod = new DateRange(new Date(2000, 01, 01), Date.MaxValue),
+                });
+
+                holding.Properties[new Date(2000, 01, 01)].Should().Be(new HoldingProperties(0, 0.00m, 0.00m));
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void AddHoldingNewStock()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -292,15 +312,19 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             holdings.Add(stock1, new Date(2000, 01, 01));
 
             var holding = holdings[stock1.Id];
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(holding.Stock, Is.EqualTo(stock1));
-                Assert.That(holding.EffectivePeriod, Is.EqualTo(new DateRange(new Date(2000, 01, 01), Date.MaxValue)));
-                Assert.That(holding[new Date(2000, 01, 01)], Is.EqualTo(new HoldingProperties(0, 0.00m, 0.00m)));
-            });
+                holding.Should().BeEquivalentTo(new
+                {
+                    Stock = stock1,
+                    EffectivePeriod = new DateRange(new Date(2000, 01, 01), Date.MaxValue),
+                });
+
+                holding.Properties[new Date(2000, 01, 01)].Should().Be(new HoldingProperties(0, 0.00m, 0.00m));
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void AddHoldingExisingStock()
         {
             var stock1 = new Stock(Guid.NewGuid());
@@ -312,7 +336,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
 
-            Assert.That(() => holdings.Add(stock1, new Date(2001, 01, 01)), Throws.TypeOf(typeof(ArgumentException)));
+            Action a = () => holdings.Add(stock1, new Date(2001, 01, 01));
+            
+            a.Should().Throw<ArgumentException>();
         }
 
     }

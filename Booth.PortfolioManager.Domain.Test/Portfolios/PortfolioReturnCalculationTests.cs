@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
 using Moq;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Utils;
-
+using FluentAssertions;
 
 namespace Booth.PortfolioManager.Domain.Test.Portfolios
 {
-    class PortfolioReturnCalculationTests
+    public class PortfolioReturnCalculationTests
     {
-        [TestCase]
+        [Fact]
         public void CalculateIRR()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -64,7 +64,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var irr = portfolio.Object.CalculateIRR(dateRange);
 
-            Assert.That(irr, Is.EqualTo(0.08745m));
+            irr.Should().Be(0.08745m);
 
             mockRepository.Verify();
         }

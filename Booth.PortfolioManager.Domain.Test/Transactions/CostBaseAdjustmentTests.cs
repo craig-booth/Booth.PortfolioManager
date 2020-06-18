@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -11,9 +12,9 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
-    class CostBaseAdjustmentTests
+    public class CostBaseAdjustmentTests
     {
-        [TestCase]
+        [Fact]
         public void IncorrectTransactionType()
         {
             var transaction = new CashTransaction()
@@ -32,12 +33,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new CostBaseAdjustmentHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -61,12 +63,14 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new CostBaseAdjustmentHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(NoSharesOwned)));
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+
+            a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void SingleParcelOwned()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -99,7 +103,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void MultipleParcelsOwned()
         {
             var stock = new Stock(Guid.NewGuid());

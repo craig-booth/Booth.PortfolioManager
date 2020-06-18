@@ -11,7 +11,7 @@ using Moq;
 using Moq.Protected;
 
 using Booth.Common;
-
+using Booth.PortfolioManager.Domain.TradingCalanders;
 
 namespace Booth.PortfolioManager.DataServices.Test
 {

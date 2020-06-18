@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -11,9 +12,9 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
-    class IncomeReceivedTests
+    public class IncomeReceivedTests
     {
-        [TestCase]
+        [Fact]
         public void IncorrectTransactionType()
         {
             var transaction = new CashTransaction()
@@ -32,12 +33,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new IncomeReceivedHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -56,7 +58,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -68,12 +70,14 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new IncomeReceivedHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(NoSharesOwned)));
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+
+            a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void DoNotCreateCashTransaction()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -92,7 +96,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -112,7 +116,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void CreateCashTransaction()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -131,7 +135,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = true,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -153,7 +157,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void OutstandingDrpBalance()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -172,7 +176,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 50.00m
+                DrpCashBalance = 50.00m
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -193,7 +197,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void TaxDeferredAmount()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -212,7 +216,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
                 Interest = 40.00m,
                 TaxDeferred = 50.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var mockRepository = new MockRepository(MockBehavior.Strict);

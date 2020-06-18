@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 throw new ArgumentException("Expected transaction to be an UnitCountAdjustment");
 
             if (!holding.IsEffectiveAt(unitCountAdjustment.Date))
-                throw new NoSharesOwned("No holdings");
+                throw new NoSharesOwnedException("No holdings");
 
             // Adjust unit count of parcels
             var ratio = (decimal)unitCountAdjustment.NewUnits / (decimal)unitCountAdjustment.OriginalUnits;

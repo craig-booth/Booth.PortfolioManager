@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         public Date PaymentDate { get; private set; }
         public decimal DividendAmount { get; private set; }
         public decimal PercentFranked { get; private set; }
-        public decimal DRPPrice { get; private set; }
+        public decimal DrpPrice { get; private set; }
 
         internal Dividend(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
         {
@@ -33,7 +33,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             PaymentDate = paymentDate;
             DividendAmount = dividendAmount;
             PercentFranked = percentFranked;
-            DRPPrice = drpPrice;
+            DrpPrice = drpPrice;
         }
 
         public IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
@@ -65,42 +65,42 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
                 Interest = 0.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = true,
-                DRPCashBalance = 0.00m,
+                DrpCashBalance = 0.00m,
                 Comment = Description
             };
             transactions.Add(incomeReceived);
 
             /* Handle Dividend Reinvestment Plan */
             var holdingSettings = holding.Settings;
-            if (dividendRules.DRPActive && holdingSettings.ParticipateInDrp && (DRPPrice != 0.00m))
+            if (dividendRules.DrpActive && holdingSettings.ParticipateInDrp && (DrpPrice != 0.00m))
             { 
                 incomeReceived.CreateCashTransaction = false;
 
                 int drpUnits;
                 decimal costBase;
 
-                if (dividendRules.DRPMethod == DRPMethod.RoundUp)
+                if (dividendRules.DrpMethod == DrpMethod.RoundUp)
                 {
-                    drpUnits = (int)Math.Ceiling(amountPaid / DRPPrice);
+                    drpUnits = (int)Math.Ceiling(amountPaid / DrpPrice);
                     costBase = amountPaid;
                 }
-                else if (dividendRules.DRPMethod == DRPMethod.RoundDown)
+                else if (dividendRules.DrpMethod == DrpMethod.RoundDown)
                 {
-                    drpUnits = (int)Math.Floor(amountPaid / DRPPrice);
+                    drpUnits = (int)Math.Floor(amountPaid / DrpPrice);
                     costBase = amountPaid;
                 }
-                else if (dividendRules.DRPMethod == DRPMethod.RetainCashBalance)
+                else if (dividendRules.DrpMethod == DrpMethod.RetainCashBalance)
                 {
                     var drpCashBalance = holding.DrpAccount.Balance(Date);
 
                     var availableAmount = amountPaid + drpCashBalance;
-                    drpUnits = (int)Math.Floor(availableAmount / DRPPrice);
-                    costBase = (drpUnits * DRPPrice).ToCurrency(dividendRules.DividendRoundingRule);
-                    incomeReceived.DRPCashBalance = availableAmount - costBase;
+                    drpUnits = (int)Math.Floor(availableAmount / DrpPrice);
+                    costBase = (drpUnits * DrpPrice).ToCurrency(dividendRules.DividendRoundingRule);
+                    incomeReceived.DrpCashBalance = availableAmount - costBase;
                 }
                 else
                 {
-                    drpUnits = (int)Math.Round(amountPaid / DRPPrice);
+                    drpUnits = (int)Math.Round(amountPaid / DrpPrice);
                     costBase = amountPaid;
                 }
 
@@ -114,7 +114,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
                         Units = drpUnits,
                         CostBase = costBase,
                         AquisitionDate = PaymentDate,
-                        Comment = "DRP " + MathUtils.FormatCurrency(DRPPrice, false, true)
+                        Comment = "DRP " + MathUtils.FormatCurrency(DrpPrice, false, true)
                     });
                 } 
             } 

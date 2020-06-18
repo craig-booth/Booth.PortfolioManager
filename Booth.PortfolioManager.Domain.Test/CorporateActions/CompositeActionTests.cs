@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -14,9 +15,9 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 {
-    class CompositeActionTests
+    public class CompositeActionTests
     {
-        [TestCase]
+        [Fact]
         public void HasBeenApplied()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -34,12 +35,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = compositeAction.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.True);
+            result.Should().BeTrue();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoChildActions()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -54,13 +55,13 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = compositeAction.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
 
-        [TestCase]
+        [Fact]
         public void GetTransactionList()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -86,7 +87,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = compositeAction.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Is.EqualTo(new IPortfolioTransaction[] { t1.Object, t2.Object, t3.Object }));
+            result.Should().Equal(new IPortfolioTransaction[] { t1.Object, t2.Object, t3.Object });
 
             mockRepository.Verify();
         }

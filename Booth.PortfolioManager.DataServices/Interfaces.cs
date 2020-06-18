@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Booth.Common;
+using Booth.PortfolioManager.Domain.TradingCalanders;
 
 namespace Booth.PortfolioManager.DataServices
 {
@@ -33,18 +34,6 @@ namespace Booth.PortfolioManager.DataServices
             AsxCode = asxCode;
             Date = date;
             Price = price;
-        }
-    }
-
-    public class NonTradingDay
-    {
-        public Date Date { get; set; }
-        public string Description { get; set; }
-
-        public NonTradingDay(Date date, string description)
-        {
-            Date = date;
-            Description = description;
         }
     }
 }

@@ -52,9 +52,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
             _ChildSecurities = new StapledSecurityChild[@event.ChildSecurities.Length];
             for (var i = 0; i < @event.ChildSecurities.Length; i++)
-                _ChildSecurities[i] = new StapledSecurityChild(@event.ChildSecurities[i].ASXCode, @event.ChildSecurities[i].Name, @event.ChildSecurities[i].Trust);
+                _ChildSecurities[i] = new StapledSecurityChild(@event.ChildSecurities[i].AsxCode, @event.ChildSecurities[i].Name, @event.ChildSecurities[i].Trust);
             
-            var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DRPMethod.Round);
+            var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DrpMethod.Round);
             _DividendRules.Change(@event.ListingDate, dividendRules);
 
             var percentages = new ApportionedCurrencyValue[_ChildSecurities.Length];
@@ -112,13 +112,13 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
     public class StapledSecurityChild
     {
-        public string ASXCode { get; set; }
+        public string AsxCode { get; set; }
         public string Name { get; set; }
         public bool Trust { get; set; }
 
         public StapledSecurityChild(string asxCode, string name, bool trust)
         {
-            ASXCode = asxCode;
+            AsxCode = asxCode;
             Name = name;
             Trust = trust;
         }

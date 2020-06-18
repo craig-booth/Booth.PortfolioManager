@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
 using Moq;
 
 using Booth.PortfolioManager.Domain.Portfolios;
-using Booth.PortfolioManager.Domain.Stocks; 
+using Booth.PortfolioManager.Domain.Stocks;
+using FluentAssertions;
 
 namespace Booth.PortfolioManager.Domain.Test.Portfolios
 {
-    class PortfolioEntityFactoryTests
+    public class PortfolioEntityFactoryTests
     {
 
-        [TestCase]
+        [Fact]
         public void CreatePortfolio()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -26,7 +27,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var portfolio = entityFactory.Create(id, "test");
 
-            Assert.That(portfolio.Id, Is.EqualTo(id));
+            portfolio.Id.Should().Be(id);
 
             mockRepository.Verify();
         }

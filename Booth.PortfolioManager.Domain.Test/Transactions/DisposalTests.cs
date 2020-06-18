@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -12,9 +13,9 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Test.Transactions
 {
-    class DisposalTests
+    public class DisposalTests
     {
-        [TestCase]
+        [Fact]
         public void IncorrectTransactionType()
         {
             var transaction = new CashTransaction()
@@ -33,12 +34,13 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new DisposalHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.ArgumentException);
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -66,12 +68,14 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new DisposalHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object, cashAccount.Object), Throws.TypeOf(typeof(NoSharesOwned)));
+            Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
+
+            a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NotEnoughShares()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -93,7 +97,6 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var parcel = mockRepository.Create<IParcel>();
-            parcel.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 02, 01))).Returns(true);
@@ -104,12 +107,14 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var handler = new DisposalHandler();
 
-            Assert.That(() => handler.Apply(transaction, holding.Object,cashAccount.Object), Throws.TypeOf(typeof(NotEnoughSharesForDisposal)));
+            Action a = () => handler.Apply(transaction, holding.Object,cashAccount.Object);
+
+            a.Should().Throw<NotEnoughSharesForDisposal>();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void SingleParcelFullySold()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -153,7 +158,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void SingleParcelPartiallySold()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -197,7 +202,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void MultipleParcelsFullySold()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -258,7 +263,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void MultipleParcelsPartiallySold()
         {
             var stock = new Stock(Guid.NewGuid());
@@ -318,7 +323,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void DoNotCreateCashTransaction()
         {
             var stock = new Stock(Guid.NewGuid());

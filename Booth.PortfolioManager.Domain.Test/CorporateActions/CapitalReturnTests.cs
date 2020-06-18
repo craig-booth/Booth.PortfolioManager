@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 using Moq;
 
 using Booth.Common;
@@ -11,12 +12,11 @@ using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Portfolios;
 
-
 namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 {
-    class CapitalReturnTests
+    public class CapitalReturnTests
     {
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoTransactionsAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -31,12 +31,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = capitalReturn.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoReturnOfCapitalAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -59,7 +59,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var transactions = mockRepository.Create<IPortfolioTransactionList>();
@@ -67,12 +67,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = capitalReturn.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenApplied()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -97,12 +97,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = capitalReturn.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.True);
+            result.Should().BeTrue();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoParcelsAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -120,19 +120,19 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = capitalReturn.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Is.Empty);
+            result.Should().BeEmpty();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AmountRounded()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -145,35 +145,32 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = capitalReturn.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(        
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(ReturnOfCapital)), "Transaction 1");
-                    if (result[0] is ReturnOfCapital returnOfCapital)
-                    {
-                        Assert.That(returnOfCapital.Date, Is.EqualTo(capitalReturn.PaymentDate), "Transaction 1");
-                        Assert.That(returnOfCapital.Stock, Is.EqualTo(capitalReturn.Stock), "Transaction 1");
-                        Assert.That(returnOfCapital.Comment, Is.EqualTo("Test Capital Return"), "Transaction 1");
-                        Assert.That(returnOfCapital.RecordDate, Is.EqualTo(capitalReturn.Date), "Transaction 1");
-                        Assert.That(returnOfCapital.Amount, Is.EqualTo(120.46m), "Transaction 1");
-                        Assert.That(returnOfCapital.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
-                    }
+                    first.Should().BeOfType<ReturnOfCapital>();
+
+                    var returnOfCapital = first as ReturnOfCapital;
+                    returnOfCapital.Date.Should().Be(capitalReturn.PaymentDate);
+                    returnOfCapital.Stock.Should().Be(capitalReturn.Stock);
+                    returnOfCapital.Comment.Should().Be("Test Capital Return");
+                    returnOfCapital.RecordDate.Should().Be(capitalReturn.Date);
+                    returnOfCapital.Amount.Should().Be(120.46m);
+                    returnOfCapital.CreateCashTransaction.Should().BeTrue();
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AmountTruncated()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Truncate, false, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Truncate, false, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -186,23 +183,22 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = capitalReturn.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(ReturnOfCapital)), "Transaction 1");
-                    if (result[0] is ReturnOfCapital returnOfCapital)
+                    first.Should().BeOfType<ReturnOfCapital>();
+
+                    if (first is ReturnOfCapital returnOfCapital)
                     {
-                        Assert.That(returnOfCapital.Date, Is.EqualTo(capitalReturn.PaymentDate), "Transaction 1");
-                        Assert.That(returnOfCapital.Stock, Is.EqualTo(capitalReturn.Stock), "Transaction 1");
-                        Assert.That(returnOfCapital.Comment, Is.EqualTo("Test Capital Return"), "Transaction 1");
-                        Assert.That(returnOfCapital.RecordDate, Is.EqualTo(capitalReturn.Date), "Transaction 1");
-                        Assert.That(returnOfCapital.Amount, Is.EqualTo(120.45m), "Transaction 1");
-                        Assert.That(returnOfCapital.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
+                        returnOfCapital.Date.Should().Be(capitalReturn.PaymentDate);
+                        returnOfCapital.Stock.Should().Be(capitalReturn.Stock);
+                        returnOfCapital.Comment.Should().Be("Test Capital Return");
+                        returnOfCapital.RecordDate.Should().Be(capitalReturn.Date);
+                        returnOfCapital.Amount.Should().Be(120.45m);
+                        returnOfCapital.CreateCashTransaction.Should().BeTrue();
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }

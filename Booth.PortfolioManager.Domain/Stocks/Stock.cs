@@ -14,7 +14,7 @@ using Booth.PortfolioManager.Domain.CorporateActions;
 namespace Booth.PortfolioManager.Domain.Stocks
 {
     public enum AssetCategory { AustralianStocks, InternationalStocks, AustralianProperty, InternationalProperty, AustralianFixedInterest, InternationlFixedInterest, Cash }
-    public enum DRPMethod { Round, RoundDown, RoundUp, RetainCashBalance }
+    public enum DrpMethod { Round, RoundDown, RoundUp, RetainCashBalance }
 
     public interface IReadOnlyStock : IEffectiveEntity
     {
@@ -31,7 +31,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
     public interface IStock : IReadOnlyStock
     {
         new ICorporateActionList CorporateActions { get; }
-        void ChangeDividendRules(Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DRPMethod newDrpMethod);
+        void ChangeDividendRules(Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DrpMethod newDrpMethod);
         void ChangeProperties(Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory);
         void DeList(Date date);
         void List(string asxCode, string name, Date date, bool trust, AssetCategory category);
@@ -67,7 +67,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
         public override string ToString()
         {
             var properties = Properties.ClosestTo(Date.Today);
-            return String.Format("{0} - {1}", properties.ASXCode, properties.Name);
+            return String.Format("{0} - {1}", properties.AsxCode, properties.Name);
         }
 
         public void SetPriceHistory(IStockPriceHistory stockPriceHistory)
@@ -98,7 +98,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             var properties = new StockProperties(@event.ASXCode, @event.Name, @event.Category);
             _Properties.Change(@event.ListingDate, properties);
 
-            var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DRPMethod.Round);
+            var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DrpMethod.Round);
             _DividendRules.Change(@event.ListingDate, dividendRules);
         }
 
@@ -165,7 +165,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _Events.Add(@event);
         }
 
-        public void ChangeDividendRules(Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DRPMethod newDrpMethod)
+        public void ChangeDividendRules(Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DrpMethod newDrpMethod)
         {
             if (!IsEffectiveAt(changeDate))
                 throw new EffectiveDateException(String.Format("Stock not active at {0}", changeDate));
@@ -197,8 +197,8 @@ namespace Booth.PortfolioManager.Domain.Stocks
             var newProperties = new DividendRules(
                 @event.CompanyTaxRate,
                 @event.DividendRoundingRule,
-                @event.DRPActive,
-                @event.DRPMethod);
+                @event.DrpActive,
+                @event.DrpMethod);
 
             _DividendRules.Change(@event.ChangeDate, newProperties);
         }
@@ -220,13 +220,13 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
     public struct StockProperties
     {
-        public readonly string ASXCode;
+        public readonly string AsxCode;
         public readonly string Name;
         public readonly AssetCategory Category;
 
         public StockProperties(string asxCode, string name, AssetCategory category)
         {
-            ASXCode = asxCode;
+            AsxCode = asxCode;
             Name = name;
             Category = category;
         }
@@ -237,15 +237,15 @@ namespace Booth.PortfolioManager.Domain.Stocks
         public readonly decimal CompanyTaxRate;
         public readonly RoundingRule DividendRoundingRule;
 
-        public readonly bool DRPActive;       
-        public readonly DRPMethod DRPMethod;
+        public readonly bool DrpActive;       
+        public readonly DrpMethod DrpMethod;
 
-        public DividendRules(decimal companyTaxRate, RoundingRule dividendRoundingRule, bool drpActive, DRPMethod drpMethod)
+        public DividendRules(decimal companyTaxRate, RoundingRule dividendRoundingRule, bool drpActive, DrpMethod drpMethod)
         {
             CompanyTaxRate = companyTaxRate;
             DividendRoundingRule = dividendRoundingRule;
-            DRPActive = drpActive;
-            DRPMethod = drpMethod;
+            DrpActive = drpActive;
+            DrpMethod = drpMethod;
         }
     }
 

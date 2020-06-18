@@ -1,15 +1,15 @@
 ﻿using System;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 using Booth.Common;
-using Booth.PortfolioManager.Domain;
 
 namespace Booth.PortfolioManager.Domain.Test
 {
     public class EffectiveEntityTests
     {
-        [TestCase]
+        [Fact]
         public void StartWithValidDate()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -17,11 +17,10 @@ namespace Booth.PortfolioManager.Domain.Test
             var startDate = new Date(2019, 12, 01);
             entity.Start(startDate);
 
-            Assert.That(entity.EffectivePeriod.FromDate, Is.EqualTo(startDate));
-            Assert.That(entity.EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
+            entity.EffectivePeriod.Should().Be(new DateRange(startDate, Date.MaxValue));
         }
 
-        [TestCase]
+        [Fact]
         public void StartAnAlreadyStartedEntity()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -29,10 +28,12 @@ namespace Booth.PortfolioManager.Domain.Test
             var startDate = new Date(2019, 12, 01);
             entity.Start(startDate);
 
-            Assert.That(() => entity.Start(startDate), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => entity.Start(startDate);
+            
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void EndWithValidDate()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -43,11 +44,10 @@ namespace Booth.PortfolioManager.Domain.Test
             entity.Start(startDate);
             entity.End(endDate);
 
-            Assert.That(entity.EffectivePeriod.FromDate, Is.EqualTo(startDate));
-            Assert.That(entity.EffectivePeriod.ToDate, Is.EqualTo(endDate));
+            entity.EffectivePeriod.Should().Be(new DateRange(startDate, endDate));
         }
 
-        [TestCase]
+        [Fact]
         public void EndAnAlreadyEndedEntity()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -58,10 +58,12 @@ namespace Booth.PortfolioManager.Domain.Test
             entity.Start(startDate);
             entity.End(endDate);
 
-            Assert.That(() => entity.End(endDate), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => entity.End(endDate);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void EndAnEntityNotStarted()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -69,10 +71,12 @@ namespace Booth.PortfolioManager.Domain.Test
             var startDate = new Date(2019, 12, 01);
             var endDate = new Date(2019, 12, 31);
 
-            Assert.That(() => entity.End(endDate), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => entity.End(endDate);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void EndAnEntityBeforeStartDate()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -82,10 +86,12 @@ namespace Booth.PortfolioManager.Domain.Test
             
             entity.Start(startDate);
 
-            Assert.That(() => entity.End(endDate), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => entity.End(endDate);
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void EffectiveAtReturnsTrueForDateInPeriod()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -96,10 +102,10 @@ namespace Booth.PortfolioManager.Domain.Test
             entity.Start(startDate);
             entity.End(endDate);
 
-            Assert.That(entity.IsEffectiveAt(new Date(2019, 12,15)), Is.True);
+            entity.IsEffectiveAt(new Date(2019, 12, 15)).Should().BeTrue();
         }
 
-        [TestCase]
+        [Fact]
         public void EffectiveAtReturnsFalseForDateNotInPeriod()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -110,10 +116,10 @@ namespace Booth.PortfolioManager.Domain.Test
             entity.Start(startDate);
             entity.End(endDate);
 
-            Assert.That(entity.IsEffectiveAt(new Date(2019, 11, 15)), Is.False);
+            entity.IsEffectiveAt(new Date(2019, 11, 15)).Should().BeFalse();
         }
 
-        [TestCase]
+        [Fact]
         public void EffectiveAtReturnsFalseForAnEntityNotStarted()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -121,10 +127,10 @@ namespace Booth.PortfolioManager.Domain.Test
             var startDate = new Date(2019, 12, 01);
             var endDate = new Date(2019, 12, 31);
 
-            Assert.That(entity.IsEffectiveAt(new Date(2019, 11, 15)), Is.False);
+            entity.IsEffectiveAt(new Date(2019, 11, 15)).Should().BeFalse(); 
         }
 
-        [TestCase]
+        [Fact]
         public void EffectiveDuringForOverlappingRange()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -137,10 +143,10 @@ namespace Booth.PortfolioManager.Domain.Test
 
             var dateRange = new DateRange(new Date(2019, 01, 01), new Date(2019, 12, 31));
 
-            Assert.That(entity.IsEffectiveDuring(dateRange), Is.True);
+            entity.IsEffectiveDuring(dateRange).Should().BeTrue();
         }
 
-        [TestCase]
+        [Fact]
         public void EffectiveDuringForNonOverlappingRange()
         {
             var entity = new EffectiveEntityTestClass(Guid.Empty);
@@ -150,7 +156,7 @@ namespace Booth.PortfolioManager.Domain.Test
 
             var dateRange = new DateRange(new Date(2018, 01, 01), new Date(2018, 12, 31));
 
-            Assert.That(entity.IsEffectiveDuring(dateRange), Is.False);
+            entity.IsEffectiveDuring(dateRange).Should().BeFalse();
         }
     }
 

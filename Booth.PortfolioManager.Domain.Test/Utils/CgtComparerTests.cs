@@ -2,50 +2,58 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Utils;
+using FluentAssertions;
 
 namespace Booth.PortfolioManager.Domain.Test.Utils
 {
-    class CgtComparerTests
+    public class CgtComparerTests
     {
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.FirstInFirstOut })]
-        public int FirstInFirstOut(Date disposalDate,  Parcel parcel1, Parcel parcel2)
+#pragma warning disable xUnit1026 // FirstInFirstOut and LastInLastOut do not need disposal date
+
+        [Theory]
+        [MemberData(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.FirstInFirstOut })]
+        public void FirstInFirstOut(Date disposalDate, ParcelPair parcels, int expected, string because)
         {
             var comparer = new FirstInFirstOutCgtComparer();
 
-            return comparer.Compare(parcel1, parcel2);    
+            comparer.Compare(parcels.Parcel1, parcels.Parcel2).Should().Be(expected, because);
         }
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.LastInFirstOut })]
-        public int LastInFirstOut(Date disposalDate, Parcel parcel1, Parcel parcel2)
+        [Theory]
+        [MemberData(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.LastInFirstOut })]
+        public void LastInFirstOut(Date disposalDate, ParcelPair parcels, int expected, string because)
         {
             var comparer = new LastInFirstOutCgtComparer();
 
-            return comparer.Compare(parcel1, parcel2);
+            comparer.Compare(parcels.Parcel1, parcels.Parcel2).Should().Be(expected, because);
         }
+#pragma warning restore xUnit1026 
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.MaximizeGain })]
-        public int MaximizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
+        [Theory]
+        [MemberData(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.MaximizeGain })]
+        public void MaximizeGain(Date disposalDate, ParcelPair parcels, int expected, string because)
         {
             var comparer = new MaximizeGainCgtComparer(disposalDate);
 
-            return comparer.Compare(parcel1, parcel2);
+            comparer.Compare(parcels.Parcel1, parcels.Parcel2).Should().Be(expected, because);
         }
 
-        [TestCaseSource(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.MinimizeGain })]
-        public int MinimizeGain(Date disposalDate, Parcel parcel1, Parcel parcel2)
+        [Theory]
+        [MemberData(nameof(CalculateCapitalGainData), new object[] { CgtCalculationMethod.MinimizeGain })]
+        public void MinimizeGain(Date disposalDate, ParcelPair parcels, int expected, string because)
         {
             var comparer = new MinimizeGainCgtComparer(disposalDate);
 
-            return comparer.Compare(parcel1, parcel2);
+            comparer.Compare(parcels.Parcel1, parcels.Parcel2).Should().Be(expected, because);
         }
 
-        static IEnumerable<TestCaseData> CalculateCapitalGainData(CgtCalculationMethod method)
+        public static IEnumerable<object[]> CalculateCapitalGainData(CgtCalculationMethod method)
         {
             var p1 = new Parcel(Guid.NewGuid(), new Date(2010, 01, 01), new Date(2019, 01, 01), new ParcelProperties(1000, 1000.00m, 1000.00m), null);
             var p2 = new Parcel(Guid.NewGuid(), new Date(2010, 01, 01), new Date(2019, 01, 01), new ParcelProperties(1000, 2000.00m, 2000.00m), null);
@@ -74,7 +82,18 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             return scenarios.Select(x => x.TestData(method));
         }
 
-        public class CapitalGainScenario
+        public class ParcelPair
+        {
+            internal Parcel Parcel1;
+            internal Parcel Parcel2;
+            internal ParcelPair(Parcel parcel1, Parcel parecel2)
+            {
+                Parcel1 = parcel1;
+                Parcel2 = parecel2;
+            }
+        }
+
+        class CapitalGainScenario
         {
             Date DisposalDate;
             Parcel Parcel1;
@@ -99,18 +118,18 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
                 MinimizeGainResult = minimizeGainResult;
             }
 
-            public TestCaseData TestData(CgtCalculationMethod method)
+            public object[] TestData(CgtCalculationMethod method)
             {
                 switch (method)
                 {
                     case CgtCalculationMethod.FirstInFirstOut:
-                        return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(FirstInFirstOutResult).SetName("FirstInFirstOut(" + Message + ")");
+                        return new object[] { DisposalDate, new ParcelPair(Parcel1, Parcel2), FirstInFirstOutResult, "FirstInFirstOut(" + Message + ")"};
                     case CgtCalculationMethod.LastInFirstOut:
-                        return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(LastInFirstOutResult).SetName("LastInFirstOut(" + Message + ")");
+                        return new object[] { DisposalDate, new ParcelPair(Parcel1, Parcel2), LastInFirstOutResult, "LastInFirstOut(" + Message + ")"};
                     case CgtCalculationMethod.MaximizeGain:
-                        return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(MaximizeGainResult).SetName("MaximizeGain(" + Message + ")");
+                        return new object[] { DisposalDate, new ParcelPair(Parcel1, Parcel2), MaximizeGainResult, "MaximizeGain(" + Message + ")"};
                     case CgtCalculationMethod.MinimizeGain:
-                        return new TestCaseData(DisposalDate, Parcel1, Parcel2).Returns(MinimizeGainResult).SetName("MinimizeGain(" + Message + ")");
+                        return new object[] { DisposalDate, new ParcelPair(Parcel1, Parcel2), MinimizeGainResult, "MinimizeGain(" + Message + ")"};
                     default:
                         return null;
                 }

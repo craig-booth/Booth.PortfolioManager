@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
 using Moq;
 
 using Booth.Common;
@@ -9,13 +9,14 @@ using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Portfolios;
+using FluentAssertions;
 
 namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 {
-    class DividendTests
+    public class DividendTests
     {
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoTransactionsAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -31,12 +32,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             
             var result = dividend.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoIncomeAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -61,12 +62,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenApplied()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -89,19 +90,19 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
             var transactions = mockRepository.Create<IPortfolioTransactionList>();
             transactions.Setup(x => x.ForHolding(stock.Id, dividend.PaymentDate)).Returns(new IPortfolioTransaction[] { transaction });
 
             var result = dividend.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.True);
+            result.Should().BeTrue();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoParcelsAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -119,19 +120,19 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Is.Empty);
+            result.Should().BeEmpty();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void AmountsRoundedNoDRP()
+        [Fact]
+        public void AmountsRoundedNoDrp()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -144,40 +145,39 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
+                    first.Should().BeOfType<IncomeReceived>();
+
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeTrue();
+                        income.DrpCashBalance.Should().Be(0.00m);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void AmountsTruncatedNoDRP()
+        [Fact]
+        public void AmountsTruncatedNoDrp()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Truncate, false, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Truncate, false, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -189,41 +189,40 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             holding.Setup(x => x.Settings).Returns(new HoldingSettings(false));
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+       
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
+                    first.Should().BeOfType<IncomeReceived>();
+
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.06m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.06m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeTrue();
+                        income.DrpCashBalance.Should().Be(0.00m);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPActiveButNotParticipating()
+        [Fact]
+        public void DrpActiveButNotParticipating()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -236,40 +235,39 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
+                    first.Should().BeOfType<IncomeReceived>();
+
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeTrue();
+                        income.DrpCashBalance.Should().Be(0.00m);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPNotActiveAndParticipating()
+        [Fact]
+        public void DrpNotActiveAndParticipating()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -282,40 +280,39 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
+                    first.Should().BeOfType<IncomeReceived>();
+
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeTrue();
+                        income.DrpCashBalance.Should().Be(0.00m);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPActiveAndParticipatingNoDRPAmount()
+        [Fact]
+        public void DrpActiveAndParticipatingNoDrpAmount()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -328,40 +325,39 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
+                    first.Should().BeOfType<IncomeReceived>();
+
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(true), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeTrue();
+                        income.DrpCashBalance.Should().Be(0.00m);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPRound()
+        [Fact]
+        public void DrpRound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -374,54 +370,53 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(2));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
-                    {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(false), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
-                    }
-                }
+                    first.Should().BeOfType<IncomeReceived>();
 
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(OpeningBalance)), "Transaction 2");
-                    if (result[1] is OpeningBalance openingBalance)
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(dividend.Stock), "Transaction 2");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("DRP $2.30"), "Transaction 2");
-                        Assert.That(openingBalance.Units, Is.EqualTo(50), "Transaction 2");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(115.07m), "Transaction 2");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeFalse();
+                        income.DrpCashBalance.Should().Be(0.00m);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<OpeningBalance>();
+
+                    if (second is OpeningBalance openingBalance)
+                    {
+                        openingBalance.Date.Should().Be(dividend.PaymentDate);
+                        openingBalance.Stock.Should().Be(dividend.Stock);
+                        openingBalance.Comment.Should().Be("DRP $2.30");
+                        openingBalance.Units.Should().Be(50);
+                        openingBalance.CostBase.Should().Be(115.07m);
+                        openingBalance.AquisitionDate.Should().Be(dividend.PaymentDate);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPRoundUp()
+        [Fact]
+        public void DrpRoundUp()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DRPMethod.RoundUp);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DrpMethod.RoundUp);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -434,54 +429,53 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(2));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
-                    {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(false), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
-                    }
-                }
+                    first.Should().BeOfType<IncomeReceived>();
 
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(OpeningBalance)), "Transaction 2");
-                    if (result[1] is OpeningBalance openingBalance)
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(dividend.Stock), "Transaction 2");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("DRP $2.30"), "Transaction 2");
-                        Assert.That(openingBalance.Units, Is.EqualTo(51), "Transaction 2");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(115.07m), "Transaction 2");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeFalse();
+                        income.DrpCashBalance.Should().Be(0.00m);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<OpeningBalance>();
+
+                    if (second is OpeningBalance openingBalance)
+                    {
+                        openingBalance.Date.Should().Be(dividend.PaymentDate);
+                        openingBalance.Stock.Should().Be(dividend.Stock);
+                        openingBalance.Comment.Should().Be("DRP $2.30");
+                        openingBalance.Units.Should().Be(51);
+                        openingBalance.CostBase.Should().Be(115.07m);
+                        openingBalance.AquisitionDate.Should().Be(dividend.PaymentDate);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPRoundDown()
+        [Fact]
+        public void DrpRoundDown()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DRPMethod.RoundDown);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DrpMethod.RoundDown);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -494,54 +488,53 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(2));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
-                    {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(false), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.00m), "Transaction 1");
-                    }
-                }
+                    first.Should().BeOfType<IncomeReceived>();
 
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(OpeningBalance)), "Transaction 2");
-                    if (result[1] is OpeningBalance openingBalance)
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(dividend.Stock), "Transaction 2");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("DRP $2.30"), "Transaction 2");
-                        Assert.That(openingBalance.Units, Is.EqualTo(50), "Transaction 2");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(115.07m), "Transaction 2");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeFalse();
+                        income.DrpCashBalance.Should().Be(0.00m);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<OpeningBalance>();
+
+                    if (second is OpeningBalance openingBalance)
+                    {
+                        openingBalance.Date.Should().Be(dividend.PaymentDate);
+                        openingBalance.Stock.Should().Be(dividend.Stock);
+                        openingBalance.Comment.Should().Be("DRP $2.30");
+                        openingBalance.Units.Should().Be(50);
+                        openingBalance.CostBase.Should().Be(115.07m);
+                        openingBalance.AquisitionDate.Should().Be(dividend.PaymentDate);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPRetainCashBalance()
+        [Fact]
+        public void DrpRetainCashBalance()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DRPMethod.RetainCashBalance);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DrpMethod.RetainCashBalance);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -558,54 +551,53 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(2));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
-                    {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(false), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(0.97m), "Transaction 1");
-                    }
-                }
+                    first.Should().BeOfType<IncomeReceived>();
 
-                if (result.Count >= 2)
-                {
-                    Assert.That(result[1], Is.TypeOf(typeof(OpeningBalance)), "Transaction 2");
-                    if (result[1] is OpeningBalance openingBalance)
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(openingBalance.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
-                        Assert.That(openingBalance.Stock, Is.EqualTo(dividend.Stock), "Transaction 2");
-                        Assert.That(openingBalance.Comment, Is.EqualTo("DRP $2.30"), "Transaction 2");
-                        Assert.That(openingBalance.Units, Is.EqualTo(51), "Transaction 2");
-                        Assert.That(openingBalance.CostBase, Is.EqualTo(117.30m), "Transaction 2");
-                        Assert.That(openingBalance.AquisitionDate, Is.EqualTo(dividend.PaymentDate), "Transaction 2");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeFalse();
+                        income.DrpCashBalance.Should().Be(0.97m);
+                    }
+                },
+                second =>
+                {
+                    second.Should().BeOfType<OpeningBalance>();
+
+                    if (second is OpeningBalance openingBalance)
+                    {
+                        openingBalance.Date.Should().Be(dividend.PaymentDate);
+                        openingBalance.Stock.Should().Be(dividend.Stock);
+                        openingBalance.Comment.Should().Be("DRP $2.30");
+                        openingBalance.Units.Should().Be(51);
+                        openingBalance.CostBase.Should().Be(117.30m);
+                        openingBalance.AquisitionDate.Should().Be(dividend.PaymentDate);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
-        public void DRPPaymentNotEnoughForAnyUnits()
+        [Fact]
+        public void DrpPaymentNotEnoughForAnyUnits()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DRPMethod.RetainCashBalance);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, true, DrpMethod.RetainCashBalance);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -622,28 +614,27 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = dividend.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(IncomeReceived)), "Transaction 1");
-                    if (result[0] is IncomeReceived income)
+                    first.Should().BeOfType<IncomeReceived>();
+
+                    if (first is IncomeReceived income)
                     {
-                        Assert.That(income.Date, Is.EqualTo(dividend.PaymentDate), "Transaction 1");
-                        Assert.That(income.Stock, Is.EqualTo(dividend.Stock), "Transaction 1");
-                        Assert.That(income.Comment, Is.EqualTo("Test Dividend"), "Transaction 1");
-                        Assert.That(income.RecordDate, Is.EqualTo(dividend.Date), "Transaction 1");
-                        Assert.That(income.FrankedAmount, Is.EqualTo(115.07m), "Transaction 1");
-                        Assert.That(income.UnfrankedAmount, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.FrankingCredits, Is.EqualTo(49.31m), "Transaction 1");
-                        Assert.That(income.Interest, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.TaxDeferred, Is.EqualTo(0.00m), "Transaction 1");
-                        Assert.That(income.CreateCashTransaction, Is.EqualTo(false), "Transaction 1");
-                        Assert.That(income.DRPCashBalance, Is.EqualTo(118.27m), "Transaction 1");
+                        income.Date.Should().Be(dividend.PaymentDate);
+                        income.Stock.Should().Be(dividend.Stock);
+                        income.Comment.Should().Be("Test Dividend");
+                        income.RecordDate.Should().Be(dividend.Date);
+                        income.FrankedAmount.Should().Be(115.07m);
+                        income.UnfrankedAmount.Should().Be(0.00m);
+                        income.FrankingCredits.Should().Be(49.31m);
+                        income.Interest.Should().Be(0.00m);
+                        income.TaxDeferred.Should().Be(0.00m);
+                        income.CreateCashTransaction.Should().BeFalse();
+                        income.DrpCashBalance.Should().Be(118.27m);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }

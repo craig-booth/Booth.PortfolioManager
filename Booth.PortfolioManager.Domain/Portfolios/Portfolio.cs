@@ -198,7 +198,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         {
             var holding = _Holdings[@event.Stock];
             if (holding == null)
-                throw new NoSharesOwned("No shares owned");
+                throw new NoSharesOwnedException("No shares owned");
 
             var disposal = new Disposal
             {
@@ -228,7 +228,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 Interest = interest,
                 TaxDeferred = taxDeferred,
                 CreateCashTransaction = createCashTransaction,
-                DRPCashBalance = drpCashBalance
+                DrpCashBalance = drpCashBalance
             };
             Apply(@event);
 
@@ -239,7 +239,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         {
             var holding = _Holdings[@event.Stock];
             if (holding == null)
-                throw new NoSharesOwned("No shares owned");
+                throw new NoSharesOwnedException("No shares owned");
 
             var incomeReceived = new IncomeReceived
             {
@@ -254,7 +254,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 Interest = @event.Interest,
                 TaxDeferred = @event.TaxDeferred,
                 CreateCashTransaction = @event.CreateCashTransaction,
-                DRPCashBalance = @event.DRPCashBalance
+                DrpCashBalance = @event.DrpCashBalance
             };
 
             var handler = _TransactionHandlers.GetService<IncomeReceived>();
@@ -317,7 +317,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         {
             var holding = _Holdings[@event.Stock];
             if (holding == null)
-                throw new NoSharesOwned("No shares owned");
+                throw new NoSharesOwnedException("No shares owned");
 
             var returnOfCapital = new ReturnOfCapital
             {
@@ -351,7 +351,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         {
             var holding = _Holdings[@event.Stock];
             if (holding == null)
-                throw new NoSharesOwned("No shares owned");
+                throw new NoSharesOwnedException("No shares owned");
 
             var unitCountAdjustment = new UnitCountAdjustment
             {

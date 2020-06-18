@@ -9,4 +9,8 @@
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0-preview.3.20214.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Booth.PortfolioManager.Domain\Booth.PortfolioManager.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

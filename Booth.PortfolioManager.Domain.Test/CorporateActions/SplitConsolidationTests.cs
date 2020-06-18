@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
 using Moq;
 
 using Booth.Common;
@@ -10,12 +10,13 @@ using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Portfolios;
+using FluentAssertions;
 
 namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 {
-    class SplitConsolidationTests
+    public class SplitConsolidationTests
     {
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoTransactionsAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -30,12 +31,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = splitConsolidation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenAppliedNoSplitAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -58,7 +59,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                 Interest = 40.00m,
                 TaxDeferred = 0.00m,
                 CreateCashTransaction = false,
-                DRPCashBalance = 0.00m
+                DrpCashBalance = 0.00m
             };
 
             var transactions = mockRepository.Create<IPortfolioTransactionList>();
@@ -66,12 +67,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = splitConsolidation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.False);
+            result.Should().BeFalse();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void HasBeenApplied()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -95,12 +96,12 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = splitConsolidation.HasBeenApplied(transactions.Object);
 
-            Assert.That(result, Is.True);
+            result.Should().BeTrue();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void NoParcelsAtRecordDate()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -118,19 +119,19 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = splitConsolidation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Is.Empty);
+            result.Should().BeEmpty();
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void StockSplit()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -143,35 +144,33 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = splitConsolidation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Has.Count.EqualTo(1));
-
-                if (result.Count >= 1)
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(UnitCountAdjustment)), "Transaction 1");
-                    if (result[0] is UnitCountAdjustment unitCountAdjustment)
+                    first.Should().BeOfType<UnitCountAdjustment>();
+
+                    if (first is UnitCountAdjustment unitCountAdjustment)
                     {
-                        Assert.That(unitCountAdjustment.Date, Is.EqualTo(splitConsolidation.Date), "Transaction 1");
-                        Assert.That(unitCountAdjustment.Stock, Is.EqualTo(splitConsolidation.Stock), "Transaction 1");
-                        Assert.That(unitCountAdjustment.Comment, Is.EqualTo("Test SplitConsolidation"), "Transaction 1");
-                        Assert.That(unitCountAdjustment.NewUnits, Is.EqualTo(2), "Transaction 1");
-                        Assert.That(unitCountAdjustment.OriginalUnits, Is.EqualTo(1), "Transaction 1");
+                        unitCountAdjustment.Date.Should().Be(splitConsolidation.Date);
+                        unitCountAdjustment.Stock.Should().Be(splitConsolidation.Stock);
+                        unitCountAdjustment.Comment.Should().Be("Test SplitConsolidation");
+                        unitCountAdjustment.NewUnits.Should().Be(2);
+                        unitCountAdjustment.OriginalUnits.Should().Be(1);
                     }
                 }
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void StockConsolidation()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
-            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DRPMethod.Round);
+            stock.ChangeDividendRules(Date.MinValue, 0.30m, RoundingRule.Round, false, DrpMethod.Round);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
@@ -184,22 +183,21 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
 
             var result = splitConsolidation.GetTransactionList(holding.Object, stockResolver.Object).ToList();
 
-            Assert.That(result, Has.Count.EqualTo(1));
-            if (result.Count >= 1)
-            {
-                Assert.Multiple(() =>
+            result.Should().SatisfyRespectively(
+                first =>
                 {
-                    Assert.That(result[0], Is.TypeOf(typeof(UnitCountAdjustment)), "Transaction 1");
-                    if (result[0] is UnitCountAdjustment unitCountAdjustment)
+                    first.Should().BeOfType<UnitCountAdjustment>();
+
+                    if (first is UnitCountAdjustment unitCountAdjustment)
                     {
-                        Assert.That(unitCountAdjustment.Date, Is.EqualTo(splitConsolidation.Date), "Transaction 1");
-                        Assert.That(unitCountAdjustment.Stock, Is.EqualTo(splitConsolidation.Stock), "Transaction 1");
-                        Assert.That(unitCountAdjustment.Comment, Is.EqualTo("Test SplitConsolidation"), "Transaction 1");
-                        Assert.That(unitCountAdjustment.NewUnits, Is.EqualTo(1), "Transaction 1");
-                        Assert.That(unitCountAdjustment.OriginalUnits, Is.EqualTo(2), "Transaction 1");
+                        unitCountAdjustment.Date.Should().Be(splitConsolidation.Date);
+                        unitCountAdjustment.Stock.Should().Be(splitConsolidation.Stock);
+                        unitCountAdjustment.Comment.Should().Be("Test SplitConsolidation");
+                        unitCountAdjustment.NewUnits.Should().Be(1);
+                        unitCountAdjustment.OriginalUnits.Should().Be(2);
                     }
-                });
-            }
+                }
+            );
 
             mockRepository.Verify();
         }

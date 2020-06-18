@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Moq;
 
 using Booth.Common;
@@ -10,9 +12,9 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Test.Stocks
 {
-    class StapledSecurityTests
+    public class StapledSecurityTests
     {
-        [TestCase]
+        [Fact]
         public void ListWithoutChildSecurities()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -20,33 +22,37 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new StapledSecurity(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.Trust, Is.False);
-
-                Assert.That(stock.EffectivePeriod.FromDate, Is.EqualTo(listingDate));
-                Assert.That(stock.EffectivePeriod.ToDate, Is.EqualTo(Date.MaxValue));
-
-                var properties = stock.Properties[listingDate];
-                Assert.That(properties.ASXCode, Is.EqualTo("ABC"));
-                Assert.That(properties.Name, Is.EqualTo("ABC Pty Ltd"));
-                Assert.That(properties.Category, Is.EqualTo(AssetCategory.AustralianProperty));
+                stock.Should().BeEquivalentTo(new
+                {
+                    Trust = false,
+                    EffectivePeriod = new DateRange(listingDate, Date.MaxValue)
+                });
+ 
+                stock.Properties[listingDate].Should().BeEquivalentTo(new
+                {
+                    AsxCode = "ABC",
+                    Name = "ABC Pty Ltd",
+                    Category = AssetCategory.AustralianProperty
+                });
 
                 // Check default values are set
-                var dividendRules = stock.DividendRules[listingDate];
-                Assert.That(dividendRules.CompanyTaxRate, Is.EqualTo(0.30m));
-                Assert.That(dividendRules.DividendRoundingRule, Is.EqualTo(RoundingRule.Round));
-                Assert.That(dividendRules.DRPActive, Is.EqualTo(false));
-                Assert.That(dividendRules.DRPMethod, Is.EqualTo(DRPMethod.Round));
+                stock.DividendRules[listingDate].Should().BeEquivalentTo(new
+                {
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = DrpMethod.Round
+                });
 
-                var ntas = stock.RelativeNTAs[listingDate];
-                Assert.That(ntas.Percentages, Is.Empty);
+                stock.RelativeNTAs[listingDate].Percentages.Should().BeEmpty();
 
-                Assert.That(stock.ChildSecurities, Is.Empty);
-            });
+                stock.ChildSecurities.Should().BeEmpty();
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void ListWithOneChildSecurity()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -59,24 +65,27 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, childSecurities);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.Trust, Is.False);
-
-                var ntas = stock.RelativeNTAs[listingDate];
-                Assert.That(ntas.Percentages, Is.EqualTo(new decimal[] { 1.00m }));
-
-                Assert.That(stock.ChildSecurities.Count, Is.EqualTo(1));
-                if (stock.ChildSecurities.Count >= 1)
+                stock.Should().BeEquivalentTo(new
                 {
-                    Assert.That(stock.ChildSecurities[0].ASXCode, Is.EqualTo("ABC_1"));
-                    Assert.That(stock.ChildSecurities[0].Name, Is.EqualTo("Child 1"));
-                    Assert.That(stock.ChildSecurities[0].Trust, Is.EqualTo(true));
-                }
-            });
+                    Trust = false,
+                    EffectivePeriod = new DateRange(listingDate, Date.MaxValue)
+                });
+   
+                stock.RelativeNTAs[listingDate].Percentages.Should().Equal(new decimal[] { 1.00m });
+
+                stock.ChildSecurities.Should().SatisfyRespectively(
+                    first => first.Should().BeEquivalentTo(new
+                    {
+                        AsxCode = "ABC_1",
+                        Name = "Child 1",
+                        Trust = true
+                    }));
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void ListWithThreeChildSecurities()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -91,38 +100,40 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, childSecurities);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.Trust, Is.False);
-
-                var ntas = stock.RelativeNTAs[listingDate];
-                Assert.That(ntas.Percentages, Is.EqualTo(new decimal[] { 0.33m, 0.34m, 0.33m }));
-
-                Assert.That(stock.ChildSecurities.Count, Is.EqualTo(3));
-                if (stock.ChildSecurities.Count >= 1)
+                stock.Should().BeEquivalentTo(new
                 {
-                    Assert.That(stock.ChildSecurities[0].ASXCode, Is.EqualTo("ABC_1"));
-                    Assert.That(stock.ChildSecurities[0].Name, Is.EqualTo("Child 1"));
-                    Assert.That(stock.ChildSecurities[0].Trust, Is.EqualTo(true));
-                }
+                    Trust = false,
+                    EffectivePeriod = new DateRange(listingDate, Date.MaxValue)
+                });
 
-                if (stock.ChildSecurities.Count >= 2)
-                {
-                    Assert.That(stock.ChildSecurities[1].ASXCode, Is.EqualTo("ABC_2"));
-                    Assert.That(stock.ChildSecurities[1].Name, Is.EqualTo("Child 2"));
-                    Assert.That(stock.ChildSecurities[1].Trust, Is.EqualTo(false));
-                }
+                stock.RelativeNTAs[listingDate].Percentages.Should().Equal(new decimal[] { 0.33m, 0.34m, 0.33m });
 
-                if (stock.ChildSecurities.Count >= 3)
-                {
-                    Assert.That(stock.ChildSecurities[2].ASXCode, Is.EqualTo("ABC_3"));
-                    Assert.That(stock.ChildSecurities[2].Name, Is.EqualTo("Child 3"));
-                    Assert.That(stock.ChildSecurities[2].Trust, Is.EqualTo(true));
-                }
-            });
+                stock.ChildSecurities.Should().SatisfyRespectively(
+                    first => first.Should().BeEquivalentTo(new
+                    {
+                        AsxCode = "ABC_1",
+                        Name = "Child 1",
+                        Trust = true
+                    }),
+                    second => second.Should().BeEquivalentTo(new
+                    {
+                        AsxCode = "ABC_2",
+                        Name = "Child 2",
+                        Trust = false
+                    }),
+                    third => third.Should().BeEquivalentTo(new
+                    {
+                        AsxCode = "ABC_3",
+                        Name = "Child 3",
+                        Trust = true
+                    }));
+            }
+
         }
 
-        [TestCase]
+        [Fact]
         public void ListWhenAlreadyListed()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -130,11 +141,13 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var stock = new StapledSecurity(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
 
-            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.List("XYZ", "XYZ Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
+            
+            a.Should().Throw<EffectiveDateException>();
         }
 
 
-        [TestCase]
+        [Fact]
         public void ListWhenDelisted()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -144,10 +157,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
             stock.DeList(delistingDate);
 
-            Assert.That(() => stock.List("XYZ", "XYZ Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.List("XYZ", "XYZ Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
+           
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void DeList()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -157,25 +172,21 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
             stock.DeList(delistingDate);
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.Trust, Is.False);
+                stock.Should().BeEquivalentTo(new
+                {
+                    Trust = false,
+                    EffectivePeriod = new DateRange(listingDate, delistingDate)
+                });
 
-                Assert.That(stock.EffectivePeriod.FromDate, Is.EqualTo(listingDate));
-                Assert.That(stock.EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
-
-                var propertyValues = stock.Properties.Values.ToList();
-                Assert.That(propertyValues.Last().EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
-
-                var dividendRules = stock.DividendRules.Values.ToList();
-                Assert.That(dividendRules.Last().EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
-
-                var ntas = stock.RelativeNTAs.Values.ToList();
-                Assert.That(ntas.Last().EffectivePeriod.ToDate, Is.EqualTo(delistingDate));
-            });
+                stock.Properties.Values.Last().EffectivePeriod.ToDate.Should().Be(delistingDate);
+                stock.DividendRules.Values.Last().EffectivePeriod.ToDate.Should().Be(delistingDate);
+                stock.RelativeNTAs.Values.Last().EffectivePeriod.ToDate.Should().Be(delistingDate);
+            }
         }
 
-        [TestCase]
+        [Fact]
         public void DeListWithoutBeingListed()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -183,11 +194,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             var stock = new StapledSecurity(Guid.NewGuid());
 
-            Assert.That(() => stock.DeList(delistingDate), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.DeList(delistingDate);
 
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void SetRelativeNTAsBeforeListing()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -202,10 +214,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
 
-            Assert.That(() => stock.SetRelativeNTAs(changeDate, new decimal[] {0.50m, 0.50m}), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.SetRelativeNTAs(changeDate, new decimal[] { 0.50m, 0.50m });
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void SetRelativeNTAsAfterDeListing()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -222,10 +236,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, new StapledSecurityChild[0]);
             stock.DeList(delistingDate);
 
-            Assert.That(() => stock.SetRelativeNTAs(changeDate, new decimal[] { 0.50m, 0.50m }), Throws.TypeOf(typeof(EffectiveDateException)));
+            Action a = () => stock.SetRelativeNTAs(changeDate, new decimal[] { 0.50m, 0.50m });
+
+            a.Should().Throw<EffectiveDateException>();
         }
 
-        [TestCase]
+        [Fact]
         public void SetRelativeNTAsTwiceOnSameDay()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -243,13 +259,10 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.SetRelativeNTAs(changeDate, new decimal[] { 0.30m, 0.70m });
             stock.SetRelativeNTAs(changeDate, new decimal[] { 0.60m, 0.40m });
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(stock.RelativeNTAs[changeDate].Percentages, Is.EqualTo(new decimal[] { 0.60m, 0.40m }));
-            });
+            stock.RelativeNTAs[changeDate].Percentages.Should().Equal(new decimal[] { 0.60m, 0.40m });
         }
 
-        [TestCase]
+        [Fact]
         public void SetRelativeNTAsWithLessPercentagesThanChildSecurities()
         {
            var listingDate = new Date(2000, 01, 01);
@@ -264,12 +277,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, childSecurities);
 
+            Action a = () => stock.SetRelativeNTAs(changeDate, new decimal[] { 1.00m });
 
-
-            Assert.That(() => stock.SetRelativeNTAs(changeDate, new decimal[] { 1.00m }), Throws.TypeOf(typeof(ArgumentException)));
+            a.Should().Throw<ArgumentException>();
         }
 
-        [TestCase]
+        [Fact]
         public void SetRelativeNTAsWithMorePercentagesThanChildSecurities()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -284,12 +297,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, childSecurities);
 
+            Action a = () => stock.SetRelativeNTAs(changeDate, new decimal[] { 0.30m, 0.50m, 0.10m, 0.10m });
 
-
-            Assert.That(() => stock.SetRelativeNTAs(changeDate, new decimal[] { 0.30m, 0.50m, 0.10m, 0.10m }), Throws.TypeOf(typeof(ArgumentException)));
+            a.Should().Throw<ArgumentException>();
         }
 
-        [TestCase]
+        [Fact]
         public void SetRelativeNTAsPercentagesDontAddTo100()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -304,11 +317,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             stock.List("ABC", "ABC Pty Ltd", listingDate, AssetCategory.AustralianProperty, childSecurities);
 
+            Action a = () => stock.SetRelativeNTAs(changeDate, new decimal[] { 0.60m, 0.60m });
 
-            Assert.That(() => stock.SetRelativeNTAs(changeDate, new decimal[] { 0.60m, 0.60m }), Throws.TypeOf(typeof(ArgumentException)));
+            a.Should().Throw<ArgumentException>();
         }
 
-        [TestCase]
+        [Fact]
         public void SetRelativeNTAs()
         {
             var listingDate = new Date(2000, 01, 01);
@@ -326,12 +340,11 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             stock.SetRelativeNTAs(listingDate, new decimal[] { 0.50m, 0.50m });
             stock.SetRelativeNTAs(changeDate, new decimal[] { 0.60m, 0.40m });
 
-            Assert.Multiple(() =>
+            using (new AssertionScope())
             {
-                Assert.That(stock.RelativeNTAs[changeDate.AddDays(-1)].Percentages, Is.EqualTo(new decimal[] { 0.50m, 0.50m }));
-
-                Assert.That(stock.RelativeNTAs[changeDate].Percentages, Is.EqualTo(new decimal[] { 0.60m, 0.40m }));
-            });
+                stock.RelativeNTAs[changeDate.AddDays(-1)].Percentages.Should().Equal(new decimal[] { 0.50m, 0.50m });
+                stock.RelativeNTAs[changeDate].Percentages.Should().Equal(new decimal[] { 0.60m, 0.40m });
+            }
         }
     }
 }

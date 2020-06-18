@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
+using FluentAssertions.Execution;
 using Moq;
 
 using Booth.Common;
@@ -9,13 +11,14 @@ using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.CorporateActions.Events;
+using System.Runtime.ExceptionServices;
 
 namespace Booth.PortfolioManager.Domain.Test.Stocks
 {
-    class CorporateActionListTests
+    public class CorporateActionListTests
     {
 
-        [TestCase]
+        [Fact]
         public void AddCapitalReturn()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -31,24 +34,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.AddCapitalReturn(id, new Date(2000, 01, 01), "Test Capital Return", new Date(2000, 02, 01), 10.00m);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var capitalReturn = corporateActionList[0] as CapitalReturn;
-                Assert.That(capitalReturn.Id, Is.EqualTo(id));
-                Assert.That(capitalReturn.Stock, Is.EqualTo(stock));
-                Assert.That(capitalReturn.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(capitalReturn.Type, Is.EqualTo(CorporateActionType.CapitalReturn));
-                Assert.That(capitalReturn.Description, Is.EqualTo("Test Capital Return"));
-                Assert.That(capitalReturn.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)));
-                Assert.That(capitalReturn.Amount, Is.EqualTo(10.00m));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.CapitalReturn,
+                    Description = "Test Capital Return",
+                    PaymentDate = new Date(2000, 02, 01),
+                    Amount = 10.00m
+                })
 
+            );
+         
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddCapitalReturnWithBlankDescription()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -64,24 +68,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.AddCapitalReturn(id, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 10.00m);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var capitalReturn = corporateActionList[0] as CapitalReturn;
-                Assert.That(capitalReturn.Id, Is.EqualTo(id));
-                Assert.That(capitalReturn.Stock, Is.EqualTo(stock));
-                Assert.That(capitalReturn.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(capitalReturn.Type, Is.EqualTo(CorporateActionType.CapitalReturn));
-                Assert.That(capitalReturn.Description, Is.EqualTo("Capital Return $10.00"));
-                Assert.That(capitalReturn.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)));
-                Assert.That(capitalReturn.Amount, Is.EqualTo(10.00m));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.CapitalReturn,
+                    Description = "Capital Return $10.00",
+                    PaymentDate = new Date(2000, 02, 01),
+                    Amount = 10.00m
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ApplyCapitalReturnAddedEvent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -97,24 +102,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             corporateActionList.Apply(@event);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var capitalReturn = corporateActionList[0] as CapitalReturn;
-                Assert.That(capitalReturn.Id, Is.EqualTo(id));
-                Assert.That(capitalReturn.Stock, Is.EqualTo(stock));
-                Assert.That(capitalReturn.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(capitalReturn.Type, Is.EqualTo(CorporateActionType.CapitalReturn));
-                Assert.That(capitalReturn.Description, Is.EqualTo("Test Capital Return"));
-                Assert.That(capitalReturn.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)));
-                Assert.That(capitalReturn.Amount, Is.EqualTo(10.00m));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.CapitalReturn,
+                    Description = "Test Capital Return",
+                    PaymentDate = new Date(2000, 02, 01),
+                    Amount = 10.00m
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddCompositeActionWithoutChildren()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -130,24 +136,27 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.StartCompositeAction(id, new Date(2000, 01, 01), "Test Composite Action").Finish();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var compositeAction = corporateActionList[0] as CompositeAction;
-                Assert.That(compositeAction.Id, Is.EqualTo(id));
-                Assert.That(compositeAction.Stock, Is.EqualTo(stock));
-                Assert.That(compositeAction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(compositeAction.Type, Is.EqualTo(CorporateActionType.Composite));
-                Assert.That(compositeAction.Description, Is.EqualTo("Test Composite Action"));
+                first =>
+                {
+                    first.Should().BeEquivalentTo(new
+                    {
+                        Id = id,
+                        Stock = stock,
+                        Date = new Date(2000, 01, 01),
+                        Type = CorporateActionType.Composite,
+                        Description = "Test Composite Action"
+                    });
+                    first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().BeEmpty();
+                }
 
-                Assert.That(compositeAction.ChildActions.Count(), Is.EqualTo(0));
-            });
+            );
 
             mockRepository.Verify(); 
         }
 
-        [TestCase]
+        [Fact]
         public void AddCompositeActionWithBlankDescription()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -163,24 +172,27 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.StartCompositeAction(id, new Date(2000, 01, 01), "").Finish();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var compositeAction = corporateActionList[0] as CompositeAction;
-                Assert.That(compositeAction.Id, Is.EqualTo(id));
-                Assert.That(compositeAction.Stock, Is.EqualTo(stock));
-                Assert.That(compositeAction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(compositeAction.Type, Is.EqualTo(CorporateActionType.Composite));
-                Assert.That(compositeAction.Description, Is.EqualTo("Complex corporate action"));
+                first =>
+                {
+                    first.Should().BeEquivalentTo(new
+                    {
+                        Id = id,
+                        Stock = stock,
+                        Date = new Date(2000, 01, 01),
+                        Type = CorporateActionType.Composite,
+                        Description = "Complex corporate action"
+                    });
+                    first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().BeEmpty();
+                }
 
-                Assert.That(compositeAction.ChildActions.Count(), Is.EqualTo(0));
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddCompositeActionChildActions()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -199,32 +211,30 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                 .AddSplitConsolidation("Split", 1, 2)
                 .Finish();
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var compositeAction = corporateActionList[0] as CompositeAction;
-                Assert.That(compositeAction.Id, Is.EqualTo(id));
-                Assert.That(compositeAction.Stock, Is.EqualTo(stock));
-                Assert.That(compositeAction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(compositeAction.Type, Is.EqualTo(CorporateActionType.Composite));
-                Assert.That(compositeAction.Description, Is.EqualTo("Test CompositeAction"));
+                first =>
+                {
+                    first.Should().BeEquivalentTo(new
+                    {
+                        Id = id,
+                        Stock = stock,
+                        Date = new Date(2000, 01, 01),
+                        Type = CorporateActionType.Composite,
+                        Description = "Test CompositeAction"
+                    });
+                    first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().SatisfyRespectively(
+                        child1 => child1.Should().BeOfType<CapitalReturn>().Which.Amount.Should().Be(10.00m),
+                        child1 => child1.Should().BeOfType<SplitConsolidation>().Which.NewUnits.Should().Be(2)
+                        );
+                }
 
-                var childActions = compositeAction.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(2));
-
-                if (childActions.Count >= 1)
-                    Assert.That(childActions[0], Is.TypeOf(typeof(CapitalReturn)), "Child 1");
-
-                if (childActions.Count >= 2)
-                    Assert.That(childActions[1], Is.TypeOf(typeof(SplitConsolidation)), "Child 2");
-
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ApplyCompositeActionAddedEvent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -241,40 +251,36 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             corporateActionList.Apply(@event);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var complexAction = corporateActionList[0] as CompositeAction;
-                Assert.That(complexAction.Id, Is.EqualTo(id));
-                Assert.That(complexAction.Stock, Is.EqualTo(stock));
-                Assert.That(complexAction.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(complexAction.Type, Is.EqualTo(CorporateActionType.Composite));
-                Assert.That(complexAction.Description, Is.EqualTo("Test Complex Action"));
-
-                var childActions = complexAction.ChildActions.ToList();
-                Assert.That(childActions, Has.Count.EqualTo(1));
-
-                if (childActions.Count >= 1)
+                first =>
                 {
-                    Assert.That(childActions[0], Is.TypeOf(typeof(SplitConsolidation)), "Child 1");
-                    if (childActions[0] is SplitConsolidation splitConsolidation)
+                    first.Should().BeEquivalentTo(new
                     {
-                        Assert.That(splitConsolidation.Id, Is.EqualTo(id), "Child 1");
-                        Assert.That(splitConsolidation.Stock, Is.EqualTo(stock), "Child 1");
-                        Assert.That(splitConsolidation.Date, Is.EqualTo(new Date(2000, 01, 01)), "Child 1");
-                        Assert.That(splitConsolidation.Type, Is.EqualTo(CorporateActionType.SplitConsolidation), "Child 1");
-                        Assert.That(splitConsolidation.Description, Is.EqualTo("Test Split"), "Child 1");
-                        Assert.That(splitConsolidation.OriginalUnits, Is.EqualTo(1), "Child 1");
-                        Assert.That(splitConsolidation.NewUnits, Is.EqualTo(2), "Child 1");
-                    }
+                        Id = id,
+                        Stock = stock,
+                        Date = new Date(2000, 01, 01),
+                        Type = CorporateActionType.Composite,
+                        Description = "Test Complex Action"
+                    });
+                    first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().SatisfyRespectively(
+                        child1 => child1.Should().BeOfType<SplitConsolidation>().Which.Should().BeEquivalentTo(new 
+                        { 
+                            Date = new Date(2000, 01, 01), 
+                            Type = CorporateActionType.SplitConsolidation,
+                            Description = "Test Split",
+                            OriginalUnits = 1,
+                            NewUnits = 2
+                        })
+                    );
                 }
-            });
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddDividend()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -290,26 +296,28 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.AddDividend(id, new Date(2000, 01, 01), "Test Dividend", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
 
-                var dividend = corporateActionList[0] as Dividend;
-                Assert.That(dividend.Id, Is.EqualTo(id));
-                Assert.That(dividend.Stock, Is.EqualTo(stock));
-                Assert.That(dividend.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(dividend.Type, Is.EqualTo(CorporateActionType.Dividend));
-                Assert.That(dividend.Description, Is.EqualTo("Test Dividend"));
-                Assert.That(dividend.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)));
-                Assert.That(dividend.DividendAmount, Is.EqualTo(1.20m));
-                Assert.That(dividend.PercentFranked, Is.EqualTo(1.00m));
-                Assert.That(dividend.DRPPrice, Is.EqualTo(2.50m));
-            });
+            corporateActionList.Should().SatisfyRespectively(
+
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.Dividend,
+                    Description = "Test Dividend",
+                    PaymentDate = new Date(2000, 02, 01),
+                    DividendAmount = 1.20m,
+                    PercentFranked = 1.00m,
+                    DrpPrice = 2.50m
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddDividendWithBlankDescription()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -325,26 +333,27 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.AddDividend(id, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var dividend = corporateActionList[0] as Dividend;
-                Assert.That(dividend.Id, Is.EqualTo(id));
-                Assert.That(dividend.Stock, Is.EqualTo(stock));
-                Assert.That(dividend.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(dividend.Type, Is.EqualTo(CorporateActionType.Dividend));
-                Assert.That(dividend.Description, Is.EqualTo("Dividend $1.20"));
-                Assert.That(dividend.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)));
-                Assert.That(dividend.DividendAmount, Is.EqualTo(1.20m));
-                Assert.That(dividend.PercentFranked, Is.EqualTo(1.00m));
-                Assert.That(dividend.DRPPrice, Is.EqualTo(2.50m));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.Dividend,
+                    Description = "Dividend $1.20",
+                    PaymentDate = new Date(2000, 02, 01),
+                    DividendAmount = 1.20m,
+                    PercentFranked = 1.00m,
+                    DrpPrice = 2.50m
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ApplyDividendAddedEvent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -360,26 +369,27 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             corporateActionList.Apply(@event);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var dividend = corporateActionList[0] as Dividend;
-                Assert.That(dividend.Id, Is.EqualTo(id));
-                Assert.That(dividend.Stock, Is.EqualTo(stock));
-                Assert.That(dividend.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(dividend.Type, Is.EqualTo(CorporateActionType.Dividend));
-                Assert.That(dividend.Description, Is.EqualTo("Test Dividend"));
-                Assert.That(dividend.PaymentDate, Is.EqualTo(new Date(2000, 02, 01)));
-                Assert.That(dividend.DividendAmount, Is.EqualTo(1.20m));
-                Assert.That(dividend.PercentFranked, Is.EqualTo(1.00m));
-                Assert.That(dividend.DRPPrice, Is.EqualTo(2.20m));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.Dividend,
+                    Description = "Test Dividend",
+                    PaymentDate = new Date(2000, 02, 01),
+                    DividendAmount = 1.20m,
+                    PercentFranked = 1.00m,
+                    DrpPrice = 2.20m
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddSplitConsolidation()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -395,24 +405,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.AddSplitConsolidation(id, new Date(2000, 01, 01), "Test Split", 1, 2);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var split = corporateActionList[0] as SplitConsolidation;
-                Assert.That(split.Id, Is.EqualTo(id));
-                Assert.That(split.Stock, Is.EqualTo(stock));
-                Assert.That(split.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(split.Type, Is.EqualTo(CorporateActionType.SplitConsolidation));
-                Assert.That(split.Description, Is.EqualTo("Test Split"));
-                Assert.That(split.OriginalUnits, Is.EqualTo(1));
-                Assert.That(split.NewUnits, Is.EqualTo(2));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.SplitConsolidation,
+                    Description = "Test Split",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddSplitConsolidationithBlankDescription()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -428,24 +439,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var id = Guid.NewGuid();
             corporateActionList.AddSplitConsolidation(id, new Date(2000, 01, 01), "", 1, 2);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+           corporateActionList.Should().SatisfyRespectively(
 
-                var split = corporateActionList[0] as SplitConsolidation;
-                Assert.That(split.Id, Is.EqualTo(id));
-                Assert.That(split.Stock, Is.EqualTo(stock));
-                Assert.That(split.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(split.Type, Is.EqualTo(CorporateActionType.SplitConsolidation));
-                Assert.That(split.Description, Is.EqualTo("1 for 2 Stock Split"));
-                Assert.That(split.OriginalUnits, Is.EqualTo(1));
-                Assert.That(split.NewUnits, Is.EqualTo(2));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.SplitConsolidation,
+                    Description = "1 for 2 Stock Split",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ApplySplitConsolidationAddedEvent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -461,24 +473,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             corporateActionList.Apply(@event);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var split = corporateActionList[0] as SplitConsolidation;
-                Assert.That(split.Id, Is.EqualTo(id));
-                Assert.That(split.Stock, Is.EqualTo(stock));
-                Assert.That(split.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(split.Type, Is.EqualTo(CorporateActionType.SplitConsolidation));
-                Assert.That(split.Description, Is.EqualTo("Test Split"));
-                Assert.That(split.OriginalUnits, Is.EqualTo(1));
-                Assert.That(split.NewUnits, Is.EqualTo(2));
-            });
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.SplitConsolidation,
+                    Description = "Test Split",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                })
+
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddTransformation()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -500,26 +513,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             corporateActionList.AddTransformation(id, new Date(2000, 01, 01), "Test Transformation", new Date(2000, 02, 01), 1.20m, false, resultStocks);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var transformation = corporateActionList[0] as Transformation;
-                Assert.That(transformation.Id, Is.EqualTo(id));
-                Assert.That(transformation.Stock, Is.EqualTo(stock));
-                Assert.That(transformation.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transformation.Type, Is.EqualTo(CorporateActionType.Transformation));
-                Assert.That(transformation.Description, Is.EqualTo("Test Transformation"));
-                Assert.That(transformation.CashComponent, Is.EqualTo(1.20m));
-                Assert.That(transformation.RolloverRefliefApplies, Is.EqualTo(false));
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.Transformation,
+                    Description = "Test Transformation",
+                    CashComponent = 1.20M,
+                    RolloverRefliefApplies = false
+                })
 
-                Assert.That(transformation.ResultingStocks.Count(), Is.EqualTo(1));
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void AddTransformationWithBlankDescription()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -541,26 +553,25 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             };
             corporateActionList.AddTransformation(id, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 1.20m, false, resultStocks);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var transformation = corporateActionList[0] as Transformation;
-                Assert.That(transformation.Id, Is.EqualTo(id));
-                Assert.That(transformation.Stock, Is.EqualTo(stock));
-                Assert.That(transformation.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transformation.Type, Is.EqualTo(CorporateActionType.Transformation));
-                Assert.That(transformation.Description, Is.EqualTo("Transformation"));
-                Assert.That(transformation.CashComponent, Is.EqualTo(1.20m));
-                Assert.That(transformation.RolloverRefliefApplies, Is.EqualTo(false));
+                first => first.Should().BeEquivalentTo(new
+                {
+                    Id = id,
+                    Stock = stock,
+                    Date = new Date(2000, 01, 01),
+                    Type = CorporateActionType.Transformation,
+                    Description = "Transformation",
+                    CashComponent = 1.20M,
+                    RolloverRefliefApplies = false
+                })
 
-                Assert.That(transformation.ResultingStocks.Count(), Is.EqualTo(1));
-            });
+            );
 
             mockRepository.Verify();
         }
 
-        [TestCase]
+        [Fact]
         public void ApplyTransformationAddedEvent()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -582,22 +593,23 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
 
             corporateActionList.Apply(@event);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(corporateActionList, Has.Count.EqualTo(1));
+            corporateActionList.Should().SatisfyRespectively(
 
-                var transformation = corporateActionList[0] as Transformation;
-                Assert.That(transformation.Id, Is.EqualTo(id));
-                Assert.That(transformation.Stock, Is.EqualTo(stock));
-                Assert.That(transformation.Date, Is.EqualTo(new Date(2000, 01, 01)));
-                Assert.That(transformation.Type, Is.EqualTo(CorporateActionType.Transformation));
-                Assert.That(transformation.Description, Is.EqualTo("Test Transformation"));
-                Assert.That(transformation.CashComponent, Is.EqualTo(1.20m));
-                Assert.That(transformation.RolloverRefliefApplies, Is.EqualTo(false));
+                first => {
+                    first.Should().BeEquivalentTo(new
+                    {
+                        Id = id,
+                        Stock = stock,
+                        Date = new Date(2000, 01, 01),
+                        Type = CorporateActionType.Transformation,
+                        Description = "Test Transformation",
+                        CashComponent = 1.20M,
+                        RolloverRefliefApplies = false
+                    });
+                    first.Should().BeOfType<Transformation>().Which.ResultingStocks.Should().HaveCount(1);
+                    }
 
-                Assert.That(transformation.ResultingStocks.Count(), Is.EqualTo(1));
-            });
-
+            );
             mockRepository.Verify();
         }
 

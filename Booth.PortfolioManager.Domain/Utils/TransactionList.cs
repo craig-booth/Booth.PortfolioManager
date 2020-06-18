@@ -145,6 +145,8 @@ namespace Booth.PortfolioManager.Domain.Utils
             {
                 if (_IdLookup.ContainsKey(id))
                     _IdLookup[id] = value;
+                else
+                    throw new KeyNotFoundException();
             }
         }
 

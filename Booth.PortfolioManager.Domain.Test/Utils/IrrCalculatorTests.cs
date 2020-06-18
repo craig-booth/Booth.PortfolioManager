@@ -2,27 +2,28 @@
 using System.Collections.Generic;
 using System.Text;
 
-using NUnit.Framework;
+using Xunit;
+using FluentAssertions;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Test.Utils
 {
-    class IrrCalculatorTests
+    public class IrrCalculatorTests
     {
 
-        [TestCase]
+        [Fact]
         public void NoCashflows()
         {
             var cashFlows = new CashFlows();
 
             var result = IrrCalculator.CalculateIrr(new Date(2000, 01, 01), 1000.00m, new Date(2005, 12, 31), 1500.00m, cashFlows);
 
-            Assert.That(result, Is.EqualTo(0.0698802d).Within(0.000001d));
+            result.Should().BeApproximately(0.0698802d, 0.000001d);
         }
 
-        [TestCase]
+        [Fact]
         public void SingleCashFlow()
         {
             var cashFlows = new CashFlows();
@@ -30,10 +31,10 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
             var result = IrrCalculator.CalculateIrr(new Date(2000, 01, 01), 1000.00m, new Date(2005, 12, 31), 2500.00m, cashFlows);
 
-            Assert.That(result, Is.EqualTo(0.0413562d).Within(0.000001d));
+            result.Should().BeApproximately(0.0413562d, 0.000001d);
         }
 
-        [TestCase]
+        [Fact]
         public void TwoCashFlow()
         {
             var cashFlows = new CashFlows();
@@ -42,10 +43,10 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
             var result = IrrCalculator.CalculateIrr(new Date(2000, 01, 01), 1000.00m, new Date(2005, 12, 31), 5000.00m, cashFlows);
 
-            Assert.That(result, Is.EqualTo(0.2244317d).Within(0.000001d));
+            result.Should().BeApproximately(0.2244317d, 0.000001d);
         }
 
-        [TestCase]
+        [Fact]
         public void LessThanOneYear()
         {
             var cashFlows = new CashFlows();
@@ -58,10 +59,10 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
             var result = IrrCalculator.CalculateIrr(new Date(2000, 01, 01), 1000.00m, new Date(2000, 08, 30), 10000.00m, cashFlows);
 
-            Assert.That(result, Is.EqualTo(2.5071595d).Within(0.000001d));
+            result.Should().BeApproximately(2.5071595d, 0.000001d);
         }
 
-        [TestCase]
+        [Fact]
         public void MoreThanOneYear()
         {
             var cashFlows = new CashFlows();
@@ -73,7 +74,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
             var result = IrrCalculator.CalculateIrr(new Date(2000, 01, 01), 1000.00m, new Date(2005, 12, 31), 10000.00m, cashFlows);
 
-            Assert.That(result, Is.EqualTo(0.2220352d).Within(0.00001d));
+            result.Should().BeApproximately(0.2220352d, 0.000001d);
         }
     }
 }
