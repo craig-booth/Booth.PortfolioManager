@@ -11,7 +11,7 @@ namespace Booth.PortfolioManager.Web.Services
     interface ITradingCalanderService
     {
         ITradingCalander TradingCalander { get; }
-        void SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays);
+        ServiceResult SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays);
     }
 
     class TradingCalanderService : ITradingCalanderService
@@ -27,10 +27,12 @@ namespace Booth.PortfolioManager.Web.Services
             _TradingCalander = _Repository.Get(calanderId);
         }
 
-        public void SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays)
+        public ServiceResult SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays)
         {
             _TradingCalander.SetNonTradingDays(year, nonTradingDays);
             _Repository.Update(_TradingCalander);
+
+            return ServiceResult.Ok();
         }
     }
 }

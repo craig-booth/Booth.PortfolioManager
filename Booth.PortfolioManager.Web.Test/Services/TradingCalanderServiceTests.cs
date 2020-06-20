@@ -70,36 +70,17 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 calanderReference.IsTradingDay(new Date(2000, 12, 25)).Should().BeTrue();
             }
 
-            service.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 12, 25), "Christmas Day") });
+            var result = service.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 12, 25), "Christmas Day") });
 
             using (new AssertionScope())
             {
+                result.Should().HaveOkStatus();
+
                 calanderReference.IsTradingDay(new Date(2000, 01, 01)).Should().BeTrue();
                 calanderReference.IsTradingDay(new Date(2000, 12, 25)).Should().BeFalse();
             }
 
             mockRepository.Verify();
         }
-
-        /*
-         * 
-         *       private TradingCalander _TradingCalander;
-        private IRepository<TradingCalander> _Repository;
-
-        public ITradingCalander TradingCalander => _TradingCalander;
-
-        public TradingCalanderService(IRepository<TradingCalander> repository, Guid calanderId)
-        {
-            _Repository = repository;
-            _TradingCalander = _Repository.Get(calanderId);
-        }
-
-        public void SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays)
-        {
-            _TradingCalander.SetNonTradingDays(year, nonTradingDays);
-            _Repository.Update(_TradingCalander);
-        }
-
-    */
     }
 }

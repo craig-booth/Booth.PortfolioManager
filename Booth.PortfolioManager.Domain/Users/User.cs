@@ -34,7 +34,7 @@ namespace Booth.PortfolioManager.Domain.Users
             Apply(@event);
             PublishEvent(@event);
         }
-     
+
         public IDictionary<string, string> GetProperties()
         {
             return _Properties;
