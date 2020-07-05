@@ -25,6 +25,9 @@ namespace Booth.PortfolioManager.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            var configuration = Configuration.GetSection("Settings").Get<Configuration>();
+            services.AddPortfolioManagerServices(configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

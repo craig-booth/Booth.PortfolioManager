@@ -59,14 +59,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
                     _Logger?.LogInformation("{0} closing prices found", closingPrices.Count);
                     if (closingPrices.Count > 0)
                     {
-                        try
-                        {
-                            _StockService.UpdateClosingPrices(stock.Id, closingPrices);
-                        }
-                        catch (Exception e)
-                        {
-                            _Logger.LogError(e, "Error occurred importing closing prices for {0}", asxCode);
-                        }
+                        _StockService.UpdateClosingPrices(stock.Id, closingPrices);
                     }
                      
                 }

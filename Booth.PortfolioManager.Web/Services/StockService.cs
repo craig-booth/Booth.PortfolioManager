@@ -11,7 +11,7 @@ using Booth.PortfolioManager.Web.Utilities;
 namespace Booth.PortfolioManager.Web.Services
 {
 
-    interface IStockService
+    public interface IStockService
     {
         ServiceResult ListStock(Guid id, string asxCode, string name, Date listingDate, bool trust, AssetCategory category);
         ServiceResult DelistStock(Guid id, Date date);
@@ -66,27 +66,31 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult.Ok();
         }
 
-  /*      public void ListStapledSecurity(Guid id, string asxCode, string name, Date listingDate, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
-        {
-            // Check that id is unique
-            var stock = _StockRepository.Get(id);
-            if (stock != null)
-                throw new Exception("Id not unique");
+        /*      public void ListStapledSecurity(Guid id, string asxCode, string name, Date listingDate, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
+              {
+                  // Check that id is unique
+                  var stock = _StockRepository.Get(id);
+                  if (stock != null)
+                      throw new Exception("Id not unique");
 
-            // Check if stock already exists with this code
-            var effectivePeriod = new DateRange(listingDate, DateUtils.NoEndDate);
-            if (_StockQuery.Find(effectivePeriod, y => y.ASXCode == asxCode).Any())
-                throw new Exception(String.Format("Stock already exists with the code {0} at {1}", asxCode, listingDate));
+                        if (command.Trust)
+                          return BadRequest("A Stapled security cannot be a trust");
 
-            var stapledSecurity = new StapledSecurity(id);
-            stapledSecurity.List(asxCode, name, category, childSecurities);
-            _StockRepository.Add(stock);
-            _StockCache.Add(stock);
 
-            var stockPriceHistory = new StockPriceHistory(id);
-            _StockPriceHistoryRepository.Add(stockPriceHistory);
-            _StockPriceHistoryCache.Add(stockPriceHistory);
-        } */
+                  // Check if stock already exists with this code
+                  var effectivePeriod = new DateRange(listingDate, DateUtils.NoEndDate);
+                  if (_StockQuery.Find(effectivePeriod, y => y.ASXCode == asxCode).Any())
+                      throw new Exception(String.Format("Stock already exists with the code {0} at {1}", asxCode, listingDate));
+
+                  var stapledSecurity = new StapledSecurity(id);
+                  stapledSecurity.List(asxCode, name, category, childSecurities);
+                  _StockRepository.Add(stock);
+                  _StockCache.Add(stock);
+
+                  var stockPriceHistory = new StockPriceHistory(id);
+                  _StockPriceHistoryRepository.Add(stockPriceHistory);
+                  _StockPriceHistoryCache.Add(stockPriceHistory);
+              } */
 
         public ServiceResult ChangeStock(Guid id, Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory)
         {

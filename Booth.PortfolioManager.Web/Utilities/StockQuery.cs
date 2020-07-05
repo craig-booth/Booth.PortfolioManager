@@ -7,7 +7,7 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Web.Utilities
 {
-    interface IStockQuery
+    public interface IStockQuery
     {
         Stock Get(Guid id);
         Stock Get(string asxCode, Date date);

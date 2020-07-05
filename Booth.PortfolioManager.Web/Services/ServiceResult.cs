@@ -5,15 +5,19 @@ using System.Threading.Tasks;
 
 namespace Booth.PortfolioManager.Web.Services
 {
-    enum ServiceStatus { Ok, NotFound, Error }
+    public enum ServiceStatus { Ok, NotFound, Error }
 
-    class ServiceResult
+    public class ServiceResult
     {
         public ServiceStatus Status { get; }
 
         private List<string> _Errors = new List<string>();
         public IEnumerable<string> Errors => _Errors;
 
+        public bool Successful
+        {
+            get { return Status == ServiceStatus.Ok; }
+        }
         public ServiceResult(ServiceStatus status)
         {
             Status = status;
@@ -87,7 +91,7 @@ namespace Booth.PortfolioManager.Web.Services
         }
     }
 
-    class ServiceResult<T> : ServiceResult
+    public class ServiceResult<T> : ServiceResult
     {
         public T Result { get; }
 

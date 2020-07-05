@@ -8,7 +8,7 @@ using Booth.PortfolioManager.Domain.Users;
 
 namespace Booth.PortfolioManager.Web.Services
 {
-    interface IUserService
+    public interface IUserService
     {
         ServiceResult<User> Authenticate(string userName, string password);
     }
