@@ -11,7 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 
 using Booth.PortfolioManager.RestApi.Users;
 using Booth.PortfolioManager.Web.Services;
-
+using Booth.PortfolioManager.Web.Authentication;
+using Booth.PortfolioManager.Domain.Users;
 
 namespace Booth.PortfolioManager.Web.Controllers
 {
@@ -20,12 +21,12 @@ namespace Booth.PortfolioManager.Web.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IUserService _UserService;
-        private readonly IJwtTokenConfiguration _JwtTokenConfiguration;
+        private readonly IJwtTokenConfigurationProvider _JwtTokenConfigurationProvider;
 
-        public AuthenticationController(IUserService userService, IJwtTokenConfiguration jwtTokenConfiguration)
+        public AuthenticationController(IUserService userService, IJwtTokenConfigurationProvider jwtTokenConfigurationProvider)
         {
             _UserService = userService;
-            _JwtTokenConfiguration = jwtTokenConfiguration;
+            _JwtTokenConfigurationProvider = jwtTokenConfigurationProvider;
         }
 
         // POST : /api/authenticate       
@@ -40,22 +41,24 @@ namespace Booth.PortfolioManager.Web.Controllers
 
             var user = result.Result;
 
+            // Create claims list for the user
+            var claims = new List<Claim>();
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Name, user.UserName));
+            if (user.Administator)
+                claims.Add(new Claim(ClaimTypes.Role, Role.Administrator));
+
             // Authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Issuer = _JwtTokenConfiguration.Issuer,
-                Audience = _JwtTokenConfiguration.Audience,
+                Issuer = _JwtTokenConfigurationProvider.Issuer,
+                Audience = _JwtTokenConfigurationProvider.Audience,
                 Expires = DateTime.UtcNow.AddHours(1),
                 IssuedAt = DateTime.UtcNow,
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Role, Role.Administrator)
-                }),
+                Subject = new ClaimsIdentity(claims),
 
-                SigningCredentials = new SigningCredentials(_JwtTokenConfiguration.GetKey(), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(_JwtTokenConfigurationProvider.Key, SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
 

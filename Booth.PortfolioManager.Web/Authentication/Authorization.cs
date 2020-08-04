@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Booth.PortfolioManager.Web
+namespace Booth.PortfolioManager.Web.Authentication
 {
     static class Role
     {

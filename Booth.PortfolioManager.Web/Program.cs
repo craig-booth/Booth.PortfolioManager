@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 [assembly: InternalsVisibleToAttribute("Booth.PortfolioManager.Web.Test")]
+[assembly: InternalsVisibleToAttribute("Booth.PortfolioManager.IntegrationTest")]
 
 namespace Booth.PortfolioManager.Web
 {

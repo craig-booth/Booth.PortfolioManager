@@ -11,7 +11,7 @@ using Booth.PortfolioManager.RestApi.Stocks;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Mappers;
-using MongoDB.Bson.Serialization.Serializers;
+using Booth.PortfolioManager.Web.Authentication;
 
 namespace Booth.PortfolioManager.Web.Controllers
 {

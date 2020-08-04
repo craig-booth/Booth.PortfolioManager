@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -11,9 +11,11 @@
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.8" />
     <PackageReference Include="Booth.EventStore" Version="1.0.2" />
-    <PackageReference Include="Booth.PortfolioManager.RestApi" Version="1.0.0" />
+    <PackageReference Include="Booth.PortfolioManager.RestApi" Version="1.0.5" />
     <PackageReference Include="Booth.Scheduler" Version="1.0.3" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
   </ItemGroup>
 
   <ItemGroup>

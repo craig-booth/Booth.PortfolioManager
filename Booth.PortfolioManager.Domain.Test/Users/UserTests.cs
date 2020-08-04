@@ -7,6 +7,7 @@ using FluentAssertions;
 using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Users.Events;
+using FluentAssertions.Execution;
 
 namespace Booth.PortfolioManager.Domain.Test.Users
 {
@@ -55,7 +56,52 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             var @event = new UserCreatedEvent(user.Id, 0, "john", "secret");
             user.ApplyEvents(new Event[] { @event });
 
-            user.UserName.Should().Be("john");
+            using (new AssertionScope())
+            {
+                user.UserName.Should().Be("john");
+                user.Administator.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public void AddAdministratorPrivilege()
+        {
+            var user = new User(Guid.NewGuid());
+            user.Create("john", TestPassword);
+            user.AddAdministratorPrivilage();
+
+            var events = user.FetchEvents().ToList();
+
+            events.Should().SatisfyRespectively(
+                event1 => event1.Should().BeOfType<UserCreatedEvent>(),
+                event2 => event2.Should().BeOfType<UserAdministratorChangedEvent>().Which.Should().BeEquivalentTo(new { Administrator = true })
+            );
+        }
+
+        [Fact]
+        public void RemoveAdministratorPrivilege()
+        {
+            var user = new User(Guid.NewGuid());
+            user.Create("john", TestPassword);
+            user.RemoveAdministratorPrivilage();
+
+            var events = user.FetchEvents().ToList();
+
+            events.Should().SatisfyRespectively(
+                event1 => event1.Should().BeOfType<UserCreatedEvent>(),
+                event2 => event2.Should().BeOfType<UserAdministratorChangedEvent>().Which.Should().BeEquivalentTo(new { Administrator = false })
+            );
+        }
+
+        [Fact]
+        public void ApplyUserAdministratorChangedEvent()
+        {
+            var user = new User(Guid.NewGuid());
+
+            var @event = new UserAdministratorChangedEvent(user.Id, 0, true);
+            user.ApplyEvents(new Event[] { @event });
+
+            user.Administator.Should().BeTrue();
         }
 
         [Fact]

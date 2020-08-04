@@ -13,6 +13,7 @@ using FluentAssertions.AspNetCore.Mvc;
 using Booth.PortfolioManager.RestApi.Users;
 using Booth.PortfolioManager.Web.Controllers;
 using Booth.PortfolioManager.Web.Services;
+using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Domain.Users;
 
 
@@ -28,7 +29,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var userService = mockRepository.Create<IUserService>();
             userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Error(""));
-            var jwtConfig = mockRepository.Create<IJwtTokenConfiguration>();
+            var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
 
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
@@ -50,11 +51,11 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var userService = mockRepository.Create<IUserService>();
             userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
-            var jwtConfig = mockRepository.Create<IJwtTokenConfiguration>();
+            var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
             jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
             jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
             var signingKey = new SymmetricSecurityKey(new HMACSHA256().Key);
-            jwtConfig.Setup(x => x.GetKey()).Returns(signingKey);
+            jwtConfig.SetupGet(x => x.Key).Returns(signingKey);
 
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
@@ -86,11 +87,11 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var userService = mockRepository.Create<IUserService>();
             userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
-            var jwtConfig = mockRepository.Create<IJwtTokenConfiguration>();
+            var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
             jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
             jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
             var signingKey = new SymmetricSecurityKey(new HMACSHA256().Key);
-            jwtConfig.Setup(x => x.GetKey()).Returns(signingKey);
+            jwtConfig.SetupGet(x => x.Key).Returns(signingKey);
 
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
@@ -107,7 +108,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void AuthenticateTokenContainAdministratorClaim()
+        public void AuthenticateTokenDoesNotAdministratorClaim()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -116,11 +117,41 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var userService = mockRepository.Create<IUserService>();
             userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
-            var jwtConfig = mockRepository.Create<IJwtTokenConfiguration>();
+            var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
             jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
             jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
             var signingKey = new SymmetricSecurityKey(new HMACSHA256().Key);
-            jwtConfig.Setup(x => x.GetKey()).Returns(signingKey);
+            jwtConfig.SetupGet(x => x.Key).Returns(signingKey);
+
+            var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
+
+            var request = new AuthenticationRequest() { UserName = "user", Password = "password" };
+            var response = controller.Authenticate(request);
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.ReadJwtToken(response.Value.Token);
+
+            token.Claims.Should().NotContain(x => (x.Type == "role") && (x.Value == "Administrator"));
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void AuthenticateTokenContainsAdministratorClaimForAdministrator()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var user = new User(Guid.NewGuid());
+            user.Create("user", "password");
+            user.AddAdministratorPrivilage();
+
+            var userService = mockRepository.Create<IUserService>();
+            userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
+            var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
+            jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
+            jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
+            var signingKey = new SymmetricSecurityKey(new HMACSHA256().Key);
+            jwtConfig.SetupGet(x => x.Key).Returns(signingKey);
 
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 

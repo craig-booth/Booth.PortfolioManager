@@ -13,6 +13,8 @@ namespace Booth.PortfolioManager.Domain.Users
     {
         public string UserName { get; private set; }
         private string _Password;
+        public bool Administator { get; private set; }
+
         private readonly Dictionary<string, string> _Properties = new Dictionary<string, string>();
 
         public User(Guid id)
@@ -67,6 +69,29 @@ namespace Booth.PortfolioManager.Domain.Users
 
             UserName = @event.UserName;
             _Properties["UserName"] = UserName;
+        }
+
+        public void AddAdministratorPrivilage()
+        { 
+            var @event = new UserAdministratorChangedEvent(Id, Version, true);
+
+            Apply(@event);
+            PublishEvent(@event);
+        }
+
+        public void RemoveAdministratorPrivilage()
+        {
+            var @event = new UserAdministratorChangedEvent(Id, Version, false);
+
+            Apply(@event);
+            PublishEvent(@event);
+        }
+
+        public void Apply(UserAdministratorChangedEvent @event)
+        {
+            Version++;
+
+            Administator = @event.Administrator;
         }
 
         public void ChangePassword(string newPassword)
