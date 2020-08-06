@@ -2,12 +2,12 @@ pipeline {
     agent { docker 'mcr.microsoft.com/dotnet/core/sdk:3.1' }
 	
 	environment {
-		PROJECT      = './Booth.PortfolioManager.RestApi/Booth.PortfolioManager.Web.csproj'
-		TEST_PROJECT1 = './Booth.PortfolioManager.RestApi.Test/Booth.PortfolioManager.Domain.Test.csproj'
-        TEST_PROJECT2 = './Booth.PortfolioManager.RestApi.Test/Booth.PortfolioManager.DataServices.Test.csproj'
-		TEST_PROJECT3 = './Booth.PortfolioManager.RestApi.Test/Booth.PortfolioManager.Web.Test.csproj'
+		PROJECT      = './Booth.PortfolioManager.PortfolioManager/Booth.PortfolioManager.Web.csproj'
+		TEST_PROJECT1 = './Booth.PortfolioManager.PortfolioManager.Domain.Test/Booth.PortfolioManager.Domain.Test.csproj'
+        TEST_PROJECT2 = './Booth.PortfolioManager.PortfolioManager.DataServices.Test/Booth.PortfolioManager.DataServices.Test.csproj'
+		TEST_PROJECT3 = './Booth.PortfolioManager.PortfolioManager.Web.Test/Booth.PortfolioManager.Web.Test.csproj'
 
-		INTTEST_PROJECT = './Booth.PortfolioManager.RestApi.Test/Booth.PortfolioManager.IntegrationTest.csproj'
+		INTTEST_PROJECT = './Booth.PortfolioManager.IntegrationTest/Booth.PortfolioManager.IntegrationTest.csproj'
 
 		NUGET_KEY = credentials('nuget')
     }
