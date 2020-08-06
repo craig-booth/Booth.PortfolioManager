@@ -4,33 +4,33 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Booth.EventStore;
-using Booth.PortfolioManager.Domain.TradingCalanders;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 
 namespace Booth.PortfolioManager.Web.Services
 {
-    interface ITradingCalanderService
+    interface ITradingCalendarService
     {
-        ITradingCalander TradingCalander { get; }
+        ITradingCalendar TradingCalendar { get; }
         ServiceResult SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays);
     }
 
-    class TradingCalanderService : ITradingCalanderService
+    class TradingCalendarService : ITradingCalendarService
     {
-        private TradingCalander _TradingCalander;
-        private IRepository<TradingCalander> _Repository;
+        private TradingCalendar _TradingCalendar;
+        private IRepository<TradingCalendar> _Repository;
 
-        public ITradingCalander TradingCalander => _TradingCalander;
+        public ITradingCalendar TradingCalendar => _TradingCalendar;
 
-        public TradingCalanderService(IRepository<TradingCalander> repository, Guid calanderId)
+        public TradingCalendarService(IRepository<TradingCalendar> repository, Guid CalendarId)
         {
             _Repository = repository;
-            _TradingCalander = _Repository.Get(calanderId);
+            _TradingCalendar = _Repository.Get(CalendarId);
         }
 
         public ServiceResult SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays)
         {
-            _TradingCalander.SetNonTradingDays(year, nonTradingDays);
-            _Repository.Update(_TradingCalander);
+            _TradingCalendar.SetNonTradingDays(year, nonTradingDays);
+            _Repository.Update(_TradingCalendar);
 
             return ServiceResult.Ok();
         }

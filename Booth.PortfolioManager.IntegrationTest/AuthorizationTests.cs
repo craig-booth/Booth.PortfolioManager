@@ -25,6 +25,8 @@ using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web;
 using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Stocks;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -123,6 +125,7 @@ namespace Booth.PortfolioManager.IntegrationTest
             builder.ConfigureTestServices(x =>
                 {
                     x.AddSingleton<IEventStore>(eventStore);
+                    x.RemoveAll<IHostedService>();
                 });
         }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 using Booth.EventStore;
-using Booth.PortfolioManager.Domain.TradingCalanders;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
 
@@ -14,13 +14,13 @@ namespace Booth.PortfolioManager.Web.DataImporters
 {
     class TradingDayImporter
     {
-        private readonly ITradingCalanderService _TradingCalanderService;
+        private readonly ITradingCalendarService _TradingCalendarService;
         private readonly ITradingDayService _DataService;
         private readonly ILogger _Logger;
 
-        public TradingDayImporter(ITradingCalanderService tradingCalanderService, ITradingDayService dataService, ILogger<TradingDayImporter> logger)
+        public TradingDayImporter(ITradingCalendarService tradingCalendarService, ITradingDayService dataService, ILogger<TradingDayImporter> logger)
         {
-            _TradingCalanderService = tradingCalanderService;
+            _TradingCalendarService = tradingCalendarService;
             _DataService = dataService;
             _Logger = logger;
         }
@@ -34,7 +34,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
             if (nonTradingDays.Any())
             {
                 _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
-                _TradingCalanderService.SetNonTradingDays(year, nonTradingDays);
+                _TradingCalendarService.SetNonTradingDays(year, nonTradingDays);
             }           
         }
     }

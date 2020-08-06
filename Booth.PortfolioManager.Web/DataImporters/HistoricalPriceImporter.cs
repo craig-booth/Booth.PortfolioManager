@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Booth.Common;
 using Booth.PortfolioManager.Domain;
 using Booth.PortfolioManager.Domain.Stocks;
-using Booth.PortfolioManager.Domain.TradingCalanders;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Services;
@@ -20,14 +20,14 @@ namespace Booth.PortfolioManager.Web.DataImporters
         private readonly IHistoricalStockPriceService _DataService;
         private readonly IStockQuery _StockQuery;
         private IStockService _StockService;
-        private readonly ITradingCalander _TradingCalander;
+        private readonly ITradingCalendar _TradingCalendar;
         private readonly ILogger _Logger;
 
-        public HistoricalPriceImporter(IStockQuery stockQuery, IStockService stockService, ITradingCalander tradingCalander, IHistoricalStockPriceService dataService, ILogger<HistoricalPriceImporter> logger)
+        public HistoricalPriceImporter(IStockQuery stockQuery, IStockService stockService, ITradingCalendar tradingCalendar, IHistoricalStockPriceService dataService, ILogger<HistoricalPriceImporter> logger)
         {
             _StockQuery = stockQuery;
             _StockService = stockService;
-            _TradingCalander = tradingCalander;
+            _TradingCalendar = tradingCalendar;
             _DataService = dataService;
             _Logger = logger;
         }
@@ -36,7 +36,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
         public async Task Import(CancellationToken cancellationToken)
         {
             var lastExpectedDate = Date.Today.AddDays(-1);
-            while (! _TradingCalander.IsTradingDay(lastExpectedDate))
+            while (! _TradingCalendar.IsTradingDay(lastExpectedDate))
                 lastExpectedDate = lastExpectedDate.AddDays(-1);
 
             foreach (var stock in _StockQuery.All())

@@ -17,6 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Web.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.IntegrationTest", "Booth.PortfolioManager.IntegrationTest\Booth.PortfolioManager.IntegrationTest.csproj", "{4ACA72CD-810C-461B-A2A0-D31B186A0D8D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{619FF4CF-B125-4BCB-BBAA-CE1611E2EB7E}"
+	ProjectSection(SolutionItems) = preProject
+		Dockerfile = Dockerfile
+		Jenkinsfile = Jenkinsfile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

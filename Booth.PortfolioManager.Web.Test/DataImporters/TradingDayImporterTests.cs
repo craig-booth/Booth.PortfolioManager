@@ -9,7 +9,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 
-using Booth.PortfolioManager.Domain.TradingCalanders;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.DataImporters;
 using System.Linq;
@@ -32,11 +32,11 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             var dataService = mockRepository.Create<ITradingDayService>();
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
-            var tradingCalanderService = mockRepository.Create<ITradingCalanderService>();
+            var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
 
             var logger = mockRepository.Create<ILogger<TradingDayImporter>>(MockBehavior.Loose);
 
-            var importer = new TradingDayImporter(tradingCalanderService.Object, dataService.Object, logger.Object);
+            var importer = new TradingDayImporter(tradingCalendarService.Object, dataService.Object, logger.Object);
             
             await importer.Import(cancellationToken);
 
@@ -59,12 +59,12 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             var dataService = mockRepository.Create<ITradingDayService>();
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
-            var tradingCalanderService = mockRepository.Create<ITradingCalanderService>();
-            tradingCalanderService.Setup(x => x.SetNonTradingDays(year, nonTradingDays)).Returns(ServiceResult.Ok());
+            var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
+            tradingCalendarService.Setup(x => x.SetNonTradingDays(year, nonTradingDays)).Returns(ServiceResult.Ok());
 
             var logger = mockRepository.Create<ILogger<TradingDayImporter>>(MockBehavior.Loose);
 
-            var importer = new TradingDayImporter(tradingCalanderService.Object, dataService.Object, logger.Object);
+            var importer = new TradingDayImporter(tradingCalendarService.Object, dataService.Object, logger.Object);
 
             await importer.Import(cancellationToken);
 
@@ -88,10 +88,10 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             var dataService = mockRepository.Create<ITradingDayService>();
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
-            var tradingCalanderService = mockRepository.Create<ITradingCalanderService>();
-            tradingCalanderService.Setup(x => x.SetNonTradingDays(year, nonTradingDays)).Returns(ServiceResult.Ok());
+            var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
+            tradingCalendarService.Setup(x => x.SetNonTradingDays(year, nonTradingDays)).Returns(ServiceResult.Ok());
 
-            var importer = new TradingDayImporter(tradingCalanderService.Object, dataService.Object, null);
+            var importer = new TradingDayImporter(tradingCalendarService.Object, dataService.Object, null);
 
             await importer.Import(cancellationToken);
         }

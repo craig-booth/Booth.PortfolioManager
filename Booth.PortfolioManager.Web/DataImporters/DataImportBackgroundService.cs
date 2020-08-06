@@ -20,13 +20,13 @@ namespace Booth.PortfolioManager.Web.DataImporters
         private readonly LivePriceImporter _LivePriceImporter;
         private readonly TradingDayImporter _TradingDayImporter;
 
-        public DataImportBackgroundService(Scheduler.Scheduler scheduler, HistoricalPriceImporter historicalPriceImporter, LivePriceImporter livePriceImporter, TradingDayImporter tradingDayImporter)
+        public DataImportBackgroundService(HistoricalPriceImporter historicalPriceImporter, LivePriceImporter livePriceImporter, TradingDayImporter tradingDayImporter)
         {
-            _Scheduler = scheduler;
             _HistoricalPriceImporter = historicalPriceImporter;
             _LivePriceImporter = livePriceImporter;
             _TradingDayImporter = tradingDayImporter;
 
+            _Scheduler = new Scheduler.Scheduler();
             _Scheduler.AddJob("Import Historical Prices", () => ImportHistoricalPrices(), Schedule.EveryDay().At(20, 00), DateTime.Now);
             _Scheduler.AddJob("Import Live Prices", () => ImportLivePrices(), Schedule.EveryWeek().OnWeekdays().EveryMinutes(5).From(9, 30).Until(17, 00), DateTime.Now);
             _Scheduler.AddJob("Import Trading Days", () => ImportTradingDays(), Schedule.EveryMonth().OnLastDay().At(18, 00), DateTime.Now);

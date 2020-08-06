@@ -12,18 +12,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json.Converters;
+using Microsoft.Extensions.Hosting;
 
 using Booth.EventStore;
 using Booth.EventStore.MongoDB;
+using Booth.Scheduler;
+using Booth.PortfolioManager.RestApi.Serialization;
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Domain.TradingCalendars;
+using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Authentication;
-using Booth.PortfolioManager.RestApi.Serialization;
+using Booth.PortfolioManager.Web.DataImporters;
+
 
 namespace Booth.PortfolioManager.Web
 {
@@ -50,20 +53,24 @@ namespace Booth.PortfolioManager.Web
             else
                 services.AddJwtAuthetication(jwtTokenConfigProvider);
 
-            services.AddScoped<IEventStore>(_ => new MongodbEventStore(settings.EventStore, settings.Database));
-            services.AddScoped<IEventStream<User>>(x => x.GetRequiredService<IEventStore>().GetEventStream<User>("Users"));
-            services.AddScoped<IEventStream<Stock>>(x => x.GetRequiredService<IEventStore>().GetEventStream<Stock>("Stocks"));
-            services.AddScoped<IEventStream<StockPriceHistory>>(x => x.GetRequiredService<IEventStore>().GetEventStream<StockPriceHistory>("StockPriceHistory"));
+            services.AddSingleton<IEventStore>(_ => new MongodbEventStore(settings.EventStore, settings.Database));
+            services.AddSingleton<IEventStream<User>>(x => x.GetRequiredService<IEventStore>().GetEventStream<User>("Users"));
+            services.AddSingleton<IEventStream<Stock>>(x => x.GetRequiredService<IEventStore>().GetEventStream<Stock>("Stocks"));
+            services.AddSingleton<IEventStream<StockPriceHistory>>(x => x.GetRequiredService<IEventStore>().GetEventStream<StockPriceHistory>("StockPriceHistory"));
+            services.AddSingleton<IEventStream<TradingCalendar>>(x => x.GetRequiredService<IEventStore>().GetEventStream<TradingCalendar>("TradingCalendar"));
 
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
             services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
-            services.AddScoped(typeof(IEntityFactory<>), typeof(DefaultEntityFactory<>));
-            services.AddScoped(typeof(ITrackedEntityFactory<>), typeof(DefaultTrackedEntityFactory<>));
+            services.AddSingleton(typeof(IEntityFactory<>), typeof(DefaultEntityFactory<>));
+            services.AddSingleton(typeof(ITrackedEntityFactory<>), typeof(DefaultTrackedEntityFactory<>));
 
-            services.AddScoped<IStockQuery, StockQuery>();
+            services.AddSingleton<ITradingCalendar>(x => x.GetRequiredService<IRepository<TradingCalendar>>().Get(TradingCalendarIds.ASX));
 
-            services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IStockService, StockService>();
+            services.AddSingleton<IStockQuery, StockQuery>();
+
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IStockService, StockService>();
+            services.AddSingleton<ITradingCalendarService>(x => new TradingCalendarService(x.GetRequiredService<IRepository<TradingCalendar>>(), TradingCalendarIds.ASX));
 
             return services;
         }
@@ -76,6 +83,20 @@ namespace Booth.PortfolioManager.Web
             }
 
             return app;
+        }
+        public static IServiceCollection AddDataImportService(this IServiceCollection services)
+        {
+            services.AddHttpClient<IHistoricalStockPriceService, AsxDataService>();
+            services.AddHttpClient<ILiveStockPriceService, AsxDataService>();
+            services.AddHttpClient<ITradingDayService, AsxDataService>();
+
+            services.AddSingleton<HistoricalPriceImporter>();
+            services.AddSingleton<LivePriceImporter>();
+            services.AddSingleton<TradingDayImporter>();
+
+            services.AddHostedService<DataImportBackgroundService>();
+
+            return services;
         }
 
         public static IServiceProvider InitializeStockCache(this IServiceProvider serviceProvider)

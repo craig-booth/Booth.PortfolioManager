@@ -5,7 +5,7 @@ using System.Linq;
 using Booth.Common;
 using Booth.EventStore;
 
-namespace Booth.PortfolioManager.Domain.TradingCalanders.Events
+namespace Booth.PortfolioManager.Domain.TradingCalendars.Events
 {
     public class NonTradingDaysSetEvent : Event
     {
@@ -24,7 +24,7 @@ namespace Booth.PortfolioManager.Domain.TradingCalanders.Events
             }
         }
 
-        public NonTradingDaysSetEvent(Guid entityId, int version, int year, IEnumerable<TradingCalanders.NonTradingDay> nonTradingDays)
+        public NonTradingDaysSetEvent(Guid entityId, int version, int year, IEnumerable<TradingCalendars.NonTradingDay> nonTradingDays)
             : base(entityId, version)
         {
             Year = year;

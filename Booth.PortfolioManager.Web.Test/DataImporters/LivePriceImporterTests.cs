@@ -11,7 +11,7 @@ using Moq;
 using FluentAssertions;
 
 using Booth.Common;
-using Booth.PortfolioManager.Domain.TradingCalanders;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.DataImporters;
 using Booth.PortfolioManager.Web.Services;

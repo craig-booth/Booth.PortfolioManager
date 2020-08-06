@@ -5,16 +5,16 @@ using System.Linq;
 using Booth.Common;
 using Booth.EventStore;
 
-using Booth.PortfolioManager.Domain.TradingCalanders.Events;
+using Booth.PortfolioManager.Domain.TradingCalendars.Events;
 
-namespace Booth.PortfolioManager.Domain.TradingCalanders
+namespace Booth.PortfolioManager.Domain.TradingCalendars
 {
-    public static class TradingCalanderIds
+    public static class TradingCalendarIds
     {
         public static Guid ASX => new Guid("712E464B-1CE6-4B21-8FB2-D679DFFE3EE3");
     }
 
-    public interface ITradingCalander
+    public interface ITradingCalendar
     {
         IEnumerable<NonTradingDay> NonTradingDays(int year);
         bool IsTradingDay(Date date);
@@ -23,11 +23,11 @@ namespace Booth.PortfolioManager.Domain.TradingCalanders
         void SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays);
     }
 
-    public class TradingCalander : TrackedEntity, ITradingCalander
+    public class TradingCalendar : TrackedEntity, ITradingCalendar
     {
         private List<NonTradingDay> _NonTradingDays = new List<NonTradingDay>();
 
-        public TradingCalander(Guid id)
+        public TradingCalendar(Guid id)
             : base(id)
         {
         }
@@ -37,7 +37,7 @@ namespace Booth.PortfolioManager.Domain.TradingCalanders
             // Check that each day is in the correct year
             var invalidDate = nonTradingDays.FirstOrDefault(x => x.Date.Year != year);
             if (invalidDate != null)
-                throw new ArgumentException(String.Format("Date {0} is not in calander year {1}", invalidDate, year));
+                throw new ArgumentException(String.Format("Date {0} is not in calendar year {1}", invalidDate, year));
 
             var @event = new NonTradingDaysSetEvent(Id, Version, year, nonTradingDays);
             Apply(@event);

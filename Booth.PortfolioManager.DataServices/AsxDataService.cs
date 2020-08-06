@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Xml.Linq;
 
 using Booth.Common;
-using Booth.PortfolioManager.Domain.TradingCalanders;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 
 namespace Booth.PortfolioManager.DataServices
 {

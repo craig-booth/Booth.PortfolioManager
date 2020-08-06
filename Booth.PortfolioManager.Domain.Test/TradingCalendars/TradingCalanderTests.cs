@@ -7,26 +7,26 @@ using FluentAssertions.Execution;
 
 using Booth.Common;
 using Booth.EventStore;
-using Booth.PortfolioManager.Domain.TradingCalanders;
-using Booth.PortfolioManager.Domain.TradingCalanders.Events;
+using Booth.PortfolioManager.Domain.TradingCalendars;
+using Booth.PortfolioManager.Domain.TradingCalendars.Events;
 
-namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
+namespace Booth.PortfolioManager.Domain.Test.TradingCalendars
 {
-    public class TradingCalanderTests
+    public class TradingCalendarTests
     {
 
         [Fact]
         public void SetNewTradingDays()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                 new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
             };
-            tradingCalander.SetNonTradingDays(2019, nonTradingDays);
+            tradingCalendar.SetNonTradingDays(2019, nonTradingDays);
 
-            var events = tradingCalander.FetchEvents().ToList();
+            var events = tradingCalendar.FetchEvents().ToList();
 
             events.Should().SatisfyRespectively(
 
@@ -40,14 +40,14 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
         [Fact]
         public void SetNewTradingDaysForInvalidYear()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                 new NonTradingDay(new Date(2020, 12, 25), "Christmas Day")
             };
 
-            Action a = () => tradingCalander.SetNonTradingDays(2019, nonTradingDays);
+            Action a = () => tradingCalendar.SetNonTradingDays(2019, nonTradingDays);
 
             a.Should().Throw<ArgumentException>();
         }
@@ -55,47 +55,47 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
         [Fact]
         public void ApplyNonTradingDaysSetEvent()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                 new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
             };
-            var @event = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
 
-            tradingCalander.ApplyEvents(new Event[] { @event });
+            tradingCalendar.ApplyEvents(new Event[] { @event });
 
             using (new AssertionScope())
             {
-                tradingCalander.IsTradingDay(new Date(2019, 01, 01)).Should().BeFalse();
-                tradingCalander.IsTradingDay(new Date(2019, 12, 25)).Should().BeFalse();
-                tradingCalander.IsTradingDay(new Date(2019, 01, 02)).Should().BeTrue();
+                tradingCalendar.IsTradingDay(new Date(2019, 01, 01)).Should().BeFalse();
+                tradingCalendar.IsTradingDay(new Date(2019, 12, 25)).Should().BeFalse();
+                tradingCalendar.IsTradingDay(new Date(2019, 01, 02)).Should().BeTrue();
             }
         }
 
         [Fact]
         public void ApplyNonTradingDaysSetEventReplaceExisting()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                 new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
             };
-            var @event1 = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
+            var @event1 = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
 
             var nonTradingDays2 = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 02), "Still Hungover")
             };
-            var @event2 = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays2);
+            var @event2 = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays2);
 
-            tradingCalander.ApplyEvents(new Event[] { @event1, @event2 });
+            tradingCalendar.ApplyEvents(new Event[] { @event1, @event2 });
 
             using (new AssertionScope())
             { 
-                tradingCalander.IsTradingDay(new Date(2019, 01, 01)).Should().BeTrue();
-                tradingCalander.IsTradingDay(new Date(2019, 12, 25)).Should().BeTrue();
-                tradingCalander.IsTradingDay(new Date(2019, 01, 02)).Should().BeFalse();
+                tradingCalendar.IsTradingDay(new Date(2019, 01, 01)).Should().BeTrue();
+                tradingCalendar.IsTradingDay(new Date(2019, 12, 25)).Should().BeTrue();
+                tradingCalendar.IsTradingDay(new Date(2019, 01, 02)).Should().BeFalse();
             }
         }
 
@@ -103,75 +103,75 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalanders
         [Fact]
         public void RetriveNonTradingDaysForYear()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                     new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                     new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
                 };
-            tradingCalander.SetNonTradingDays(2019, nonTradingDays);
+            tradingCalendar.SetNonTradingDays(2019, nonTradingDays);
 
-            tradingCalander.NonTradingDays(2019).Should().HaveCount(2);
+            tradingCalendar.NonTradingDays(2019).Should().HaveCount(2);
         }
 
         [Fact]
         public void RetriveNonTradingDaysForYearWithNoData()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                     new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                     new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
                 };
-            tradingCalander.SetNonTradingDays(2019, nonTradingDays);
+            tradingCalendar.SetNonTradingDays(2019, nonTradingDays);
 
-            tradingCalander.NonTradingDays(2020).Should().BeEmpty();
+            tradingCalendar.NonTradingDays(2020).Should().BeEmpty();
         }
 
         [Fact]
         public void CheckIfDateIsATradingDayReturnTrue()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                 new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
             };
-            var @event = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
 
-            tradingCalander.ApplyEvents(new Event[] { @event });
+            tradingCalendar.ApplyEvents(new Event[] { @event });
 
-            tradingCalander.IsTradingDay(new Date(2019, 01, 02)).Should().BeTrue();
+            tradingCalendar.IsTradingDay(new Date(2019, 01, 02)).Should().BeTrue();
         }
 
         [Fact]
         public void CheckIfDateIsAtradingDayReturnFalse()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                 new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                 new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
             };
-            var @event = new NonTradingDaysSetEvent(tradingCalander.Id, 0, 2019, nonTradingDays);
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
 
-            tradingCalander.ApplyEvents(new Event[] { @event });
+            tradingCalendar.ApplyEvents(new Event[] { @event });
 
-            tradingCalander.IsTradingDay(new Date(2019, 01, 01)).Should().BeFalse();
+            tradingCalendar.IsTradingDay(new Date(2019, 01, 01)).Should().BeFalse();
         }
 
         [Fact]
         public void EnumerateTradingDays()
         {
-            var tradingCalander = new TradingCalander(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
 
             var nonTradingDays = new NonTradingDay[] {
                     new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
                     new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
                 };
-            tradingCalander.SetNonTradingDays(2019, nonTradingDays);
+            tradingCalendar.SetNonTradingDays(2019, nonTradingDays);
 
-            var tradingDays = tradingCalander.TradingDays(new DateRange(new Date(2019, 01, 01), new Date(2019, 01, 10))).ToList();
+            var tradingDays = tradingCalendar.TradingDays(new DateRange(new Date(2019, 01, 01), new Date(2019, 01, 10))).ToList();
 
             tradingDays.Should().HaveCount(7).And.BeInAscendingOrder().And.OnlyHaveUniqueItems();           
         }
