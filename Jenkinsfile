@@ -35,12 +35,17 @@ pipeline {
 				}
 			}
         }
-		stage('Deploy') {
+		stage('Publish') {
 			steps {
 				sh "dotnet publish ${PROJECT} --configuration Release --output ./deploy"
-
-				def dockerImage = docker.build("craigbooth/portfoliomanager")
-				dockerImage.push();
+            }
+		}
+		stage('Deploy') {
+			steps {
+				script {
+					def dockerImage = docker.build("craigbooth/portfoliomanager")
+					dockerImage.push()
+				}
             }
 		}
     }
