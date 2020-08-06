@@ -2,7 +2,7 @@ pipeline {
     agent { docker 'mcr.microsoft.com/dotnet/core/sdk:3.1' }
 	
 	environment {
-		PROJECT      = './Booth.PortfolioManager.PortfolioManager/Booth.PortfolioManager.Web.csproj'
+		PROJECT      = './Booth.PortfolioManager.PortfolioManager.Web/Booth.PortfolioManager.Web.csproj'
 		TEST_PROJECT1 = './Booth.PortfolioManager.PortfolioManager.Domain.Test/Booth.PortfolioManager.Domain.Test.csproj'
         TEST_PROJECT2 = './Booth.PortfolioManager.PortfolioManager.DataServices.Test/Booth.PortfolioManager.DataServices.Test.csproj'
 		TEST_PROJECT3 = './Booth.PortfolioManager.PortfolioManager.Web.Test/Booth.PortfolioManager.Web.Test.csproj'
