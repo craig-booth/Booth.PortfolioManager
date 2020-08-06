@@ -1,5 +1,7 @@
 pipeline {
     	
+	agent any
+
 	environment {
 		PROJECT      = './Booth.PortfolioManager.Web/Booth.PortfolioManager.Web.csproj'
 		TEST_PROJECT1 = './Booth.PortfolioManager.Domain.Test/Booth.PortfolioManager.Domain.Test.csproj'
