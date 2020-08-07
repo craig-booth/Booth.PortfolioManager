@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +12,6 @@ using FluentAssertions;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.DataImporters;
-using System.Linq;
 using Booth.PortfolioManager.Web.Services;
 
 namespace Booth.PortfolioManager.Web.Test.DataImporters

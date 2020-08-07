@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 
@@ -32,9 +34,21 @@ namespace Booth.PortfolioManager.Web.Authentication
             Issuer = issuer;
             Audience = audience;
 
-            var base64Key = System.IO.File.ReadAllText(keyFile);
-            var key = Convert.FromBase64String(base64Key);
+            byte[] key;
+            if (File.Exists(keyFile))
+            {
+                var base64Key = File.ReadAllText(keyFile);
+                key = Convert.FromBase64String(base64Key);
+            }
+            else
+            {
+                key = new HMACSHA256().Key;
+                var base64Key = Convert.ToBase64String(key);
+                File.WriteAllText(keyFile, base64Key);
+            }
+
             Key = new SymmetricSecurityKey(key);
+
         }
     }
 }

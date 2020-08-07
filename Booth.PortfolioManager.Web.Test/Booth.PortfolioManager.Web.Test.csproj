@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -17,6 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Booth.PortfolioManager.DataServices\Booth.PortfolioManager.DataServices.csproj" />
+    <ProjectReference Include="..\Booth.PortfolioManager.Domain\Booth.PortfolioManager.Domain.csproj" />
     <ProjectReference Include="..\Booth.PortfolioManager.Web\Booth.PortfolioManager.Web.csproj" />
   </ItemGroup>
 

@@ -39,7 +39,7 @@ namespace Booth.PortfolioManager.Web
             services.AddTransient<IConfigureOptions<MvcNewtonsoftJsonOptions>, RestApiMvcJsonOptions>(); 
 
             IJwtTokenConfigurationProvider jwtTokenConfigProvider;
-            if (settings.JwtTokenConfiguration.Key != "")
+            if ((settings.JwtTokenConfiguration.Key != null) && (settings.JwtTokenConfiguration.Key != ""))
             {
                 var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(settings.JwtTokenConfiguration.Key));
                 jwtTokenConfigProvider = new JwtTokenConfigurationProvider(settings.JwtTokenConfiguration.Issuer, settings.JwtTokenConfiguration.Audience, key);
@@ -60,17 +60,15 @@ namespace Booth.PortfolioManager.Web
             services.AddSingleton<IEventStream<TradingCalendar>>(x => x.GetRequiredService<IEventStore>().GetEventStream<TradingCalendar>("TradingCalendar"));
 
             services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
-            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
-            services.AddSingleton(typeof(IEntityFactory<>), typeof(DefaultEntityFactory<>));
-            services.AddSingleton(typeof(ITrackedEntityFactory<>), typeof(DefaultTrackedEntityFactory<>));
-
-            services.AddSingleton<ITradingCalendar>(x => x.GetRequiredService<IRepository<TradingCalendar>>().Get(TradingCalendarIds.ASX));
+            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));       
 
             services.AddSingleton<IStockQuery, StockQuery>();
 
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IStockService, StockService>();
             services.AddSingleton<ITradingCalendarService>(x => new TradingCalendarService(x.GetRequiredService<IRepository<TradingCalendar>>(), TradingCalendarIds.ASX));
+
+            services.AddSingleton<ITradingCalendar>(x => x.GetRequiredService<ITradingCalendarService>().TradingCalendar);
 
             return services;
         }

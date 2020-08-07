@@ -5,5 +5,7 @@ RUN apk add --update tzdata
 WORKDIR /app
 COPY /deploy ./WebAPI
 
+RUN mkdir ./WebAPI/config
+
 WORKDIR /app/WebAPI
-ENTRYPOINT ["dotnet", "PortfolioManager.Web.dll"]
+ENTRYPOINT ["dotnet", "Booth.PortfolioManager.Web.dll"]

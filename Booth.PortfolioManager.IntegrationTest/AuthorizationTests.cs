@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Text;
 using System.Net;
-using System.Net.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
-using Booth.PortfolioManager.RestApi.Users;
-using System.Net.Http.Json;
-using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using System.Security;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using Xunit;
 using FluentAssertions;
@@ -20,13 +16,11 @@ using FluentAssertions;
 using Booth.Common;
 using Booth.EventStore;
 using Booth.EventStore.Memory;
-using Booth.PortfolioManager.Domain.Users;
-using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web;
 using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Stocks;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Booth.PortfolioManager.Domain.Users;
+using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {

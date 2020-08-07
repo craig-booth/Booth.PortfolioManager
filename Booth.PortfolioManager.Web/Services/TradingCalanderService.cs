@@ -21,10 +21,19 @@ namespace Booth.PortfolioManager.Web.Services
 
         public ITradingCalendar TradingCalendar => _TradingCalendar;
 
-        public TradingCalendarService(IRepository<TradingCalendar> repository, Guid CalendarId)
+        public TradingCalendarService(IRepository<TradingCalendar> repository, Guid calendarId)
         {
             _Repository = repository;
-            _TradingCalendar = _Repository.Get(CalendarId);
+
+            try
+            {
+                _TradingCalendar = _Repository.Get(calendarId);
+            }
+            catch
+            {
+                _TradingCalendar = new TradingCalendar(calendarId);
+            }
+            
         }
 
         public ServiceResult SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays)
