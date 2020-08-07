@@ -13,7 +13,10 @@ pipeline {
 
     stages {
 		stage('Build') {
-			agent { docker 'mcr.microsoft.com/dotnet/core/sdk:3.1' }
+			agent { 
+				docker 'mcr.microsoft.com/dotnet/core/sdk:3.1' 
+				reuseNode true
+			}
 
 			stages {
 				stage('Build') {
