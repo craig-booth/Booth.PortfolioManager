@@ -58,7 +58,6 @@ pipeline {
 			steps {
 				script {
 					def dockerImage = docker.build("craigbooth/portfoliomanager")
-					dockerImage.push()
 				}
             }
 		}
