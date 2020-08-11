@@ -53,21 +53,28 @@ namespace Booth.PortfolioManager.Web
             else
                 services.AddJwtAuthetication(jwtTokenConfigProvider);
 
+            // Generic classes
+            services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
+            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
+
+            // Event Store
             services.AddSingleton<IEventStore>(_ => new MongodbEventStore(settings.EventStore, settings.Database));
             services.AddSingleton<IEventStream<User>>(x => x.GetRequiredService<IEventStore>().GetEventStream<User>("Users"));
             services.AddSingleton<IEventStream<Stock>>(x => x.GetRequiredService<IEventStore>().GetEventStream<Stock>("Stocks"));
             services.AddSingleton<IEventStream<StockPriceHistory>>(x => x.GetRequiredService<IEventStore>().GetEventStream<StockPriceHistory>("StockPriceHistory"));
             services.AddSingleton<IEventStream<TradingCalendar>>(x => x.GetRequiredService<IEventStore>().GetEventStream<TradingCalendar>("TradingCalendar"));
 
-            services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
-            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));       
+            // Entity Factories
+            services.AddSingleton<ITrackedEntityFactory<Stock>, StockEntityFactory>();
 
-            services.AddSingleton<IStockQuery, StockQuery>();
-
+            // Services
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IStockService, StockService>();
             services.AddSingleton<ITradingCalendarService>(x => new TradingCalendarService(x.GetRequiredService<IRepository<TradingCalendar>>(), TradingCalendarIds.ASX));
 
+
+            // Others
+            services.AddSingleton<IStockQuery, StockQuery>();
             services.AddSingleton<ITradingCalendar>(x => x.GetRequiredService<ITradingCalendarService>().TradingCalendar);
 
             return services;

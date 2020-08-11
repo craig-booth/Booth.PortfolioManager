@@ -15,6 +15,20 @@ namespace Booth.PortfolioManager.Domain.Stocks.Events
         public AssetCategory Category { get; set; }
         public StapledSecurityChild[] ChildSecurities { get; set; }
 
+        public class StapledSecurityChild
+        {
+            public string ASXCode { get; set; }
+            public string Name { get; set; }
+            public bool Trust { get; set; }
+
+            public StapledSecurityChild(string asxCode, string name, bool trust)
+            {
+                ASXCode = asxCode;
+                Name = name;
+                Trust = trust;
+            }
+        }
+
         public StapledSecurityListedEvent(Guid entityId, int version, string asxCode, string name, Date listingDate, AssetCategory category, StapledSecurityChild[] childSecurities)
             : base(entityId, version)
         {

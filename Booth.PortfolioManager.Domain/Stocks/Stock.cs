@@ -208,7 +208,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             return _Events.Fetch();
         }
 
-        public void ApplyEvents(IEnumerable<Event> events)
+        public virtual void ApplyEvents(IEnumerable<Event> events)
         {
             foreach (var @event in events)
             {

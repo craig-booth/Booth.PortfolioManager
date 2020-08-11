@@ -35,7 +35,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public void List(string asxCode, string name, Date date, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
         {
-            var @event = new StapledSecurityListedEvent(Id, Version, asxCode, name, date, category, childSecurities?.ToArray());
+            var children = childSecurities.Select(x => new StapledSecurityListedEvent.StapledSecurityChild(x.AsxCode, x.Name, x.Trust)).ToArray();
+            
+            var @event = new StapledSecurityListedEvent(Id, Version, asxCode, name, date, category, children);
             Apply(@event);
 
             PublishEvent(@event);
@@ -52,7 +54,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
             _ChildSecurities = new StapledSecurityChild[@event.ChildSecurities.Length];
             for (var i = 0; i < @event.ChildSecurities.Length; i++)
-                _ChildSecurities[i] = new StapledSecurityChild(@event.ChildSecurities[i].AsxCode, @event.ChildSecurities[i].Name, @event.ChildSecurities[i].Trust);
+                _ChildSecurities[i] = new StapledSecurityChild(@event.ChildSecurities[i].ASXCode, @event.ChildSecurities[i].Name, @event.ChildSecurities[i].Trust);
             
             var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DrpMethod.Round);
             _DividendRules.Change(@event.ListingDate, dividendRules);
@@ -99,7 +101,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _RelativeNTAs.Change(@event.Date, new RelativeNTA(@event.Percentages));
         }
 
-        public new void ApplyEvents(IEnumerable<Event> events)
+        public override void ApplyEvents(IEnumerable<Event> events)
         {
             foreach (var @event in events)
             {

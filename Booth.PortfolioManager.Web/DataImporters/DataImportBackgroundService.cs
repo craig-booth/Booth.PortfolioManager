@@ -14,6 +14,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
 {
     class DataImportBackgroundService : BackgroundService
     {
+        private CancellationToken _CancellationToken;
         private Scheduler.Scheduler _Scheduler;
 
         private readonly HistoricalPriceImporter _HistoricalPriceImporter;
@@ -34,6 +35,8 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            _CancellationToken = stoppingToken;
+
             _Scheduler.Start();
 
             await Task.Delay(-1, stoppingToken);
@@ -43,19 +46,19 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         private void ImportHistoricalPrices()
         {
-            var importTask = _HistoricalPriceImporter.Import(CancellationToken.None);
+            var importTask = _HistoricalPriceImporter.Import(_CancellationToken);
             importTask.Wait();
         }
 
         private void ImportLivePrices()
         {
-            var importTask = _LivePriceImporter.Import(CancellationToken.None);
+            var importTask = _LivePriceImporter.Import(_CancellationToken);
             importTask.Wait();
         }
 
         private void ImportTradingDays()
         {
-            var importTask = _TradingDayImporter.Import(CancellationToken.None);
+            var importTask = _TradingDayImporter.Import(_CancellationToken);
             importTask.Wait();
         }
     }
