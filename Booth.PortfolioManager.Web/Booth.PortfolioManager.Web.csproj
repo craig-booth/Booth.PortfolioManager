@@ -17,11 +17,11 @@
     <PackageReference Include="Booth.Common" Version="1.0.8" />
     <PackageReference Include="Booth.EventStore" Version="1.0.3" />
     <PackageReference Include="Booth.EventStore.MongoDB" Version="1.0.2" />
-    <PackageReference Include="Booth.PortfolioManager.RestApi" Version="1.0.5" />
+    <PackageReference Include="Booth.PortfolioManager.RestApi" Version="1.0.9" />
     <PackageReference Include="Booth.Scheduler" Version="1.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.7" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.7" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
   </ItemGroup>
 

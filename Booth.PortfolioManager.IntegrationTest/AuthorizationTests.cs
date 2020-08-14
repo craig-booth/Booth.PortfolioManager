@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using System.Security;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -27,18 +26,9 @@ namespace Booth.PortfolioManager.IntegrationTest
     public class AuthorizationTests  : IClassFixture<AppTestFixture>
     {
         private AppTestFixture _Fixture;
-        private SecureString _Password;
         public AuthorizationTests(AppTestFixture fixture)
         {
-            _Fixture = fixture;
-            
-            _Password = new SecureString();
-            _Password.AppendChar('s');
-            _Password.AppendChar('e');
-            _Password.AppendChar('c');
-            _Password.AppendChar('r');
-            _Password.AppendChar('e');
-            _Password.AppendChar('t');
+            _Fixture = fixture;         
         }
 
         [Fact]
@@ -55,7 +45,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         public async void StandardUserHasReadAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate("StandardUser", _Password);
+            await client.Authenticate("StandardUser", "secret");
 
             var response = await client.Stocks.Get(StockId.BHP);
 
@@ -66,7 +56,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         public async void StandardUserShouldNotHaveUpdateAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate("StandardUser", _Password);
+            await client.Authenticate("StandardUser", "secret");
 
             var command = new ChangeStockCommand()
             {
@@ -85,7 +75,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         public async void AdminUserHasUpdateAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate("AdminUser", _Password);
+            await client.Authenticate("AdminUser", "secret");
 
             var command = new ChangeStockCommand()
             {
