@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.RestApi.Stocks;
@@ -32,6 +33,21 @@ namespace Booth.PortfolioManager.Web.Mappers
                 DividendRoundingRule = dividendRules.DividendRoundingRule,
                 DrpActive = dividendRules.DrpActive,
                 DrpMethod = dividendRules.DrpMethod.ToResponse()
+            };
+
+            return result;
+        }
+
+        public static RestApi.Portfolios.Stock ToSummaryResponse(this IReadOnlyStock stock, Date date)
+        {
+            var stockProperties = stock.Properties.ClosestTo(date);    
+
+            var result = new RestApi.Portfolios.Stock()
+            {
+                Id = stock.Id,
+                AsxCode = stockProperties.AsxCode,
+                Name = stockProperties.Name,
+                Category = stockProperties.Category.ToResponse()
             };
 
             return result;
@@ -74,25 +90,6 @@ namespace Booth.PortfolioManager.Web.Mappers
                 result.AddClosingPrice(price.Date, price.Price);
 
             return result;
-        }
-
-        public static RestApi.Stocks.AssetCategory ToResponse(this Domain.Stocks.AssetCategory assetCategory)
-        {
-            return (RestApi.Stocks.AssetCategory)assetCategory;
-        }
-
-        public static Domain.Stocks.AssetCategory ToDomain(this RestApi.Stocks.AssetCategory assetCategory)
-        {
-            return (Domain.Stocks.AssetCategory)assetCategory;
-        }
-
-        public static RestApi.Stocks.DrpMethod ToResponse(this Domain.Stocks.DrpMethod method)
-        {
-            return (RestApi.Stocks.DrpMethod)method;
-        }
-        public static Domain.Stocks.DrpMethod ToDomain(this RestApi.Stocks.DrpMethod method)
-        {
-            return (Domain.Stocks.DrpMethod)method;
         }
     }
 }

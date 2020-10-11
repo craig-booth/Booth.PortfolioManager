@@ -9,9 +9,9 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    static class PortfolioReturnCalculation
+    public static class PortfolioReturnCalculation
     {
-        public static decimal CalculateIRR(this IPortfolio portfolio, DateRange dateRange)
+        public static decimal CalculateIRR(this IReadOnlyPortfolio portfolio, DateRange dateRange)
         {
             // Get the initial portfolio value         
             var initialHoldings = portfolio.Holdings.All(dateRange.FromDate);

@@ -11,27 +11,18 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class SplitConsolidation : ICorporateAction
+    public class SplitConsolidation : CorporateAction
     {
-        public Guid Id { get; private set; }
-        public IReadOnlyStock Stock { get; private set; }
-        public Date Date { get; private set; }
-        public CorporateActionType Type { get; private set; }
-        public string Description { get; private set; }
         public int OriginalUnits { get; private set; }
         public int NewUnits { get; private set; }
         internal SplitConsolidation(Guid id, IReadOnlyStock stock, Date actionDate, string description, int originalUnits, int newUnits)
+            : base(id, stock, actionDate, description)
         {
-            Id = id;
-            Stock = stock;
-            Date = actionDate;
-            Type = CorporateActionType.SplitConsolidation;
-            Description = description;
             OriginalUnits = originalUnits;
             NewUnits = newUnits;
         }
 
-        public IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
+        public override IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
         {
             var transactions = new List<IPortfolioTransaction>();
 
@@ -55,7 +46,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             return transactions;
         }
 
-        public bool HasBeenApplied(IPortfolioTransactionList transactions)
+        public override bool HasBeenApplied(IPortfolioTransactionList transactions)
         {
             return transactions.ForHolding(Stock.Id, Date).OfType<UnitCountAdjustment>().Any();
         }

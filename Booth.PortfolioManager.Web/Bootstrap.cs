@@ -4,22 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authorization;
 
 using Booth.EventStore;
 using Booth.EventStore.MongoDB;
-using Booth.Scheduler;
 using Booth.PortfolioManager.RestApi.Serialization;
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
@@ -48,6 +46,8 @@ namespace Booth.PortfolioManager.Web
                 jwtTokenConfigProvider = new JwtTokenConfigurationProvider(settings.JwtTokenConfiguration.Issuer, settings.JwtTokenConfiguration.Audience, settings.JwtTokenConfiguration.KeyFile);
             services.AddSingleton<IJwtTokenConfigurationProvider>(jwtTokenConfigProvider);
 
+            services.AddScoped<IAuthorizationHandler, PortfolioOwnerAuthorizationHandler>();
+
             if (settings.AllowDebugUserAcccess)
                 services.AddAnonymousAuthetication();
             else
@@ -55,7 +55,7 @@ namespace Booth.PortfolioManager.Web
 
             // Generic classes
             services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
-            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
+            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>)); 
 
             // Event Store
             services.AddSingleton<IEventStore>(_ => new MongodbEventStore(settings.EventStore, settings.Database));
@@ -63,17 +63,24 @@ namespace Booth.PortfolioManager.Web
             services.AddSingleton<IEventStream<Stock>>(x => x.GetRequiredService<IEventStore>().GetEventStream<Stock>("Stocks"));
             services.AddSingleton<IEventStream<StockPriceHistory>>(x => x.GetRequiredService<IEventStore>().GetEventStream<StockPriceHistory>("StockPriceHistory"));
             services.AddSingleton<IEventStream<TradingCalendar>>(x => x.GetRequiredService<IEventStore>().GetEventStream<TradingCalendar>("TradingCalendar"));
+            services.AddSingleton<IEventStream<Portfolio>>(x => x.GetRequiredService<IEventStore>().GetEventStream<Portfolio>("Portfolios"));
 
             // Entity Factories
             services.AddSingleton<ITrackedEntityFactory<Stock>, StockEntityFactory>();
+            services.AddSingleton<ITrackedEntityFactory<Portfolio>, PortfolioEntityFactory>();
 
             // Services
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IStockService, StockService>();
             services.AddSingleton<ITradingCalendarService>(x => new TradingCalendarService(x.GetRequiredService<IRepository<TradingCalendar>>(), TradingCalendarIds.ASX));
-
+            services.AddScoped<IPortfolioPropertiesService, PortfolioPropertiesService>();
 
             // Others
+            services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().ReadOnlyPortfolio);
+            services.AddScoped<IPortfolioAccessor, PortfolioAccessor>();
+            services.AddSingleton<IPortfolioFactory, PortfolioFactory>();
+            services.AddSingleton<IPortfolioCache, PortfolioCache>();
+            services.AddSingleton<IStockResolver, StockResolver>();
             services.AddSingleton<IStockQuery, StockQuery>();
             services.AddSingleton<ITradingCalendar>(x => x.GetRequiredService<ITradingCalendarService>().TradingCalendar);
 
@@ -163,7 +170,7 @@ namespace Booth.PortfolioManager.Web
     }
 
 
-    public class RestApiMvcJsonOptions : IConfigureOptions<MvcNewtonsoftJsonOptions>
+    class RestApiMvcJsonOptions : IConfigureOptions<MvcNewtonsoftJsonOptions>
     {
         public void Configure(MvcNewtonsoftJsonOptions options)
         {

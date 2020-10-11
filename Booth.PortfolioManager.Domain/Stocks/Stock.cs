@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
     public interface IReadOnlyStock : IEffectiveEntity
     {
-        ITransactionList<ICorporateAction> CorporateActions { get; }
+        ITransactionList<CorporateAction> CorporateActions { get; }
         IEffectiveProperties<DividendRules> DividendRules { get; }
         IEffectiveProperties<StockProperties> Properties { get; }
         bool Trust { get; }
@@ -56,7 +56,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
         protected CorporateActionList _CorporateActions;
         public ICorporateActionList CorporateActions => _CorporateActions;
 
-        ITransactionList<ICorporateAction> IReadOnlyStock.CorporateActions => _CorporateActions;
+        ITransactionList<CorporateAction> IReadOnlyStock.CorporateActions => _CorporateActions;
 
         public Stock(Guid id)
             : base(id)

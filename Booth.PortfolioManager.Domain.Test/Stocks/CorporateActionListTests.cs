@@ -41,7 +41,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.CapitalReturn,
                     Description = "Test Capital Return",
                     PaymentDate = new Date(2000, 02, 01),
                     Amount = 10.00m
@@ -75,7 +74,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.CapitalReturn,
                     Description = "Capital Return $10.00",
                     PaymentDate = new Date(2000, 02, 01),
                     Amount = 10.00m
@@ -109,7 +107,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.CapitalReturn,
                     Description = "Test Capital Return",
                     PaymentDate = new Date(2000, 02, 01),
                     Amount = 10.00m
@@ -145,7 +142,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                         Id = id,
                         Stock = stock,
                         Date = new Date(2000, 01, 01),
-                        Type = CorporateActionType.Composite,
                         Description = "Test Composite Action"
                     });
                     first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().BeEmpty();
@@ -181,7 +177,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                         Id = id,
                         Stock = stock,
                         Date = new Date(2000, 01, 01),
-                        Type = CorporateActionType.Composite,
                         Description = "Complex corporate action"
                     });
                     first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().BeEmpty();
@@ -220,7 +215,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                         Id = id,
                         Stock = stock,
                         Date = new Date(2000, 01, 01),
-                        Type = CorporateActionType.Composite,
                         Description = "Test CompositeAction"
                     });
                     first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().SatisfyRespectively(
@@ -260,14 +254,12 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                         Id = id,
                         Stock = stock,
                         Date = new Date(2000, 01, 01),
-                        Type = CorporateActionType.Composite,
                         Description = "Test Complex Action"
                     });
                     first.Should().BeOfType<CompositeAction>().Which.ChildActions.Should().SatisfyRespectively(
                         child1 => child1.Should().BeOfType<SplitConsolidation>().Which.Should().BeEquivalentTo(new 
                         { 
                             Date = new Date(2000, 01, 01), 
-                            Type = CorporateActionType.SplitConsolidation,
                             Description = "Test Split",
                             OriginalUnits = 1,
                             NewUnits = 2
@@ -304,7 +296,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.Dividend,
                     Description = "Test Dividend",
                     PaymentDate = new Date(2000, 02, 01),
                     DividendAmount = 1.20m,
@@ -340,7 +331,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.Dividend,
                     Description = "Dividend $1.20",
                     PaymentDate = new Date(2000, 02, 01),
                     DividendAmount = 1.20m,
@@ -376,7 +366,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.Dividend,
                     Description = "Test Dividend",
                     PaymentDate = new Date(2000, 02, 01),
                     DividendAmount = 1.20m,
@@ -412,7 +401,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.SplitConsolidation,
                     Description = "Test Split",
                     OriginalUnits = 1,
                     NewUnits = 2
@@ -446,7 +434,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.SplitConsolidation,
                     Description = "1 for 2 Stock Split",
                     OriginalUnits = 1,
                     NewUnits = 2
@@ -480,7 +467,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.SplitConsolidation,
                     Description = "Test Split",
                     OriginalUnits = 1,
                     NewUnits = 2
@@ -520,7 +506,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.Transformation,
                     Description = "Test Transformation",
                     CashComponent = 1.20M,
                     RolloverRefliefApplies = false
@@ -560,7 +545,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                     Id = id,
                     Stock = stock,
                     Date = new Date(2000, 01, 01),
-                    Type = CorporateActionType.Transformation,
                     Description = "Transformation",
                     CashComponent = 1.20M,
                     RolloverRefliefApplies = false
@@ -601,7 +585,6 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
                         Id = id,
                         Stock = stock,
                         Date = new Date(2000, 01, 01),
-                        Type = CorporateActionType.Transformation,
                         Description = "Test Transformation",
                         CashComponent = 1.20M,
                         RolloverRefliefApplies = false

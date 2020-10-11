@@ -6,24 +6,29 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
 using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Authentication
 {
     public class PortfolioOwnerRequirement : IAuthorizationRequirement { }
 
-    public class PortfolioOwnerAuthorizationHandler : AuthorizationHandler<PortfolioOwnerRequirement, Portfolio>
+    class PortfolioOwnerAuthorizationHandler : AuthorizationHandler<PortfolioOwnerRequirement>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
-                                                        PortfolioOwnerRequirement requirement,
-                                                        Portfolio resource)
-        {
+        private readonly IReadOnlyPortfolio _Portfolio;
 
-            if (context.User.Identity.IsAuthenticated)
+        public PortfolioOwnerAuthorizationHandler(IPortfolioAccessor portfolioAccessor)
+        {
+            _Portfolio = portfolioAccessor.ReadOnlyPortfolio;
+        }
+
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PortfolioOwnerRequirement requirement)
+        {
+            if ((_Portfolio != null) && (context.User.Identity.IsAuthenticated))
             {
                 var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
 
                 var userId = new Guid(userIdClaim.Value);
-                if (resource.Owner == userId)
+                if (_Portfolio.Owner == userId)
                     context.Succeed(requirement);
             }
 

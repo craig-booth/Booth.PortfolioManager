@@ -11,32 +11,23 @@ using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.CorporateActions
 {
-    public class Dividend : ICorporateAction
+    public class Dividend : CorporateAction
     {
-        public Guid Id { get; private set; }
-        public IReadOnlyStock Stock { get; private set; }
-        public Date Date { get; private set; }
-        public CorporateActionType Type { get; private set; }
-        public string Description { get; private set; }
         public Date PaymentDate { get; private set; }
         public decimal DividendAmount { get; private set; }
         public decimal PercentFranked { get; private set; }
         public decimal DrpPrice { get; private set; }
 
         internal Dividend(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
+            : base(id, stock, actionDate, description)
         {
-            Id = id;
-            Stock = stock;
-            Date = actionDate;
-            Type = CorporateActionType.Dividend;
-            Description = description;
             PaymentDate = paymentDate;
             DividendAmount = dividendAmount;
             PercentFranked = percentFranked;
             DrpPrice = drpPrice;
         }
 
-        public IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
+        public override IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)
         {
             var transactions = new List<IPortfolioTransaction>();
 
@@ -122,7 +113,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             return transactions;
         }
 
-        public bool HasBeenApplied(IPortfolioTransactionList transactions)
+        public override bool HasBeenApplied(IPortfolioTransactionList transactions)
         {
             return transactions.ForHolding(Stock.Id, PaymentDate).OfType<IncomeReceived>().Any();
         }

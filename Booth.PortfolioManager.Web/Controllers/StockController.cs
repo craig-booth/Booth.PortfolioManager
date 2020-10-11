@@ -44,7 +44,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             {
                 if (date != null)
                 {
-                    resultDate = DateFromParameter(date, Date.Today);
+                    resultDate = DateFromParameter(date);
                     stocks = _StockQuery.All(resultDate);
                 }
                 else if ((fromDate != null) || (toDate != null))
@@ -64,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             {
                 if (date != null)
                 {
-                    resultDate = DateFromParameter(date, Date.Today);
+                    resultDate = DateFromParameter(date);
                     stocks = _StockQuery.Find(resultDate, x => MatchesQuery(x, query));
                 }
                 else if ((fromDate != null) || (toDate != null))
@@ -293,18 +293,14 @@ namespace Booth.PortfolioManager.Web.Controllers
             return ((stock.AsxCode.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) || (stock.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0));
         }
 
-        private Date DateFromParameter(DateTime? date, Date defaultDate)
+        private Date DateFromParameter(DateTime? date)
         {
-            return date == null ? default : new Date(date!.Value);
+            return date == null ? Date.Today : new Date(date!.Value);
         }
         private DateRange DateRangeFromParameter(DateTime? fromDate, DateTime? toDate)
         {
             return new DateRange((fromDate != null) ? new Date(fromDate!.Value) : Date.MinValue, (toDate != null) ? new Date(toDate!.Value) : Date.MaxValue);
         }
 
-        private DateRange DateRangeFromParameter(DateTime? fromDate, Date defaultFromDate, DateTime? toDate, Date defaultToDate)
-        {
-            return new DateRange((fromDate != null) ? new Date(fromDate!.Value) : Date.MinValue, (toDate != null) ? new Date(toDate!.Value) : Date.MaxValue);
-        }
     }
 }

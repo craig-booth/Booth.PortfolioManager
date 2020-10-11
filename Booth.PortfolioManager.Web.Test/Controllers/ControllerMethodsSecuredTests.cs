@@ -13,6 +13,8 @@ using System.Linq;
 using FluentAssertions.Common;
 using FluentAssertions.Execution;
 
+using Booth.PortfolioManager.Web.Authentication;
+
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {
     public class ControllerMethodsSecuredTests
@@ -21,10 +23,9 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         [Fact]
         public void AllControllerMethodsShouldRequireAuthentication()
         {
-
             var controllers = TypeUtils.GetSubclassesOf(typeof(ControllerBase), true)
                 .Where(x => x.Assembly.GetName().Name.StartsWith("Booth.PortfolioManager.Web"))
-                .Where(x => ! x.IsDecoratedWith<AuthorizeAttribute>());
+                .Where(x => !x.IsDecoratedWith<AuthorizeAttribute>());
 
             using (new AssertionScope())
             {

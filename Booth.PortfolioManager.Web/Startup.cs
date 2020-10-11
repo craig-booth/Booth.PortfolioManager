@@ -26,6 +26,9 @@ namespace Booth.PortfolioManager.Web
             services.AddPortfolioManagerServices(settings)
                 .AddDataImportService();
 
+            services.AddMemoryCache();
+            services.AddHttpContextAccessor();
+
             services.AddControllers()
                 .AddNewtonsoftJson();
         }

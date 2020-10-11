@@ -21,5 +21,17 @@ namespace Booth.PortfolioManager.Web.Mappers
             else
                 return new BadRequestResult();
         }
+
+        public static ActionResult ToActionResult<T>(this ServiceResult<T> result)
+        {
+            if (result.Status == ServiceStatus.Ok)
+                return new OkObjectResult(result.Result);
+            else if (result.Status == ServiceStatus.NotFound)
+                return new NotFoundResult();
+            else if (result.Status == ServiceStatus.Error)
+                return new BadRequestObjectResult(result.Errors);
+            else
+                return new BadRequestResult();
+        }
     }
 }

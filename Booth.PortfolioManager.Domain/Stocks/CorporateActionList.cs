@@ -7,12 +7,13 @@ using Booth.EventStore;
 
 using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.CorporateActions.Events;
+using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Utils;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
 
-    public interface ICorporateActionList : ITransactionList<ICorporateAction>
+    public interface ICorporateActionList : ITransactionList<CorporateAction>
     {
         void AddCapitalReturn(Guid id, Date recordDate, string description, Date paymentDate, decimal amount);
         void AddDividend(Guid id, Date recordDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice);
@@ -21,7 +22,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
         ICompositeActionBuilder StartCompositeAction(Guid id, Date recordDate, string description);
     }
 
-    public class CorporateActionList : TransactionList<ICorporateAction>, ICorporateActionList
+    public class CorporateActionList : TransactionList<CorporateAction>, ICorporateActionList
     {
         private IEventList _Events;
 
@@ -46,7 +47,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
             Add(corporateAction);
         }
-        private ICorporateAction CorporateActionFromEvent(CorporateActionAddedEvent @event)
+        private CorporateAction CorporateActionFromEvent(CorporateActionAddedEvent @event)
         {
             if (@event is CapitalReturnAddedEvent capitalReturnEvent)
                 return CorporateActionFromEvent(capitalReturnEvent);
@@ -73,7 +74,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        private ICorporateAction CorporateActionFromEvent(CapitalReturnAddedEvent @event)
+        private CorporateAction CorporateActionFromEvent(CapitalReturnAddedEvent @event)
         {
             var capitalReturn = new CapitalReturn(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.PaymentDate, @event.Amount);
 
@@ -91,7 +92,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        private ICorporateAction CorporateActionFromEvent(DividendAddedEvent @event)
+        private CorporateAction CorporateActionFromEvent(DividendAddedEvent @event)
         {
             var dividend = new Dividend(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.PaymentDate, @event.DividendAmount, @event.PercentFranked, @event.DrpPrice);
 
@@ -110,7 +111,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        private ICorporateAction CorporateActionFromEvent(TransformationAddedEvent @event)
+        private CorporateAction CorporateActionFromEvent(TransformationAddedEvent @event)
         {
             var transformationResultingStocks = @event.ResultingStocks.Select(x => new Transformation.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBasePercentage, x.AquisitionDate));
             var transformation = new Transformation(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.ImplementationDate, @event.CashComponent, @event.RolloverRefliefApplies, transformationResultingStocks);
@@ -134,7 +135,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             PublishEvent(@event);
         }
 
-        private ICorporateAction CorporateActionFromEvent(SplitConsolidationAddedEvent @event)
+        private CorporateAction CorporateActionFromEvent(SplitConsolidationAddedEvent @event)
         {
             var splitConsolidation = new SplitConsolidation(@event.ActionId, Stock, @event.ActionDate, @event.Description, @event.OriginalUnits, @event.NewUnits);
 
@@ -151,7 +152,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             return builder;
         }
 
-        private ICorporateAction CorporateActionFromEvent(CompositeActionAddedEvent @event)
+        private CorporateAction CorporateActionFromEvent(CompositeActionAddedEvent @event)
         {
             var childActions = @event.ChildActions.Select(x => CorporateActionFromEvent(x));
             var compositeAction = new CompositeAction(@event.ActionId, Stock, @event.ActionDate, @event.Description, childActions);
