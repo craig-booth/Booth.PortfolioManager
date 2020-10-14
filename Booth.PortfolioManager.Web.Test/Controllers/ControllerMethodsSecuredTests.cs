@@ -13,7 +13,6 @@ using System.Linq;
 using FluentAssertions.Common;
 using FluentAssertions.Execution;
 
-using Booth.PortfolioManager.Web.Authentication;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {

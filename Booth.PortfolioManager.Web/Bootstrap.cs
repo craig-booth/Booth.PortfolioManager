@@ -24,7 +24,9 @@ using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.DataImporters;
-
+using Booth.Common;
+using System.Reflection;
+using System.Drawing;
 
 namespace Booth.PortfolioManager.Web
 {
@@ -34,7 +36,7 @@ namespace Booth.PortfolioManager.Web
         public static IServiceCollection AddPortfolioManagerServices(this IServiceCollection services, AppSettings settings)
         {
             services.AddSingleton<AppSettings>(settings);
-            services.AddTransient<IConfigureOptions<MvcNewtonsoftJsonOptions>, RestApiMvcJsonOptions>(); 
+            services.AddTransient<IConfigureOptions<MvcNewtonsoftJsonOptions>, RestApiMvcJsonOptions>();
 
             IJwtTokenConfigurationProvider jwtTokenConfigProvider;
             if ((settings.JwtTokenConfiguration.Key != null) && (settings.JwtTokenConfiguration.Key != ""))
@@ -55,7 +57,7 @@ namespace Booth.PortfolioManager.Web
 
             // Generic classes
             services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
-            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>)); 
+            services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
 
             // Event Store
             services.AddSingleton<IEventStore>(_ => new MongodbEventStore(settings.EventStore, settings.Database));
@@ -73,7 +75,19 @@ namespace Booth.PortfolioManager.Web
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IStockService, StockService>();
             services.AddSingleton<ITradingCalendarService>(x => new TradingCalendarService(x.GetRequiredService<IRepository<TradingCalendar>>(), TradingCalendarIds.ASX));
+            services.AddScoped<ICashAccountService, CashAccountService>();
+        //    services.AddScoped<ICorporateActionService, CorporateActionService>();
+            services.AddScoped<IPortfolioCapitalGainsService, PortfolioCapitalGainsService>();
+            services.AddScoped<IPortfolioCgtLiabilityService, PortfolioCgtLiabilityService>();
+            services.AddScoped<IPortfolioCorporateActionsService, PortfolioCorporateActionsService>();
+            services.AddScoped<IPortfolioIncomeService, PortfolioIncomeService>();
+            services.AddScoped<IPortfolioPerformanceService, PortfolioPerformanceService>();
             services.AddScoped<IPortfolioPropertiesService, PortfolioPropertiesService>();
+            services.AddScoped<IPortfolioService, PortfolioService>();
+            services.AddScoped<IPortfolioSummaryService, PortfolioSummaryService>();
+            services.AddScoped<IPortfolioTransactionService, PortfolioTransactionService>();
+            services.AddScoped<IPortfolioValueService, PortfolioValueService>();
+
 
             // Others
             services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().ReadOnlyPortfolio);

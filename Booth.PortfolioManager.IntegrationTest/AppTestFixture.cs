@@ -16,6 +16,7 @@ using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -30,7 +31,7 @@ namespace Booth.PortfolioManager.IntegrationTest
 
     public class AppTestFixture : WebApplicationFactory<Startup>
     {
-
+        private TestPortfolioAccessor _PortfolioAccessor;
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             var eventStore = new MemoryEventStore();
@@ -43,7 +44,21 @@ namespace Booth.PortfolioManager.IntegrationTest
             {
                 x.AddSingleton<IEventStore>(eventStore);
                 x.RemoveAll<IHostedService>();
+                x.AddScoped<IPortfolioAccessor>(_ => _PortfolioAccessor);
             });
+        }
+
+        private class TestPortfolioAccessor : IPortfolioAccessor
+        {
+            private Portfolio _Portfolio;
+            public TestPortfolioAccessor(Portfolio portfolio)
+            {
+                _Portfolio = portfolio;
+            }
+
+            public IReadOnlyPortfolio ReadOnlyPortfolio => _Portfolio;
+
+            public IPortfolio Portfolio => _Portfolio;
         }
 
         private void AddUsers(IEventStore eventStore)
@@ -90,6 +105,8 @@ namespace Booth.PortfolioManager.IntegrationTest
 
             var eventStream = eventStore.GetEventStream<Portfolio>("Portfolios");
             eventStream.Add(portfolio.Id, "Portfolio", portfolio.FetchEvents());
+
+            _PortfolioAccessor = new TestPortfolioAccessor(portfolio);
         }
     }
 }
