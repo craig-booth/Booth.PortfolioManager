@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
 {
@@ -26,7 +27,7 @@ namespace Booth.PortfolioManager.Web.Services
         public ServiceResult<PortfolioSummaryResponse> GetSummary(Date date)
         {
             var response = new PortfolioSummaryResponse();
-       //     response.Holdings.AddRange(_Portfolio.Holdings.All(date).Select(x => x.Convert(date)));
+            response.Holdings.AddRange(_Portfolio.Holdings.All(date).Select(x => x.ToResponse(date)));
             response.CashBalance = _Portfolio.CashAccount.Balance(date);
             response.PortfolioValue = response.Holdings.Sum(x => x.Value) + response.CashBalance;
             response.PortfolioCost = response.Holdings.Sum(x => x.Cost) + response.CashBalance; 
