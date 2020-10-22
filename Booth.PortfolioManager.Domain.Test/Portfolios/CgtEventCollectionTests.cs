@@ -19,7 +19,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var events = new CgtEventCollection();
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             events.Add(new Date(2000, 01, 01), stock, 100, 1000.00m, 1200.00m, 200.00m, CgtMethod.Indexation);
 

@@ -22,7 +22,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AccessParcelsByDateNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
@@ -33,7 +33,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AccessParcelsByDateParcelsExistButNotAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -46,7 +46,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AccessParcelsByDateParcelsExistAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -59,7 +59,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetParcelsNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
@@ -70,7 +70,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetParcelsByDateParcelsExiste()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -83,7 +83,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetParcelsByDateNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
@@ -94,7 +94,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetParcelsByDateParcelsExistButNotAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -107,7 +107,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetParcelsByDateParcelsExistAtDate()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -120,18 +120,18 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetParcelsByDateRangeNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
-            holding.Parcels(new DateRange(Date.MinValue, Date.MaxValue)).Should().BeEmpty();
+            holding.Parcels(new DateRange(new Date(1974, 01, 01), Date.MaxValue)).Should().BeEmpty();
         }
 
         [Fact]
         public void GetParcelsByDateRangeParcelsExistButNotInRange()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -144,7 +144,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetParcelsByDateParcelsExistInRange()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -157,7 +157,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AddParcelNoExistingHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -175,7 +175,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AddParcelExistingHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -190,7 +190,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void DisposeOfParcelNotInHoldings()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -208,7 +208,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var eventSink = mockRepository.Create<ICgtEventSink>();
             CgtEventArgs cgtEvent = null;
@@ -253,7 +253,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var eventSink = mockRepository.Create<ICgtEventSink>();
             CgtEventArgs cgtEvent = null;
@@ -295,7 +295,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void DisposeOfParcelMoreUnitsThanInParcel()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             var parcel = holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
@@ -311,7 +311,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var eventSink = mockRepository.Create<ICgtEventSink>();
             CgtEventArgs cgtEvent = null;
@@ -351,7 +351,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetValueNoParcels()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
@@ -369,7 +369,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             priceHistory.Setup(x => x.GetPrice(new Date(2001, 01, 01))).Returns(10.00m).Verifiable();
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
             stock.SetPriceHistory(priceHistory.Object);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
@@ -389,7 +389,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             priceHistory.Setup(x => x.GetPrice(new Date(2001, 01, 01))).Returns(10.00m).Verifiable();
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
             stock.SetPriceHistory(priceHistory.Object);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
@@ -405,7 +405,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void ChangeDrpParticipation()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
 
@@ -418,7 +418,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AddDrpAmount()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddDrpAccountAmount(new Date(2001, 01, 01), 100.00m);
@@ -431,7 +431,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AddDrpNegativeAmount()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = new Holding(stock, new Date(2000, 01, 01));
             holding.AddDrpAccountAmount(new Date(2001, 01, 01), 100.00m);

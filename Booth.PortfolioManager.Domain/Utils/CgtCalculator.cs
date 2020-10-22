@@ -10,7 +10,7 @@ namespace Booth.PortfolioManager.Domain.Utils
 {
     public enum CgtCalculationMethod { MinimizeGain, MaximizeGain, FirstInFirstOut, LastInFirstOut }
 
-    class CgtCalculator
+    public static class CgtUtils
     {
         public static Date IndexationEndDate = new Date(1999, 09, 21);
 
@@ -28,10 +28,13 @@ namespace Booth.PortfolioManager.Domain.Utils
         {
             if ((cgtMethod == CgtMethod.Discount) && (cgtAmount > 0.00m))
                 return (cgtAmount / 2).ToCurrency(RoundingRule.Round);
-            
+
             return cgtAmount;
         }
+    }
 
+    class CgtCalculator
+    {
         public static IComparer<IReadOnlyParcel> GetCgtComparer(Date disposalDate, CgtCalculationMethod method)
         {
             switch (method)
@@ -84,8 +87,8 @@ namespace Booth.PortfolioManager.Domain.Utils
                 costBase = (properties.CostBase * ((decimal)unitsSold / properties.Units)).ToCurrency(RoundingRule.Round);
 
             var capitalGain = amountReceived - costBase;
-            var cgtMethod = CgtMethodForParcel(parcel.AquisitionDate, disposalDate);
-            var discountedGain = DiscountedCgt(capitalGain, cgtMethod);       
+            var cgtMethod = CgtUtils.CgtMethodForParcel(parcel.AquisitionDate, disposalDate);
+            var discountedGain = CgtUtils.DiscountedCgt(capitalGain, cgtMethod);       
 
             return new ParcelSold(parcel, unitsSold, costBase, amountReceived, capitalGain, cgtMethod, discountedGain);
         }

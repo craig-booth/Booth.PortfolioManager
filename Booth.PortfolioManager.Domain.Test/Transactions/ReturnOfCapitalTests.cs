@@ -34,7 +34,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var handler = new ReturnOfCapitalHandler();
 
             Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
-a.Should().Throw<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
@@ -43,7 +43,7 @@ a.Should().Throw<ArgumentException>();
         public void NoSharesOwned()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var transaction = new ReturnOfCapital()
             {
@@ -76,7 +76,7 @@ a.Should().Throw<ArgumentException>();
         public void SingleParcelOwned()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var transaction = new ReturnOfCapital()
             {
@@ -112,7 +112,7 @@ a.Should().Throw<ArgumentException>();
         public void MultipleParcelsOwned()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var transaction = new ReturnOfCapital()
             {
@@ -155,7 +155,7 @@ a.Should().Throw<ArgumentException>();
         public void NoCashTransaction()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var transaction = new ReturnOfCapital()
             {

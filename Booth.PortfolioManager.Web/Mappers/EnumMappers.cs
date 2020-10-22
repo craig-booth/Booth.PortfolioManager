@@ -34,5 +34,15 @@ namespace Booth.PortfolioManager.Web.Mappers
         {
             return (Domain.Transactions.BankAccountTransactionType)type;
         }
+        public static RestApi.Portfolios.CgtMethod ToResponse(this Domain.Portfolios.CgtMethod method)
+        {
+            return (RestApi.Portfolios.CgtMethod)method;
+        }
+        public static Domain.Portfolios.CgtMethod ToDomain(this RestApi.Portfolios.CgtMethod method)
+        {
+            return (Domain.Portfolios.CgtMethod)method;
+        }
+
+        
     }
 }

@@ -73,7 +73,7 @@ a.Should().Throw<ArgumentException>();
         public void OpeningBalance()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var transaction = new OpeningBalance()
             {

@@ -26,7 +26,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
         public void ToStringBeforeStartDate()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MaxValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(3000, 01, 01), false, AssetCategory.AustralianStocks);
 
             stock.ToString().Should().Be("ABC - ABC Pty Ltd");
         }
@@ -35,7 +35,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
         public void ToStringAfterEndDate()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
             stock.DeList(new Date(2000, 01, 01));
 
             stock.ToString().Should().Be("ABC - ABC Pty Ltd");
@@ -45,7 +45,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
         public void ToStringPropertiesChangedToday()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(Date.Today, "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianStocks);
 
             stock.ToString().Should().Be("XYZ - XYZ Pty Ltd");
@@ -55,7 +55,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
         public void ToStringPropertiesChangedBeforeToday()
         { 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(Date.Today.AddDays(-1), "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianStocks);
 
             stock.ToString().Should().Be("XYZ - XYZ Pty Ltd");
@@ -65,7 +65,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
         public void ToStringPropertiesChangedAfterToday()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(Date.Today.AddDays(1), "XYZ", "XYZ Pty Ltd", AssetCategory.AustralianStocks);
 
             stock.ToString().Should().Be("ABC - ABC Pty Ltd");
@@ -116,6 +116,17 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             Action a = () => stock.List("XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianProperty);
 
             a.Should().Throw<EffectiveDateException>();
+        }
+
+
+        [Fact]
+        public void ListWithoutADate()
+        {
+            var stock = new Stock(Guid.NewGuid());
+
+            Action a = () => stock.List("XYZ", "XYZ Pty Ltd", Date.MinValue, true, AssetCategory.AustralianProperty);
+
+            a.Should().Throw<ArgumentOutOfRangeException>();
         }
 
 

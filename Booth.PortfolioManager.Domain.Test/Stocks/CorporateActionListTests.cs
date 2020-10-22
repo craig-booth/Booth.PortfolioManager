@@ -24,7 +24,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<CapitalReturnAddedEvent>())).Verifiable();
@@ -57,7 +57,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<CapitalReturnAddedEvent>())).Verifiable();
@@ -90,7 +90,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             var corporateActionList = new CorporateActionList(stock, events.Object);
@@ -123,7 +123,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<CompositeActionAddedEvent>())).Verifiable();
@@ -158,7 +158,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<CompositeActionAddedEvent>())).Verifiable();
@@ -193,7 +193,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<CompositeActionAddedEvent>())).Verifiable();
@@ -234,7 +234,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             var corporateActionList = new CorporateActionList(stock, events.Object);
@@ -278,7 +278,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<DividendAddedEvent>())).Verifiable();
@@ -314,7 +314,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<DividendAddedEvent>())).Verifiable();
@@ -349,7 +349,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             var corporateActionList = new CorporateActionList(stock, events.Object);
@@ -384,7 +384,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<SplitConsolidationAddedEvent>())).Verifiable();
@@ -417,7 +417,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<SplitConsolidationAddedEvent>())).Verifiable();
@@ -450,7 +450,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             var corporateActionList = new CorporateActionList(stock, events.Object);
@@ -483,10 +483,10 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<TransformationAddedEvent>())).Verifiable();
@@ -522,10 +522,10 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             events.Setup(x => x.Add(It.IsAny<TransformationAddedEvent>())).Verifiable();
@@ -561,10 +561,10 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "XYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "XYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var events = mockRepository.Create<IEventList>();
             var corporateActionList = new CorporateActionList(stock, events.Object);

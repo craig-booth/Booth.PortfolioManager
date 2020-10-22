@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Domain.Utils;
 using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
 {
@@ -29,49 +31,55 @@ namespace Booth.PortfolioManager.Web.Services
 
         public ServiceResult<SimpleUnrealisedGainsResponse> GetCapitalGains(Date date)
         {
-            /* var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<SimpleUnrealisedGainsResponse>.NotFound();
 
-             return GetCapitalGains(portfolio.Holdings.All(date), date); */
+            var result = GetCapitalGains(_Portfolio.Holdings.All(date), date); 
 
-            throw new NotSupportedException();
+            return ServiceResult<SimpleUnrealisedGainsResponse>.Ok(result);
+
         }
 
         public ServiceResult<SimpleUnrealisedGainsResponse> GetCapitalGains(Guid stockId, Date date)
         {
-          /*  var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<SimpleUnrealisedGainsResponse>.NotFound();
 
-            var holding = portfolio.Holdings.Get(stockId);
+            var holding = _Portfolio.Holdings[stockId];
             if (holding == null)
-                throw new HoldingNotFoundException(stockId);
+                return ServiceResult<SimpleUnrealisedGainsResponse>.NotFound();
 
-            return GetCapitalGains(new[] { holding} , date); */
+            var result = GetCapitalGains(new[] { holding}  , date);
 
-            throw new NotSupportedException();
+            return ServiceResult<SimpleUnrealisedGainsResponse>.Ok(result);
         }
 
         public ServiceResult<DetailedUnrealisedGainsResponse> GetDetailedCapitalGains(Date date)
         {
-         /*   var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<DetailedUnrealisedGainsResponse>.NotFound();
 
-            return GetDetailedCapitalGains(portfolio.Holdings.All(date), date); */
+            var result = GetDetailedCapitalGains(_Portfolio.Holdings.All(date), date);
 
-            throw new NotSupportedException();
+            return ServiceResult<DetailedUnrealisedGainsResponse>.Ok(result);
+
         }
 
         public ServiceResult<DetailedUnrealisedGainsResponse> GetDetailedCapitalGains(Guid stockId, Date date)
         {
-     /*       var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<DetailedUnrealisedGainsResponse>.NotFound();
 
-            var holding = portfolio.Holdings.Get(stockId);
+            var holding = _Portfolio.Holdings[stockId];
             if (holding == null)
-                throw new HoldingNotFoundException(stockId);
+                return ServiceResult<DetailedUnrealisedGainsResponse>.NotFound();
 
-            return GetDetailedCapitalGains(new[] { holding }, date);
-      */
-            throw new NotSupportedException();
+            var result = GetDetailedCapitalGains(new[] { holding }, date);
+
+            return ServiceResult<DetailedUnrealisedGainsResponse>.Ok(result);
         }
 
-  /*      private SimpleUnrealisedGainsResponse GetCapitalGains(IEnumerable<Domain.Portfolios.Holding> holdings, DateTime date)
+        private SimpleUnrealisedGainsResponse GetCapitalGains(IEnumerable<IReadOnlyHolding> holdings, Date date)
         {
             var response = new SimpleUnrealisedGainsResponse();
 
@@ -83,29 +91,29 @@ namespace Booth.PortfolioManager.Web.Services
 
                     var value = properties.Units * holding.Stock.GetPrice(date);
                     var capitalGain = value - properties.CostBase;
-                    var discountMethod = CgtCalculator.CgtMethodForParcel(parcel.AquisitionDate, date);
-                    var discoutedGain = (discountMethod == CGTMethod.Discount) ? CgtCalculator.CgtDiscount(capitalGain) : capitalGain;
+                    var discountMethod = CgtUtils.CgtMethodForParcel(parcel.AquisitionDate, date);
+                    var discoutedGain = (discountMethod == Domain.Portfolios.CgtMethod.Discount) ? CgtUtils.DiscountedCgt(capitalGain, Domain.Portfolios.CgtMethod.Discount) : capitalGain;
 
                     var unrealisedGain = new SimpleUnrealisedGainsItem()
                     {
-                        Stock = holding.Stock.Convert(date),
+                        Stock = holding.Stock.ToSummaryResponse(date),
                         AquisitionDate = parcel.AquisitionDate,
                         Units = properties.Units,
                         CostBase = properties.CostBase,
                         MarketValue = value,
                         CapitalGain = capitalGain,
                         DiscoutedGain = discoutedGain,
-                        DiscountMethod = discountMethod
+                        DiscountMethod = discountMethod.ToResponse()
                     };
 
                     response.UnrealisedGains.Add(unrealisedGain);
                 }
-            }
+            } 
 
             return response;
         }
 
-        private DetailedUnrealisedGainsResponse GetDetailedCapitalGains(IEnumerable<Domain.Portfolios.Holding> holdings, DateTime date)
+        private DetailedUnrealisedGainsResponse GetDetailedCapitalGains(IEnumerable<IReadOnlyHolding> holdings, Date date)
         {
             var response = new DetailedUnrealisedGainsResponse();
 
@@ -117,19 +125,19 @@ namespace Booth.PortfolioManager.Web.Services
 
                     var value = properties.Units * holding.Stock.GetPrice(date);
                     var capitalGain = value - properties.CostBase;
-                    var discountMethod = CgtCalculator.CgtMethodForParcel(parcel.AquisitionDate, date);
-                    var discoutedGain = (discountMethod == CGTMethod.Discount) ? CgtCalculator.CgtDiscount(capitalGain) : capitalGain;
+                    var discountMethod = CgtUtils.CgtMethodForParcel(parcel.AquisitionDate, date);
+                    var discoutedGain = (discountMethod == Domain.Portfolios.CgtMethod.Discount) ? CgtUtils.DiscountedCgt(capitalGain, Domain.Portfolios.CgtMethod.Discount) : capitalGain;
 
                     var unrealisedGain = new DetailedUnrealisedGainsItem()
                     {
-                        Stock = holding.Stock.Convert(date),
+                        Stock = holding.Stock.ToSummaryResponse(date),
                         AquisitionDate = parcel.AquisitionDate,
                         Units = properties.Units,
                         CostBase = properties.CostBase,
                         MarketValue = value,
                         CapitalGain = capitalGain,
                         DiscoutedGain = discoutedGain,
-                        DiscountMethod = discountMethod
+                        DiscountMethod = discountMethod.ToResponse()
                     };
 
                     int units = 0;
@@ -143,6 +151,7 @@ namespace Booth.PortfolioManager.Web.Services
                         {
                             Date = auditRecord.Date,
                             Description = auditRecord.Transaction.Description,
+                            UnitChange = auditRecord.UnitCountChange,
                             Units = units,
                             CostBaseChange = auditRecord.CostBaseChange,
                             CostBase = costBase,
@@ -155,8 +164,8 @@ namespace Booth.PortfolioManager.Web.Services
 
                 }
             }
-
+     
             return response;
-        } */
+        } 
     } 
 }

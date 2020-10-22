@@ -18,8 +18,8 @@ namespace Booth.PortfolioManager.Domain.Utils
 
         public override int Compare(IReadOnlyParcel a, IReadOnlyParcel b)
         {
-            var discountAppliesA = (CgtCalculator.CgtMethodForParcel(a.AquisitionDate, _DisposalDate) == CgtMethod.Discount);
-            var discountAppliesB = (CgtCalculator.CgtMethodForParcel(b.AquisitionDate, _DisposalDate) == CgtMethod.Discount);
+            var discountAppliesA = (CgtUtils.CgtMethodForParcel(a.AquisitionDate, _DisposalDate) == CgtMethod.Discount);
+            var discountAppliesB = (CgtUtils.CgtMethodForParcel(b.AquisitionDate, _DisposalDate) == CgtMethod.Discount);
 
             if (discountAppliesA && !discountAppliesB)
                 return -1;

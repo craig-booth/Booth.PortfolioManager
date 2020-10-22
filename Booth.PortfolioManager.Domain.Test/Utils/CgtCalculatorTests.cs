@@ -20,7 +20,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         {
             var saleDate = new Date(2020, 01, 01);
              
-            var cgtMethod = CgtCalculator.CgtMethodForParcel(aquisitionDate, saleDate);
+            var cgtMethod = CgtUtils.CgtMethodForParcel(aquisitionDate, saleDate);
 
             cgtMethod.Should().Be(method, reason);
         }
@@ -37,7 +37,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [Fact]
         public void DiscountedCgtCalculationPositiveAmount()
         {
-            var discountedGain = CgtCalculator.DiscountedCgt(1000.00m, CgtMethod.Discount);
+            var discountedGain = CgtUtils.DiscountedCgt(1000.00m, CgtMethod.Discount);
 
             discountedGain.Should().Be(500.00m);
         }
@@ -45,7 +45,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [Fact]
         public void DiscountedCgtCalculationNegativeAmount()
         {
-            var discountedGain = CgtCalculator.DiscountedCgt(-1000.00m, CgtMethod.Discount);
+            var discountedGain = CgtUtils.DiscountedCgt(-1000.00m, CgtMethod.Discount);
 
             discountedGain.Should().Be(-1000.00m);
         }
@@ -53,7 +53,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         [Fact]
         public void DiscountedCgtCalculationZeroAmount()
         {
-            var discountedGain = CgtCalculator.DiscountedCgt(0.00m, CgtMethod.Discount);
+            var discountedGain = CgtUtils.DiscountedCgt(0.00m, CgtMethod.Discount);
 
             discountedGain.Should().Be(0.00m);
         }

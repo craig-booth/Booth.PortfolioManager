@@ -27,7 +27,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AccessHoldingsByStockSingleEntry()
         {
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock, new Date(2000, 01, 01));
@@ -51,10 +51,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AccessHoldingsByStockMultipleEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -78,10 +78,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsNoEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
 
@@ -92,10 +92,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsSingleEntry()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -107,10 +107,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsMultipleEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -123,10 +123,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateNoEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
 
@@ -137,10 +137,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateNoEntriesAtDate()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -153,10 +153,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateEntriesAtDate()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -169,10 +169,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateSomeEntriesAtDate()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -185,10 +185,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateRangeNoEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
 
@@ -199,10 +199,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateRangeNoEntriesInRange()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -215,10 +215,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateRangeEntriesInRange()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -231,10 +231,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AllHoldingsByDateRangeSomeEntriesInRange()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -255,7 +255,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetHoldingsByStockSingleEntry()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -277,10 +277,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void GetHoldingsByStockMultipleEntries()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -303,10 +303,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AddHoldingNewStock()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));
@@ -328,10 +328,10 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         public void AddHoldingExisingStock()
         {
             var stock1 = new Stock(Guid.NewGuid());
-            stock1.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock1.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var stock2 = new Stock(Guid.NewGuid());
-            stock2.List("XYZ", "ZYZ Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock2.List("XYZ", "ZYZ Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holdings = new HoldingCollection();
             holdings.Add(stock1, new Date(2000, 01, 01));

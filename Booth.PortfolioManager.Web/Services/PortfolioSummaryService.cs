@@ -26,6 +26,9 @@ namespace Booth.PortfolioManager.Web.Services
 
         public ServiceResult<PortfolioSummaryResponse> GetSummary(Date date)
         {
+            if (_Portfolio == null)
+                return ServiceResult<PortfolioSummaryResponse>.NotFound();
+
             var response = new PortfolioSummaryResponse();
             response.Holdings.AddRange(_Portfolio.Holdings.All(date).Select(x => x.ToResponse(date)));
             response.CashBalance = _Portfolio.CashAccount.Balance(date);

@@ -82,6 +82,10 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public void List(string asxCode, string name, Date date, bool trust, AssetCategory category)
         {
+            if ((date <= Date.MinValue) || (date >= Date.MaxValue))
+                throw new ArgumentOutOfRangeException("Listing date is invalid");
+
+
             var @event = new StockListedEvent(Id, Version, asxCode, name, date, category, trust);
             Apply(@event);
 

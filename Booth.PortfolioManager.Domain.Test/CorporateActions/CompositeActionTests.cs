@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var transactions = mockRepository.Create<IPortfolioTransactionList>();
 
@@ -46,7 +46,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var transactions = mockRepository.Create<IPortfolioTransactionList>();
 
@@ -67,7 +67,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", Date.MinValue, false, AssetCategory.AustralianStocks);
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
 
             var holding = mockRepository.Create<IReadOnlyHolding>();
 

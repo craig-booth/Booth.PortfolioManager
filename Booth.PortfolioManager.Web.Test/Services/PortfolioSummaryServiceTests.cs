@@ -10,9 +10,10 @@ using Booth.Common;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Test.Services
-{/*
+{
     public class PortfolioSummaryServiceTests
     {
         [Fact]
@@ -28,59 +29,43 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetSummary()
         {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
 
-            //  var stockProperties = mockRepository.Create<IEffectiveProperties<StockProperties>>();
-            //  stockProperties.Setup(x => x.ClosestTo(Date.Today)).Returns(new StockProperties("BHP", "BHP Pty Ltd", AssetCategory.AustralianStocks));
+            var service = new PortfolioSummaryService(portfolio);
 
-            var stockId = Guid.NewGuid();
-            var stock = mockRepository.Create<IReadOnlyStock>();
-            //           stock.SetupGet(x => x.Id).Returns(stockId);
-            //           stock.SetupGet(x => x.Properties).Returns(stockProperties.Object);
-
-            var holding = mockRepository.Create<IReadOnlyHolding>();
-            //          holding.SetupGet(x => x.Stock).Returns(stock.Object);
-            //          holding.SetupGet(x => x.EffectivePeriod).Returns(new DateRange(new Date(2001, 01, 01), new Date(2002, 01, 01)));
-            //          holding.SetupGet(x => x.Settings).Returns(new HoldingSettings(true));
-
-            var holdingsCollection = mockRepository.Create<IHoldingCollection>();
-            holdingsCollection.Setup(x => x.All()).Returns(new[] { holding.Object });
-
-            var cashAccount = mockRepository.Create<IReadOnlyCashAccount>();
-            cashAccount.Setup(x => x.Balance(new Date(2000, 01, 01))).Returns(120.00m);
-
-     //       var id = Guid.NewGuid();
-            var portfolio = mockRepository.Create<IReadOnlyPortfolio>();
-            portfolio.SetupGet(x => x.CashAccount).Returns(cashAccount.Object);
-            portfolio.SetupGet(x => x.Holdings).Returns(holdingsCollection.Object);
-
-            var service = new PortfolioSummaryService(portfolio.Object);
-
-            var result = service.GetSummary(new Date(2000, 01, 01));
+            var result = service.GetSummary(new Date(2010, 01, 01));
 
             result.Result.Should().BeEquivalentTo(new
             {
-                PortfolioValue = 0.00m,
-                PortfolioCost = 0.00m,
-                Return1Year = 0.00m,
-                Return3Year = 0.00m,
-                Return5Year = 0.00m,
-                ReturnAll = 0.00m,
-                CashBalance = 120.00m,
+                PortfolioValue = 200m + 300m + (10000m - 119.95m - 259.95m),
+                PortfolioCost = 10000.00m,
+                Return1Year = 0.00698m,
+                Return3Year = 0.00769m,
+                Return5Year = 0.00339m,
+                ReturnAll = 0.00159m,
+                CashBalance = 10000m - 119.95m - 259.95m,
                 Holdings = new[]
                 {
                     new RestApi.Portfolios.Holding()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = stockId, AsxCode = "BHP", Name = "BHP Pty Ltd", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
-                        Units = 0,
-                        Value = 0,
-                        Cost = 0.00m,
-                        CostBase = 0.00m
+                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.ArgId, AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Units = 100,
+                        Value = 200m,
+                        Cost = 119.95m,
+                        CostBase = 119.95m
+                    },
+                    new RestApi.Portfolios.Holding()
+                    {
+                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.WamId, AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Units = 200,
+                        Value = 300m,
+                        Cost = 259.95m,
+                        CostBase = 259.95m
                     }
                 }
 
             });
 
-    }
-    } */
+        }
+    } 
 }
