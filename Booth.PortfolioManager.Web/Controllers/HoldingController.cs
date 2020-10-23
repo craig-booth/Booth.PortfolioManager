@@ -20,7 +20,7 @@ namespace Booth.PortfolioManager.Web.Controllers
     public class HoldingController : ControllerBase
     {
 
-        // GET:
+        // GET
         [HttpGet]
         public ActionResult<List<Holding>> Get([FromServices] IPortfolioService service, [FromQuery]DateTime? date, [FromQuery]DateTime? fromDate, [FromQuery]DateTime? toDate)
         {
