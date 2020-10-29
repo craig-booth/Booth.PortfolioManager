@@ -9,19 +9,15 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class Disposal : IPortfolioTransaction
+    public class Disposal : PortfolioTransaction
     {
-        public Guid Id { get; set; }
-        public Date Date { get; set; }
-        public IReadOnlyStock Stock { get; set; }
-        public string Comment { get; set; }
         public int Units { get; set; }
         public decimal AveragePrice { get; set; }
         public decimal TransactionCosts { get; set; }
         public CgtCalculationMethod CgtMethod { get; set; }
         public bool CreateCashTransaction { get; set; }
 
-        public string Description
+        public override string Description
         {
             get { return "Disposed of " + Units.ToString("n0") + " shares @ " + MathUtils.FormatCurrency(AveragePrice, false, true); }
         }

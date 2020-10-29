@@ -7,16 +7,12 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class UnitCountAdjustment : IPortfolioTransaction
+    public class UnitCountAdjustment : PortfolioTransaction
     {
-        public Guid Id { get; set; }
-        public Date Date { get; set; }
-        public IReadOnlyStock Stock { get; set; }
-        public string Comment { get; set; }
         public int OriginalUnits { get; set; }
         public int NewUnits { get; set; }
 
-        public string Description
+        public override string Description
         {
             get
             {

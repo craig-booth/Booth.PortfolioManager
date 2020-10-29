@@ -7,18 +7,14 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class Aquisition : IPortfolioTransaction
+    public class Aquisition : PortfolioTransaction
     {
-        public Guid Id { get; set; }
-        public Date Date { get; set; }
-        public IReadOnlyStock Stock { get; set; }
-        public string Comment { get; set; }
         public int Units { get; set; }
         public decimal AveragePrice { get; set; }
         public decimal TransactionCosts { get; set; }
         public bool CreateCashTransaction { get; set; }
 
-        public string Description
+        public override string Description
         {
             get { return "Aquired " + Units.ToString("n0") + " shares @ " + MathUtils.FormatCurrency(AveragePrice, false, true); }
         }

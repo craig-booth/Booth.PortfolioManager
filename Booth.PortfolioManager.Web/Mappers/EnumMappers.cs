@@ -43,6 +43,13 @@ namespace Booth.PortfolioManager.Web.Mappers
             return (Domain.Portfolios.CgtMethod)method;
         }
 
-        
+        public static RestApi.Transactions.CgtCalculationMethod ToResponse(this Domain.Utils.CgtCalculationMethod method)
+        {
+            return (RestApi.Transactions.CgtCalculationMethod)method;
+        }
+        public static Domain.Utils.CgtCalculationMethod ToDomain(this RestApi.Transactions.CgtCalculationMethod method)
+        {
+            return (Domain.Utils.CgtCalculationMethod)method;
+        }
     }
 }

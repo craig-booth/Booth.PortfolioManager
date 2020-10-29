@@ -48,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.Holding()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.ArgId, AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_ARG,
                         Units = 100,
                         Value = 200m,
                         Cost = 119.95m,
@@ -56,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.Holding()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.WamId, AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_WAM,
                         Units = 200,
                         Value = 300m,
                         Cost = 259.95m,

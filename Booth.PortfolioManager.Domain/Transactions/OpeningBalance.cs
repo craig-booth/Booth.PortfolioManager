@@ -7,17 +7,13 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class OpeningBalance : IPortfolioTransaction
+    public class OpeningBalance : PortfolioTransaction
     {
-        public Guid Id { get; set; }
-        public Date Date { get; set; }
-        public IReadOnlyStock Stock { get; set; }
-        public string Comment { get; set; }
         public int Units { get; set; }
         public decimal CostBase { get; set; }
         public Date AquisitionDate { get; set; }
 
-        public string Description
+        public override string Description
         {
             get { return "Opening balance of " + Units.ToString("n0") + " shares"; }
         } 

@@ -15,4 +15,14 @@ namespace Booth.PortfolioManager.Domain.Transactions
         string Comment { get; }
         string Description { get; }
     }
+
+    public abstract class PortfolioTransaction : IPortfolioTransaction
+    {
+        public Guid Id { get; set; }
+        public Date Date { get; set; }
+        public IReadOnlyStock Stock { get; set; }
+        public string Comment { get; set; }
+        public abstract string Description { get; }
+
+    }
 }

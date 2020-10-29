@@ -16,8 +16,8 @@ namespace Booth.PortfolioManager.Web.Mappers
 
         public static RestApi.CorporateActions.CorporateAction ToResponse(this Domain.CorporateActions.ICorporateAction action)
         {
-            if (action is Domain.CorporateActions.CapitalReturn capitalReurn)
-                return capitalReurn.ToResponse();
+            if (action is Domain.CorporateActions.CapitalReturn capitalReturn)
+                return capitalReturn.ToResponse();
             else if (action is Domain.CorporateActions.CompositeAction compositeAction)
                 return compositeAction.ToResponse();
             else if (action is Domain.CorporateActions.Dividend dividend)
@@ -32,8 +32,8 @@ namespace Booth.PortfolioManager.Web.Mappers
 
         public static RestApi.CorporateActions.CorporateAction ToResponse(this Domain.CorporateActions.CorporateAction action)
         {
-            if (action is Domain.CorporateActions.CapitalReturn capitalReurn)
-                return capitalReurn.ToResponse();
+            if (action is Domain.CorporateActions.CapitalReturn capitalReturn)
+                return capitalReturn.ToResponse();
             else if (action is Domain.CorporateActions.CompositeAction compositeAction)
                 return compositeAction.ToResponse();
             else if (action is Domain.CorporateActions.Dividend dividend)

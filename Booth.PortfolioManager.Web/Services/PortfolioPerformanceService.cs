@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Domain.Transactions;
+using Booth.PortfolioManager.Domain.Utils;
 using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
 {
@@ -26,124 +29,150 @@ namespace Booth.PortfolioManager.Web.Services
 
         public ServiceResult<PortfolioPerformanceResponse> GetPerformance(DateRange dateRange)
         {
-            /*     var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<PortfolioPerformanceResponse>.NotFound();
 
-                 var response = new PortfolioPerformanceResponse();
+            var response = new PortfolioPerformanceResponse();
 
-                 var dateRangeExcludingFirstDay = new DateRange(dateRange.FromDate.AddDays(1), dateRange.ToDate);
+            var dateRangeExcludingFirstDay = new DateRange(dateRange.FromDate.AddDays(1), dateRange.ToDate);
 
-                 var openingHoldings = portfolio.Holdings.All(dateRange.FromDate);
-                 var closingHoldings = portfolio.Holdings.All(dateRange.ToDate);
+            var openingHoldings = _Portfolio.Holdings.All(dateRange.FromDate);
+            var closingHoldings = _Portfolio.Holdings.All(dateRange.ToDate);
 
 
-                 var workingList = new List<HoldingPerformanceWorkItem>();
+            var workingList = new List<HoldingPerformanceWorkItem>();
 
-                 HoldingPerformanceWorkItem workItem;
+            HoldingPerformanceWorkItem workItem;
 
-                 // Add opening holdings
-                 foreach (var holding in openingHoldings)
-                 {
-                     workItem = new HoldingPerformanceWorkItem(holding.Stock.Convert(dateRange.FromDate));
+            // Add opening holdings
+            foreach (var holding in openingHoldings)
+            {
+                workItem = new HoldingPerformanceWorkItem(holding.Stock.ToSummaryResponse(dateRange.FromDate));
 
-                     var value = holding.Value(dateRange.FromDate);
-                     workItem.HoldingPerformance.OpeningBalance = value;
-                     workItem.CashFlows.Add(dateRange.FromDate, -value);
-                     workingList.Add(workItem);
-                 }
+                var value = holding.Value(dateRange.FromDate);
 
-                 // Process transactions during the period
-                 var transactions = portfolio.Transactions.InDateRange(dateRangeExcludingFirstDay);
-                 foreach (var transaction in transactions)
-                 {
-                     if ((transaction is Aquisition) ||
-                         (transaction is OpeningBalance) ||
-                         (transaction is Disposal) ||
-                         (transaction is IncomeReceived))
-                     {
-                         workItem = workingList.FirstOrDefault(x => x.HoldingPerformance.Stock.Id == transaction.Stock.Id);
-                         if (workItem == null)
-                         {
-                             workItem = new HoldingPerformanceWorkItem(transaction.Stock.Convert(transaction.Date));
-                             workingList.Add(workItem);
-                         }
+                workItem.HoldingPerformance.OpeningBalance = value;
+                workItem.StartDate = dateRange.FromDate;
+                workItem.InitialValue = value;
 
-                         if (transaction is Aquisition)
-                         {
-                             var aquisition = transaction as Aquisition;
+                workingList.Add(workItem);
+            }
 
-                             workItem.HoldingPerformance.Purchases += aquisition.Units * aquisition.AveragePrice;
-                             workItem.CashFlows.Add(aquisition.Date, -(aquisition.Units * aquisition.AveragePrice));
-                         }
-                         else if (transaction is OpeningBalance)
-                         {
-                             var openingBalance = transaction as OpeningBalance;
+            // Process transactions during the period
+            var transactions = _Portfolio.Transactions.InDateRange(dateRangeExcludingFirstDay);
+            foreach (var transaction in transactions)
+            {
+                if ((transaction is Aquisition) ||
+                    (transaction is OpeningBalance) ||
+                    (transaction is Disposal) ||
+                    (transaction is IncomeReceived))
+                {
+                    var newItem = false;
 
-                             workItem.HoldingPerformance.Purchases += openingBalance.CostBase;
-                             workItem.CashFlows.Add(openingBalance.Date, -openingBalance.CostBase);
-                         }
-                         else if (transaction is Disposal)
-                         {
-                             var disposal = transaction as Disposal;
+                    workItem = workingList.FirstOrDefault(x => x.HoldingPerformance.Stock.Id == transaction.Stock.Id);
+                    if (workItem == null)
+                    {
+                        newItem = true;
+                        workItem = new HoldingPerformanceWorkItem(transaction.Stock.ToSummaryResponse(dateRange.FromDate));
+                        workItem.HoldingPerformance.OpeningBalance = 0.00m;
+                        workingList.Add(workItem);
+                    }
 
-                             workItem.HoldingPerformance.Sales += disposal.Units * disposal.AveragePrice;
-                             workItem.CashFlows.Add(disposal.Date, disposal.Units * disposal.AveragePrice);
-                         }
-                         else if (transaction is IncomeReceived)
-                         {
-                             var income = transaction as IncomeReceived;
+                    if (transaction is Aquisition aquisition)
+                    {
+                        var value = aquisition.Units * aquisition.AveragePrice;
 
-                             workItem.HoldingPerformance.Dividends += income.CashIncome;
-                             workItem.CashFlows.Add(income.Date, income.CashIncome);
-                         }
-                     }
-                 }
+                        workItem.HoldingPerformance.Purchases += value;                   
+                        if (newItem)
+                        {
+                            workItem.StartDate = aquisition.Date;
+                            workItem.InitialValue = value;
+                        }
+                        else
+                            workItem.CashFlows.Add(aquisition.Date, -value);
+                    }
+                    else if (transaction is OpeningBalance openingBalance)
+                    {
+                        workItem.HoldingPerformance.Purchases += openingBalance.CostBase;
 
-                 // Populate HoldingPerformance from work list
-                 foreach (var item in workingList)
-                 {
-                     var holding = closingHoldings.FirstOrDefault(x => x.Stock.Id == item.HoldingPerformance.Stock.Id);
-                     if (holding != null)
-                     {
-                         var value = holding.Value(dateRange.ToDate);
-                         item.HoldingPerformance.ClosingBalance = value;
-                         item.CashFlows.Add(dateRange.ToDate, value);
+                        if (newItem)
+                        {
+                            workItem.StartDate = openingBalance.Date;
+                            workItem.InitialValue = openingBalance.CostBase;
+                        }
+                        else
+                            
+                        workItem.CashFlows.Add(openingBalance.Date, -openingBalance.CostBase);
+                    }
+                    else if (transaction is Disposal disposal)
+                    {
+                        var value = disposal.Units * disposal.AveragePrice;
 
-                         item.HoldingPerformance.DRPCashBalance = holding.DrpAccount.Balance(dateRange.ToDate);
-                     }
-                     else
-                         item.HoldingPerformance.ClosingBalance = 0.00m;
+                        workItem.HoldingPerformance.Sales += value;
+                        workItem.CashFlows.Add(disposal.Date, value);
+                    }
+                    else if (transaction is IncomeReceived income)
+                    {
+                        workItem.HoldingPerformance.Dividends += income.CashIncome;
+                        workItem.CashFlows.Add(income.Date, income.CashIncome);
+                    } 
+                } 
+            }
 
-                     item.HoldingPerformance.CapitalGain = item.HoldingPerformance.ClosingBalance - (item.HoldingPerformance.OpeningBalance + item.HoldingPerformance.Purchases - item.HoldingPerformance.Sales);
-                     item.HoldingPerformance.TotalReturn = item.HoldingPerformance.CapitalGain + item.HoldingPerformance.Dividends;
+            // Populate HoldingPerformance from work list
+            foreach (var item in workingList)
+            {
+                var holding = closingHoldings.FirstOrDefault(x => x.Stock.Id == item.HoldingPerformance.Stock.Id);
+                if (holding != null)
+                {
+                    var value = holding.Value(dateRange.ToDate);
+                    item.HoldingPerformance.ClosingBalance = value;
 
-                     var irr = IrrCalculator.CalculateIrr(item.CashFlows);
-                     item.HoldingPerformance.IRR = (decimal)Math.Round(irr, 5);
+                    item.EndDate = dateRange.ToDate;
+                    item.FinalValue = value;
 
-                     response.HoldingPerformance.Add(item.HoldingPerformance);
-                 }
+                    item.HoldingPerformance.DrpCashBalance = holding.DrpAccount.Balance(dateRange.ToDate);
+                }
+                else
+                {
+                    item.HoldingPerformance.ClosingBalance = 0.00m;
+                }
 
-                 var cashTransactions = portfolio.CashAccount.Transactions.InDateRange(dateRangeExcludingFirstDay);
-                 response.OpeningCashBalance = portfolio.CashAccount.Balance(dateRange.FromDate);
-                 response.Deposits = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Deposit).Sum(x => x.Amount);
-                 response.Withdrawls = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Withdrawl).Sum(x => x.Amount);
-                 response.Interest = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Interest).Sum(x => x.Amount);
-                 response.Fees = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Fee).Sum(x => x.Amount);
-                 response.ClosingCashBalance = portfolio.CashAccount.Balance(dateRange.ToDate);
+                item.HoldingPerformance.CapitalGain = item.HoldingPerformance.ClosingBalance - (item.HoldingPerformance.OpeningBalance + item.HoldingPerformance.Purchases - item.HoldingPerformance.Sales);
+                item.HoldingPerformance.TotalReturn = item.HoldingPerformance.CapitalGain + item.HoldingPerformance.Dividends;
 
-                 response.OpeningBalance = openingHoldings.Sum(x => x.Value(dateRange.FromDate));
-                 response.Dividends = response.HoldingPerformance.Sum(x => x.Dividends);
-                 response.ChangeInMarketValue = response.HoldingPerformance.Sum(x => x.CapitalGain);
-                 response.OutstandingDRPAmount = -response.HoldingPerformance.Sum(x => x.DRPCashBalance);
-                 response.ClosingBalance = closingHoldings.Sum(x => x.Value(dateRange.ToDate));
+                var irr = IrrCalculator.CalculateIrr(item.StartDate, item.InitialValue, item.EndDate, item.FinalValue, item.CashFlows);
+                item.HoldingPerformance.Irr = (decimal)Math.Round(irr, 5);
 
-                 return response; */
-            throw new NotSupportedException();
+                response.HoldingPerformance.Add(item.HoldingPerformance); 
+            }
+
+            var cashTransactions = _Portfolio.CashAccount.Transactions.InDateRange(dateRangeExcludingFirstDay);
+            response.OpeningCashBalance = _Portfolio.CashAccount.Balance(dateRange.FromDate);
+            response.Deposits = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Deposit).Sum(x => x.Amount);
+            response.Withdrawls = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Withdrawl).Sum(x => x.Amount);
+            response.Interest = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Interest).Sum(x => x.Amount);
+            response.Fees = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Fee).Sum(x => x.Amount);
+            response.ClosingCashBalance = _Portfolio.CashAccount.Balance(dateRange.ToDate);
+
+            response.OpeningBalance = openingHoldings.Sum(x => x.Value(dateRange.FromDate));
+            response.Dividends = response.HoldingPerformance.Sum(x => x.Dividends);
+            response.ChangeInMarketValue = response.HoldingPerformance.Sum(x => x.CapitalGain);
+            response.OutstandingDRPAmount = -response.HoldingPerformance.Sum(x => x.DrpCashBalance);
+            response.ClosingBalance = closingHoldings.Sum(x => x.Value(dateRange.ToDate));
+
+          
+            return ServiceResult<PortfolioPerformanceResponse>.Ok(response);
         }
 
-      /*  private class HoldingPerformanceWorkItem
+        private class HoldingPerformanceWorkItem
         {
             public PortfolioPerformanceResponse.HoldingPerformanceItem HoldingPerformance;
             public CashFlows CashFlows;
+            public Date StartDate;
+            public decimal InitialValue;
+            public Date EndDate;
+            public decimal FinalValue;
 
             public HoldingPerformanceWorkItem(Stock stock)
             {
@@ -153,7 +182,7 @@ namespace Booth.PortfolioManager.Web.Services
                 };
                 CashFlows = new CashFlows();
             } 
-        } */
+        } 
     } 
 }
 

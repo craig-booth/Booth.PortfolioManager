@@ -7,17 +7,13 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class ReturnOfCapital : IPortfolioTransaction
+    public class ReturnOfCapital : PortfolioTransaction
     {
-        public Guid Id { get; set; }
-        public Date Date { get; set; }
-        public IReadOnlyStock Stock { get; set; }
-        public string Comment { get; set; }
         public Date RecordDate { get; set; }
         public decimal Amount { get; set; }
         public bool CreateCashTransaction { get; set; }
 
-        public string Description
+        public override string Description
         {
             get
             {

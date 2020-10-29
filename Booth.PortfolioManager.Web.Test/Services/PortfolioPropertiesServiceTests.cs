@@ -28,7 +28,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreatePortfolio();
 
-            portfolio.ChangeDrpParticipation(PortfolioTestCreator.WamId, true);
+            portfolio.ChangeDrpParticipation(PortfolioTestCreator.Stock_WAM.Id, true);
 
             var service = new PortfolioPropertiesService(portfolio);
 
@@ -44,14 +44,14 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.HoldingProperties()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.ArgId, AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_ARG,
                         StartDate = new Date(2000, 01, 01),
                         EndDate = Date.MaxValue,
                         ParticipatingInDrp = false
                     },
                     new RestApi.Portfolios.HoldingProperties()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.WamId, AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_WAM,
                         StartDate = new Date(2000, 01, 01),
                         EndDate = Date.MaxValue,
                         ParticipatingInDrp = true

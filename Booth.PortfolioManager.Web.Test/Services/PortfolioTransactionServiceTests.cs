@@ -7,9 +7,10 @@ using FluentAssertions;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Services;
+using Booth.PortfolioManager.RestApi.Transactions;
 
 namespace Booth.PortfolioManager.Web.Test.Services
-{/*
+{
     public class PortfolioTransactionServiceTests
     {
         [Fact]
@@ -22,46 +23,116 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var result = service.GetTransactions(dateRange);
 
             result.Should().HaveNotFoundStatus();
-
         }
 
         [Fact]
         public void GetTransactionNotFound()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioTransactionService(portfolio);
+
+            var result = service.GetTransaction(Guid.NewGuid());
+
+            result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
         public void GetTransaction()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioTransactionService(portfolio);
+
+            var id = portfolio.Transactions[1].Id;
+            var result = service.GetTransaction(id);
+
+            result.Result.Should().BeEquivalentTo(new
+            {
+                Stock = PortfolioTestCreator.Stock_ARG.Id,
+                Id = id,
+                Type = TransactionType.Aquisition,
+                TransactionDate = new Date(2000, 01, 01),
+                Description = "Aquired 100 shares @ $1.00"
+            });
         }
 
         [Fact]
         public void GetTransactions()
         {
-            false.Should().BeTrue();
-        }
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
 
-        [Fact]
-        public void GetTransactionsForStockNotFound()
-        {
-            false.Should().BeTrue();
+            var service = new PortfolioTransactionService(portfolio);
+
+            var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
+            var result = service.GetTransactions(dateRange);
+
+            result.Result.Transactions.Should().BeEquivalentTo(new []
+            {
+                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                {
+                    Id = portfolio.Transactions[0].Id,
+                    Stock = null,
+                    TransactionDate = new Date(2000, 01, 01),
+                    Description = "Deposit $10,000.00",
+                    Comment= ""
+                },
+                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                {
+                    Id = portfolio.Transactions[1].Id,
+                    Stock = PortfolioTestCreator.Stock_ARG,
+                    TransactionDate = new Date(2000, 01, 01),
+                    Description = "Aquired 100 shares @ $1.00",
+                    Comment= ""
+                },
+                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                {
+                    Id = portfolio.Transactions[2].Id,
+                    Stock = PortfolioTestCreator.Stock_WAM,
+                    TransactionDate = new Date(2000, 01, 01),
+                    Description = "Aquired 200 shares @ $1.20",
+                    Comment= ""
+                }
+            });
         }
 
         [Fact]
         public void GetTransactionsForStockNotOwned()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioTransactionService(portfolio);
+
+            var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
+            var result = service.GetTransactions(Guid.NewGuid(), dateRange);
+
+            result.Result.Transactions.Should().BeEmpty();
         }
 
         [Fact]
         public void GetTransactionsForStock()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioTransactionService(portfolio);
+
+            var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
+            var result = service.GetTransactions(PortfolioTestCreator.Stock_WAM.Id, dateRange);
+
+            result.Result.Transactions.Should().BeEquivalentTo(new[]
+            {
+                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                {
+                    Id = portfolio.Transactions[2].Id,
+                    Stock = PortfolioTestCreator.Stock_WAM,
+                    TransactionDate = new Date(2000, 01, 01),
+                    Description = "Aquired 200 shares @ $1.20",
+                    Comment= ""
+                }
+            });
         }
 
-        [Fact]
+     /*   [Fact]
         public void ApplyAquisitionValidationError()
         {
             false.Should().BeTrue();
@@ -155,6 +226,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
         public void ApplyUnitCountAdjustment()
         {
             false.Should().BeTrue();
-        }
-    } */
+        } */
+    } 
 }

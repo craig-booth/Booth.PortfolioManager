@@ -7,15 +7,11 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class CostBaseAdjustment : IPortfolioTransaction
+    public class CostBaseAdjustment : PortfolioTransaction
     {
-        public Guid Id { get; set; }
-        public Date Date { get; set; }
-        public IReadOnlyStock Stock { get; set; }
-        public string Comment { get; set; }
         public decimal Percentage { get; set; }
 
-        public string Description
+        public override string Description
         {
             get
             {

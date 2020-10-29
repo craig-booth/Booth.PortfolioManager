@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
 {
@@ -32,34 +34,51 @@ namespace Booth.PortfolioManager.Web.Services
 
         public ServiceResult<Transaction> GetTransaction(Guid id)
         {
-            /*  var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<Transaction>.NotFound();
 
-              var transaction = portfolio.Transactions[id];
-              if (transaction == null)
-                  throw new TransactionNotFoundException(id);
+            IPortfolioTransaction transaction;
+            try 
+            {
+                transaction = _Portfolio.Transactions[id];
+            }
+            catch
+            {
+                return ServiceResult<Transaction>.NotFound();
+            }
 
-              return _Mapper.Map<RestApi.Transactions.Transaction>(transaction); */
-            throw new NotSupportedException();
+            var response = transaction.ToResponse();
+
+            return ServiceResult<Transaction>.Ok(response);
         }
 
         public ServiceResult<TransactionsResponse> GetTransactions(DateRange dateRange)
         {
-            /*      var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<TransactionsResponse>.NotFound();
 
-                  return GetTransactions(portfolio.Transactions.InDateRange(dateRange), dateRange.ToDate); */
-            throw new NotSupportedException();
+            var transactions = _Portfolio.Transactions.InDateRange(dateRange);
+
+
+            var response = new TransactionsResponse();
+
+            response.Transactions.AddRange(transactions.Select(x => x.ToTransactionItem(dateRange.ToDate)));
+                 
+            return ServiceResult<TransactionsResponse>.Ok(response);
         }
 
         public ServiceResult<TransactionsResponse> GetTransactions(Guid stockId, DateRange dateRange)
         {
-            /*      var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<TransactionsResponse>.NotFound();
 
-                  var holding = portfolio.Holdings.Get(stockId);
-                  if (holding == null)
-                      throw new HoldingNotFoundException(stockId);
+            var transactions = _Portfolio.Transactions.ForHolding(stockId, dateRange);
 
-                  return GetTransactions(portfolio.Transactions.ForHolding(holding.Stock.Id, dateRange), dateRange.ToDate); */
-            throw new NotSupportedException();
+            var response = new TransactionsResponse();
+
+            response.Transactions.AddRange(transactions.Select(x => x.ToTransactionItem(dateRange.ToDate)));
+
+            return ServiceResult<TransactionsResponse>.Ok(response);
         }
 
         /*    private RestApi.Portfolios.TransactionsResponse GetTransactions(IEnumerable<Transaction> transactions, DateTime date)
@@ -86,7 +105,7 @@ namespace Booth.PortfolioManager.Web.Services
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(Aquisition aquisition)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.Aquisition aquisition)
         {
             /*       var portfolio = _PortfolioCache.Get(portfolioId);
 
@@ -97,7 +116,7 @@ namespace Booth.PortfolioManager.Web.Services
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(CashTransaction cashTransaction)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.CashTransaction cashTransaction)
         {
             /*var portfolio = _PortfolioCache.Get(portfolioId);
 
@@ -107,12 +126,12 @@ namespace Booth.PortfolioManager.Web.Services
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(CostBaseAdjustment costBaseAdjustment)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.CostBaseAdjustment costBaseAdjustment)
         {
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(Disposal disposal)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.Disposal disposal)
         {
             /*  var portfolio = _PortfolioCache.Get(portfolioId);
 
@@ -123,7 +142,7 @@ namespace Booth.PortfolioManager.Web.Services
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(IncomeReceived incomeReceived)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.IncomeReceived incomeReceived)
         {
             /*     var portfolio = _PortfolioCache.Get(portfolioId);
 
@@ -135,7 +154,7 @@ namespace Booth.PortfolioManager.Web.Services
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(OpeningBalance openingBalance)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.OpeningBalance openingBalance)
         {
             /*      var portfolio = _PortfolioCache.Get(portfolioId);
 
@@ -147,7 +166,7 @@ namespace Booth.PortfolioManager.Web.Services
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(ReturnOfCapital returnOfCapital)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.ReturnOfCapital returnOfCapital)
         {
             /*   var portfolio = _PortfolioCache.Get(portfolioId);
 
@@ -158,7 +177,7 @@ namespace Booth.PortfolioManager.Web.Services
             throw new NotSupportedException();
         }
 
-        private ServiceResult ApplyTransaction(UnitCountAdjustment unitCountAdjustment)
+        private ServiceResult ApplyTransaction(RestApi.Transactions.UnitCountAdjustment unitCountAdjustment)
         {
             throw new NotSupportedException();
         }

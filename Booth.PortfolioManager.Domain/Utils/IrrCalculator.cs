@@ -6,7 +6,7 @@ using Booth.Common;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    class IrrCalculator
+    public class IrrCalculator
     {
         private const double RequiredPrecision = 0.000001;
         private const int MaximumIterations = 100;

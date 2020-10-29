@@ -38,7 +38,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.ArgId, AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -49,7 +49,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.WamId, AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 200,
                         CostBase = 259.95m,
@@ -82,7 +82,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetCapitalGains(PortfolioTestCreator.ArgId, new Date(1999, 01, 01));
+            var result = service.GetCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(1999, 01, 01));
 
             result.Result.UnrealisedGains.Should().BeEmpty();
         }
@@ -94,7 +94,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetCapitalGains(PortfolioTestCreator.ArgId, new Date(2010, 01, 01));
+            var result = service.GetCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(2010, 01, 01));
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -102,7 +102,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.ArgId, AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -131,7 +131,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.ArgId, AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -153,7 +153,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.WamId, AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 200,
                         CostBase = 259.95m,
@@ -197,7 +197,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetDetailedCapitalGains(PortfolioTestCreator.ArgId, new Date(1999, 01, 01));
+            var result = service.GetDetailedCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(1999, 01, 01));
 
             result.Result.UnrealisedGains.Should().BeEmpty();
         }
@@ -209,7 +209,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetDetailedCapitalGains(PortfolioTestCreator.ArgId, new Date(2010, 01, 01));
+            var result = service.GetDetailedCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(2010, 01, 01));
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -217,7 +217,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = new RestApi.Portfolios.Stock() { Id = PortfolioTestCreator.ArgId, AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks},
+                        Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,

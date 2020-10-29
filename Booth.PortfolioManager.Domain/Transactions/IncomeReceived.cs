@@ -7,12 +7,8 @@ using Booth.PortfolioManager.Domain.Stocks;
 
 namespace Booth.PortfolioManager.Domain.Transactions
 {
-    class IncomeReceived : IPortfolioTransaction
+    public class IncomeReceived : PortfolioTransaction
     {
-        public Guid Id { get; set; }
-        public Date Date { get; set; }
-        public IReadOnlyStock Stock { get; set; }
-        public string Comment { get; set; }
         public Date RecordDate { get; set; }
         public decimal FrankedAmount { get; set; }
         public decimal UnfrankedAmount { get; set; }
@@ -22,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
         public bool CreateCashTransaction { get; set; }
         public decimal DrpCashBalance { get; set; }
 
-        public string Description
+        public override string Description
         {
             get
             {
