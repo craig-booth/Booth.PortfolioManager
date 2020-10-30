@@ -17,23 +17,8 @@ using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
-    public class StockServiceTests : IDisposable
+    public class StockServiceTests 
     {
-        private CultureInfo _CultureBackup;
-        public StockServiceTests()
-        {
-            _CultureBackup = Thread.CurrentThread.CurrentCulture;
-
-            var testCulture = new CultureInfo("en-AU");
-            testCulture.DateTimeFormat.ShortDatePattern = "d/M/yyyy";
-
-            Thread.CurrentThread.CurrentCulture = testCulture;
-        }
-        public void Dispose()
-        {
-            Thread.CurrentThread.CurrentCulture = _CultureBackup;
-        }
-
         [Fact]
         public void ListStockDuplicateId()
         {
@@ -79,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var result = service.ListStock(id, "XYZ", "XYZ Pty Ltd", new Date(2000, 01, 01), true, AssetCategory.AustralianFixedInterest);
 
-            result.Should().HaveErrorStatus().WithError("A stock already exists with the code XYZ on 1/1/2000");
+            result.Should().HaveErrorStatus().WithError("A stock already exists with the code XYZ on 1/01/2000");
 
             mockRepository.Verify();
         }
@@ -349,7 +334,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
-            result.Should().HaveErrorStatus().WithError("A later change has been made on 1/1/2002");
+            result.Should().HaveErrorStatus().WithError("A later change has been made on 1/01/2002");
 
             mockRepository.Verify();
         }
@@ -378,7 +363,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
-            result.Should().HaveErrorStatus().WithError("A stock already exists with code ABC on 1/1/2000");
+            result.Should().HaveErrorStatus().WithError("A stock already exists with code ABC on 1/01/2000");
 
             mockRepository.Verify();
         }
@@ -809,7 +794,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var result = service.ChangeDividendRules(id, new Date(2000, 01, 01), 0.30m, RoundingRule.Round, true, DrpMethod.Round);
 
-            result.Should().HaveErrorStatus().WithError("Stock is not active at 1/1/2000");
+            result.Should().HaveErrorStatus().WithError("Stock is not active at 1/01/2000");
 
             mockRepository.Verify();
         }
