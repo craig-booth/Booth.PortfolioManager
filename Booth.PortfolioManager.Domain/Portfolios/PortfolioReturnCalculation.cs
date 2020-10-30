@@ -32,10 +32,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 .Where(x => (x.Type == BankAccountTransactionType.Deposit) || ((x.Type == BankAccountTransactionType.Withdrawl)));
             foreach (var transaction in transactions)
             {
-                if (transaction.Type == BankAccountTransactionType.Deposit)
-                    cashFlows.Add(transaction.Date, -transaction.Amount);
-                else
-                    cashFlows.Add(transaction.Date, transaction.Amount);
+                cashFlows.Add(transaction.Date, -transaction.Amount);
             }
                 
 

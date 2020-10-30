@@ -49,6 +49,28 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2003, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                    },
+                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2005, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                    },
+                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    {
                         Stock = PortfolioTestCreator.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 200,
@@ -56,6 +78,17 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 300m,
                         CapitalGain = 40.05m,
                         DiscoutedGain = 20.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                    },
+                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_WAM,
+                        AquisitionDate = new Date(2005, 01, 03),
+                        Units = 5,
+                        CostBase = 32.50m,
+                        MarketValue = 7.50m,
+                        CapitalGain = -25.00m,
+                        DiscoutedGain = -25.00m,
                         DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
                     }
                 }
@@ -110,6 +143,28 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
                         DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                    },
+                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2003, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                    },
+                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2005, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
                     }
                 }
 
@@ -153,6 +208,50 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2003, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        CGTEvents = {
+                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            {
+                                Date = new Date(2003, 01, 01),
+                                Description = "Aquired 100 shares @ $1.00",
+                                UnitChange = 100,
+                                Units = 100,
+                                CostBaseChange = 119.95m,
+                                CostBase = 119.95m
+                            }
+                        }
+                    },
+                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2005, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        CGTEvents = {
+                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            {
+                                Date = new Date(2005, 01, 01),
+                                Description = "Aquired 100 shares @ $1.00",
+                                UnitChange = 100,
+                                Units = 100,
+                                CostBaseChange = 119.95m,
+                                CostBase = 119.95m
+                            }
+                        }
+                    },
+                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    {
                         Stock = PortfolioTestCreator.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 200,
@@ -170,6 +269,28 @@ namespace Booth.PortfolioManager.Web.Test.Services
                                 Units = 200,
                                 CostBaseChange = 259.95m,
                                 CostBase = 259.95m
+                            }
+                        }
+                    },
+                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_WAM,
+                        AquisitionDate = new Date(2005, 01, 03),
+                        Units = 5,
+                        CostBase = 32.50m,
+                        MarketValue = 7.50m,
+                        CapitalGain = -25.00m,
+                        DiscoutedGain = -25.00m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        CGTEvents = {
+                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            {
+                                Date = new Date(2005, 01, 03),
+                                Description = "Opening balance of 5 shares",
+                                UnitChange = 5,
+                                Units = 5,
+                                CostBaseChange = 32.50m,
+                                CostBase = 32.50m
                             }
                         }
                     }
@@ -229,6 +350,50 @@ namespace Booth.PortfolioManager.Web.Test.Services
                             new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2000, 01, 01),
+                                Description = "Aquired 100 shares @ $1.00",
+                                UnitChange = 100,
+                                Units = 100,
+                                CostBaseChange = 119.95m,
+                                CostBase = 119.95m
+                            }
+                        }
+                    },
+                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2003, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        CGTEvents = {
+                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            {
+                                Date = new Date(2003, 01, 01),
+                                Description = "Aquired 100 shares @ $1.00",
+                                UnitChange = 100,
+                                Units = 100,
+                                CostBaseChange = 119.95m,
+                                CostBase = 119.95m
+                            }
+                        }
+                    },
+                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        AquisitionDate = new Date(2005, 01, 01),
+                        Units = 100,
+                        CostBase = 119.95m,
+                        MarketValue = 200m,
+                        CapitalGain = 80.05m,
+                        DiscoutedGain = 40.03m,
+                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        CGTEvents = {
+                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            {
+                                Date = new Date(2005, 01, 01),
                                 Description = "Aquired 100 shares @ $1.00",
                                 UnitChange = 100,
                                 Units = 100,

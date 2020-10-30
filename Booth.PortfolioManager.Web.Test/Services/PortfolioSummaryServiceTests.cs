@@ -37,30 +37,30 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Result.Should().BeEquivalentTo(new
             {
-                PortfolioValue = 200m + 300m + (10000m - 119.95m - 259.95m),
-                PortfolioCost = 10000.00m,
-                Return1Year = 0.00698m,
-                Return3Year = 0.00769m,
-                Return5Year = 0.00339m,
-                ReturnAll = 0.00159m,
-                CashBalance = 10000m - 119.95m - 259.95m,
+                PortfolioValue = 6027.70m,
+                PortfolioCost = 5772.50m,
+                Return1Year = 0.02228m,
+                Return3Year = 0.02132m,
+                Return5Year = 0.01055m,
+                ReturnAll = 0.00611m,
+                CashBalance = 5120.20m,
                 Holdings = new[]
                 {
                     new RestApi.Portfolios.Holding()
                     {
                         Stock = PortfolioTestCreator.Stock_ARG,
-                        Units = 100,
-                        Value = 200m,
-                        Cost = 119.95m,
-                        CostBase = 119.95m
+                        Units = 300,
+                        Value = 600m,
+                        Cost = 359.85m,
+                        CostBase = 359.85m
                     },
                     new RestApi.Portfolios.Holding()
                     {
                         Stock = PortfolioTestCreator.Stock_WAM,
-                        Units = 200,
-                        Value = 300m,
-                        Cost = 259.95m,
-                        CostBase = 259.95m
+                        Units = 205,
+                        Value = 307.50m,
+                        Cost = 292.45m,
+                        CostBase = 292.45m
                     }
                 }
 

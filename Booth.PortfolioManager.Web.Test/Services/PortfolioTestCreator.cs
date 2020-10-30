@@ -59,9 +59,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
             portfolio.AddOpeningBalance(Stock_WAM.Id, new Date(2005, 01, 03), new Date(2005, 01, 03), 5, 32.50m, "", Guid.NewGuid());
             portfolio.IncomeReceived(Stock_ARG.Id, new Date(2007, 01, 02), new Date(2007, 01, 02), 70.00m, 15.00m, 2.00m, 0.00m, 0.00m, 0.00m, true, "", Guid.NewGuid());
 
-            portfolio.MakeCashTransaction(new Date(2009, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 500m, "", Guid.NewGuid());
-
             portfolio.MakeCashTransaction(new Date(2008, 01, 01), Domain.Transactions.BankAccountTransactionType.Withdrawl, 5000m, "", Guid.NewGuid());
+            portfolio.MakeCashTransaction(new Date(2009, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 500m, "", Guid.NewGuid());
+            
 
             return portfolio;
         }
