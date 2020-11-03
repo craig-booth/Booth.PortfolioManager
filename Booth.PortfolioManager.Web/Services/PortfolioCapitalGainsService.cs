@@ -49,7 +49,7 @@ namespace Booth.PortfolioManager.Web.Services
             if (holding == null)
                 return ServiceResult<SimpleUnrealisedGainsResponse>.NotFound();
 
-            var result = GetCapitalGains(new[] { holding}  , date);
+            var result = GetCapitalGains(new[] { holding }, date);
 
             return ServiceResult<SimpleUnrealisedGainsResponse>.Ok(result);
         }

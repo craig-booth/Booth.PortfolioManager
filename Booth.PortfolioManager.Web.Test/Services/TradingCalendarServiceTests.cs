@@ -102,7 +102,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new TradingCalendar(Guid.NewGuid());
-            tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
+            tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<IRepository<TradingCalendar>>();
             repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
             repository.Setup(x => x.Update(tradingCalendar));
@@ -113,13 +113,13 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             using (new AssertionScope())
             {
-                calendarReference.IsTradingDay(new Date(2000, 01, 01)).Should().BeFalse();
-                calendarReference.IsTradingDay(new Date(2000, 12, 25)).Should().BeTrue();
+                calendarReference.IsTradingDay(new Date(2001, 01, 01)).Should().BeFalse();
+                calendarReference.IsTradingDay(new Date(2001, 12, 25)).Should().BeTrue();
             }
 
             var updatedTradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
-            updatedTradingCalendar.Year = 2000;
-            updatedTradingCalendar.NonTradingDays.Add(new RestApi.TradingCalendars.TradingCalendar.NonTradingDay() { Date = new Date(2000, 12, 25), Description = "Christmas Day" });
+            updatedTradingCalendar.Year = 2001;
+            updatedTradingCalendar.NonTradingDays.Add(new RestApi.TradingCalendars.TradingCalendar.NonTradingDay() { Date = new Date(2001, 12, 25), Description = "Christmas Day" });
 
             var result = service.Update(updatedTradingCalendar);
 
@@ -127,8 +127,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 result.Should().HaveOkStatus();
 
-                calendarReference.IsTradingDay(new Date(2000, 01, 01)).Should().BeTrue();
-                calendarReference.IsTradingDay(new Date(2000, 12, 25)).Should().BeFalse();
+                calendarReference.IsTradingDay(new Date(2001, 01, 01)).Should().BeTrue();
+                calendarReference.IsTradingDay(new Date(2001, 12, 25)).Should().BeFalse();
             }
 
             mockRepository.Verify();
@@ -140,7 +140,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new TradingCalendar(Guid.NewGuid());
-            tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
+            tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<IRepository<TradingCalendar>>();
             repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
             repository.Setup(x => x.Update(tradingCalendar));
@@ -151,16 +151,16 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             using (new AssertionScope())
             {
-                calendarReference.IsTradingDay(new Date(2000, 01, 01)).Should().BeFalse();
-                calendarReference.IsTradingDay(new Date(2000, 12, 25)).Should().BeTrue();
+                calendarReference.IsTradingDay(new Date(2001, 01, 01)).Should().BeFalse();
+                calendarReference.IsTradingDay(new Date(2001, 12, 25)).Should().BeTrue();
             }
 
-            service.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 12, 25), "Christmas Day") });
+            service.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 12, 25), "Christmas Day") });
 
             using (new AssertionScope())
             {
-                calendarReference.IsTradingDay(new Date(2000, 01, 01)).Should().BeTrue();
-                calendarReference.IsTradingDay(new Date(2000, 12, 25)).Should().BeFalse();
+                calendarReference.IsTradingDay(new Date(2001, 01, 01)).Should().BeTrue();
+                calendarReference.IsTradingDay(new Date(2001, 12, 25)).Should().BeFalse();
             }
 
             mockRepository.Verify();

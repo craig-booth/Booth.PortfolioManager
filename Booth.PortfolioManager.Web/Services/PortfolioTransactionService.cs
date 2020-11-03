@@ -81,19 +81,6 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<TransactionsResponse>.Ok(response);
         }
 
-        /*    private RestApi.Portfolios.TransactionsResponse GetTransactions(IEnumerable<Transaction> transactions, DateTime date)
-            {
-                var response = new RestApi.Portfolios.TransactionsResponse();
-
-                foreach (var transaction in transactions)
-                {
-                    var t = _Mapper.Map<RestApi.Portfolios.TransactionsResponse.TransactionItem>(transaction, opts => opts.Items["date"] = date);
-                    response.Transactions.Add(t);
-                }
-
-                return response;
-            } */
-
         public ServiceResult ApplyTransaction(Transaction transaction)
         {
             /*       var portfolio = _PortfolioCache.Get(portfolioId);

@@ -35,9 +35,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         public async Task Import(CancellationToken cancellationToken)
         {
-            var lastExpectedDate = Date.Today.AddDays(-1);
-            while (! _TradingCalendar.IsTradingDay(lastExpectedDate))
-                lastExpectedDate = lastExpectedDate.AddDays(-1);
+            var lastExpectedDate = _TradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1));
 
             foreach (var stock in _StockQuery.All())
             {

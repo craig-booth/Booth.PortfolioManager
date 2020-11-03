@@ -3,12 +3,15 @@
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
     static class PortfolioTestCreator
     {
+        public static ITradingCalendar TradingCalendar = new TradingCalendar(Guid.NewGuid());
+
         public static RestApi.Portfolios.Stock Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
         public static RestApi.Portfolios.Stock Stock_WAM = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
 
@@ -23,8 +26,25 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var argStockPrice = new StockPriceHistory(arg.Id);
             arg.SetPriceHistory(argStockPrice);
             argStockPrice.UpdateClosingPrice(new Date(2000, 01, 01), 1.00m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 03), 1.01m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 04), 1.00m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 05), 1.03m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 06), 1.02m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 07), 1.01m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 10), 1.05m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 14), 1.07m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 17), 1.08m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 01, 31), 1.09m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 02, 29), 1.10m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 03, 31), 1.07m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 04, 28), 1.07m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 05, 25), 1.03m);
+            argStockPrice.UpdateClosingPrice(new Date(2000, 12, 29), 1.04m);
             argStockPrice.UpdateClosingPrice(new Date(2001, 01, 01), 1.05m);
-            argStockPrice.UpdateClosingPrice(new Date(2005, 01, 02), 1.10m);
+            argStockPrice.UpdateClosingPrice(new Date(2001, 12, 31), 1.01m);
+            argStockPrice.UpdateClosingPrice(new Date(2002, 12, 31), 0.99m);
+            argStockPrice.UpdateClosingPrice(new Date(2003, 12, 31), 1.29m);
+            argStockPrice.UpdateClosingPrice(new Date(2003, 05, 23), 1.40m);
             argStockPrice.UpdateClosingPrice(new Date(2007, 01, 02), 0.90m);
             argStockPrice.UpdateClosingPrice(new Date(2009, 01, 02), 1.70m);
             argStockPrice.UpdateClosingPrice(new Date(2010, 01, 01), 2.00m);
@@ -36,7 +56,25 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var wamStockPrice = new StockPriceHistory(wam.Id);
             wam.SetPriceHistory(wamStockPrice);
             wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 01), 1.20m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 03), 1.21m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 04), 1.20m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 05), 1.23m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 06), 1.22m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 07), 1.21m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 10), 1.25m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 14), 1.24m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 17), 1.27m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 31), 1.28m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 02, 29), 1.29m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 03, 31), 1.27m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 04, 28), 1.27m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 05, 25), 1.23m);
+            wamStockPrice.UpdateClosingPrice(new Date(2000, 12, 29), 1.14m);
             wamStockPrice.UpdateClosingPrice(new Date(2001, 01, 01), 1.15m);
+            wamStockPrice.UpdateClosingPrice(new Date(2001, 12, 31), 1.27m);
+            wamStockPrice.UpdateClosingPrice(new Date(2002, 12, 31), 1.27m);
+            wamStockPrice.UpdateClosingPrice(new Date(2003, 12, 31), 1.27m);
+            wamStockPrice.UpdateClosingPrice(new Date(2003, 05, 23), 1.40m);
             wamStockPrice.UpdateClosingPrice(new Date(2005, 01, 02), 1.10m);
             wamStockPrice.UpdateClosingPrice(new Date(2007, 01, 02), 0.90m);
             wamStockPrice.UpdateClosingPrice(new Date(2009, 01, 02), 1.30m);

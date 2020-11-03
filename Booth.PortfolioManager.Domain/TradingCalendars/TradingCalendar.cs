@@ -18,6 +18,9 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
     {
         IEnumerable<NonTradingDay> NonTradingDays(int year);
         bool IsTradingDay(Date date);
+        Date NextTradingDay(Date date);
+        Date PreviousTradingDay(Date date);
+
         IEnumerable<Date> TradingDays(DateRange range);
 
         void SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays);
@@ -67,12 +70,33 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
 
         public bool IsTradingDay(Date date)
         {
-            return (_NonTradingDays.BinarySearch(new NonTradingDay(date, "")) < 0);
+            if (!date.WeekDay())
+                return false;
+            else
+                return (_NonTradingDays.BinarySearch(new NonTradingDay(date, "")) < 0);
+        }
+
+        public Date NextTradingDay(Date date)
+        {
+            var nextTradingDay = date;
+            while (!IsTradingDay(nextTradingDay))
+                nextTradingDay = nextTradingDay.AddDays(1);
+
+            return nextTradingDay;
+        }
+
+        public Date PreviousTradingDay(Date date)
+        {
+            var previousTradingDay = date;
+            while (!IsTradingDay(previousTradingDay))
+                previousTradingDay = previousTradingDay.AddDays(-1);
+
+            return previousTradingDay;
         }
 
         public IEnumerable<Date> TradingDays(DateRange range)
         {
-            return DateUtils.Days(range.FromDate, range.ToDate).Where(x => x.WeekDay() && IsTradingDay(x));
+            return DateUtils.Days(range.FromDate, range.ToDate).Where(x => IsTradingDay(x));
         }
 
     }

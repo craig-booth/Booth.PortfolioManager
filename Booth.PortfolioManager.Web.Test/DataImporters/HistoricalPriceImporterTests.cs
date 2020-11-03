@@ -46,6 +46,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
 
             var tradingCalendar = mockRepository.Create<ITradingCalendar>();
             tradingCalendar.Setup(x => x.IsTradingDay(It.IsAny<Date>())).Returns(true);
+            tradingCalendar.Setup(x => x.PreviousTradingDay(Date.Today.AddDays(-1))).Returns(Date.Today.AddDays(-1));
 
             var logger = mockRepository.Create<ILogger<HistoricalPriceImporter>>(MockBehavior.Loose);
 
@@ -82,6 +83,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
 
             var tradingCalendar = mockRepository.Create<ITradingCalendar>();
             tradingCalendar.Setup(x => x.IsTradingDay(It.IsAny<Date>())).Returns(true);
+            tradingCalendar.Setup(x => x.PreviousTradingDay(Date.Today.AddDays(-1))).Returns(Date.Today.AddDays(-1));
 
             var logger = mockRepository.Create<ILogger<HistoricalPriceImporter>>(MockBehavior.Loose);
 
@@ -124,6 +126,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
 
             var tradingCalendar = mockRepository.Create<ITradingCalendar>();
             tradingCalendar.Setup(x => x.IsTradingDay(It.IsAny<Date>())).Returns(true);
+            tradingCalendar.Setup(x => x.PreviousTradingDay(Date.Today.AddDays(-1))).Returns(Date.Today.AddDays(-1));
 
             var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendar.Object, dataService.Object, null);
 

@@ -9,6 +9,7 @@ using Booth.Common;
 using Booth.EventStore;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Domain.TradingCalendars.Events;
+using System.Data;
 
 namespace Booth.PortfolioManager.Domain.Test.TradingCalendars
 {
@@ -158,6 +159,118 @@ namespace Booth.PortfolioManager.Domain.Test.TradingCalendars
             tradingCalendar.ApplyEvents(new Event[] { @event });
 
             tradingCalendar.IsTradingDay(new Date(2019, 01, 01)).Should().BeFalse();
+        }
+
+        [Fact]
+        public void CheckIfWeekEndIsATradingDay()
+        {
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+
+            var nonTradingDays = new NonTradingDay[] {
+                new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
+                new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
+            };
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
+
+            tradingCalendar.ApplyEvents(new Event[] { @event });
+
+            tradingCalendar.IsTradingDay(new Date(2019, 11, 10)).Should().BeFalse();
+        }
+
+        [Fact]
+        public void NextTradingDayForTradingDay()
+        {
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+
+            var nonTradingDays = new NonTradingDay[] {
+                new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
+                new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
+            };
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
+
+            tradingCalendar.ApplyEvents(new Event[] { @event });
+
+            tradingCalendar.NextTradingDay(new Date(2019, 11, 08)).Should().Be(new Date(2019, 11, 08));
+        }
+
+        [Fact]
+        public void NextTradingDayForNonTradingDay()
+        {
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+
+            var nonTradingDays = new NonTradingDay[] {
+                new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
+                new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
+            };
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
+
+            tradingCalendar.ApplyEvents(new Event[] { @event });
+
+            tradingCalendar.NextTradingDay(new Date(2019, 01, 01)).Should().Be(new Date(2019, 01, 02));
+        }
+
+        [Fact]
+        public void NextTradingDayForWeekEnd()
+        {
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+
+            var nonTradingDays = new NonTradingDay[] {
+                new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
+                new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
+            };
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
+
+            tradingCalendar.ApplyEvents(new Event[] { @event });
+
+            tradingCalendar.NextTradingDay(new Date(2019, 11, 10)).Should().Be(new Date(2019, 11, 11));
+        }
+
+        [Fact]
+        public void PreviousTradingDayForTradingDay()
+        {
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+
+            var nonTradingDays = new NonTradingDay[] {
+                new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
+                new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
+            };
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
+
+            tradingCalendar.ApplyEvents(new Event[] { @event });
+
+            tradingCalendar.PreviousTradingDay(new Date(2019, 11, 08)).Should().Be(new Date(2019, 11, 08));
+        }
+
+        [Fact]
+        public void PreviousTradingDayForNonTradingDay()
+        {
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+
+            var nonTradingDays = new NonTradingDay[] {
+                new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
+                new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
+            };
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
+
+            tradingCalendar.ApplyEvents(new Event[] { @event });
+
+            tradingCalendar.PreviousTradingDay(new Date(2019, 01, 01)).Should().Be(new Date(2018, 12, 31));
+        }
+
+        [Fact]
+        public void PreviousTradingDayForWeekEnd()
+        {
+            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+
+            var nonTradingDays = new NonTradingDay[] {
+                new NonTradingDay(new Date(2019, 01, 01), "New Years Day"),
+                new NonTradingDay(new Date(2019, 12, 25), "Christmas Day")
+            };
+            var @event = new NonTradingDaysSetEvent(tradingCalendar.Id, 0, 2019, nonTradingDays);
+
+            tradingCalendar.ApplyEvents(new Event[] { @event });
+
+            tradingCalendar.PreviousTradingDay(new Date(2019, 11, 10)).Should().Be(new Date(2019, 11, 08));
         }
 
         [Fact]

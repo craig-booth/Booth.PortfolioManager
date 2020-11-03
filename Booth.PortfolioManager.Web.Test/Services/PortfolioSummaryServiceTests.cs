@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 PortfolioCost = 5772.50m,
                 Return1Year = 0.02228m,
                 Return3Year = 0.02132m,
-                Return5Year = 0.01055m,
+                Return5Year = 0.00916m,
                 ReturnAll = 0.00611m,
                 CashBalance = 5120.20m,
                 Holdings = new[]
