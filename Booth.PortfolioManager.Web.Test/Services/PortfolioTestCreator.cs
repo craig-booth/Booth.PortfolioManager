@@ -12,16 +12,22 @@ namespace Booth.PortfolioManager.Web.Test.Services
     {
         public static ITradingCalendar TradingCalendar = new TradingCalendar(Guid.NewGuid());
 
+        private static EntityCache<Stock> _StockCache = new EntityCache<Stock>();
+        public static IStockResolver StockResolver = new StockResolver(_StockCache);
+
         public static RestApi.Portfolios.Stock Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
         public static RestApi.Portfolios.Stock Stock_WAM = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
 
+        public static Guid ARG_CapitalReturn = Guid.NewGuid();
+        public static Guid WAM_Split = Guid.NewGuid();
+      
         public static Portfolio CreatePortfolio()
         {
-            var stockCache = new EntityCache<Stock>();
-
             var arg = new Stock(Stock_ARG.Id);
             arg.List(Stock_ARG.AsxCode, Stock_ARG.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
-            stockCache.Add(arg);
+            _StockCache.Add(arg);
+
+            arg.CorporateActions.AddCapitalReturn(ARG_CapitalReturn, new Date(2001, 01, 01), "ARG Capital Return", new Date(2001, 01, 02), 10.00m);
 
             var argStockPrice = new StockPriceHistory(arg.Id);
             arg.SetPriceHistory(argStockPrice);
@@ -51,7 +57,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var wam = new Stock(Stock_WAM.Id);
             wam.List(Stock_WAM.AsxCode, Stock_WAM.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
-            stockCache.Add(wam);
+            _StockCache.Add(wam);
+
+            wam.CorporateActions.AddSplitConsolidation(WAM_Split, new Date(2002, 01, 01), "WAM Split", 1, 2);
 
             var wamStockPrice = new StockPriceHistory(wam.Id);
             wam.SetPriceHistory(wamStockPrice);
@@ -80,8 +88,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             wamStockPrice.UpdateClosingPrice(new Date(2009, 01, 02), 1.30m);
             wamStockPrice.UpdateClosingPrice(new Date(2010, 01, 01), 1.50m);
 
-            var stockResolver = new StockResolver(stockCache);
-            var portfolioFactory = new PortfolioFactory(stockResolver);
+            var portfolioFactory = new PortfolioFactory(StockResolver);
             var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid(), "Test", Guid.NewGuid());
 
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 10000m, "", Guid.NewGuid());

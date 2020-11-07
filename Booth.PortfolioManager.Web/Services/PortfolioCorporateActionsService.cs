@@ -7,7 +7,7 @@ using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Transactions;
-
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
 {
@@ -23,72 +23,87 @@ namespace Booth.PortfolioManager.Web.Services
     {
 
         private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IStockResolver _StockResolver;
 
-        public PortfolioCorporateActionsService(IReadOnlyPortfolio portfolio)
+        public PortfolioCorporateActionsService(IReadOnlyPortfolio portfolio, IStockResolver stockResolver)
         {
             _Portfolio = portfolio;
+            _StockResolver = stockResolver;
         }
 
         public ServiceResult<CorporateActionsResponse> GetCorporateActions()
-        {/*
-            var portfolio = _PortfolioCache.Get(portfolioId);
-
-            return GetCorporateActions(portfolio, portfolio.Holdings.All(DateTime.Today)); */
-            throw new NotSupportedException();
-        }
-
-        public ServiceResult<CorporateActionsResponse> GetCorporateActions(Guid stockId)
         {
-            /*     var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<CorporateActionsResponse>.NotFound();
 
-                 var holding = portfolio.Holdings.Get(stockId);
-                 if (holding == null)
-                     throw new HoldingNotFoundException(stockId);
-
-                 return GetCorporateActions(portfolio, new[] { holding }); */
-            throw new NotSupportedException();
-        }
-
-     /*   private CorporateActionsResponse GetCorporateActions(Portfolio portfolio, IEnumerable<Domain.Portfolios.Holding> holdings)
-        {
             var response = new CorporateActionsResponse();
 
-            foreach (var holding in holdings)
+            foreach (var holding in _Portfolio.Holdings.All(Date.Today))
             {
                 foreach (var corporateAction in holding.Stock.CorporateActions.InDateRange(holding.EffectivePeriod))
                 {
-                    if (! corporateAction.HasBeenApplied(portfolio.Transactions))
+                    if (!corporateAction.HasBeenApplied(_Portfolio.Transactions))
                     {
                         response.CorporateActions.Add(new CorporateActionsResponse.CorporateActionItem()
                         {
                             Id = corporateAction.Id,
                             ActionDate = corporateAction.Date,
-                            Stock = corporateAction.Stock.Convert(corporateAction.Date),
+                            Stock = corporateAction.Stock.ToSummaryResponse(corporateAction.Date),
                             Description = corporateAction.Description
                         });
                     }
                 }
             }
 
-            return response; 
-        } */
+            return ServiceResult<CorporateActionsResponse>.Ok(response);
+        }
+
+        public ServiceResult<CorporateActionsResponse> GetCorporateActions(Guid stockId)
+        {
+            if (_Portfolio == null)
+                return ServiceResult<CorporateActionsResponse>.NotFound();
+
+            var holding = _Portfolio.Holdings[stockId];
+            if (holding == null)
+                return ServiceResult<CorporateActionsResponse>.NotFound();
+
+            var response = new CorporateActionsResponse();
+
+            foreach (var corporateAction in holding.Stock.CorporateActions.InDateRange(holding.EffectivePeriod))
+            {
+                if (!corporateAction.HasBeenApplied(_Portfolio.Transactions))
+                {
+                    response.CorporateActions.Add(new CorporateActionsResponse.CorporateActionItem()
+                    {
+                        Id = corporateAction.Id,
+                        ActionDate = corporateAction.Date,
+                        Stock = corporateAction.Stock.ToSummaryResponse(corporateAction.Date),
+                        Description = corporateAction.Description
+                    });
+                }
+            }
+
+            return ServiceResult<CorporateActionsResponse>.Ok(response);
+        }
 
         public ServiceResult<List<Transaction>> GetTransactionsForCorporateAction(Guid stockId, Guid actionId)
         {
-            /*     var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<List<Transaction>>.NotFound();
 
-                 var holding = portfolio.Holdings.Get(stockId);
-                 if (holding == null)
-                     throw new HoldingNotFoundException(stockId);
+            var holding = _Portfolio.Holdings[stockId];
+            if (holding == null)
+                return ServiceResult<List<Transaction>>.NotFound();
 
-                 var corporateAction = holding.Stock.CorporateActions[actionId];
-                 if (corporateAction == null)
-                     throw new CorporateActionNotFoundException(actionId);
+            var corporateAction = holding.Stock.CorporateActions[actionId];
+            if (corporateAction == null)
+                return ServiceResult<List<Transaction>>.NotFound();
 
-                 var transactions = corporateAction.GetTransactionList(holding);
+            var transactions = corporateAction.GetTransactionList(holding, _StockResolver);
 
-                 return _Mapper.Map<IEnumerable<RestApi.Transactions.Transaction>>(transactions); */
-            throw new NotSupportedException();
+            var result = transactions.Select(x => x.ToResponse()).ToList();
+
+            return ServiceResult<List<Transaction>>.Ok(result);
         }
 
     } 

@@ -12,6 +12,7 @@ using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.RestApi.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -60,11 +61,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IRepository<Stock>>();
             repository.Setup(x => x.Update(It.IsAny<Stock>())).Callback<Stock>(x => _Events.AddRange(x.FetchEvents())); */
         }
-/*
+
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioCorporateActionsService(null);
+            var service = new PortfolioCorporateActionsService(null, PortfolioTestCreator.StockResolver);
 
             var result = service.GetCorporateActions();
 
@@ -74,61 +75,102 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCorporateActions()
         {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
 
-            var holdingCollection = mockRepository.Create<IHoldingCollection>();
-
-            var portfolio = mockRepository.Create<IReadOnlyPortfolio>();
-            portfolio.Setup(x => x.Holdings).Returns(holdingCollection.Object);
-
-            var service = new PortfolioCorporateActionsService(portfolio.Object);
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
 
             var result = service.GetCorporateActions();
 
-            mockRepository.Verify();
+            result.Result.Should().BeEquivalentTo(new
+            {
+                CorporateActions = new[]
+                {
+                    new CorporateActionsResponse.CorporateActionItem() { Id = PortfolioTestCreator.ARG_CapitalReturn, ActionDate = new Date(2001, 01, 01), Stock = PortfolioTestCreator.Stock_ARG, Description = "ARG Capital Return" },
+                    new CorporateActionsResponse.CorporateActionItem() { Id = PortfolioTestCreator.WAM_Split, ActionDate = new Date(2002, 01, 01), Stock = PortfolioTestCreator.Stock_WAM, Description = "WAM Split" },
+                }
+
+            });
         }
 
-        [Fact]
-        public void GetCorporateActionsStockNotFound()
-        {
-            false.Should().BeTrue();
-        }
 
         [Fact]
         public void GetCorporateActionsStockNotOwned()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+
+            var result = service.GetCorporateActions(Guid.NewGuid());
+
+            result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
         public void GetCorporateActionsForStock()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+
+            var result = service.GetCorporateActions(PortfolioTestCreator.Stock_WAM.Id);
+
+            result.Result.Should().BeEquivalentTo(new
+            {
+                CorporateActions = new[]
+                {
+                   new CorporateActionsResponse.CorporateActionItem() { Id = PortfolioTestCreator.WAM_Split, ActionDate = new Date(2002, 01, 01), Stock = PortfolioTestCreator.Stock_WAM, Description = "WAM Split" },
+                }
+
+            });
         }
 
-        [Fact]
-        public void GetTransactionsForCorporateActionStockNotFound()
-        {
-            false.Should().BeTrue();
-        }
 
         [Fact]
         public void GetTransactionsForCorporateActionStockNotOwned()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+
+            var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
+
+            result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
         public void GetTransactionsForCorporateActionActionNotFound()
         {
-            false.Should().BeTrue();
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+
+            var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
+
+            result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
         public void GetTransactionsForCorporateAction()
         {
-            false.Should().BeTrue();
-        } */
+            var portfolio = PortfolioTestCreator.CreatePortfolio();
+
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+
+            var result = service.GetTransactionsForCorporateAction(PortfolioTestCreator.Stock_WAM.Id, PortfolioTestCreator.WAM_Split);
+
+            result.Result.Should().BeEquivalentTo(new []
+            {
+                new RestApi.Transactions.UnitCountAdjustment()
+                {
+                    Stock = PortfolioTestCreator.Stock_WAM.Id,
+                    TransactionDate = new Date(2002, 01, 01),
+                    Description = "Adjust unit count using ratio 1:2",
+                    Comment= "WAM Split",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                }
+            }, options => options.Excluding(x => x.Id));
+        } 
     }
 
 }
