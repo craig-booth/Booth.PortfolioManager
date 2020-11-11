@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
 {
@@ -26,28 +27,29 @@ namespace Booth.PortfolioManager.Web.Services
         }
 
         public ServiceResult<IncomeResponse> GetIncome(DateRange dateRange)
-        {/*
-            var portfolio = _PortfolioCache.Get(portfolioId);
-
+        {
+            if (_Portfolio == null)
+                return ServiceResult<IncomeResponse>.NotFound();
+            
+            
             var response = new IncomeResponse();
 
-            var incomes = portfolio.Transactions.InDateRange(dateRange).OfType<IncomeReceived>()
+            var incomes = _Portfolio.Transactions.InDateRange(dateRange).OfType<Domain.Transactions.IncomeReceived>()
                 .GroupBy(x => x.Stock,
                         x => x,
                         (key, result) => new IncomeResponse.IncomeItem()
                         {
-                            Stock = key.Convert(dateRange.ToDate),
+                            Stock = key.ToSummaryResponse(dateRange.ToDate),
                             UnfrankedAmount = result.Sum(x => x.UnfrankedAmount),
                             FrankedAmount = result.Sum(x => x.FrankedAmount),
                             FrankingCredits = result.Sum(x => x.FrankingCredits),
-                            NettIncome = result.Sum(x => x.CashIncome),
+                            NetIncome = result.Sum(x => x.CashIncome),
                             GrossIncome = result.Sum(x => x.TotalIncome)
                         });
 
             response.Income.AddRange(incomes);
-
-            return response; */
-            throw new NotSupportedException();
+          
+            return ServiceResult<IncomeResponse>.Ok(response); 
         }
     } 
 }

@@ -35,7 +35,7 @@ namespace Booth.PortfolioManager.Web.Controllers
         }
 
         // GET:  transactions/id/corporateaction/id
-        [HttpGet("{stockId:guid}/corporateaction/{actionId:guid}")]
+        [HttpGet("{stockId:guid}/corporateactions/{actionId:guid}")]
         public ActionResult<List<Transaction>> GetTransactionsForCorporateAction([FromServices] IPortfolioCorporateActionsService service, Guid stockId, Guid actionId)
         {
             var result = service.GetTransactionsForCorporateAction(stockId, actionId);

@@ -136,6 +136,10 @@ namespace Booth.PortfolioManager.Web.Services
                 else
                 {
                     item.HoldingPerformance.ClosingBalance = 0.00m;
+
+                    holding = openingHoldings.FirstOrDefault(x => x.Stock.Id == item.HoldingPerformance.Stock.Id);
+                    item.EndDate = holding.EffectivePeriod.ToDate;
+                    item.FinalValue = 0.00m;
                 }
 
                 item.HoldingPerformance.CapitalGain = item.HoldingPerformance.ClosingBalance - (item.HoldingPerformance.OpeningBalance + item.HoldingPerformance.Purchases - item.HoldingPerformance.Sales);
