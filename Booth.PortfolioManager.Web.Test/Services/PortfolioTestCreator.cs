@@ -97,6 +97,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             portfolio.MakeCashTransaction(new Date(2002, 01, 01), Domain.Transactions.BankAccountTransactionType.Interest, 100m, "", Guid.NewGuid());
             portfolio.AquireShares(Stock_ARG.Id, new Date(2003, 01, 01), 100, 1.00m, 19.95m, true, "", Guid.NewGuid());
+            portfolio.DisposeOfShares(Stock_ARG.Id, new Date(2004, 01, 01), 50, 1.02m, 19.95m, Domain.Utils.CgtCalculationMethod.MinimizeGain, true, "", Guid.NewGuid());
             portfolio.AquireShares(Stock_ARG.Id, new Date(2005, 01, 01), 100, 1.00m, 19.95m, true, "", Guid.NewGuid());
 
             portfolio.IncomeReceived(Stock_ARG.Id, new Date(2005, 01, 02), new Date(2005, 01, 02), 50.00m, 5.00m, 2.00m, 0.00m, 0.00m, 0.00m, true,"",  Guid.NewGuid());

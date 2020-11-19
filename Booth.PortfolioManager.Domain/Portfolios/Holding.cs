@@ -43,6 +43,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
     {   
         public Date EventDate { get; set; }
         public IReadOnlyStock Stock { get; set; }
+        public int Units { get; set; }
+        public decimal CostBase { get; set; }
         public decimal AmountReceived { get; set; }
         public decimal CapitalGain { get; set; }
         public CgtMethod CgtMethod { get; set; }
@@ -160,7 +162,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             }
             _Properties.Change(date, newProperties);
 
-            OnCgtEventOccured(date, Stock, amount, capitalGain, cgtMethod, transaction);    
+            OnCgtEventOccured(date, Stock, units, costBaseChange, amount, capitalGain, cgtMethod, transaction);    
         }
 
         public decimal Value(Date date)
@@ -184,7 +186,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             Settings.ParticipateInDrp = participateInDrp;
         }
 
-        private void OnCgtEventOccured(Date eventDate, IReadOnlyStock stock, decimal amountReceived, decimal capitalGain, CgtMethod cgtMethod, IPortfolioTransaction transaction)
+        private void OnCgtEventOccured(Date eventDate, IReadOnlyStock stock, int units, decimal costBase, decimal amountReceived, decimal capitalGain, CgtMethod cgtMethod, IPortfolioTransaction transaction)
         {
             // Make a temporary copy of the event to avoid possibility of
             // a race condition if the last subscriber unsubscribes
@@ -197,6 +199,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 {
                     EventDate = eventDate,
                     Stock = stock,
+                    Units = units,
+                    CostBase = costBase,
                     AmountReceived = amountReceived,
                     CapitalGain = capitalGain,
                     CgtMethod = cgtMethod,

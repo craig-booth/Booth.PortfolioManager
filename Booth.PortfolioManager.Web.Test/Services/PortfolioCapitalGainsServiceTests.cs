@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Xunit;
-using FluentAssertions;
-using Moq;
-
-using Booth.Common;
+﻿using Booth.Common;
 using Booth.PortfolioManager.Web.Services;
+using FluentAssertions;
+using System;
+using Xunit;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -40,11 +35,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     {
                         Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
-                        Units = 100,
-                        CostBase = 119.95m,
-                        MarketValue = 200m,
-                        CapitalGain = 80.05m,
-                        DiscoutedGain = 40.03m,
+                        Units = 50,
+                        CostBase = 59.97m,
+                        MarketValue = 100m,
+                        CapitalGain = 40.03m,
+                        DiscoutedGain = 20.02m,
                         DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
@@ -137,11 +132,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     {
                         Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
-                        Units = 100,
-                        CostBase = 119.95m,
-                        MarketValue = 200m,
-                        CapitalGain = 80.05m,
-                        DiscoutedGain = 40.03m,
+                        Units = 50,
+                        CostBase = 59.97m,
+                        MarketValue = 100m,
+                        CapitalGain = 40.03m,
+                        DiscoutedGain = 20.02m,
                         DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
@@ -188,11 +183,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     {
                         Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
-                        Units = 100,
-                        CostBase = 119.95m,
-                        MarketValue = 200m,
-                        CapitalGain = 80.05m,
-                        DiscoutedGain = 40.03m,
+                        Units = 50,
+                        CostBase = 59.97m,
+                        MarketValue = 100m,
+                        CapitalGain = 40.03m,
+                        DiscoutedGain = 20.02m,
                         DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
                         CGTEvents = {
                             new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
@@ -203,6 +198,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
                                 Units = 100,
                                 CostBaseChange = 119.95m,
                                 CostBase = 119.95m
+                            },
+                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            {
+                                Date = new Date(2004, 01, 01),
+                                Description = "Disposed of 50 shares @ $1.02",
+                                UnitChange = -50,
+                                Units = 50,
+                                CostBaseChange = -59.98m,
+                                CostBase = 59.97m
                             }
                         }
                     },
@@ -340,11 +344,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     {
                         Stock = PortfolioTestCreator.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
-                        Units = 100,
-                        CostBase = 119.95m,
-                        MarketValue = 200m,
-                        CapitalGain = 80.05m,
-                        DiscoutedGain = 40.03m,
+                        Units = 50,
+                        CostBase = 59.97m,
+                        MarketValue = 100m,
+                        CapitalGain = 40.03m,
+                        DiscoutedGain = 20.02m,
                         DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
                         CGTEvents = {
                             new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
@@ -355,6 +359,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
                                 Units = 100,
                                 CostBaseChange = 119.95m,
                                 CostBase = 119.95m
+                            },
+                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            {
+                                Date = new Date(2004, 01, 01),
+                                Description = "Disposed of 50 shares @ $1.02",
+                                UnitChange = -50,
+                                Units = 50,
+                                CostBaseChange = -59.98m,
+                                CostBase = 59.97m
                             }
                         }
                     },
@@ -406,5 +419,5 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             });
         }
-    } 
+    }
 }

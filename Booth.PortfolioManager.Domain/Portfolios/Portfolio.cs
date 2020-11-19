@@ -160,6 +160,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             {
                 var stock = _StockResolver.GetStock(@event.Stock);
                 holding = _Holdings.Add(stock, @event.Date);
+                holding.CgtEventOccurred += Holding_CgtEventOccurred;
             }
 
             var aquisition = new Aquisition
@@ -282,6 +283,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             {
                 var stock = _StockResolver.GetStock(@event.Stock);
                 holding = _Holdings.Add(stock, @event.Date);
+                holding.CgtEventOccurred += Holding_CgtEventOccurred;
             }
 
             var openingBalance = new OpeningBalance
@@ -367,5 +369,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             handler.Apply(unitCountAdjustment, holding, _CashAccount);
             _Transactions.Add(unitCountAdjustment);
         }
+
+        private void Holding_CgtEventOccurred(object sender, CgtEventArgs e)
+        {
+            _CgtEvents.Add(e.EventDate, e.Stock, e.Units, e.CostBase, e.AmountReceived, e.CapitalGain, e.CgtMethod);
+        }
+
     }
 }
