@@ -22,7 +22,7 @@ namespace Booth.PortfolioManager.Web.Controllers
 
         // GET
         [HttpGet]
-        public ActionResult<List<Holding>> Get([FromServices] IPortfolioService service, [FromQuery]DateTime? date, [FromQuery]DateTime? fromDate, [FromQuery]DateTime? toDate)
+        public ActionResult<List<Holding>> Get([FromServices] IPortfolioHoldingService service, [FromQuery]DateTime? date, [FromQuery]DateTime? fromDate, [FromQuery]DateTime? toDate)
         {
             ServiceResult<List<Holding>> result;
 
@@ -39,7 +39,7 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET:  id
         [Route("{id:guid}")]
         [HttpGet]
-        public ActionResult<Holding> Get([FromServices] IPortfolioService service, [FromRoute]Guid id, [FromQuery]DateTime? date)
+        public ActionResult<Holding> Get([FromServices] IPortfolioHoldingService service, [FromRoute]Guid id, [FromQuery]DateTime? date)
         {
             var result = service.GetHolding(id, DateFromParameter(date));
 

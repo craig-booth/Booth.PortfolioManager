@@ -83,6 +83,7 @@ namespace Booth.PortfolioManager.Web
             services.AddScoped<IPortfolioIncomeService, PortfolioIncomeService>();
             services.AddScoped<IPortfolioPerformanceService, PortfolioPerformanceService>();
             services.AddScoped<IPortfolioPropertiesService, PortfolioPropertiesService>();
+            services.AddScoped<IPortfolioHoldingService, PortfolioHoldingService>();
             services.AddScoped<IPortfolioService, PortfolioService>();
             services.AddScoped<IPortfolioSummaryService, PortfolioSummaryService>();
             services.AddScoped<IPortfolioTransactionService, PortfolioTransactionService>();
@@ -91,6 +92,7 @@ namespace Booth.PortfolioManager.Web
 
             // Others
             services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().ReadOnlyPortfolio);
+            services.AddScoped<IPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().Portfolio);
             services.AddScoped<IPortfolioAccessor, PortfolioAccessor>();
             services.AddSingleton<IPortfolioFactory, PortfolioFactory>();
             services.AddSingleton<IPortfolioCache, PortfolioCache>();

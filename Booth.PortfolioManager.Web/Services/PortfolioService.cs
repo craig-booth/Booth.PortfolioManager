@@ -6,68 +6,37 @@ using System.Threading.Tasks;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
 {
 
     public interface IPortfolioService
     {
-        ServiceResult<List<Holding>> GetHoldings(Date date);
-        ServiceResult<List<Holding>> GetHoldings(DateRange dateRange);
-        ServiceResult<Holding> GetHolding(Guid stockId, Date date);
         ServiceResult ChangeDrpParticipation(Guid stockId, bool participation);
     }
     
     public class PortfolioService : IPortfolioService
     {
-        private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IPortfolio _Portfolio;
 
-        public PortfolioService(IReadOnlyPortfolio portfolio)
+        public PortfolioService(IPortfolio portfolio)
         {
             _Portfolio = portfolio;
         }
 
-        public ServiceResult<List<Holding>> GetHoldings(Date date)
-        {
-            /*  var portfolio = _PortfolioCache.Get(portfolioId);
-
-              var holdings = portfolio.Holdings.All(date);
-
-              return _Mapper.Map<List<RestApi.Portfolios.Holding>>(holdings, opts => opts.Items["date"] = date); */
-            throw new NotSupportedException();
-        }
-
-        public ServiceResult<List<Holding>> GetHoldings(DateRange dateRange)
-        {
-            /*  var portfolio = _PortfolioCache.Get(portfolioId);
-
-              var holdings = portfolio.Holdings.All(dateRange);
-
-              return _Mapper.Map<List<RestApi.Portfolios.Holding>>(holdings, opts => opts.Items["date"] = dateRange.ToDate); */
-
-            throw new NotSupportedException();
-        }
-
-        public ServiceResult<Holding> GetHolding(Guid stockId, Date date)
-        {
-            /*     var portfolio = _PortfolioCache.Get(portfolioId);
-
-                 var holding = portfolio.Holdings.Get(id);
-                 if (holding == null)
-                     throw new HoldingNotFoundException(id);
-
-                 return _Mapper.Map<RestApi.Portfolios.Holding>(holding, opts => opts.Items["date"] = date); */
-            throw new NotSupportedException();
-        }
-
         public ServiceResult ChangeDrpParticipation(Guid stockId, bool participation)
         {
-            /*   var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<List<Holding>>.NotFound();
 
-               portfolio.ChangeDrpParticipation(holding, participation);
+            var holding = _Portfolio.Holdings[stockId];
+            if (holding == null)
+                return ServiceResult.NotFound();
 
-               _PortfolioRepository.Update(portfolio); */
-            throw new NotSupportedException();
+            _Portfolio.ChangeDrpParticipation(stockId, participation);
+
+            return ServiceResult.Ok();
         }
     } 
 } 

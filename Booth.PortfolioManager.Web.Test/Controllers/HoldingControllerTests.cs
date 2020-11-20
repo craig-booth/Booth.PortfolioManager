@@ -24,7 +24,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var response = new List<Holding>();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHoldings(Date.Today)).Returns(ServiceResult<List<Holding>>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var response = new List<Holding>();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHoldings(new Date(2000, 01, 01))).Returns(ServiceResult<List<Holding>>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
@@ -60,7 +60,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var response = new List<Holding>();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHoldings(new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)))).Returns(ServiceResult<List<Holding>>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
@@ -78,7 +78,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var response = new List<Holding>();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHoldings(new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)))).Returns(ServiceResult<List<Holding>>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
@@ -96,7 +96,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var response = new List<Holding>();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHoldings(new DateRange(new Date(2000, 06, 01), new Date(2000, 12, 31)))).Returns(ServiceResult<List<Holding>>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
@@ -114,7 +114,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var response = new List<Holding>();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHoldings(new Date(1999, 01, 01))).Returns(ServiceResult<List<Holding>>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
@@ -132,7 +132,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHolding(stockId, new Date(2000, 01, 01))).Returns(ServiceResult<Holding>.NotFound()).Verifiable();
 
             var controller = new HoldingController();
@@ -151,7 +151,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var stockId = Guid.NewGuid();
             var response = new Holding();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHolding(stockId, Date.Today)).Returns(ServiceResult<Holding>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
@@ -170,7 +170,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var stockId = Guid.NewGuid();
             var response = new Holding();
 
-            var service = mockRepository.Create<IPortfolioService>();
+            var service = mockRepository.Create<IPortfolioHoldingService>();
             service.Setup(x => x.GetHolding(stockId, new Date(2000, 01, 01))).Returns(ServiceResult<Holding>.Ok(response)).Verifiable();
 
             var controller = new HoldingController();
