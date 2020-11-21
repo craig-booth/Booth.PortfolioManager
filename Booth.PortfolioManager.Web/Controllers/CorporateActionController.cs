@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
+using Booth.Common;
 using Booth.PortfolioManager.RestApi.CorporateActions;
 using Booth.PortfolioManager.Web.Authentication;
-
+using Booth.PortfolioManager.Web.Services;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Controllers
 {
@@ -17,15 +19,19 @@ namespace Booth.PortfolioManager.Web.Controllers
     [ApiController]
     public class CorporateActionController : ControllerBase
     {
+        private readonly ICorporateActionService _Service; 
+        public CorporateActionController(ICorporateActionService service)
+        {
+            _Service = service;
+        }
 
         // GET : /api/stocks/{stockId}/corporateactions
         [HttpGet]
         public ActionResult<List<CorporateAction>> GetCorporateActions([FromRoute]Guid stockId, [FromQuery]DateTime? fromDate, [FromQuery]DateTime? toDate)
         {
-            /*       var dateRange = new DateRange((fromDate != null) ? (DateTime)fromDate : DateUtils.NoStartDate, (toDate != null) ? (DateTime)toDate : DateTime.Today);
+            var result = _Service.GetCorporateActions(stockId, DateRangeFromParameter(fromDate, toDate));
 
-                   return _Service.GetCorporateActions(stockId, dateRange).ToList(); */
-            throw new NotSupportedException();
+            return result.ToActionResult<List<CorporateAction>>();
         }
 
         // GET : /api/stocks/{stockId}/corporateactions/{id}
@@ -33,8 +39,9 @@ namespace Booth.PortfolioManager.Web.Controllers
         [HttpGet]       
         public ActionResult<CorporateAction> GetCorporateAction([FromRoute]Guid stockId, [FromRoute]Guid id)
         {
-            //   return _Service.GetCorporateAction(stockId, id);  
-            throw new NotSupportedException();
+            var result = _Service.GetCorporateAction(stockId, id);
+
+            return result.ToActionResult<CorporateAction>();
         }
 
         // POST : /api/stocks/{stockId}/corporateactions
@@ -43,17 +50,26 @@ namespace Booth.PortfolioManager.Web.Controllers
         [HttpPost]
         public ActionResult AddCorporateAction([FromRoute]Guid stockId, [FromBody] CorporateAction corporateAction)
         {
-            /*  if (corporateAction == null)
-                  throw new UnknownCorporateActionType();
+            var result = _Service.AddCorporateAction(stockId, corporateAction);
 
-              // Check id in URL and id in command match
-              if (stockId != corporateAction.Stock)
-                  return BadRequest("Id in command doesn't match id on URL");
+            return result.ToActionResult();
+        }
 
-              _Service.AddCorporateAction(stockId, corporateAction);
+        private Date DateFromParameter(DateTime? date)
+        {
+            return date == null ? Date.Today : new Date(date!.Value);
+        }
 
-              return Ok(); */
-            throw new NotSupportedException();
+        private DateRange DateRangeFromParameter(DateTime? fromDate, DateTime? toDate)
+        {
+            if ((fromDate != null) && (toDate != null))
+                return new DateRange(new Date(fromDate!.Value), new Date(toDate!.Value));
+            else if ((fromDate != null) && (toDate == null))
+                return new DateRange(new Date(fromDate!.Value), Date.MaxValue);
+            else if ((fromDate == null) && (toDate != null))
+                return new DateRange(Date.MinValue, new Date(toDate!.Value));
+            else
+                return new DateRange(Date.MinValue, Date.MaxValue);
         }
     }
 
