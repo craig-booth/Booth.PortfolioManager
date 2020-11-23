@@ -166,6 +166,68 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         }
 
         [Fact]
+        public void AdjustCostBaseNoHoldings()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
+
+            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+
+            var transactionId = Guid.NewGuid();
+            Action a = () => portfolio.AdjustCostBase(stock.Id, new Date(2000, 01, 01), 0.50m, "Comment", transactionId);
+            
+            a.Should().Throw<NoSharesOwnedException>();
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void AdjustCostBase()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var handler = mockRepository.Create<ITransactionHandler>();
+            CostBaseAdjustment transaction = null;
+            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
+                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (CostBaseAdjustment)t)
+                .Verifiable();
+
+            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
+            transactionHandlers.Setup(x => x.GetService<CostBaseAdjustment>()).Returns(handler.Object);
+            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
+
+            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
+
+            var transactionId = Guid.NewGuid();
+            portfolio.AdjustCostBase(stock.Id, new Date(2000, 01, 01), 0.50m, "Comment", transactionId);
+
+            transaction.Should().BeEquivalentTo(new
+            {
+                Id = transaction.Id,
+                Date = new Date(2000, 01, 01),
+                Stock = stock,
+                Comment = "Comment",
+                Percentage = 0.50m
+            });
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
         public void AdjustUnitCountNoHoldings()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -182,7 +244,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var transactionId = Guid.NewGuid();
             Action a = () => portfolio.AdjustUnitCount(stock.Id, new Date(2000, 01, 01), 1, 2, "Comment", transactionId);
-            
+
             a.Should().Throw<NoSharesOwnedException>();
 
             mockRepository.Verify();

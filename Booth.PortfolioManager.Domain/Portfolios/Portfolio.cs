@@ -29,6 +29,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         void ChangeDrpParticipation(Guid stockId, bool participateInDrp);
         void AddOpeningBalance(Guid stockId, Date transactionDate, Date aquisitionDate, int units, decimal costBase, string comment, Guid transactionId);
         void AdjustUnitCount(Guid stockId, Date date,int oldCount, int NewCount, string comment, Guid transactionId);
+        void AdjustCostBase(Guid stockId, Date date, decimal percentage, string comment, Guid transactionId);
         void AquireShares(Guid stockId, Date aquisitionDate, int units, decimal averagePrice, decimal transactionCosts, bool createCashTransaction, string comment, Guid transactionId);
         void DisposeOfShares(Guid stockId, Date disposalDate, int units, decimal averagePrice, decimal transactionCosts, CgtCalculationMethod cgtMethod, bool createCashTransaction, string comment, Guid transactionId);
         void IncomeReceived(Guid stockId, Date recordDate, Date paymentDate, decimal frankedAmount, decimal unfrankedAmount, decimal frankingCredits, decimal interest, decimal taxDeferred, decimal drpCashBalance, bool createCashTransaction, string comment, Guid transactionId);
@@ -112,7 +113,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public void MakeCashTransaction(Date transactionDate, BankAccountTransactionType type, decimal amount, string comment, Guid transactionId)
         {
-            var @event = new CashTransactionOccurredEvent(Id, Version, transactionId, transactionDate, Guid.Empty, comment)
+            var @event = new CashTransactionOccurredEvent(Id, Version, transactionId, transactionDate, comment)
             {
                 CashTransactionType = type,
                 Amount = amount
@@ -335,6 +336,37 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             var handler = _TransactionHandlers.GetService<ReturnOfCapital>();
             handler.Apply(returnOfCapital, holding, _CashAccount);
             _Transactions.Add(returnOfCapital);
+        }
+
+        public void AdjustCostBase(Guid stockId, Date date, decimal percentage, string comment, Guid transactionId)
+        {
+            var @event = new CostBaseAdjustmentOccurredEvent(Id, Version, transactionId, date, stockId, comment)
+            {
+                Percentage = percentage
+            };
+            Apply(@event);
+
+            PublishEvent(@event);
+        }
+
+        public void Apply(CostBaseAdjustmentOccurredEvent @event)
+        {
+            var holding = _Holdings[@event.Stock];
+            if (holding == null)
+                throw new NoSharesOwnedException("No shares owned");
+
+            var costBaseAdjustment = new CostBaseAdjustment
+            {
+                Id = @event.TransactionId,
+                Date = @event.Date,
+                Stock = holding.Stock,
+                Comment = @event.Comment,
+                Percentage = @event.Percentage
+            };
+
+            var handler = _TransactionHandlers.GetService<CostBaseAdjustment>();
+            handler.Apply(costBaseAdjustment, holding, _CashAccount);
+            _Transactions.Add(costBaseAdjustment);
         }
 
         public void AdjustUnitCount(Guid stockId, Date date, int oldCount, int newCount, string comment, Guid transactionId)

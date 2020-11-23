@@ -28,6 +28,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _TransactionHandlers.Register<OpeningBalance>(() => new OpeningBalanceHandler());
             _TransactionHandlers.Register<IncomeReceived>(() => new IncomeReceivedHandler());
             _TransactionHandlers.Register<ReturnOfCapital>(() => new ReturnOfCapitalHandler());
+            _TransactionHandlers.Register<CostBaseAdjustment>(() => new CostBaseAdjustmentHandler());
+            _TransactionHandlers.Register<UnitCountAdjustment>(() => new UnitCountAdjustmentHandler());
         }
 
         public Portfolio CreatePortfolio(Guid id, string name, Guid owner)

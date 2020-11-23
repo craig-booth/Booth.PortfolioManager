@@ -76,7 +76,6 @@ namespace Booth.PortfolioManager.Web
             services.AddSingleton<IStockService, StockService>();
             services.AddSingleton<ITradingCalendarService>(x => new TradingCalendarService(x.GetRequiredService<IRepository<TradingCalendar>>(), TradingCalendarIds.ASX));
             services.AddScoped<ICashAccountService, CashAccountService>();
-        //    services.AddScoped<ICorporateActionService, CorporateActionService>();
             services.AddScoped<IPortfolioCapitalGainsService, PortfolioCapitalGainsService>();
             services.AddScoped<IPortfolioCgtLiabilityService, PortfolioCgtLiabilityService>();
             services.AddScoped<IPortfolioCorporateActionsService, PortfolioCorporateActionsService>();
@@ -88,6 +87,7 @@ namespace Booth.PortfolioManager.Web
             services.AddScoped<IPortfolioSummaryService, PortfolioSummaryService>();
             services.AddScoped<IPortfolioTransactionService, PortfolioTransactionService>();
             services.AddScoped<IPortfolioValueService, PortfolioValueService>();
+            services.AddScoped<ICorporateActionService, CorporateActionService>();
 
 
             // Others

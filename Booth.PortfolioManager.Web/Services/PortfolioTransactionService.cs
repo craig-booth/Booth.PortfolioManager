@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Booth.Common;
+using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.RestApi.Portfolios;
@@ -25,11 +26,13 @@ namespace Booth.PortfolioManager.Web.Services
     
     public class PortfolioTransactionService : IPortfolioTransactionService
     {
-        private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IPortfolio _Portfolio;
+        private readonly IRepository<Portfolio> _Repository;
 
-        public PortfolioTransactionService(IReadOnlyPortfolio portfolio)
+        public PortfolioTransactionService(IPortfolio portfolio, IRepository<Portfolio> repository)
         {
             _Portfolio = portfolio;
+            _Repository = repository;
         }
 
         public ServiceResult<Transaction> GetTransaction(Guid id)
@@ -83,90 +86,33 @@ namespace Booth.PortfolioManager.Web.Services
 
         public ServiceResult ApplyTransaction(Transaction transaction)
         {
-            /*       var portfolio = _PortfolioCache.Get(portfolioId);
+            if (_Portfolio == null)
+                return ServiceResult<TransactionsResponse>.NotFound();
 
-                   var stock = _StockQuery.Get(aquisition.Stock);
-                   portfolio.AquireShares(aquisition.TransactionDate, stock, aquisition.Units, aquisition.AveragePrice, aquisition.TransactionCosts, aquisition.CreateCashTransaction, aquisition.Comment, aquisition.Id);
+            ServiceResult result;
+            if (transaction is RestApi.Transactions.Aquisition aquisition)
+                _Portfolio.AquireShares(aquisition.Stock, aquisition.TransactionDate, aquisition.Units, aquisition.AveragePrice, aquisition.TransactionCosts, aquisition.CreateCashTransaction, aquisition.Comment, aquisition.Id);
+            else if (transaction is RestApi.Transactions.CashTransaction cashTransaction)
+                _Portfolio.MakeCashTransaction(cashTransaction.TransactionDate, cashTransaction.CashTransactionType.ToDomain(), cashTransaction.Amount, cashTransaction.Comment, cashTransaction.Id);
+            else if (transaction is RestApi.Transactions.CostBaseAdjustment costBaseAdjustment)
+                _Portfolio.AdjustCostBase(costBaseAdjustment.Stock, costBaseAdjustment.TransactionDate, costBaseAdjustment.Percentage, costBaseAdjustment.Comment, costBaseAdjustment.Id);
+            else if (transaction is RestApi.Transactions.Disposal disposal)
+                _Portfolio.DisposeOfShares(disposal.Stock, disposal.TransactionDate, disposal.Units, disposal.AveragePrice, disposal.TransactionCosts, disposal.CgtMethod.ToDomain(), disposal.CreateCashTransaction, disposal.Comment, disposal.Id);
+            else if (transaction is RestApi.Transactions.IncomeReceived income)
+                _Portfolio.IncomeReceived(income.Stock, income.RecordDate, income.TransactionDate, income.FrankedAmount, income.UnfrankedAmount, income.FrankingCredits, income.Interest, income.TaxDeferred, income.DrpCashBalance, income.CreateCashTransaction, income.Comment, income.Id);
+            else if (transaction is RestApi.Transactions.OpeningBalance openingBalance)
+                _Portfolio.AddOpeningBalance(openingBalance.Stock, openingBalance.TransactionDate, openingBalance.AquisitionDate, openingBalance.Units, openingBalance.CostBase, openingBalance.Comment, openingBalance.Id);
+            else if (transaction is RestApi.Transactions.ReturnOfCapital returnOfCapital)
+                _Portfolio.ReturnOfCapitalReceived(returnOfCapital.Stock, returnOfCapital.TransactionDate, returnOfCapital.RecordDate, returnOfCapital.Amount, returnOfCapital.CreateCashTransaction, returnOfCapital.Comment, returnOfCapital.Id);
+            else if (transaction is RestApi.Transactions.UnitCountAdjustment unitCountAdjustment)
+                _Portfolio.AdjustUnitCount(unitCountAdjustment.Stock, unitCountAdjustment.TransactionDate, unitCountAdjustment.OriginalUnits, unitCountAdjustment.NewUnits, unitCountAdjustment.Comment, unitCountAdjustment.Id);
+            else
+                result = ServiceResult.Error("Unkown Transaction type");
 
-                   _PortfolioRepository.Update(portfolio); */
-            throw new NotSupportedException();
+            _Repository.Update((Portfolio)_Portfolio);
+
+            return ServiceResult.Ok();
         }
 
-        private ServiceResult ApplyTransaction(RestApi.Transactions.Aquisition aquisition)
-        {
-            /*       var portfolio = _PortfolioCache.Get(portfolioId);
-
-                   var stock = _StockQuery.Get(aquisition.Stock);
-                   portfolio.AquireShares(aquisition.TransactionDate, stock, aquisition.Units, aquisition.AveragePrice, aquisition.TransactionCosts, aquisition.CreateCashTransaction, aquisition.Comment, aquisition.Id);
-
-                   _PortfolioRepository.Update(portfolio); */
-            throw new NotSupportedException();
-        }
-
-        private ServiceResult ApplyTransaction(RestApi.Transactions.CashTransaction cashTransaction)
-        {
-            /*var portfolio = _PortfolioCache.Get(portfolioId);
-
-                        portfolio.MakeCashTransaction(cashTransaction.TransactionDate, PortfolioManager.RestApi.Transactions.RestApiNameMapping.ToBankAccountTransactionType(cashTransaction.CashTransactionType), cashTransaction.Amount, cashTransaction.Comment, cashTransaction.Id);
-
-                        _PortfolioRepository.Update(portfolio); */
-            throw new NotSupportedException();
-        }
-
-        private ServiceResult ApplyTransaction(RestApi.Transactions.CostBaseAdjustment costBaseAdjustment)
-        {
-            throw new NotSupportedException();
-        }
-
-        private ServiceResult ApplyTransaction(RestApi.Transactions.Disposal disposal)
-        {
-            /*  var portfolio = _PortfolioCache.Get(portfolioId);
-
-              var stock = _StockQuery.Get(disposal.Stock);
-              portfolio.DisposeOfShares(disposal.TransactionDate, stock, disposal.Units, disposal.AveragePrice, disposal.TransactionCosts, RestApi.Transactions.RestApiNameMapping.ToCGTCalculationMethod(disposal.CGTMethod), disposal.CreateCashTransaction, disposal.Comment, disposal.Id);
-
-              _PortfolioRepository.Update(portfolio); */
-            throw new NotSupportedException();
-        }
-
-        private ServiceResult ApplyTransaction(RestApi.Transactions.IncomeReceived incomeReceived)
-        {
-            /*     var portfolio = _PortfolioCache.Get(portfolioId);
-
-                 var stock = _StockQuery.Get(incomeReceived.Stock);
-                 portfolio.IncomeReceived(incomeReceived.RecordDate, incomeReceived.TransactionDate, stock, incomeReceived.FrankedAmount, incomeReceived.UnfrankedAmount, incomeReceived.FrankingCredits, incomeReceived.Interest, incomeReceived.TaxDeferred, incomeReceived.DRPCashBalance, incomeReceived.CreateCashTransaction, incomeReceived.Comment, incomeReceived.Id);
-
-                 _PortfolioRepository.Update(portfolio); */
-
-            throw new NotSupportedException();
-        }
-
-        private ServiceResult ApplyTransaction(RestApi.Transactions.OpeningBalance openingBalance)
-        {
-            /*      var portfolio = _PortfolioCache.Get(portfolioId);
-
-                  var stock = _StockQuery.Get(openingBalance.Stock);
-                  portfolio.AddOpeningBalance(openingBalance.TransactionDate, openingBalance.AquisitionDate, stock, openingBalance.Units, openingBalance.CostBase, openingBalance.Comment, openingBalance.Id);
-
-                  _PortfolioRepository.Update(portfolio); */
-
-            throw new NotSupportedException();
-        }
-
-        private ServiceResult ApplyTransaction(RestApi.Transactions.ReturnOfCapital returnOfCapital)
-        {
-            /*   var portfolio = _PortfolioCache.Get(portfolioId);
-
-               var stock = _StockQuery.Get(returnOfCapital.Stock);
-               portfolio.ReturnOfCapitalReceived(returnOfCapital.TransactionDate, returnOfCapital.RecordDate, stock, returnOfCapital.Amount, returnOfCapital.CreateCashTransaction, returnOfCapital.Comment, returnOfCapital.Id);
-
-               _PortfolioRepository.Update(portfolio); */
-            throw new NotSupportedException();
-        }
-
-        private ServiceResult ApplyTransaction(RestApi.Transactions.UnitCountAdjustment unitCountAdjustment)
-        {
-            throw new NotSupportedException();
-        }
     } 
 }

@@ -33,7 +33,7 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
             var handler = new AquisitionHandler();
 
             Action a = () => handler.Apply(transaction, holding.Object, cashAccount.Object);
-a.Should().Throw<ArgumentException>();
+            a.Should().Throw<ArgumentException>();
 
             mockRepository.Verify();
         }
