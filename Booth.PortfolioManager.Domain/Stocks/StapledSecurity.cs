@@ -49,12 +49,12 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
             Start(@event.ListingDate);
 
-            var properties = new StockProperties(@event.ASXCode, @event.Name, @event.Category);
+            var properties = new StockProperties(@event.AsxCode, @event.Name, @event.Category);
             _Properties.Change(@event.ListingDate, properties);
 
             _ChildSecurities = new StapledSecurityChild[@event.ChildSecurities.Length];
             for (var i = 0; i < @event.ChildSecurities.Length; i++)
-                _ChildSecurities[i] = new StapledSecurityChild(@event.ChildSecurities[i].ASXCode, @event.ChildSecurities[i].Name, @event.ChildSecurities[i].Trust);
+                _ChildSecurities[i] = new StapledSecurityChild(@event.ChildSecurities[i].AsxCode, @event.ChildSecurities[i].Name, @event.ChildSecurities[i].Trust);
             
             var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DrpMethod.Round);
             _DividendRules.Change(@event.ListingDate, dividendRules);

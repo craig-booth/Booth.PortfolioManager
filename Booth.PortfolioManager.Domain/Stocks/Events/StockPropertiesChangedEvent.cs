@@ -10,7 +10,7 @@ namespace Booth.PortfolioManager.Domain.Stocks.Events
     public class StockPropertiesChangedEvent : Event
     {
         public Date ChangeDate { get; set; }
-        public string ASXCode { get; set; }
+        public string AsxCode { get; set; }
         public string Name { get; set; }
         public AssetCategory Category { get; set; }
 
@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Stocks.Events
             : base(entityId, version)
         {
             ChangeDate = changeDate;
-            ASXCode = asxCode;
+            AsxCode = asxCode;
             Name = name;
             Category = category;
         }

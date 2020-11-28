@@ -99,7 +99,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
             Start(@event.ListingDate);
 
-            var properties = new StockProperties(@event.ASXCode, @event.Name, @event.Category);
+            var properties = new StockProperties(@event.AsxCode, @event.Name, @event.Category);
             _Properties.Change(@event.ListingDate, properties);
 
             var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DrpMethod.Round);
@@ -187,7 +187,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
             Version++;
 
             var newProperties = new StockProperties(
-                @event.ASXCode,
+                @event.AsxCode,
                 @event.Name,
                 @event.Category);
 

@@ -9,7 +9,7 @@ namespace Booth.PortfolioManager.Domain.Stocks.Events
 {
     public class StockListedEvent : Event
     {
-        public string ASXCode { get; set; }
+        public string AsxCode { get; set; }
         public string Name { get; set; }
         public Date ListingDate { get; set; }
         public AssetCategory Category { get; set; }
@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Stocks.Events
         public StockListedEvent(Guid entityId, int version, string asxCode, string name, Date listingDate, AssetCategory category, bool trust)
             : base(entityId, version)
         {
-            ASXCode = asxCode;
+            AsxCode = asxCode;
             Name = name;
             ListingDate = listingDate;
             Trust = trust;

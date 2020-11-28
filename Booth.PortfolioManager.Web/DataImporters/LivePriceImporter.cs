@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
                     var stock = _StockQuery.Get(stockQuote.AsxCode, stockQuote.Date);
                     if (stock != null)
                     {
-                        _Logger?.LogInformation("Updating current price foe {0}: {1}", stockQuote.AsxCode, stockQuote.Price);
+                        _Logger?.LogInformation("Updating current price for {0}: {1}", stockQuote.AsxCode, stockQuote.Price);
 
                         _StockService.UpdateCurrentPrice(stock.Id, stockQuote.Price);
                     }
