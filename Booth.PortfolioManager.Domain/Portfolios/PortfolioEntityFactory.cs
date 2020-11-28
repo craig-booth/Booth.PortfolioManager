@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public Portfolio Create(Guid id, string storedEntityType)
         {
-            return _PortfolioFactory.CreatePortfolio(id, "", Guid.Empty);
+            return _PortfolioFactory.CreatePortfolio(id);
         }
     }
 }

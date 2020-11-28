@@ -10,7 +10,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 {
     public interface IPortfolioFactory
     {
-        Portfolio CreatePortfolio(Guid id, string name, Guid owner);
+        Portfolio CreatePortfolio(Guid id);
     }
 
     public class PortfolioFactory : IPortfolioFactory
@@ -32,10 +32,9 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _TransactionHandlers.Register<UnitCountAdjustment>(() => new UnitCountAdjustmentHandler());
         }
 
-        public Portfolio CreatePortfolio(Guid id, string name, Guid owner)
+        public Portfolio CreatePortfolio(Guid id)
         {
             var portfolio = new Portfolio(id, _StockResolver, _TransactionHandlers);
-            portfolio.Create(name, owner);
 
             return portfolio;
         }

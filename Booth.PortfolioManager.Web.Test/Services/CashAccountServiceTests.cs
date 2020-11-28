@@ -40,7 +40,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             var factory = new PortfolioFactory(stockResolver.Object);
-            var portfolio = factory.CreatePortfolio(id, "test", Guid.NewGuid());
+            var portfolio = factory.CreatePortfolio(id);
 
             var service = new CashAccountService(portfolio);
 
@@ -70,7 +70,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             var factory = new PortfolioFactory(stockResolver.Object);
-            var portfolio = factory.CreatePortfolio(id, "test", Guid.NewGuid());
+            var portfolio = factory.CreatePortfolio(id);
             portfolio.MakeCashTransaction(new Date(1999, 01, 01), BankAccountTransactionType.Deposit, 100.00m, "", Guid.NewGuid());
             portfolio.MakeCashTransaction(new Date(2000, 04, 01), BankAccountTransactionType.Withdrawl, 50.00m, "", Guid.NewGuid());
             portfolio.MakeCashTransaction(new Date(2001, 01, 01), BankAccountTransactionType.Deposit, 20.00m, "", Guid.NewGuid());
@@ -113,7 +113,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var stockResolver = mockRepository.Create<IStockResolver>();
             var factory = new PortfolioFactory(stockResolver.Object);
-            var portfolio = factory.CreatePortfolio(id, "test", Guid.NewGuid());
+            var portfolio = factory.CreatePortfolio(id);
             portfolio.MakeCashTransaction(new Date(1999, 01, 01), BankAccountTransactionType.Deposit, 100.00m, "", Guid.NewGuid());
             portfolio.MakeCashTransaction(new Date(2000, 04, 01), BankAccountTransactionType.Withdrawl, 50.00m, "", Guid.NewGuid());
             portfolio.MakeCashTransaction(new Date(2001, 01, 01), BankAccountTransactionType.Deposit, 20.00m, "", Guid.NewGuid());
