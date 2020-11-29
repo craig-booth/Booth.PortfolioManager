@@ -98,7 +98,8 @@ namespace Booth.PortfolioManager.IntegrationTest
             var stockResolver = new StockResolver(stockCache);
 
             var factory = new PortfolioFactory(stockResolver);
-            var portfolio = factory.CreatePortfolio(Ids.PortfolioId, "Test", Ids.UserId);
+            var portfolio = factory.CreatePortfolio(Ids.PortfolioId);
+            portfolio.Create("Test", Ids.UserId);
 
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), BankAccountTransactionType.Deposit, 50000.00m, "", Guid.NewGuid());
             portfolio.AquireShares(Ids.BHP, new Date(2000, 06, 30), 100, 12.00m, 19.95m, true, "", Guid.NewGuid());

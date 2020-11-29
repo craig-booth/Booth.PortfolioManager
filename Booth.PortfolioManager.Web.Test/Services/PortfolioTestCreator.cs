@@ -89,7 +89,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             wamStockPrice.UpdateClosingPrice(new Date(2010, 01, 01), 1.50m);
 
             var portfolioFactory = new PortfolioFactory(StockResolver);
-            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid(), "Test", Guid.NewGuid());
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+            portfolio.Create("Test", Guid.NewGuid());
 
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 10000m, "", Guid.NewGuid());
             portfolio.AquireShares(Stock_ARG.Id, new Date(2000, 01, 01), 100, 1.00m, 19.95m, true, "", Guid.NewGuid());

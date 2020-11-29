@@ -26,7 +26,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var portfolioFactory = new PortfolioFactory(stockResolver.Object);
 
             var id = Guid.NewGuid();
-            var portfolio = portfolioFactory.CreatePortfolio(id, "Test", Guid.NewGuid());
+            var portfolio = portfolioFactory.CreatePortfolio(id);
 
             var repositry = mockRepository.Create<IRepository<Portfolio>>();
 
@@ -53,7 +53,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var portfolioFactory = new PortfolioFactory(stockResolver.Object);
 
             var id = Guid.NewGuid();
-            var portfolio = portfolioFactory.CreatePortfolio(id, "Test", Guid.NewGuid());
+            var portfolio = portfolioFactory.CreatePortfolio(id);
 
             var repositry = mockRepository.Create<IRepository<Portfolio>>();
             repositry.Setup(x => x.Get(id)).Returns(portfolio).Verifiable();
@@ -107,7 +107,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var portfolioFactory = new PortfolioFactory(stockResolver.Object);
 
             var id = Guid.NewGuid();
-            var portfolio = portfolioFactory.CreatePortfolio(id, "Test", Guid.NewGuid());
+            var portfolio = portfolioFactory.CreatePortfolio(id);
 
             var repositry = mockRepository.Create<IRepository<Portfolio>>();
 
@@ -133,7 +133,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var portfolioFactory = new PortfolioFactory(stockResolver.Object);
 
             var id = Guid.NewGuid();
-            var portfolio = portfolioFactory.CreatePortfolio(id, "Test", Guid.NewGuid());
+            var portfolio = portfolioFactory.CreatePortfolio(id);
 
             var repositry = mockRepository.Create<IRepository<Portfolio>>();
             repositry.Setup(x => x.Get(id)).Returns(portfolio).Verifiable();

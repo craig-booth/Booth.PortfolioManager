@@ -22,7 +22,7 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var id = Guid.NewGuid();
             var createdPortfolio = new Portfolio(id, null, null);
             var portfolioFactory = mockRepository.Create<IPortfolioFactory>();
-            portfolioFactory.Setup(x => x.CreatePortfolio(id, "", Guid.Empty)).Returns(createdPortfolio).Verifiable();
+            portfolioFactory.Setup(x => x.CreatePortfolio(id)).Returns(createdPortfolio).Verifiable();
             var entityFactory = new PortfolioEntityFactory(portfolioFactory.Object);
 
             var portfolio = entityFactory.Create(id, "test");
