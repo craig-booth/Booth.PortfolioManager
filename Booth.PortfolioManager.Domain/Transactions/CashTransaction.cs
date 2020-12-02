@@ -20,15 +20,15 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 switch (CashTransactionType)
                 {
                     case BankAccountTransactionType.Deposit:
-                        return String.Format("Deposit {0:c}", Amount);
+                        return "Deposit " + MathUtils.FormatCurrency(Amount, true, true);
                     case BankAccountTransactionType.Fee:
-                        return String.Format("Fee {0:c}", Amount);
+                        return "Fee " + MathUtils.FormatCurrency(Amount, true, true);
                     case BankAccountTransactionType.Interest:
-                        return String.Format("Interest {0:c}", Amount);
+                        return "Interest " + MathUtils.FormatCurrency(Amount, true, true);
                     case BankAccountTransactionType.Transfer:
-                        return String.Format("Transfer {0:c}", Amount);
+                        return "Transfer " + MathUtils.FormatCurrency(Amount, true, true);
                     case BankAccountTransactionType.Withdrawl:
-                        return String.Format("Withdrawl {0:c}", Amount);
+                        return "Withdrawl " + MathUtils.FormatCurrency(Amount, true, true);
                 }
 
                 return "";
