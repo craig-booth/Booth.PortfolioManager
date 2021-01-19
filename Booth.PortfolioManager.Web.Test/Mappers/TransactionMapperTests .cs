@@ -114,7 +114,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 Stock = stock.Object.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
-                Description = "Adjust cost base by 35.00%",
+                Description = String.Format("Adjust cost base by {0:P2}", 0.35m),
                 Percentage = 0.35m
             });
         }
