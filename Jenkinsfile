@@ -15,7 +15,7 @@ pipeline {
 		stage('Build') {
 			agent { 
 				docker { 
-					image 'mcr.microsoft.com/dotnet/core/sdk:3.1-alpine' 
+					image 'mcr.microsoft.com/dotnet/sdk:5.0-alpine' 
 					reuseNode true
 				}
 			}
