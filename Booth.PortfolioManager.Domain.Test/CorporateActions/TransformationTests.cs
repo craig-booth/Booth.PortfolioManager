@@ -375,6 +375,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                     {
                         costBaseAdjustment.Date.Should().Be(transformation.ImplementationDate);
                         costBaseAdjustment.Stock.Should().Be(stock);
+                        costBaseAdjustment.Percentage.Should().Be(0.60m);
                         costBaseAdjustment.Comment.Should().Be("Test Transformation");
                     }
                 }
@@ -446,6 +447,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                     {
                         costBaseAdjustment.Date.Should().Be(transformation.ImplementationDate);
                         costBaseAdjustment.Stock.Should().Be(stock);
+                        costBaseAdjustment.Percentage.Should().Be(0.60m);
                         costBaseAdjustment.Comment.Should().Be("Test Transformation");
                     }
                 },
@@ -459,7 +461,7 @@ namespace Booth.PortfolioManager.Domain.Test.CorporateActions
                         disposal.Comment.Should().Be("Test Transformation");
                         disposal.Units.Should().Be(100);
                         disposal.AveragePrice.Should().Be(1.20m);
-                        disposal.TransactionCosts.Should().Be(.00m);
+                        disposal.TransactionCosts.Should().Be(0.00m);
                         disposal.CreateCashTransaction.Should().BeTrue();
                     }
                 }
