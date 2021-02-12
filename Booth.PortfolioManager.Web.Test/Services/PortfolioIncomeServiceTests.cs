@@ -31,7 +31,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioIncomeService(portfolio);
 

@@ -25,7 +25,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingsAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 
@@ -56,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingsInDateRange()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 
@@ -86,7 +86,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingAtDateStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 
@@ -98,7 +98,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 

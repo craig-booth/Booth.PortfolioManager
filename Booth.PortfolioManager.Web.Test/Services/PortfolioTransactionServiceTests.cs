@@ -32,7 +32,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioTransactionService(portfolio, null);
 
@@ -44,7 +44,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransaction()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioTransactionService(portfolio, null);
 
@@ -64,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactions()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioTransactionService(portfolio, null);
 
@@ -103,7 +103,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForStockNotOwned()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioTransactionService(portfolio, null);
 
@@ -116,7 +116,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForStock()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioTransactionService(portfolio, null);
 
@@ -142,7 +142,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();
@@ -183,7 +183,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();
@@ -220,7 +220,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();
@@ -255,7 +255,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();
@@ -299,7 +299,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();
@@ -348,7 +348,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();
@@ -387,7 +387,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();
@@ -426,7 +426,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var events = new List<Event>();
             var repository = mockRepository.Create<IRepository<Portfolio>>();

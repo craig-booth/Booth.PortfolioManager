@@ -75,7 +75,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCorporateActions()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
 
@@ -96,7 +96,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCorporateActionsStockNotOwned()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
 
@@ -108,7 +108,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCorporateActionsForStock()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
 
@@ -128,7 +128,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForCorporateActionStockNotOwned()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
 
@@ -140,7 +140,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForCorporateActionActionNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
 
@@ -152,7 +152,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForCorporateAction()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
 

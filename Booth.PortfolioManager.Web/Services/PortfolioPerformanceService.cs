@@ -122,9 +122,20 @@ namespace Booth.PortfolioManager.Web.Services
             // Populate HoldingPerformance from work list
             foreach (var item in workingList)
             {
-                var holding = closingHoldings.FirstOrDefault(x => x.Stock.Id == item.HoldingPerformance.Stock.Id);
-                if (holding != null)
+                //    var holding = closingHoldings.FirstOrDefault(x => x.Stock.Id == item.HoldingPerformance.Stock.Id);
+                var holding = _Portfolio.Holdings[item.HoldingPerformance.Stock.Id];
+
+                if (holding.EffectivePeriod.ToDate < dateRange.ToDate)
                 {
+                    // Holding sold before period ended
+                    item.HoldingPerformance.ClosingBalance = 0.00m;
+                    item.EndDate = holding.EffectivePeriod.ToDate;
+                    item.FinalValue = 0.00m;
+                    item.HoldingPerformance.DrpCashBalance = 0.00m;
+                }
+                else
+                {
+                    // Holding still held at period end
                     var value = holding.Value(dateRange.ToDate);
                     item.HoldingPerformance.ClosingBalance = value;
 
@@ -132,14 +143,6 @@ namespace Booth.PortfolioManager.Web.Services
                     item.FinalValue = value;
 
                     item.HoldingPerformance.DrpCashBalance = holding.DrpAccount.Balance(dateRange.ToDate);
-                }
-                else
-                {
-                    item.HoldingPerformance.ClosingBalance = 0.00m;
-
-                    holding = openingHoldings.FirstOrDefault(x => x.Stock.Id == item.HoldingPerformance.Stock.Id);
-                    item.EndDate = holding.EffectivePeriod.ToDate;
-                    item.FinalValue = 0.00m;
                 }
 
                 item.HoldingPerformance.CapitalGain = item.HoldingPerformance.ClosingBalance - (item.HoldingPerformance.OpeningBalance + item.HoldingPerformance.Purchases - item.HoldingPerformance.Sales);

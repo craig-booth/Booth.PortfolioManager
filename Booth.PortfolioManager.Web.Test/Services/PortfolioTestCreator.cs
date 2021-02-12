@@ -21,7 +21,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
         public static Guid ARG_CapitalReturn = Guid.NewGuid();
         public static Guid WAM_Split = Guid.NewGuid();
       
-        public static Portfolio CreatePortfolio()
+
+        public static Portfolio CreateEmptyPortfolio()
         {
             var arg = new Stock(Stock_ARG.Id);
             arg.List(Stock_ARG.AsxCode, Stock_ARG.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
@@ -91,6 +92,16 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var portfolioFactory = new PortfolioFactory(StockResolver);
             var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
             portfolio.Create("Test", Guid.NewGuid());
+
+            // Remove Events
+            portfolio.FetchEvents();
+
+            return portfolio;
+        }
+
+        public static Portfolio CreateDefaultPortfolio()
+        {
+            var portfolio = CreateEmptyPortfolio();
 
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 10000m, "", Guid.NewGuid());
             portfolio.AquireShares(Stock_ARG.Id, new Date(2000, 01, 01), 100, 1.00m, 19.95m, true, "", Guid.NewGuid());

@@ -29,7 +29,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetSummary()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioSummaryService(portfolio);
 

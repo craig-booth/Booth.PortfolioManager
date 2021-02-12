@@ -28,7 +28,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetPerformance()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioPerformanceService(portfolio);
 
@@ -79,5 +79,136 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             });
         } 
+
+        [Fact]
+        public void HoldingAquiredAfterPeriodStart()
+        {
+            var portfolio = PortfolioTestCreator.CreateEmptyPortfolio();
+
+            portfolio.AquireShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
+
+            var service = new PortfolioPerformanceService(portfolio);
+            var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
+
+            result.Result.Should().BeEquivalentTo(new
+            {
+                OpeningBalance = 0.00m,
+                Dividends = 0.00m,
+                ChangeInMarketValue = 100.00m,
+                OutstandingDRPAmount = 0.00m,
+                ClosingBalance = 200.00m,
+                OpeningCashBalance = 0.00m,
+                Deposits = 0.00m,
+                Withdrawls = 0.00m,
+                Interest = 0.00m,
+                Fees = 0.00m,
+                ClosingCashBalance = 0.00m,
+                HoldingPerformance = new[]
+                {
+                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        OpeningBalance = 0.00m,
+                        Purchases = 100.00m,
+                        Sales = 0.00m,
+                        ClosingBalance = 200.00m,
+                        Dividends = 0.00m,
+                        CapitalGain = 100.00m,
+                        DrpCashBalance = 0.00m,
+                        TotalReturn = 100.00m,
+                        Irr = 0.09044m
+                    }
+                }
+
+            });
+        }
+
+        [Fact]
+        public void HoldingDisposedBeforePeriodEnds()
+        {
+            var portfolio = PortfolioTestCreator.CreateEmptyPortfolio();
+
+            portfolio.AquireShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2000, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
+            portfolio.DisposeOfShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
+
+            var service = new PortfolioPerformanceService(portfolio);
+            var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
+
+            result.Result.Should().BeEquivalentTo(new
+            {
+                OpeningBalance = 105.00m,
+                Dividends = 0.00m,
+                ChangeInMarketValue = 15.00m,
+                OutstandingDRPAmount = 0.00m,
+                ClosingBalance = 0.00m,
+                OpeningCashBalance = 0.00m,
+                Deposits = 0.00m,
+                Withdrawls = 0.00m,
+                Interest = 0.00m,
+                Fees = 0.00m,
+                ClosingCashBalance = 0.00m,
+                HoldingPerformance = new[]
+                {
+                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        OpeningBalance = 105.00m,
+                        Purchases = 0.00m,
+                        Sales = 120.00m,
+                        ClosingBalance = 0.00m,
+                        Dividends = 0.00m,
+                        CapitalGain = 15.00m,
+                        DrpCashBalance = 0.00m,
+                        TotalReturn = 15.00m,
+                        Irr = 0.01682m
+                    }
+                }
+
+            });
+        }
+
+        [Fact]
+        public void HoldingAquiredAndDisposedInPeriod()
+        {
+            var portfolio = PortfolioTestCreator.CreateEmptyPortfolio();
+
+            portfolio.AquireShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
+            portfolio.DisposeOfShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
+
+            var service = new PortfolioPerformanceService(portfolio);
+            var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
+
+            result.Result.Should().BeEquivalentTo(new
+            {
+                OpeningBalance = 0.00m,
+                Dividends = 0.00m,
+                ChangeInMarketValue = 20.00m,
+                OutstandingDRPAmount = 0.00m,
+                ClosingBalance = 000.00m,
+                OpeningCashBalance = 0.00m,
+                Deposits = 0.00m,
+                Withdrawls = 0.00m,
+                Interest = 0.00m,
+                Fees = 0.00m,
+                ClosingCashBalance = 0.00m,
+                HoldingPerformance = new[]
+                 {
+                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    {
+                        Stock = PortfolioTestCreator.Stock_ARG,
+                        OpeningBalance = 0.00m,
+                        Purchases = 100.00m,
+                        Sales = 120.00m,
+                        ClosingBalance = 0.00m,
+                        Dividends = 0.00m,
+                        CapitalGain = 20.00m,
+                        DrpCashBalance = 0.00m,
+                        TotalReturn = 20.00m,
+                        Irr = 0.02637m
+                    }
+                }
+
+            });
+        }
     }
 }

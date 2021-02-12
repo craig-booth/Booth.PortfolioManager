@@ -27,7 +27,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void ChangeDrpParticipationStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioService(portfolio);
 
@@ -40,7 +40,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void ChangeDrpParticipation()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioService(portfolio);
 

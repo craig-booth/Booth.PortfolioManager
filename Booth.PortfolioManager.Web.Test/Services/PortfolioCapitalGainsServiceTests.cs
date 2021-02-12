@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGains()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -94,7 +94,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGainsStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -106,7 +106,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGainsStockNotOwnedAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -118,7 +118,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGainsStockOwnedAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -169,7 +169,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGains()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -306,7 +306,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGainsStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -318,7 +318,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGainsStockNotOwnedAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -330,7 +330,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGainsStockOwnedtDate()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 

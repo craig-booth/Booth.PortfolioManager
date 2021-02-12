@@ -26,7 +26,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetProperties()
         {
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             portfolio.ChangeDrpParticipation(PortfolioTestCreator.Stock_WAM.Id, true);
 

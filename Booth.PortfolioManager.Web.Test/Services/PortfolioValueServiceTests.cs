@@ -31,7 +31,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
@@ -57,7 +57,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 17));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
@@ -80,7 +80,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 05, 25));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
@@ -105,7 +105,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
@@ -119,7 +119,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
@@ -134,7 +134,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
@@ -159,7 +159,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 17));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
@@ -182,7 +182,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 05, 25));
 
-            var portfolio = PortfolioTestCreator.CreatePortfolio();
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
             var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
 
