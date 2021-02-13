@@ -149,7 +149,10 @@ namespace Booth.PortfolioManager.Web.Services
                 item.HoldingPerformance.TotalReturn = item.HoldingPerformance.CapitalGain + item.HoldingPerformance.Dividends;
 
                 var irr = IrrCalculator.CalculateIrr(item.StartDate, item.InitialValue, item.EndDate, item.FinalValue, item.CashFlows);
-                item.HoldingPerformance.Irr = (decimal)Math.Round(irr, 5);
+                if (double.IsNaN(irr) || double.IsInfinity(irr))
+                    item.HoldingPerformance.Irr = 0.00M;
+                else
+                    item.HoldingPerformance.Irr = (decimal)Math.Round(irr, 5);
 
                 response.HoldingPerformance.Add(item.HoldingPerformance); 
             }
