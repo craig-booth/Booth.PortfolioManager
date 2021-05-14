@@ -12,6 +12,7 @@ namespace Booth.PortfolioManager.Domain.Users
     public class User : TrackedEntity, IEntityProperties
     {
         public string UserName { get; private set; }
+        public string Password => _Password;
         private string _Password;
         public bool Administator { get; private set; }
 
@@ -32,6 +33,14 @@ namespace Booth.PortfolioManager.Domain.Users
 
             var hashedPassword = HashPassword(password);
             var @event = new UserCreatedEvent(Id, Version, userName, hashedPassword);
+
+            Apply(@event);
+            PublishEvent(@event);
+        }
+
+        public void Create2(string userName, string password)
+        {  
+            var @event = new UserCreatedEvent(Id, Version, userName, password);
 
             Apply(@event);
             PublishEvent(@event);
