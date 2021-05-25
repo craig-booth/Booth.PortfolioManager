@@ -224,9 +224,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
     public struct StockProperties
     {
-        public readonly string AsxCode;
-        public readonly string Name;
-        public readonly AssetCategory Category;
+        public string AsxCode { get; }
+        public string Name { get; }
+        public AssetCategory Category { get; }
 
         public StockProperties(string asxCode, string name, AssetCategory category)
         {
@@ -238,11 +238,11 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
     public struct DividendRules
     {
-        public readonly decimal CompanyTaxRate;
-        public readonly RoundingRule DividendRoundingRule;
+        public decimal CompanyTaxRate { get; }
+        public RoundingRule DividendRoundingRule { get; }
 
-        public readonly bool DrpActive;       
-        public readonly DrpMethod DrpMethod;
+        public bool DrpActive { get; }
+        public DrpMethod DrpMethod { get; }
 
         public DividendRules(decimal companyTaxRate, RoundingRule dividendRoundingRule, bool drpActive, DrpMethod drpMethod)
         {

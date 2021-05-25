@@ -16,6 +16,7 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
 
     public interface ITradingCalendar
     {
+        IEnumerable<int> Years { get; }
         IEnumerable<NonTradingDay> NonTradingDays(int year);
         bool IsTradingDay(Date date);
         Date NextTradingDay(Date date);
@@ -67,6 +68,15 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
         {
             return _NonTradingDays.Where(x => x.Date.Year == year);
         }
+
+        public IEnumerable<int> Years 
+        { 
+            get
+            {
+                return _NonTradingDays.Select(x => x.Date.Year).Distinct();
+            }
+        }
+
 
         public bool IsTradingDay(Date date)
         {

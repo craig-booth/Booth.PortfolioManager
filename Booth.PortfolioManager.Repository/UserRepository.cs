@@ -4,77 +4,68 @@ using System.Text;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 using Booth.PortfolioManager.Domain.Users;
-using Booth.PortfolioManager.Domain.Users.Events;
+
 
 namespace Booth.PortfolioManager.Repository
 {
 
-    public class UserRepository : IRepository<User>
+    public interface IUserRepository : IRepository<User>
     {
-        private readonly IMongoCollection<BsonDocument> _Collection;
-        public UserRepository(string connectionString, string databaseName)
-        {
-            var client = new MongoClient(connectionString);
-            var database = client.GetDatabase(databaseName);
 
-            _Collection = database.GetCollection<BsonDocument>("Users");
+    }
+
+    public class UserRepository : IUserRepository
+    {
+        protected readonly IMongoCollection<BsonDocument> _Collection;
+        public UserRepository(IPortfolioManagerDatabase database)
+        {
+            _Collection = database.GetCollection("Users");
         }
 
         public User Get(Guid id)
         {
-            throw new NotImplementedException();
+            var bson = _Collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).SingleOrDefault();
+            if (bson == null)
+                return null;
+
+            var user = BsonSerializer.Deserialize<User>(bson);
+
+            return user;
         }
 
         public IEnumerable<User> All()
         {
-            throw new NotImplementedException();
+            var bsonElements = _Collection.Find("{}").ToList();
+
+            foreach (var bson in bsonElements)
+            {
+                var user = BsonSerializer.Deserialize<User>(bson);
+
+                yield return user;
+            }
         }
 
-        public void Add(User user)
+        public void Add(User entity)
         {
-            var document = new BsonDocument()
-            {
-                { "id", new BsonString(user.Id.ToString()) },
-                { "userName", new BsonString(user.UserName) },
-                { "password", new BsonString(user.Password) },
-                { "administrator", new BsonBoolean(user.Administator) }
-            };
+            var bson = entity.ToBsonDocument();
 
-            _Collection.InsertOne(document);
+            _Collection.InsertOne(bson);
         }
 
-        public void Update(User user)
+        public void Update(User entity)
         {
-            var events = user.FetchEvents();
+            var bson = entity.ToBsonDocument();
 
-            var update = Builders<BsonDocument>.Update.Set("", "");
-            foreach (var @event in events)
-            {
-                switch (@event)
-                {
-                    case PasswordChangedEvent passwordChangedEvent:
-                        update = update.Set("password", new BsonString(user.Password));
-                        break;
-                    case UserAdministratorChangedEvent administratorChangedEvent:
-                        update = update.Set("administrator", new BsonBoolean(user.Administator));
-                        break;
-                    case UserNameChangedEvent nameChangedEvent:
-                        update = update.Set("userName", new BsonString(user.UserName));
-                        break;
-                }
-            }          
-
-            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("id", user.Id), update);
+            _Collection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
         }
 
         public void Delete(Guid id)
         {
-            throw new NotImplementedException();
+            _Collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", id));
         }
-
-
 
     }
 }

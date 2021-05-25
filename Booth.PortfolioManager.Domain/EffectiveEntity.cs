@@ -20,7 +20,9 @@ namespace Booth.PortfolioManager.Domain
     public abstract class EffectiveEntity : IEffectiveEntity
     {
         public Guid Id { get; }
-        public DateRange EffectivePeriod { get; private set; }
+
+        private DateRange _EffectivePeriod;
+        public DateRange EffectivePeriod => _EffectivePeriod;
 
         public EffectiveEntity(Guid id)
         {
@@ -32,28 +34,28 @@ namespace Booth.PortfolioManager.Domain
             if (!EffectivePeriod.FromDate.Equals(Date.MinValue))
                 throw new EffectiveDateException("Entity already started");
 
-            EffectivePeriod = new DateRange(date, Date.MaxValue);
+            _EffectivePeriod = new DateRange(date, Date.MaxValue);
         }
 
         protected virtual void End(Date date)
         {
-            if (!EffectivePeriod.ToDate.Equals(Date.MaxValue))
+            if (!_EffectivePeriod.ToDate.Equals(Date.MaxValue))
                 throw new EffectiveDateException("Entity is not current");
 
-            if (!EffectivePeriod.Contains(date))
+            if (!_EffectivePeriod.Contains(date))
                 throw new EffectiveDateException("Entity not active on that date");
 
-            EffectivePeriod = new DateRange(EffectivePeriod.FromDate, date);
+            _EffectivePeriod = new DateRange(_EffectivePeriod.FromDate, date);
         }
 
         public bool IsEffectiveAt(Date date)
         {
-            return EffectivePeriod.Contains(date);
+            return _EffectivePeriod.Contains(date);
         }
 
         public bool IsEffectiveDuring(DateRange dateRange)
         {
-            return EffectivePeriod.Overlaps(dateRange);
+            return _EffectivePeriod.Overlaps(dateRange);
         }
     }
 }

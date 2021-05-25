@@ -15,6 +15,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
     public interface ICorporateActionList : ITransactionList<CorporateAction>
     {
+        void Add(CorporateAction action);
         void AddCapitalReturn(Guid id, Date recordDate, string description, Date paymentDate, decimal amount);
         void AddDividend(Guid id, Date recordDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice);
         void AddTransformation(Guid id, Date recordDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<Transformation.ResultingStock> resultingStocks);
@@ -36,6 +37,10 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _Events = eventList;
         }
 
+        public new void Add(CorporateAction action)
+        {
+            base.Add(action);
+        }
         protected void PublishEvent(Event @event)
         {
             _Events.Add(@event);

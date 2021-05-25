@@ -12,8 +12,9 @@ namespace Booth.PortfolioManager.Domain.Users
     public class User : TrackedEntity, IEntityProperties
     {
         public string UserName { get; private set; }
-        public string Password => _Password;
-        private string _Password;
+
+        public string Password { get; private set; }
+
         public bool Administator { get; private set; }
 
         private readonly Dictionary<string, string> _Properties = new Dictionary<string, string>();
@@ -56,7 +57,7 @@ namespace Booth.PortfolioManager.Domain.Users
             Version++;
 
             UserName = @event.UserName;
-            _Password = @event.Password;
+            Password = @event.Password;
 
             _Properties["UserName"] = UserName;
         }
@@ -110,7 +111,7 @@ namespace Booth.PortfolioManager.Domain.Users
 
             var hashedPassword = HashPassword(newPassword);
 
-            if (hashedPassword == _Password)
+            if (hashedPassword == Password)
                 throw new ArgumentException("Password must not be the same as your existing password");
 
             var @event = new PasswordChangedEvent(Id, Version, hashedPassword);
@@ -123,14 +124,14 @@ namespace Booth.PortfolioManager.Domain.Users
         {
             Version++;
 
-            _Password = @event.Password;
+            Password = @event.Password;
         }
 
         public bool PasswordCorrect(string password)
         {
             var hashedPassword = HashPassword(password);
 
-            return (hashedPassword == _Password);
+            return (hashedPassword == Password);
         }
 
         private bool ValidateUserName(string userName)
