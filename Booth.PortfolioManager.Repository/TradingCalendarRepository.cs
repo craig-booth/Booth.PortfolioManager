@@ -18,55 +18,16 @@ namespace Booth.PortfolioManager.Repository
         void UpdateYear(TradingCalendar calendar, int year);
     }
 
-    public class TradingCalendarRepository : ITradingCalendarRepository
+    public class TradingCalendarRepository : Repository<TradingCalendar>, ITradingCalendarRepository
     {
-
-        private readonly IMongoCollection<BsonDocument> _Collection;
         public TradingCalendarRepository(IPortfolioManagerDatabase database)
+            :base(database, "TradingCalendar")
         {
-            _Collection = database.GetCollection("TradingCalendar");
         }
-
-        public TradingCalendar Get(Guid id)
-        {
-            var bson = _Collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).SingleOrDefault();
-            if (bson == null)
-                return null;
-
-            var calendar = BsonSerializer.Deserialize<TradingCalendar>(bson);
-
-            return calendar;
-        }
-
-        public IEnumerable<TradingCalendar> All()
-        {
-            var bsonElements = _Collection.Find("{}").ToList();
-
-            foreach (var bson in bsonElements)
-            {
-                var calendar = BsonSerializer.Deserialize<TradingCalendar>(bson);
-
-                yield return calendar;
-            }
-        }
-
-        public void Add(TradingCalendar entity)
-        {
-            var bson = entity.ToBsonDocument();
-
-            _Collection.InsertOne(bson);
-        }
-
-        public void Update(TradingCalendar entity)
+        public override void Update(TradingCalendar entity)
         {
             throw new NotSupportedException();
         }
-
-        public void Delete(Guid id)
-        {
-            _Collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", id));
-        }
-
 
         public void UpdateYear(TradingCalendar calendar, int year)
         {

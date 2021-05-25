@@ -4,6 +4,7 @@ using System.Globalization;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 using Booth.Common;
 using Booth.EventStore;
@@ -20,48 +21,6 @@ namespace Booth.PortfolioManager.Repository
         void Delete(Guid id);
     }
 
-    static class BsonSerializaton
-    {
-        public static Date ToDate(this BsonValue bsonValue)
-        {
-            if (bsonValue.BsonType == BsonType.String)
-            {
-                var value = bsonValue.AsString;
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return Date.MinValue;
-                }
-                if (Date.TryParseExact(value, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None, out Date date))
-                    return date;
-                else
-                    return Date.MinValue;
-            }
-            else if (bsonValue.BsonType == BsonType.DateTime)
-            {
-                var value = bsonValue.AsInt64;
-                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(value).DateTime;
-
-                return new Date(dateTime);
-            }
-            else if (bsonValue.BsonType == BsonType.Timestamp)
-            {
-                var value = bsonValue.AsInt64;
-                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(value).DateTime;
-
-                return new Date(dateTime);
-            }
-            else
-            {
-                return Date.MinValue;
-            }
-        }
-
-        public static BsonValue ToBsonValue(this Date date)
-        {
-            return new BsonString(date.ToString("yyyy-MM-dd"));
-        }
-    }
-
     public abstract class Repository<T> : IRepository<T> where T : IEntity
     {
         protected readonly IPortfolioManagerDatabase _Database;
@@ -71,49 +30,46 @@ namespace Booth.PortfolioManager.Repository
             _Database = database;
             _Collection = database.GetCollection(collectionName);
         }
-
-        protected abstract T CreateFromBson(BsonDocument document);
-
-        protected abstract BsonDocument InsertBson(T entity);
-
-        protected abstract UpdateDefinition<BsonDocument> UpdateBson(T entity);
-
-        public T Get(Guid id)
+        public virtual T Get(Guid id)
         {
-            var bson = _Collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id.ToString())).SingleOrDefault();
+            var bson = _Collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).SingleOrDefault();
             if (bson == null)
                 return default(T);
 
-            return CreateFromBson(bson);
+            var entity = BsonSerializer.Deserialize<T>(bson);
+
+            return entity;
         }
 
-        public IEnumerable<T> All()
+        public virtual IEnumerable<T> All()
         {
             var bsonElements = _Collection.Find("{}").ToList();
 
             foreach (var bson in bsonElements)
             {
-                yield return CreateFromBson(bson);
+                var entity = BsonSerializer.Deserialize<T>(bson);
+
+                yield return entity;
             }
         }
 
-        public void Add(T entity)
+        public virtual void Add(T entity)
         {
-            var bson = InsertBson(entity);
+            var bson = entity.ToBsonDocument();
 
             _Collection.InsertOne(bson);
         }
 
-        public void Update(T entity)
+        public virtual void Update(T entity)
         {
-            var bson = UpdateBson(entity);
+            var bson = entity.ToBsonDocument();
 
-            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id.ToString()), bson);
+            _Collection.ReplaceOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
         }
 
-        public void Delete(Guid id)
+        public virtual void Delete(Guid id)
         {
-            _Collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", id.ToString()));
+            _Collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", id));
         }
     }
 }

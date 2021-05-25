@@ -27,46 +27,14 @@ namespace Booth.PortfolioManager.Repository
 
     }
 
-    public class StockRepository : IStockRepository
+    public class StockRepository : Repository<Stock>, IStockRepository
     {
-
-        private readonly IMongoCollection<BsonDocument> _Collection;
         public StockRepository(IPortfolioManagerDatabase database)
+            : base(database, "Stocks")
         {
-            _Collection = database.GetCollection("Stocks");
         }
 
-        public Stock Get(Guid id)
-        {
-            var bson = _Collection.Find(Builders<BsonDocument>.Filter.Eq("_id", id)).SingleOrDefault();
-            if (bson == null)
-                return null;
-
-            var stock = BsonSerializer.Deserialize<Stock>(bson);
-
-            return stock;
-        }
-
-        public IEnumerable<Stock> All()
-        {
-            var bsonElements = _Collection.Find("{}").ToList();
-
-            foreach (var bson in bsonElements)
-            {
-                var stock = BsonSerializer.Deserialize<Stock>(bson);
-
-                yield return stock;
-            }
-        }
-
-        public void Add(Stock entity)
-        {
-            var bson = entity.ToBsonDocument();
-
-            _Collection.InsertOne(bson);
-        }
-
-        public void Update(Stock entity)
+        public override void Update(Stock entity)
         {
             var bson = Builders<BsonDocument>.Update
             .Set("listingDate", entity.EffectivePeriod.FromDate)            
@@ -76,11 +44,6 @@ namespace Booth.PortfolioManager.Repository
                 bson.Set("delistingDate", entity.EffectivePeriod.ToDate);
 
             _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
-        }
-
-        public void Delete(Guid id)
-        {
-            _Collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", id));
         }
 
         public void UpdateProperties(Stock stock, Date date)
