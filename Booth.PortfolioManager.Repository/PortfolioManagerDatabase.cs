@@ -4,11 +4,10 @@ using System.Text;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
 
-using Booth.Common;
+using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Repository.Serialization;
+
 
 
 namespace Booth.PortfolioManager.Repository
@@ -23,12 +22,12 @@ namespace Booth.PortfolioManager.Repository
     public class PortfolioManagerDatabase : IPortfolioManagerDatabase
     {
         private readonly IMongoDatabase _Database;
-        public PortfolioManagerDatabase(string connectionString, string databaseName)
+        public PortfolioManagerDatabase(string connectionString, string databaseName, IPortfolioFactory portfolioFactory, IStockResolver stockResolver)
         {
             var client = new MongoClient(connectionString);
             _Database = client.GetDatabase(databaseName);
 
-            SerializationProvider.Configure();
+            SerializationProvider.Configure(portfolioFactory, stockResolver);
         }
 
         public IMongoCollection<BsonDocument> GetCollection(string name)

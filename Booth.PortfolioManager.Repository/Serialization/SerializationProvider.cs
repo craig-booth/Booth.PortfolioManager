@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -8,34 +9,32 @@ using MongoDB.Bson.Serialization.Conventions;
 using Booth.Common;
 using Booth.EventStore;
 using Booth.PortfolioManager.Domain;
+using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Utils;
 
 
 namespace Booth.PortfolioManager.Repository.Serialization
 {
+    interface IConfigureSerialization
+    {
+        void ConfigureSerializaton();
+    }
+
     class SerializationProvider : IBsonSerializationProvider
     {
 
-        public static void Configure()
+        public static void Configure(IPortfolioFactory portfolioFactory, IStockResolver stockResolver)
         {
             var conventions = new ConventionPack();
             conventions.Add(new CamelCaseElementNameConvention());
-         //   conventions.Add(new ImmutableTypeClassMapConvention());
             ConventionRegistry.Register("PortfolioManager", conventions, t => true);
-
-
 
             BsonSerializer.RegisterSerializationProvider(new SerializationProvider());
             BsonSerializer.RegisterSerializer(typeof(Date), new DateSerializer());
 
-
-        /*    BsonClassMap.RegisterClassMap<TrackedEntity>(cm =>
-            {
-                cm.MapIdField(c => c.Id);
-            });  */
-
             StockRepository.ConfigureSerializaton();
             TradingCalendarRepository.ConfigureSerializaton();
+            PortfolioRepository.ConfigureSerializaton(portfolioFactory, stockResolver);
         }
 
         public IBsonSerializer GetSerializer(Type type)

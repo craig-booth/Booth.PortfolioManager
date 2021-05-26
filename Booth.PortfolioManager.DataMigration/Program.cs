@@ -7,6 +7,8 @@ using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Domain.Transactions;
 
 
 namespace Booth.PortfolioManager.DataMigration
@@ -17,10 +19,14 @@ namespace Booth.PortfolioManager.DataMigration
         {
             var x = new TradingCalendar(Guid.Empty);
 
-        //    var eventStore = new MongodbEventStore("mongodb://192.168.1.93:27017", "PortfolioManager");
-            var database = new PortfolioManagerDatabase("mongodb://192.168.1.93:27017", "PortfolioManager2");
+            var stockResolver = new StockResolver();
+            var factory = new PortfolioFactory(stockResolver);
+
+            //    var eventStore = new MongodbEventStore("mongodb://192.168.1.93:27017", "PortfolioManager");
+            var database = new PortfolioManagerDatabase("mongodb://192.168.1.93:27017", "PortfolioManager2", factory, stockResolver);
 
             var stock = new Stock(Guid.NewGuid());
+            stockResolver.Add(stock);
             stock.List("ABC", "Test", new Date(1974, 04, 10), false, AssetCategory.AustralianStocks);
             stock.ChangeProperties(new Date(2000, 01, 01), "DEF", "New Name", AssetCategory.AustralianProperty);
             stock.ChangeDividendRules(new Date(2001, 02, 03), 0.45m, RoundingRule.Truncate, true, DrpMethod.RoundDown);
@@ -38,16 +44,23 @@ namespace Booth.PortfolioManager.DataMigration
 
             stock.DeList(new Date(2020, 10, 01));
 
+      
+            var portfolio = factory.CreatePortfolio(Guid.NewGuid());
+            portfolio.Create("Testing", Guid.NewGuid());
+            portfolio.MakeCashTransaction(new Date(2000, 01, 01), BankAccountTransactionType.Deposit, 100.00m, "Initial deposit", Guid.NewGuid());
+            portfolio.AquireShares(stock.Id, new Date(2001, 01, 01), 100, 0.02m, 9.95m, true, "test", Guid.NewGuid());
 
+
+            TestPortfolio(portfolio, database);
             // MigrateUsers(eventStore, database);
 
             //   MigrateTradingCalendars(eventStore, database);
 
             //  MigrateStocks(eventStore, database);
 
-        //    TestStock(stock, database);
+            //    TestStock(stock, database);
 
-            TestTradingCalendar(database);
+            //   TestTradingCalendar(database);
 
             Console.WriteLine("Hello World!");
         }
@@ -155,6 +168,32 @@ namespace Booth.PortfolioManager.DataMigration
             calendar.SetNonTradingDays(2021, new[] { new NonTradingDay(new Date(2021, 04, 10), "Birthday"), new NonTradingDay(new Date(2021, 12, 10), "Ryan Birthday") });
 
             repository.UpdateYear(calendar, 2021);
+        }
+
+        static void TestPortfolio(Portfolio portfolio, PortfolioManagerDatabase database)
+        {
+            var repository = new PortfolioRepository(database);
+
+            repository.Add(portfolio);
+
+            repository.Get(portfolio.Id);
+
+        }
+
+    }
+
+    class StockResolver : IStockResolver
+    {
+        private Dictionary<Guid, Stock> _Stocks = new Dictionary<Guid, Stock>();
+
+        public void Add(Stock stock)
+        {
+            _Stocks.Add(stock.Id, stock);
+        }
+
+        public IReadOnlyStock GetStock(Guid id)
+        {
+            return _Stocks[id];
         }
 
     }
