@@ -41,17 +41,51 @@ namespace Booth.PortfolioManager.Repository
 
         public void AddTransaction(Portfolio portfolio, Guid id)
         {
-            throw new NotSupportedException();
+            var transaction = portfolio.Transactions[id];
+
+            var filter = Builders<BsonDocument>.Filter
+                .And(new[]
+                    {
+                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
+                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
+                    }
+                );
+
+            var addValue = Builders<BsonDocument>.Update
+                .Push("transactions", transaction);
+
+            _Collection.UpdateOne(filter, addValue); 
         }
 
         public void DeleteTransaction(Portfolio portfolio, Guid id)
         {
-            throw new NotSupportedException();
+            var filter = Builders<BsonDocument>.Filter
+                .And(new[]
+                    {
+                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
+                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
+                    }
+                );
+
+            _Collection.DeleteOne(filter); 
         }
 
         public void UpdateTransaction(Portfolio portfolio, Guid id)
         {
-            throw new NotSupportedException();
+            var transaction = portfolio.Transactions[id];
+
+            var filter = Builders<BsonDocument>.Filter
+                .And(new[]
+                    {
+                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
+                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
+                    }
+                );
+
+            var updateValue = Builders<BsonDocument>.Update
+                .Set("transactions.$", transaction);
+
+            _Collection.UpdateOne(filter, updateValue); 
         }
 
         public static void ConfigureSerializaton(IPortfolioFactory factory, IStockResolver stockResolver)

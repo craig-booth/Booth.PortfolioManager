@@ -10,7 +10,7 @@ using Booth.PortfolioManager.Domain.Stocks.Events;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
-    class StapledSecurity : Stock
+    public class StapledSecurity : Stock
     {
         private StapledSecurityChild[] _ChildSecurities;
         public IReadOnlyList<StapledSecurityChild> ChildSecurities
@@ -126,9 +126,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
         }
     }
 
-    struct RelativeNTA
+    public struct RelativeNTA
     {
-        public readonly decimal[] Percentages;
+        public decimal[] Percentages { get; private set; }
 
         public RelativeNTA(decimal[] percentages)
         {

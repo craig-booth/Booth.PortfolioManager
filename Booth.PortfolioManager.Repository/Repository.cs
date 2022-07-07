@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -8,7 +7,6 @@ using MongoDB.Bson.Serialization;
 
 using Booth.Common;
 using Booth.EventStore;
-
 
 namespace Booth.PortfolioManager.Repository
 {
@@ -70,6 +68,38 @@ namespace Booth.PortfolioManager.Repository
         public virtual void Delete(Guid id)
         {
             _Collection.DeleteOne(Builders<BsonDocument>.Filter.Eq("_id", id));
+        }
+
+        protected void UpdateEffectiveProperties<P>(T entity, Date date, P property, string propertyName) where P: struct
+        {
+            var existsFilter = Builders<BsonDocument>.Filter
+                .And(new[]
+                    {
+                    Builders<BsonDocument>.Filter.Eq("_id", entity.Id),
+                    Builders<BsonDocument>.Filter.Eq(propertyName + ".date", date)
+                    }
+                );
+
+
+            var updateValue = Builders<BsonDocument>.Update
+                 .Set(propertyName + ".$.properties", property);
+
+            var notExistsFilter = Builders<BsonDocument>.Filter
+                .And(new[]
+                    {
+                    Builders<BsonDocument>.Filter.Eq("_id", entity.Id),
+                    Builders<BsonDocument>.Filter.Ne(propertyName + ".date", date)
+                    }
+                );
+
+            var addValue = Builders<BsonDocument>.Update
+                .Push(propertyName, property);
+
+            _Collection.BulkWrite(new[]
+             {
+                new UpdateOneModel<BsonDocument>(existsFilter, updateValue),
+                new UpdateOneModel<BsonDocument>(notExistsFilter, addValue)
+            });
         }
     }
 }

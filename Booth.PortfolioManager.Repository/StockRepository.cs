@@ -25,6 +25,7 @@ namespace Booth.PortfolioManager.Repository
         void DeleteCorporateAction(Stock stock, Guid id);
         void UpdateCorporateAction(Stock stock, Guid id);
 
+        void UpdateRelativeNTAs(Stock stock, Date date);
     }
 
     public class StockRepository : Repository<Stock>, IStockRepository
@@ -32,6 +33,13 @@ namespace Booth.PortfolioManager.Repository
         public StockRepository(IPortfolioManagerDatabase database)
             : base(database, "Stocks")
         {
+        }
+
+        public void Test(Stock entity)
+        {
+            var bson = entity.ToBsonDocument();
+
+            var entity2 = BsonSerializer.Deserialize<Stock>(bson);
         }
 
         public override void Update(Stock entity)
@@ -48,70 +56,14 @@ namespace Booth.PortfolioManager.Repository
 
         public void UpdateProperties(Stock stock, Date date)
         {
-            var property = stock.Properties[date];
-
-            var existsFilter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", stock.Id),
-                    Builders<BsonDocument>.Filter.Eq("properties.date", date)
-                    }
-                );
-
-            var updateValue = Builders<BsonDocument>.Update
-                 .Set("properties.$.properties", property);
-
-            var notExistsFilter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", stock.Id),
-                    Builders<BsonDocument>.Filter.Ne("properties.date", date)
-                    }
-                );
-
-            var addValue = Builders<BsonDocument>.Update
-                .Push("properties", property); 
-
-           _Collection.BulkWrite(new[]
-            {
-                new UpdateOneModel<BsonDocument>(existsFilter, updateValue),
-                new UpdateOneModel<BsonDocument>(notExistsFilter, addValue)
-            });  
+            base.UpdateEffectiveProperties<StockProperties>(stock, date, stock.Properties[date], "properties");
         }
 
         public void UpdateDividendRules(Stock stock, Date date)
         {
-            var rules = stock.DividendRules[date];
-
-            var existsFilter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", stock.Id),
-                    Builders<BsonDocument>.Filter.Eq("dividendRules.date", date)
-                    }
-                );
-
-
-            var updateValue = Builders<BsonDocument>.Update
-                 .Set("dividendRules.$.properties", rules);
-
-            var notExistsFilter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", stock.Id),
-                    Builders<BsonDocument>.Filter.Ne("dividendRules.date", date)
-                    }
-                );
-
-            var addValue = Builders<BsonDocument>.Update
-                .Push("properties", rules);
-
-            _Collection.BulkWrite(new[]
-             {
-                new UpdateOneModel<BsonDocument>(existsFilter, updateValue),
-                new UpdateOneModel<BsonDocument>(notExistsFilter, addValue)
-            });
+            base.UpdateEffectiveProperties<DividendRules>(stock, date, stock.DividendRules[date], "dividendRules");
         }
+
         public void AddCorporateAction(Stock stock, Guid id)
         {
             var action = stock.CorporateActions[id];
@@ -124,7 +76,6 @@ namespace Booth.PortfolioManager.Repository
                     }
                 );
 
-
             var addValue = Builders<BsonDocument>.Update
                 .Push("corporateActions", action);
 
@@ -133,8 +84,6 @@ namespace Booth.PortfolioManager.Repository
 
         public void DeleteCorporateAction(Stock stock, Guid id)
         {
-            var action = stock.CorporateActions[id];
-
             var filter = Builders<BsonDocument>.Filter
                 .And(new[]
                     {
@@ -157,11 +106,20 @@ namespace Booth.PortfolioManager.Repository
                     Builders<BsonDocument>.Filter.Eq("corporateActions._id", id)
                     }
                 );
-
+            
             var updateValue = Builders<BsonDocument>.Update
                 .Set("corporateActions.$", action);
 
             _Collection.UpdateOne(filter, updateValue);
+        }
+
+        public void UpdateRelativeNTAs(Stock stock, Date date)
+        {
+            var stapledSecurity = stock as StapledSecurity;
+            if (stapledSecurity == null)
+                throw new Exception("Can only update Relative NTAs on stapled securities");
+
+            base.UpdateEffectiveProperties<RelativeNTA>(stock, date, stapledSecurity.RelativeNTAs[date], "relativeNTAs");
         }
 
         public static void ConfigureSerializaton()

@@ -64,7 +64,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
                 var genericType = classType.MakeGenericType(argumentType);
 
                 return (IBsonSerializer)Activator.CreateInstance(genericType);
-            }
+            } 
 
             return null;
         }

@@ -25,9 +25,21 @@ namespace Booth.PortfolioManager.DataMigration
             //    var eventStore = new MongodbEventStore("mongodb://192.168.1.93:27017", "PortfolioManager");
             var database = new PortfolioManagerDatabase("mongodb://192.168.1.93:27017", "PortfolioManager2", factory, stockResolver);
 
-            var stock = new Stock(Guid.NewGuid());
+
+            var stock = new StapledSecurity(Guid.NewGuid());
             stockResolver.Add(stock);
-            stock.List("ABC", "Test", new Date(1974, 04, 10), false, AssetCategory.AustralianStocks);
+
+            var childStocks = new[] {
+                new StapledSecurityChild("CH1", "Child 1", false),
+                new StapledSecurityChild("CH2", "Child 2", true)
+            };
+
+            stock.List("ABC", "Test", new Date(1974, 04, 10), AssetCategory.AustralianStocks, childStocks);
+
+            stock.SetRelativeNTAs(new Date(1974, 04, 10), new[] { 0.45m, 0.55m });
+            stock.SetRelativeNTAs(new Date(1975, 01, 01), new[] { 0.50m, 0.50m });
+            stock.SetRelativeNTAs(new Date(1976, 01, 01), new[] { 0.60m, 0.40m });
+
             stock.ChangeProperties(new Date(2000, 01, 01), "DEF", "New Name", AssetCategory.AustralianProperty);
             stock.ChangeDividendRules(new Date(2001, 02, 03), 0.45m, RoundingRule.Truncate, true, DrpMethod.RoundDown);
 
@@ -51,14 +63,14 @@ namespace Booth.PortfolioManager.DataMigration
             portfolio.AquireShares(stock.Id, new Date(2001, 01, 01), 100, 0.02m, 9.95m, true, "test", Guid.NewGuid());
 
 
-            TestPortfolio(portfolio, database);
+           // TestPortfolio(portfolio, database);
             // MigrateUsers(eventStore, database);
 
             //   MigrateTradingCalendars(eventStore, database);
 
             //  MigrateStocks(eventStore, database);
 
-            //    TestStock(stock, database);
+            TestStock(stock, database);
 
             //   TestTradingCalendar(database);
 
@@ -146,13 +158,25 @@ namespace Booth.PortfolioManager.DataMigration
         {
             var repository = new StockRepository(database);
 
+            repository.Test(stock);
+
+            if (stock is StapledSecurity stapledSecurity)
+            {
+                stapledSecurity.SetRelativeNTAs(new Date(1976, 01, 01), new[] { 0.35m, 0.65m });
+                repository.UpdateRelativeNTAs(stapledSecurity, new Date(1975, 01, 01));
+
+                stapledSecurity.SetRelativeNTAs(new Date(1977, 01, 01), new[] { 0.80m, 0.20m });
+                repository.UpdateRelativeNTAs(stapledSecurity, new Date(1976, 01, 01));
+            }
+
+            /*
             repository.Add(stock);
 
             repository.Update(stock);
 
             repository.UpdateProperties(stock, new Date(2000, 01, 01));
 
-            var newStock = repository.Get(stock.Id);
+            var newStock = repository.Get(stock.Id); */
         }
 
         static void TestTradingCalendar(PortfolioManagerDatabase database)

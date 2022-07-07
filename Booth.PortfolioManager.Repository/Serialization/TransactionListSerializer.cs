@@ -14,19 +14,6 @@ using Booth.PortfolioManager.Domain.CorporateActions;
 namespace Booth.PortfolioManager.Repository.Serialization
 {
 
-/*   class CorporateActionListSerializer : SerializerBase<ITransactionList<T>>, IBsonArraySerializer where T : ITransaction
-    {
-        public override ITransactionList<T> Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
-        {
-
-        }
-
-        public override ITransactionList<T> Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
-        {
-
-        }
-    } */
-
     class TransactionListSerializer<T> : SerializerBase<ITransactionList<T>>, IBsonArraySerializer where T : ITransaction
     {
         private IBsonSerializer<T> _Serializer;
@@ -41,24 +28,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
         }
 
         public override ITransactionList<T> Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
-        {
-            /*        TransactionList<T> transactions = null;
-                //    var transactions = new TransactionList<T>();
-
-                    var bsonReader = context.Reader;
-                    if (bsonReader.CurrentBsonType == BsonType.Array)
-                    {
-                        bsonReader.ReadStartArray();
-
-                        while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
-                        {
-
-                        }
-
-                        bsonReader.ReadEndArray();
-                    }
-
-                    return transactions; */
+        {       
             throw new NotSupportedException();
         }
 

@@ -27,7 +27,10 @@ namespace Booth.PortfolioManager.Repository.Serialization
             bool trust = false;
             IEffectiveProperties<StockProperties> effectiveProperties = null;
             IEffectiveProperties<DividendRules> dividendRules = null;
-            var corporateActions = new List<CorporateAction>();
+            List<CorporateAction> corporateActions = null;
+
+            List<StapledSecurityChild> childSecurities = null;
+            IEffectiveProperties<RelativeNTA> relativeNTAs = null;
 
             bsonReader.ReadStartDocument();
             while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
@@ -55,42 +58,68 @@ namespace Booth.PortfolioManager.Repository.Serialization
                         dividendRules = BsonSerializer.Deserialize<IEffectiveProperties<DividendRules>>(bsonReader);
                         break;
                     case "corporateActions":
-                        bsonReader.ReadStartArray();
-                        while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
-                        {
-                            var action = BsonSerializer.Deserialize<CorporateAction>(bsonReader);
-                            corporateActions.Add(action);
-                        }
-                        bsonReader.ReadEndArray();
+                        corporateActions = BsonSerializer.Deserialize<List<CorporateAction>>(bsonReader);
+                        break;
+                    case "childSecurities":
+                        childSecurities = BsonSerializer.Deserialize<List<StapledSecurityChild>>(bsonReader);
+                        break;
+                    case "relativeNTAs":
+                        relativeNTAs = BsonSerializer.Deserialize<IEffectiveProperties<RelativeNTA>>(bsonReader);
                         break;
                 }
             }
 
-
-            var stock = new Stock(id);
-
-            if (listingDate != Date.MinValue)
+            Stock stock = null;
+            if (childSecurities.Count == 0)
             {
-                var listingProperties = effectiveProperties[listingDate];
-                stock.List(listingProperties.AsxCode, listingProperties.Name, listingDate, trust, listingProperties.Category);
+                stock = new Stock(id);
+
+                if (listingDate != Date.MinValue)
+                {
+                    var listingProperties = effectiveProperties[listingDate];
+                    stock.List(listingProperties.AsxCode, listingProperties.Name, listingDate, trust, listingProperties.Category);
+                }
+            }
+            else
+            {
+                var stapledSecurity = new StapledSecurity(id);
+
+                if (listingDate != Date.MinValue)
+                {
+                    var listingProperties = effectiveProperties[listingDate];
+                    stapledSecurity.List(listingProperties.AsxCode, listingProperties.Name, listingDate, listingProperties.Category, childSecurities);
+                }
+
+                foreach (var relativeNTA in relativeNTAs.Values.Reverse())
+                    stapledSecurity.SetRelativeNTAs(relativeNTA.EffectivePeriod.FromDate, relativeNTA.Properties.Percentages);
+
+                stock = stapledSecurity;
             }
 
-            foreach (var effectiveProperty in effectiveProperties.Values.Reverse().Skip(1))
+            if (effectiveProperties != null)
             {
-                var property = effectiveProperty.Properties;
-                stock.ChangeProperties(effectiveProperty.EffectivePeriod.FromDate, property.AsxCode, property.Name, property.Category);
+                foreach (var effectiveProperty in effectiveProperties.Values.Reverse().Skip(1))
+                {
+                    var property = effectiveProperty.Properties;
+                    stock.ChangeProperties(effectiveProperty.EffectivePeriod.FromDate, property.AsxCode, property.Name, property.Category);
+                }
             }
 
-            foreach (var dividendRule in dividendRules.Values.Reverse())
+            if (dividendRules != null)
             {
-                var property = dividendRule.Properties;
+                foreach (var dividendRule in dividendRules.Values.Reverse())
+                {
+                    var property = dividendRule.Properties;
 
-                stock.ChangeDividendRules(dividendRule.EffectivePeriod.FromDate, property.CompanyTaxRate, property.DividendRoundingRule, property.DrpActive, property.DrpMethod);
+                    stock.ChangeDividendRules(dividendRule.EffectivePeriod.FromDate, property.CompanyTaxRate, property.DividendRoundingRule, property.DrpActive, property.DrpMethod);
+                }
             }
 
-            foreach (var action in corporateActions)
-                stock.CorporateActions.Add(action);
-           
+            if (corporateActions != null)
+            {
+                foreach (var action in corporateActions)
+                    stock.CorporateActions.Add(action);
+            }
 
             if (delistingDate != Date.MaxValue)
             {
@@ -121,8 +150,20 @@ namespace Booth.PortfolioManager.Repository.Serialization
                 BsonSerializer.Serialize<Date>(bsonWriter, value.EffectivePeriod.ToDate);
             }
 
-            bsonWriter.WriteName("trust");
-            bsonWriter.WriteBoolean(value.Trust);
+            if (value is StapledSecurity stapledSecurity)
+            {
+                bsonWriter.WriteName("childSecurities");
+                BsonSerializer.Serialize<IEnumerable<StapledSecurityChild>>(bsonWriter, stapledSecurity.ChildSecurities);
+
+                bsonWriter.WriteName("relativeNTAs");
+                BsonSerializer.Serialize<IEffectiveProperties<RelativeNTA>>(bsonWriter, stapledSecurity.RelativeNTAs);
+            }
+            else
+            {
+
+                bsonWriter.WriteName("trust");
+                bsonWriter.WriteBoolean(value.Trust);
+            }
 
             bsonWriter.WriteName("properties");
             BsonSerializer.Serialize<IEffectiveProperties<StockProperties>>(bsonWriter, value.Properties);
