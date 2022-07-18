@@ -19,8 +19,8 @@ namespace Booth.PortfolioManager.Repository
     public interface IStockRepository : IRepository<Stock>
     {
         void UpdateProperties(Stock stock, Date date);
-        void UpdateDividendRules(Stock stock, Date date);
 
+        void UpdateDividendRules(Stock stock, Date date);
         void AddCorporateAction(Stock stock, Guid id);
         void DeleteCorporateAction(Stock stock, Guid id);
         void UpdateCorporateAction(Stock stock, Guid id);

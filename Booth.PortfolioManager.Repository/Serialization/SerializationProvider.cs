@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
             ConventionRegistry.Register("PortfolioManager", conventions, t => true);
 
             BsonSerializer.RegisterSerializationProvider(new SerializationProvider());
-            BsonSerializer.RegisterSerializer(typeof(Date), new DateSerializer());
+         //   BsonSerializer.RegisterSerializer(typeof(Date), new DateSerializer());
 
             StockRepository.ConfigureSerializaton();
             TradingCalendarRepository.ConfigureSerializaton();

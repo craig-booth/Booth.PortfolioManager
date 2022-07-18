@@ -8,9 +8,10 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 
 using Booth.Common;
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Domain.TradingCalendars;
+using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -18,33 +19,20 @@ namespace Booth.PortfolioManager.Web.Test.Services
     {
 
         [Fact]
-        public void CreateServiceForExistingCalendar()
+        public void GetYearCalanderNotExist()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
-            tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
-            var repository = mockRepository.Create<IRepository<TradingCalendar>>();
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
+            var repository = mockRepository.Create<ITradingCalendarRepository>();
 
-            var service = new TradingCalendarService(repository.Object, tradingCalendar.Id);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(It.IsAny<Guid>())).Returns(default(TradingCalendar));
 
-            service.TradingCalendar.Should().Be(tradingCalendar);
+            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
 
-            mockRepository.Verify();
-        }
+            var result = service.Get(Guid.NewGuid(), 2010);
 
-        [Fact]
-        public void CreateServiceForNewCalendar()
-        {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var id = Guid.NewGuid();
-            var repository = mockRepository.Create<IRepository<TradingCalendar>>();
-            repository.Setup(x => x.Get(id)).Returns(default(TradingCalendar));
-            repository.Setup(x => x.Add(It.Is<TradingCalendar>(y => y.Id == id)));
-
-            var service = new TradingCalendarService(repository.Object, id);
+            result.Should().HaveNotFoundStatus();
 
             mockRepository.Verify();
         }
@@ -54,14 +42,16 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
-            var repository = mockRepository.Create<IRepository<TradingCalendar>>();
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
+            var repository = mockRepository.Create<ITradingCalendarRepository>();
 
-            var service = new TradingCalendarService(repository.Object, tradingCalendar.Id);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var result = service.Get(2010);
+            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+
+            var result = service.Get(tradingCalendar.Id, 2010);
             var response = result.Result;
 
             response.Should().BeEquivalentTo(new
@@ -76,14 +66,16 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
-            var repository = mockRepository.Create<IRepository<TradingCalendar>>();
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
+            var repository = mockRepository.Create<ITradingCalendarRepository>();
 
-            var service = new TradingCalendarService(repository.Object, tradingCalendar.Id);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var result = service.Get(2000);
+            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+
+            var result = service.Get(tradingCalendar.Id, 2000);
             var response = result.Result;
 
             response.Should().BeEquivalentTo(new
@@ -101,15 +93,17 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
-            var repository = mockRepository.Create<IRepository<TradingCalendar>>();
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
-            repository.Setup(x => x.Update(tradingCalendar));
+            var repository = mockRepository.Create<ITradingCalendarRepository>();
+            repository.Setup(x => x.UpdateYear(tradingCalendar, 2001));
 
-            var service = new TradingCalendarService(repository.Object, tradingCalendar.Id);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var calendarReference = service.TradingCalendar;
+            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+
+            var calendarReference = tradingCalendar;
 
             using (new AssertionScope())
             {
@@ -121,7 +115,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             updatedTradingCalendar.Year = 2001;
             updatedTradingCalendar.NonTradingDays.Add(new RestApi.TradingCalendars.TradingCalendar.NonTradingDay() { Date = new Date(2001, 12, 25), Description = "Christmas Day" });
 
-            var result = service.Update(updatedTradingCalendar);
+            var result = service.Update(tradingCalendar.Id, updatedTradingCalendar);
 
             using (new AssertionScope())
             {
@@ -139,15 +133,17 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var tradingCalendar = new TradingCalendar(Guid.NewGuid());
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
-            var repository = mockRepository.Create<IRepository<TradingCalendar>>();
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
-            repository.Setup(x => x.Update(tradingCalendar));
+            var repository = mockRepository.Create<ITradingCalendarRepository>();
+            repository.Setup(x => x.UpdateYear(tradingCalendar, 2001));
 
-            var service = new TradingCalendarService(repository.Object, tradingCalendar.Id);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var calendarReference = service.TradingCalendar;
+            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+
+            var calendarReference = tradingCalendar;
 
             using (new AssertionScope())
             {
@@ -155,7 +151,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 calendarReference.IsTradingDay(new Date(2001, 12, 25)).Should().BeTrue();
             }
 
-            service.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 12, 25), "Christmas Day") });
+            service.SetNonTradingDays(tradingCalendar.Id, 2001, new[] { new NonTradingDay(new Date(2001, 12, 25), "Christmas Day") });
 
             using (new AssertionScope())
             {

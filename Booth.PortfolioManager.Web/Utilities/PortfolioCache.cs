@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Utilities
@@ -17,10 +17,10 @@ namespace Booth.PortfolioManager.Web.Utilities
 
     public class PortfolioCache : IPortfolioCache
     {
-        private IRepository<Portfolio> _Repository;
+        private IPortfolioRepository _Repository;
         private IMemoryCache _Cache;
 
-        public PortfolioCache(IRepository<Portfolio> repository, IMemoryCache memoryCache)
+        public PortfolioCache(IPortfolioRepository repository, IMemoryCache memoryCache)
         {
             _Repository = repository;
             _Cache = memoryCache;

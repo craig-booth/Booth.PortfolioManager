@@ -15,8 +15,6 @@
 
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.8" />
-    <PackageReference Include="Booth.EventStore" Version="1.0.5" />
-    <PackageReference Include="Booth.EventStore.MongoDB" Version="1.0.4" />
     <PackageReference Include="Booth.PortfolioManager.RestApi" Version="1.1.1" />
     <PackageReference Include="Booth.Scheduler" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
@@ -36,6 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Booth.PortfolioManager.DataServices\Booth.PortfolioManager.DataServices.csproj" />
     <ProjectReference Include="..\Booth.PortfolioManager.Domain\Booth.PortfolioManager.Domain.csproj" />
+    <ProjectReference Include="..\Booth.PortfolioManager.Repository\Booth.PortfolioManager.Repository.csproj" />
   </ItemGroup>
 
 

@@ -19,15 +19,15 @@ namespace Booth.PortfolioManager.Web.DataImporters
     {
         private readonly IHistoricalStockPriceService _DataService;
         private readonly IStockQuery _StockQuery;
-        private IStockService _StockService;
-        private readonly ITradingCalendar _TradingCalendar;
+        private readonly IStockService _StockService;
+        private readonly IEntityCache<TradingCalendar> _TradingCalendarCache;
         private readonly ILogger _Logger;
 
-        public HistoricalPriceImporter(IStockQuery stockQuery, IStockService stockService, ITradingCalendar tradingCalendar, IHistoricalStockPriceService dataService, ILogger<HistoricalPriceImporter> logger)
+        public HistoricalPriceImporter(IStockQuery stockQuery, IStockService stockService, IEntityCache<TradingCalendar> tradingCalendarCache, IHistoricalStockPriceService dataService, ILogger<HistoricalPriceImporter> logger)
         {
             _StockQuery = stockQuery;
             _StockService = stockService;
-            _TradingCalendar = tradingCalendar;
+            _TradingCalendarCache = tradingCalendarCache;
             _DataService = dataService;
             _Logger = logger;
         }
@@ -35,7 +35,9 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         public async Task Import(CancellationToken cancellationToken)
         {
-            var lastExpectedDate = _TradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1));
+            var tradingCalendar = _TradingCalendarCache.Get(TradingCalendarIds.ASX);
+
+            var lastExpectedDate = tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1));
 
             foreach (var stock in _StockQuery.All())
             {

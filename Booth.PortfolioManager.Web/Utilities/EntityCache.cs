@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-using Booth.EventStore;
+using Booth.PortfolioManager.Domain;
+using Booth.PortfolioManager.Repository;
 
 namespace Booth.PortfolioManager.Web.Utilities
 {
-    interface IEntityCache<T> where T : IEntity
+    public interface IEntityCache<T> where T : IEntity
     {
         T Get(Guid id);
 

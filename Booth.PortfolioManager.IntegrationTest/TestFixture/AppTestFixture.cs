@@ -8,17 +8,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 
 using Booth.Common;
-using Booth.EventStore;
-using Booth.EventStore.Memory;
 using Booth.PortfolioManager.Web;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
-using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Booth.PortfolioManager.Repository;
 
-namespace Booth.PortfolioManager.IntegrationTest
+namespace Booth.PortfolioManager.IntegrationTest.TestFixture
 {
     static class Ids
     {
@@ -34,15 +32,24 @@ namespace Booth.PortfolioManager.IntegrationTest
         private TestPortfolioAccessor _PortfolioAccessor;
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            var eventStore = new MemoryEventStore();
+            var userRepository = new InMemoryUserRepository();
+            AddUsers(userRepository);
 
-            AddUsers(eventStore);
-            AddStocks(eventStore);
-            AddPortfolios(eventStore);
+            var stockRepository = new InMemoryStockRepository();
+            AddStocks(stockRepository);
+
+            var stockPriceRepository = new InMemoryStockPriceRepository();
+
+            var portfolioRepository = new InMemoryPortfolioRepository();
+            AddPortfolios(portfolioRepository, stockRepository);
 
             builder.ConfigureTestServices(x =>
             {
-                x.AddSingleton<IEventStore>(eventStore);
+                x.AddSingleton<IPortfolioRepository>(portfolioRepository);
+                x.AddSingleton<IUserRepository>(userRepository);
+                x.AddSingleton<IStockRepository>(stockRepository);
+                x.AddSingleton<IStockPriceRepository>(stockPriceRepository);
+
                 x.RemoveAll<IHostedService>();
                 x.AddScoped<IPortfolioAccessor>(_ => _PortfolioAccessor);
             });
@@ -61,39 +68,34 @@ namespace Booth.PortfolioManager.IntegrationTest
             public IPortfolio Portfolio => _Portfolio;
         }
 
-        private void AddUsers(IEventStore eventStore)
+        private void AddUsers(IUserRepository repository)
         {
-            var eventStream = eventStore.GetEventStream<User>("Users");
 
             var standardUser = new User(Ids.UserId);
             standardUser.Create("StandardUser", "secret");
-            eventStream.Add(standardUser.Id, "User", standardUser.GetProperties(), standardUser.FetchEvents());
+            repository.Add(standardUser);
 
             var standardUser2 = new User(Guid.NewGuid());
             standardUser2.Create("StandardUser2", "secret");
-            eventStream.Add(standardUser2.Id, "User", standardUser2.GetProperties(), standardUser2.FetchEvents());
+            repository.Add(standardUser2);
 
             var administrator = new User(Guid.NewGuid());
             administrator.Create("AdminUser", "secret");
             administrator.AddAdministratorPrivilage();
-            eventStream.Add(administrator.Id, "User", administrator.GetProperties(), administrator.FetchEvents());
+            repository.Add(administrator);
         }
 
-        private void AddStocks(IEventStore eventStore)
+        private void AddStocks(IStockRepository repository)
         {
-            var eventStream = eventStore.GetEventStream<Stock>("Stocks");
-
             var stock = new Stock(Ids.BHP);
-            stock.List("BHP", "BHP Pty Ltd", new Date(2000, 01, 01), false, Domain.Stocks.AssetCategory.AustralianStocks);
-            eventStream.Add(stock.Id, "Stock", stock.FetchEvents());
+            stock.List("BHP", "BHP Pty Ltd", new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
+            repository.Add(stock);
         }
 
-        private void AddPortfolios(IEventStore eventStore)
-        {   
-            var repository = new Repository<Stock>(eventStore.GetEventStream<Stock>("Stocks"));
-
+        private void AddPortfolios(IPortfolioRepository repository, IStockRepository stockRepository)
+        {
             var stockCache = new EntityCache<Stock>();
-            stockCache.PopulateCache(repository);
+            stockCache.PopulateCache(stockRepository);
 
             var stockResolver = new StockResolver(stockCache);
 
@@ -104,8 +106,8 @@ namespace Booth.PortfolioManager.IntegrationTest
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), BankAccountTransactionType.Deposit, 50000.00m, "", Guid.NewGuid());
             portfolio.AquireShares(Ids.BHP, new Date(2000, 06, 30), 100, 12.00m, 19.95m, true, "", Guid.NewGuid());
 
-            var eventStream = eventStore.GetEventStream<Portfolio>("Portfolios");
-            eventStream.Add(portfolio.Id, "Portfolio", portfolio.FetchEvents());
+
+            repository.Add(portfolio);
 
             _PortfolioAccessor = new TestPortfolioAccessor(portfolio);
         }

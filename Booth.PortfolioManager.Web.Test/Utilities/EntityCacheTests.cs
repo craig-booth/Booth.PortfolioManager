@@ -6,7 +6,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 
-using Booth.EventStore;
+using Booth.PortfolioManager.Domain;
 using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Test.Utilities

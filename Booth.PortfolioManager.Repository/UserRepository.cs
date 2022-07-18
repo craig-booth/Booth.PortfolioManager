@@ -14,7 +14,7 @@ namespace Booth.PortfolioManager.Repository
 
     public interface IUserRepository : IRepository<User>
     {
-
+        User GetUserByUserName(string userName);
     }
 
     public class UserRepository : Repository<User>, IUserRepository
@@ -23,6 +23,11 @@ namespace Booth.PortfolioManager.Repository
             : base(database, "Users")
         {
 
+        }
+
+        public User GetUserByUserName(string userName)
+        {
+            return FindFirst("userName", userName);
         }
 
     }

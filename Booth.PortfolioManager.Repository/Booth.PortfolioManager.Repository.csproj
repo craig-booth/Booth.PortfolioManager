@@ -5,8 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Booth.EventStore" Version="1.0.5" />
-    <PackageReference Include="Booth.EventStore.MongoDB" Version="1.0.4" />
     <PackageReference Include="MongoDB.Driver" Version="2.12.3" />
   </ItemGroup>
 

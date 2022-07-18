@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using Booth.Common;
-using Booth.EventStore;
 using Booth.PortfolioManager.Domain.Portfolios.Events;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Transactions.Events;

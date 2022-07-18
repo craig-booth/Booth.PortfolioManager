@@ -9,7 +9,7 @@ using Booth.PortfolioManager.Domain.Users.Events;
 namespace Booth.PortfolioManager.Domain.Users
 {
 
-    public class User : TrackedEntity, IEntityProperties
+    public class User : TrackedEntity
     {
         public string UserName { get; private set; }
 
@@ -45,11 +45,6 @@ namespace Booth.PortfolioManager.Domain.Users
 
             Apply(@event);
             PublishEvent(@event);
-        }
-
-        public IDictionary<string, string> GetProperties()
-        {
-            return _Properties;
         }
 
         public void Apply(UserCreatedEvent @event)

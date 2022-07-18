@@ -22,55 +22,59 @@ namespace Booth.PortfolioManager.DataMigration
             var stockResolver = new StockResolver();
             var factory = new PortfolioFactory(stockResolver);
 
-            //    var eventStore = new MongodbEventStore("mongodb://192.168.1.93:27017", "PortfolioManager");
+            var eventStore = new MongodbEventStore("mongodb://192.168.1.93:27017", "PortfolioManager");
             var database = new PortfolioManagerDatabase("mongodb://192.168.1.93:27017", "PortfolioManager2", factory, stockResolver);
 
+            /*
+                        var stock = new StapledSecurity(Guid.NewGuid());
+                        stockResolver.Add(stock);
 
-            var stock = new StapledSecurity(Guid.NewGuid());
-            stockResolver.Add(stock);
+                        var childStocks = new[] {
+                            new StapledSecurityChild("CH1", "Child 1", false),
+                            new StapledSecurityChild("CH2", "Child 2", true)
+                        };
 
-            var childStocks = new[] {
-                new StapledSecurityChild("CH1", "Child 1", false),
-                new StapledSecurityChild("CH2", "Child 2", true)
-            };
+                        stock.List("ABC", "Test", new Date(1974, 04, 10), AssetCategory.AustralianStocks, childStocks);
 
-            stock.List("ABC", "Test", new Date(1974, 04, 10), AssetCategory.AustralianStocks, childStocks);
+                        stock.SetRelativeNTAs(new Date(1974, 04, 10), new[] { 0.45m, 0.55m });
+                        stock.SetRelativeNTAs(new Date(1975, 01, 01), new[] { 0.50m, 0.50m });
+                        stock.SetRelativeNTAs(new Date(1976, 01, 01), new[] { 0.60m, 0.40m });
 
-            stock.SetRelativeNTAs(new Date(1974, 04, 10), new[] { 0.45m, 0.55m });
-            stock.SetRelativeNTAs(new Date(1975, 01, 01), new[] { 0.50m, 0.50m });
-            stock.SetRelativeNTAs(new Date(1976, 01, 01), new[] { 0.60m, 0.40m });
+                        stock.ChangeProperties(new Date(2000, 01, 01), "DEF", "New Name", AssetCategory.AustralianProperty);
+                        stock.ChangeDividendRules(new Date(2001, 02, 03), 0.45m, RoundingRule.Truncate, true, DrpMethod.RoundDown);
 
-            stock.ChangeProperties(new Date(2000, 01, 01), "DEF", "New Name", AssetCategory.AustralianProperty);
-            stock.ChangeDividendRules(new Date(2001, 02, 03), 0.45m, RoundingRule.Truncate, true, DrpMethod.RoundDown);
+                        stock.CorporateActions.AddCapitalReturn(Guid.NewGuid(), new Date(2002, 06, 01), "test", new Date(2002, 06, 03), 6.00m);
+                        stock.CorporateActions.AddSplitConsolidation(Guid.NewGuid(), new Date(2004, 06, 01), "test3", 1, 2);
 
-            stock.CorporateActions.AddCapitalReturn(Guid.NewGuid(), new Date(2002, 06, 01), "test", new Date(2002, 06, 03), 6.00m);
-            stock.CorporateActions.AddSplitConsolidation(Guid.NewGuid(), new Date(2004, 06, 01), "test3", 1, 2);
+                        var resultingStocks = new List<Domain.CorporateActions.Transformation.ResultingStock>();
+                        resultingStocks.Add(new Domain.CorporateActions.Transformation.ResultingStock(Guid.NewGuid(), 1, 2, 0.67m, new Date(2005, 05, 01)));
+                        stock.CorporateActions.AddTransformation(Guid.NewGuid(), new Date(2005, 05, 01), "test4", new Date(2005, 05, 02), 5.24m, true, resultingStocks);
 
-            var resultingStocks = new List<Domain.CorporateActions.Transformation.ResultingStock>();
-            resultingStocks.Add(new Domain.CorporateActions.Transformation.ResultingStock(Guid.NewGuid(), 1, 2, 0.67m, new Date(2005, 05, 01)));
-            stock.CorporateActions.AddTransformation(Guid.NewGuid(), new Date(2005, 05, 01), "test4", new Date(2005, 05, 02), 5.24m, true, resultingStocks);
+                        stock.CorporateActions.StartCompositeAction(Guid.NewGuid(), new Date(2006, 05, 03), "test5")
+                            .AddCapitalReturn("test", new Date(2006, 06, 03), 6.00m)
+                            .Finish();
 
-            stock.CorporateActions.StartCompositeAction(Guid.NewGuid(), new Date(2006, 05, 03), "test5")
-                .AddCapitalReturn("test", new Date(2006, 06, 03), 6.00m)
-                .Finish();
-
-            stock.DeList(new Date(2020, 10, 01));
-
-      
-            var portfolio = factory.CreatePortfolio(Guid.NewGuid());
-            portfolio.Create("Testing", Guid.NewGuid());
-            portfolio.MakeCashTransaction(new Date(2000, 01, 01), BankAccountTransactionType.Deposit, 100.00m, "Initial deposit", Guid.NewGuid());
-            portfolio.AquireShares(stock.Id, new Date(2001, 01, 01), 100, 0.02m, 9.95m, true, "test", Guid.NewGuid());
+                        stock.DeList(new Date(2020, 10, 01));
 
 
-           // TestPortfolio(portfolio, database);
-            // MigrateUsers(eventStore, database);
+                        var portfolio = factory.CreatePortfolio(Guid.NewGuid());
+                        portfolio.Create("Testing", Guid.NewGuid());
+                        portfolio.MakeCashTransaction(new Date(2000, 01, 01), BankAccountTransactionType.Deposit, 100.00m, "Initial deposit", Guid.NewGuid());
+                        portfolio.AquireShares(stock.Id, new Date(2001, 01, 01), 100, 0.02m, 9.95m, true, "test", Guid.NewGuid());
+            */
 
-            //   MigrateTradingCalendars(eventStore, database);
+            MigrateUsers(eventStore, database);
+            MigrateTradingCalendars(eventStore, database);
+            MigrateStocks(eventStore, database);
 
-            //  MigrateStocks(eventStore, database);
 
-            TestStock(stock, database);
+            // TestPortfolio(portfolio, database);
+
+
+
+
+
+            //   TestStock(stock, database);
 
             //   TestTradingCalendar(database);
 
@@ -93,11 +97,6 @@ namespace Booth.PortfolioManager.DataMigration
                     newUser.AddAdministratorPrivilage();
 
                 repository.Add(newUser);
-
-
-                newUser.RemoveAdministratorPrivilage();
-                newUser.AddAdministratorPrivilage();
-                repository.Update(newUser);
             }
 
 

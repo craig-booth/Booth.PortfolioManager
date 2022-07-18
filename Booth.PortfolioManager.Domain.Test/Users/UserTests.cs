@@ -104,17 +104,6 @@ namespace Booth.PortfolioManager.Domain.Test.Users
             user.Administator.Should().BeTrue();
         }
 
-        [Fact]
-        public void GetProperties()
-        {
-            var user = new User(Guid.NewGuid());
-            user.Create("john", "secret");
-
-            var properties = user.GetProperties();
-
-            properties["UserName"].Should().Be("john");
-        }
-
 
         [Fact]
         public void ChangeUserNameToBlank()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Collections.Generic;
 
 using MongoDB.Driver;
@@ -6,7 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 
 using Booth.Common;
-using Booth.EventStore;
+using Booth.PortfolioManager.Domain;
 
 namespace Booth.PortfolioManager.Repository
 {
@@ -38,6 +39,17 @@ namespace Booth.PortfolioManager.Repository
 
             return entity;
         }
+
+        public virtual T FindFirst(string property, string value)
+        {
+            var bson = _Collection.Find(Builders<BsonDocument>.Filter.Eq(property, value)).SingleOrDefault();
+            if (bson == null)
+                return default(T);
+
+            var entity = BsonSerializer.Deserialize<T>(bson);
+
+            return entity;
+        } 
 
         public virtual IEnumerable<T> All()
         {

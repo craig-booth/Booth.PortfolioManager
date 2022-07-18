@@ -7,7 +7,7 @@ using FluentAssertions;
 using Moq;
 
 using Booth.Common;
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.RestApi.Transactions;
 using Booth.PortfolioManager.Domain.Portfolios;
@@ -144,38 +144,32 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
-
             var transaction = new Aquisition()
             {
                 Id = Guid.NewGuid(),
                 Stock = PortfolioTestCreator.Stock_ARG.Id,
                 TransactionDate = new Date(2007, 01, 01),
-                Units = 50, 
+                Units = 50,
                 AveragePrice = 0.98m,
                 TransactionCosts = 1.00m,
                 Comment = "",
                 CreateCashTransaction = true
             };
+
+            var repository = mockRepository.Create<IPortfolioRepository> ();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
+
             var result = service.ApplyTransaction(transaction);
 
             result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new AquisitionOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), PortfolioTestCreator.Stock_ARG.Id, "")
-                {
-                    Units = 50,
-                    AveragePrice = 0.98m,
-                    TransactionCosts = 1.00m,
-                    CreateCashTransaction = true
-                }
-            });
 
-            mockRepository.Verify();
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units.Should().Be(priorUnits + 50);
+
+            mockRepository.Verify(); 
         }
 
         [Fact]
@@ -184,12 +178,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
-
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
 
             var transaction = new CashTransaction()
             {
@@ -200,19 +188,21 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 CashTransactionType = CashTransactionType.Interest,
                 Amount = 1.98m
             };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorBalance = portfolio.CashAccount.Balance(transaction.TransactionDate);
+
             var result = service.ApplyTransaction(transaction);
 
             result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new CashTransactionOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), "")
-                {
-                    CashTransactionType = Domain.Transactions.BankAccountTransactionType.Interest,
-                    Amount = 1.98m,
-                }
-            });
 
-            mockRepository.Verify();
+            portfolio.CashAccount.Balance(transaction.TransactionDate).Should().Be(priorBalance + 1.98m);
+
+            mockRepository.Verify(); 
         }
 
         [Fact]
@@ -222,12 +212,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
-
             var transaction = new CostBaseAdjustment()
             {
                 Id = Guid.NewGuid(),
@@ -236,18 +220,21 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Comment = "",
                 Percentage = 0.50m
             };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorCostBase = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase;
+
             var result = service.ApplyTransaction(transaction);
 
             result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new CostBaseAdjustmentOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), PortfolioTestCreator.Stock_ARG.Id, "")
-                {
-                   Percentage = 0.50m
-                }
-            });
 
-            mockRepository.Verify();
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase.Should().Be(priorCostBase * 0.50m);
+
+            mockRepository.Verify(); 
         }
 
         [Fact]
@@ -256,12 +243,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
-
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
 
             var transaction = new Disposal()
             {
@@ -275,22 +256,21 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 CgtMethod = CgtCalculationMethod.LastInFirstOut,
                 CreateCashTransaction = true
             };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
+
             var result = service.ApplyTransaction(transaction);
 
-            result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new DisposalOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), PortfolioTestCreator.Stock_ARG.Id, "")
-                {
-                    Units = 50,
-                    AveragePrice = 0.98m,
-                    TransactionCosts = 1.00m,
-                    CgtMethod = Domain.Utils.CgtCalculationMethod.LastInFirstOut,
-                    CreateCashTransaction = true
-                }
-            });
+            result.Should().HaveOkStatus();          
 
-            mockRepository.Verify();
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units.Should().Be(priorUnits - 50);
+
+            mockRepository.Verify(); 
         }
 
 
@@ -300,12 +280,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
-
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
 
             var transaction = new IncomeReceived()
             {
@@ -321,26 +295,22 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 TaxDeferred = 5.00m,
                 CreateCashTransaction = true,
                 DrpCashBalance = 2.50m
-             };
+            };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorBalance = portfolio.CashAccount.Balance(transaction.TransactionDate);
+
             var result = service.ApplyTransaction(transaction);
 
             result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new IncomeOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), PortfolioTestCreator.Stock_ARG.Id, "")
-                {
-                    RecordDate = new Date(2006, 12, 27),
-                    FrankedAmount = 1.00m,
-                    UnfrankedAmount = 2.00m,
-                    FrankingCredits = 3.00m,
-                    Interest = 4.00m,
-                    TaxDeferred = 5.00m,
-                    CreateCashTransaction = true,
-                    DrpCashBalance = 2.50m
-                }
-            });
 
-            mockRepository.Verify();
+            portfolio.CashAccount.Balance(transaction.TransactionDate).Should().Be(priorBalance + 1.00m + 2.00m + 4.00m + 5.00m);
+
+            mockRepository.Verify(); 
         }
 
         [Fact]
@@ -349,12 +319,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
-
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
 
             var transaction = new OpeningBalance()
             {
@@ -366,20 +330,21 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 CostBase = 0.98m,
                 AquisitionDate = new Date(2005, 01, 01)
             };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
+
             var result = service.ApplyTransaction(transaction);
 
             result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new OpeningBalanceOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), PortfolioTestCreator.Stock_ARG.Id, "")
-                {
-                    Units = 50,
-                    CostBase = 0.98m,
-                    AquisitionDate = new Date(2005, 01, 01)
-                }
-            });
 
-            mockRepository.Verify();
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units.Should().Be(priorUnits + 50);
+
+            mockRepository.Verify(); 
         }
 
         [Fact]
@@ -389,12 +354,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
-
             var transaction = new ReturnOfCapital()
             {
                 Id = Guid.NewGuid(),
@@ -402,23 +361,24 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 TransactionDate = new Date(2007, 01, 01),
                 Comment = "",
                 Amount = 5.00m,
-                RecordDate =  new Date(2006, 12, 01),
+                RecordDate = new Date(2006, 12, 01),
                 CreateCashTransaction = true
             };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorCostBase = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase;
+
             var result = service.ApplyTransaction(transaction);
 
             result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new ReturnOfCapitalOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), PortfolioTestCreator.Stock_ARG.Id, "")
-                {
-                    Amount = 5.00m,
-                    RecordDate =  new Date(2006, 12, 01),
-                    CreateCashTransaction = true
-                }
-            });
 
-            mockRepository.Verify();
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase.Should().Be(priorCostBase - 5.00m);
+
+            mockRepository.Verify(); 
         }
 
         [Fact]
@@ -427,12 +387,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
-
-            var events = new List<Event>();
-            var repository = mockRepository.Create<IRepository<Portfolio>>();
-            repository.Setup(x => x.Update(It.IsAny<Portfolio>())).Callback<Portfolio>(x => events.AddRange(x.FetchEvents()));
-
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
 
             var transaction = new UnitCountAdjustment()
             {
@@ -443,19 +397,21 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 OriginalUnits = 1,
                 NewUnits = 2
             };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object);
+
+            var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
+
             var result = service.ApplyTransaction(transaction);
 
             result.Should().HaveOkStatus();
-            events.Should().BeEquivalentTo(new[]
-            {
-                new UnitCountAdjustmentOccurredEvent(portfolio.Id, 1, transaction.Id, new Date(2007, 01, 01), PortfolioTestCreator.Stock_ARG.Id, "")
-                {
-                    OriginalUnitCount = 1,
-                    NewUnitCount = 2
-                }
-            });
+            
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units.Should().Be(priorUnits * 2);
 
-            mockRepository.Verify();
+            mockRepository.Verify(); 
         } 
     } 
 }

@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
     public interface IParcel : IReadOnlyParcel
     {          
         void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, IPortfolioTransaction transaction);
-    }
+    } 
 
     class Parcel : EffectiveEntity, IParcel, IReadOnlyParcel
     {

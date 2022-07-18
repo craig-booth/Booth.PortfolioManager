@@ -8,9 +8,9 @@ using Moq;
 using FluentAssertions;
 
 using Booth.PortfolioManager.Web.Utilities;
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Portfolios;
-using System.Reflection.Metadata;
+
 
 namespace Booth.PortfolioManager.Web.Test.Utilities
 {
@@ -28,7 +28,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var id = Guid.NewGuid();
             var portfolio = portfolioFactory.CreatePortfolio(id);
 
-            var repositry = mockRepository.Create<IRepository<Portfolio>>();
+            var repositry = mockRepository.Create<IPortfolioRepository>();
 
             var memoryCache = mockRepository.Create<IMemoryCache>();
             object portfolioObject = portfolio;
@@ -55,7 +55,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var id = Guid.NewGuid();
             var portfolio = portfolioFactory.CreatePortfolio(id);
 
-            var repositry = mockRepository.Create<IRepository<Portfolio>>();
+            var repositry = mockRepository.Create<IPortfolioRepository>();
             repositry.Setup(x => x.Get(id)).Returns(portfolio).Verifiable();
 
             var cacheEntry = mockRepository.Create<ICacheEntry>(MockBehavior.Loose);
@@ -83,7 +83,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var id = Guid.NewGuid();
             Portfolio portfolio = null;
 
-            var repositry = mockRepository.Create<IRepository<Portfolio>>();
+            var repositry = mockRepository.Create<IPortfolioRepository>();
             repositry.Setup(x => x.Get(id)).Returns(portfolio);
 
             var memoryCache = mockRepository.Create<IMemoryCache>();
@@ -109,7 +109,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var id = Guid.NewGuid();
             var portfolio = portfolioFactory.CreatePortfolio(id);
 
-            var repositry = mockRepository.Create<IRepository<Portfolio>>();
+            var repositry = mockRepository.Create<IPortfolioRepository>();
 
             var memoryCache = mockRepository.Create<IMemoryCache>();
             object portfolioObject = portfolio;
@@ -135,7 +135,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var id = Guid.NewGuid();
             var portfolio = portfolioFactory.CreatePortfolio(id);
 
-            var repositry = mockRepository.Create<IRepository<Portfolio>>();
+            var repositry = mockRepository.Create<IPortfolioRepository>();
             repositry.Setup(x => x.Get(id)).Returns(portfolio).Verifiable();
 
             var cacheEntry = mockRepository.Create<ICacheEntry>(MockBehavior.Loose);
@@ -162,7 +162,7 @@ namespace Booth.PortfolioManager.Web.Test.Utilities
             var id = Guid.NewGuid();
             Portfolio portfolio = null;
 
-            var repositry = mockRepository.Create<IRepository<Portfolio>>();
+            var repositry = mockRepository.Create<IPortfolioRepository>();
             repositry.Setup(x => x.Get(id)).Returns(portfolio);
 
             var memoryCache = mockRepository.Create<IMemoryCache>();
