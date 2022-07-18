@@ -224,20 +224,28 @@ a.Should().Throw<ArgumentException>();
             var drpAccount = mockRepository.Create<ICashAccount>();
             drpAccount.Setup(x => x.Balance(new Date(2020, 02, 01))).Returns(0.00m);
 
+            var parcel1Id = Guid.NewGuid();
             var parcel1 = mockRepository.Create<IParcel>();
+            parcel1.Setup(x => x.Id).Returns(parcel1Id);
             parcel1.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(100, 1000.00m, 1000.00m));
-            parcel1.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 14.29m, transaction)).Verifiable();
+
+            var parcel2Id = Guid.NewGuid();
             var parcel2 = mockRepository.Create<IParcel>();
+            parcel2.Setup(x => x.Id).Returns(parcel2Id);
             parcel2.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 500.00m, 500.00m));
-            parcel2.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 7.14m, transaction)).Verifiable();
+
+            var parcel3Id = Guid.NewGuid();
             var parcel3 = mockRepository.Create<IParcel>();
+            parcel3.Setup(x => x.Id).Returns(parcel3Id);
             parcel3.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(200, 1000.00m, 1000.00m));
-            parcel3.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 28.57m, transaction)).Verifiable(); 
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
             holding.Setup(x => x.DrpAccount).Returns(drpAccount.Object);
             holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
+            holding.Setup(x => x.ReduceParcelCostBase(parcel1Id, new Date(2020, 01, 01), 14.29m, transaction)).Verifiable();
+            holding.Setup(x => x.ReduceParcelCostBase(parcel2Id, new Date(2020, 01, 01), 7.14m, transaction)).Verifiable();
+            holding.Setup(x => x.ReduceParcelCostBase(parcel3Id, new Date(2020, 01, 01), 28.57m, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
 

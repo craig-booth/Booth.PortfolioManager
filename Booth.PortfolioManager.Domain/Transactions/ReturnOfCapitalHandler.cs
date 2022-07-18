@@ -22,7 +22,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             foreach (var parcel in holding.Parcels(returnOfCapital.RecordDate))
             {
                 var costBaseReduction = parcel.Properties[returnOfCapital.RecordDate].Units * returnOfCapital.Amount;
-                parcel.Change(returnOfCapital.RecordDate, 0, 0.00m, costBaseReduction, transaction);
+                holding.ReduceParcelCostBase(parcel.Id, returnOfCapital.RecordDate, costBaseReduction, transaction);
 
                 totalAmount += costBaseReduction;
             }

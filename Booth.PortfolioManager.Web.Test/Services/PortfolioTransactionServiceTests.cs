@@ -232,7 +232,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Should().HaveOkStatus();
 
-            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase.Should().Be(priorCostBase * 0.50m);
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase.Should().BeApproximately(priorCostBase * 0.50m, 2);
 
             mockRepository.Verify(); 
         }
@@ -360,7 +360,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Stock = PortfolioTestCreator.Stock_ARG.Id,
                 TransactionDate = new Date(2007, 01, 01),
                 Comment = "",
-                Amount = 5.00m,
+                Amount = 0.10m,
                 RecordDate = new Date(2006, 12, 01),
                 CreateCashTransaction = true
             };
@@ -376,7 +376,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Should().HaveOkStatus();
 
-            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase.Should().Be(priorCostBase - 5.00m);
+            portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase.Should().Be(priorCostBase - 25.00m);
 
             mockRepository.Verify(); 
         }

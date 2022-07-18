@@ -35,7 +35,7 @@ namespace Booth.PortfolioManager.Domain.Utils
 
     class CgtCalculator
     {
-        public static IComparer<IReadOnlyParcel> GetCgtComparer(Date disposalDate, CgtCalculationMethod method)
+        public static IComparer<IParcel> GetCgtComparer(Date disposalDate, CgtCalculationMethod method)
         {
             switch (method)
             {
@@ -52,7 +52,7 @@ namespace Booth.PortfolioManager.Domain.Utils
             }
         }
 
-        public IEnumerable<ParcelSold> Calculate(IEnumerable<IReadOnlyParcel> parcelsOwned, Date disposalDate, int unitsSold, decimal amountReceived, IComparer<IReadOnlyParcel> cgtComparer)
+        public IEnumerable<ParcelSold> Calculate(IEnumerable<IParcel> parcelsOwned, Date disposalDate, int unitsSold, decimal amountReceived, IComparer<IParcel> cgtComparer)
         {
             var parcelsInSellOrder = parcelsOwned.Where(x => x.EffectivePeriod.ToDate == Date.MaxValue).OrderBy(x => x, cgtComparer);
 
@@ -76,7 +76,7 @@ namespace Booth.PortfolioManager.Domain.Utils
             throw new ArgumentException("Not enough units");
         }
 
-        public ParcelSold CalculateParcelCgt(IReadOnlyParcel parcel, Date disposalDate, int unitsSold, decimal amountReceived)
+        public ParcelSold CalculateParcelCgt(IParcel parcel, Date disposalDate, int unitsSold, decimal amountReceived)
         {
             decimal costBase;
 

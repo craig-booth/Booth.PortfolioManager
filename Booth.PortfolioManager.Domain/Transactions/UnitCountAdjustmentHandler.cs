@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             foreach (var parcel in holding.Parcels(unitCountAdjustment.Date))
             {
                 var units = (int)Math.Ceiling(parcel.Properties[unitCountAdjustment.Date].Units * ratio);
-                parcel.Change(unitCountAdjustment.Date, units, 0.00m, 0.00m, transaction);
+                holding.ChangeParcelUnitCount(parcel.Id, unitCountAdjustment.Date, units, transaction);
             }
         }
     }

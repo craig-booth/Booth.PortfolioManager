@@ -16,25 +16,20 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         IEffectiveProperties<HoldingProperties> Properties { get; }
         HoldingSettings Settings { get; }
         IReadOnlyCashAccount DrpAccount { get; }
-        IEnumerable<IReadOnlyParcel> Parcels();
-        IEnumerable<IReadOnlyParcel> Parcels(Date date);
-        IEnumerable<IReadOnlyParcel> Parcels(DateRange dateRange);
-        decimal Value(Date date);
-    }
-
-    public interface IHolding : IEffectiveEntity
-    {
-        IReadOnlyStock Stock { get; }
-        IEffectiveProperties<HoldingProperties> Properties { get; }
-        HoldingSettings Settings { get; }
-        IReadOnlyCashAccount DrpAccount { get; }
-        decimal Value(Date date);
         IEnumerable<IParcel> Parcels();
         IEnumerable<IParcel> Parcels(Date date);
         IEnumerable<IParcel> Parcels(DateRange dateRange);
+        decimal Value(Date date);
+    }
 
+    public interface IHolding : IEffectiveEntity, IReadOnlyHolding
+    {
         IParcel AddParcel(Date date, Date aquisitionDate, int units, decimal amount, decimal costBase, IPortfolioTransaction transaction);
         void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, decimal capitalGain, CgtMethod cgtMethod, IPortfolioTransaction transaction);
+        void ChangeParcelUnitCount(Guid parcelId, Date date, int newCount, IPortfolioTransaction transaction);
+        void ReduceParcelCostBase(Guid parcelId, Date date, decimal amount, IPortfolioTransaction transaction);
+
+
         void AddDrpAccountAmount(Date date, decimal amount);
         void ChangeDrpParticipation(bool participateInDrp);
     }
@@ -76,14 +71,9 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _Properties.Change(fromDate, new HoldingProperties(0, 0.00m, 0.00m));
         }
 
-        public HoldingProperties this[Date date] 
-        { 
-            get { return _Properties[date]; }
-        }
-
-        IEnumerable<IReadOnlyParcel> IReadOnlyHolding.Parcels()
+        public HoldingProperties this[Date date]
         {
-            return Parcels();
+            get { return _Properties[date]; }
         }
 
         public IEnumerable<IParcel> Parcels()
@@ -91,19 +81,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             return _Parcels.Values;
         }
 
-        IEnumerable<IReadOnlyParcel> IReadOnlyHolding.Parcels(Date date)
-        {
-            return Parcels(date);
-        }
 
         public IEnumerable<IParcel> Parcels(Date date)
         {
             return _Parcels.Values.Where(x => x.IsEffectiveAt(date));
-        }
-
-        IEnumerable<IReadOnlyParcel> IReadOnlyHolding.Parcels(DateRange dateRange)
-        {
-            return Parcels(dateRange);
         }
 
         public IEnumerable<IParcel> Parcels(DateRange dateRange)
@@ -125,7 +106,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         }
 
         public void DisposeOfParcel(Guid parcelId, Date date, int units, decimal amount, decimal capitalGain, CgtMethod cgtMethod, IPortfolioTransaction transaction)
-        {        
+        {
             if (!_Parcels.TryGetValue(parcelId, out var parcel))
                 throw new ArgumentException("Parcel is not part of this holding");
 
@@ -162,7 +143,65 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             }
             _Properties.Change(date, newProperties);
 
-            OnCgtEventOccured(date, Stock, units, costBaseChange, amount, capitalGain, cgtMethod, transaction);    
+            OnCgtEventOccured(date, Stock, units, costBaseChange, amount, capitalGain, cgtMethod, transaction);
+        }
+
+        public void ChangeParcelUnitCount(Guid parcelId, Date date, int newCount, IPortfolioTransaction transaction)
+        {
+            if (!_Parcels.TryGetValue(parcelId, out var parcel))
+                throw new ArgumentException("Parcel is not part of this holding");
+
+            var parcelProperties = parcel.Properties[date];
+
+            // Adjust Parcel
+            var unitCountChange = newCount - parcelProperties.Units;
+            parcel.Change(date, unitCountChange, 0.00m, 0.00m, transaction);
+
+            // Adjust holding          
+            var holdingProperties = Properties[date];
+            var newHoldingCount = holdingProperties.Units + unitCountChange;
+            HoldingProperties newProperties;
+            if (newHoldingCount == 0)
+            {
+                End(date);
+                newProperties = new HoldingProperties(0, 0.00m, 0.00m);
+            }
+            else
+            {
+                newProperties = new HoldingProperties(newHoldingCount, holdingProperties.Amount, holdingProperties.CostBase);
+            }
+            _Properties.Change(date, newProperties);
+        }
+
+        public void ReduceParcelCostBase(Guid parcelId, Date date, decimal amount, IPortfolioTransaction transaction)
+        {
+            if (!_Parcels.TryGetValue(parcelId, out var parcel))
+                throw new ArgumentException("Parcel is not part of this holding");
+
+            var parcelProperties = parcel.Properties[date];
+
+            // Adjust Parcel
+            decimal costBaseChange;
+            decimal capitalGain;
+            if (parcelProperties.CostBase >= amount)
+            {
+                costBaseChange = -amount;
+                capitalGain = 0.00m;
+            }
+            else
+            {
+                costBaseChange = -parcelProperties.CostBase;
+                capitalGain = amount - parcelProperties.CostBase;
+            }
+            parcel.Change(date, 0, 0.00m, costBaseChange, transaction);
+
+            // Adjust holding          
+            var holdingProperties = Properties[date];
+            var newProperties = new HoldingProperties(holdingProperties.Units, holdingProperties.Amount, holdingProperties.CostBase + costBaseChange);
+            _Properties.Change(date, newProperties);
+
+            if (capitalGain > 0)
+                OnCgtEventOccured(date, Stock, holdingProperties.Units, capitalGain, amount, capitalGain, CgtMethod.Discount, transaction);
         }
 
         public decimal Value(Date date)

@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
                 // Reduce cost base of parcels 
                 var i = 0;
                 foreach (var parcel in parcels)
-                    parcel.Change(incomeReceived.RecordDate, 0, 0.00m, apportionedAmounts[i++].Amount, transaction);
+                    holding.ReduceParcelCostBase(parcel.Id, incomeReceived.RecordDate, apportionedAmounts[i++].Amount, transaction);
             }
 
             if (incomeReceived.CreateCashTransaction)
