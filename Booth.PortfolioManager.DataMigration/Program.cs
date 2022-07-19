@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Booth.Common;
 using Booth.EventStore.MongoDB;
@@ -63,10 +64,10 @@ namespace Booth.PortfolioManager.DataMigration
                         portfolio.AquireShares(stock.Id, new Date(2001, 01, 01), 100, 0.02m, 9.95m, true, "test", Guid.NewGuid());
             */
 
-            MigrateUsers(eventStore, database);
-            MigrateTradingCalendars(eventStore, database);
-            MigrateStocks(eventStore, database);
-
+         //   MigrateUsers(eventStore, database);
+           // MigrateTradingCalendars(eventStore, database);
+           //   MigrateStocks(eventStore, database);
+              MigrateStockPriceHistory(eventStore, database);
 
             // TestPortfolio(portfolio, database);
 
@@ -118,15 +119,6 @@ namespace Booth.PortfolioManager.DataMigration
                 newCalendar.SetNonTradingDays(year, calendar.NonTradingDays(year));
 
             repository.Add(calendar);
-
-
-            var existingCalendar = repository.Get(calendar.Id);
-            existingCalendar.SetNonTradingDays(2020, new[] { new NonTradingDay(new Common.Date(2020, 04, 10), "Birthday" )});
-            repository.UpdateYear(existingCalendar, 2020);
-
-            existingCalendar.SetNonTradingDays(2021, new[] { new NonTradingDay(new Common.Date(2021, 04, 10), "Birthday2") });
-            repository.UpdateYear(existingCalendar, 2021);
-
         }
 
         static void MigrateStocks(MongodbEventStore eventStore, PortfolioManagerDatabase database)
@@ -144,13 +136,39 @@ namespace Booth.PortfolioManager.DataMigration
                 if (existingStock == null)
                     repository.Add(stock);
 
-                
-
-              //  existingStock.CorporateActions.AddCapitalReturn(Guid.NewGuid(), new Date(1974, 4, 10), "Birthday", new Date(1974, 4, 10), 100.00m);
-              //  repository.AddCorporateAction(???);                 
+             //   var id = Guid.NewGuid();
+             //   stock.CorporateActions.AddCapitalReturn(id, new Date(1974, 4, 10), "Birthday", new Date(1974, 4, 10), 100.00m);
+              //  repository.AddCorporateAction(stock, id);
+             //   break;
             }
+        }
 
+        static void MigrateStockPriceHistory(MongodbEventStore eventStore, PortfolioManagerDatabase database)
+        {
+            // Load users from Event Store
+            var eventStream = eventStore.GetEventStream<StockPriceHistory>("StockPriceHistory");
+            var eventRepository = new EventStore.Repository<StockPriceHistory>(eventStream);
 
+            var repository = new StockPriceRepository(database);
+
+            foreach (var stockPrices in eventRepository.All())
+            {
+                var existingStockPrices = repository.Get(stockPrices.Id);
+
+                if (existingStockPrices == null)
+                    repository.Add(stockPrices);
+
+             /*   stockPrices.UpdateClosingPrice(new Date(1997, 07, 18), 5.00m);
+                repository.UpdatePrice(stockPrices, new Date(1997, 07, 18));
+
+                stockPrices.UpdateClosingPrice(new Date(1997, 07, 20), 15.00m);
+                repository.UpdatePrice(stockPrices, new Date(1997, 07, 20));
+
+                stockPrices.UpdateClosingPrice(new Date(1997, 07, 17), 6.00m);
+                stockPrices.UpdateClosingPrice(new Date(1997, 07, 21), 5.50m);
+                repository.UpdatePrices(stockPrices, new DateRange(new Date(1997, 07, 17), new Date(1997, 07, 21)));
+                break; */
+            }
         }
 
         static void TestStock(Stock stock, PortfolioManagerDatabase database)

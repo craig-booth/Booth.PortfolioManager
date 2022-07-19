@@ -27,14 +27,23 @@ namespace Booth.PortfolioManager.Repository.Serialization
         {
             var conventions = new ConventionPack();
             conventions.Add(new CamelCaseElementNameConvention());
-            ConventionRegistry.Register("PortfolioManager", conventions, t => true);
+            ConventionRegistry.Register("PortfolioManager", conventions, t => ConventionFilter(t)); 
 
             BsonSerializer.RegisterSerializationProvider(new SerializationProvider());
-         //   BsonSerializer.RegisterSerializer(typeof(Date), new DateSerializer());
+         /*   BsonSerializer.RegisterSerializer(typeof(Date), new DateSerializer()); */
 
             StockRepository.ConfigureSerializaton();
+            StockPriceRepository.ConfigureSerializaton();
             TradingCalendarRepository.ConfigureSerializaton();
             PortfolioRepository.ConfigureSerializaton(portfolioFactory, stockResolver);
+        }
+
+        private static bool ConventionFilter(Type t)
+        {
+            return t.Namespace.StartsWith("Booth.PortfolioManager.Domain")
+                && !t.IsSubclassOf(typeof(Event))
+                && ((t.DeclaringType != null) && !t.DeclaringType.IsSubclassOf(typeof(Event)));
+
         }
 
         public IBsonSerializer GetSerializer(Type type)

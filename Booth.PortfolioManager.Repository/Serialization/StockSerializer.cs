@@ -70,7 +70,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
             }
 
             Stock stock = null;
-            if (childSecurities.Count == 0)
+            if (childSecurities == null)
             {
                 stock = new Stock(id);
 

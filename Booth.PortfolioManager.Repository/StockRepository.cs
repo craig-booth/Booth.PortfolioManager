@@ -68,13 +68,7 @@ namespace Booth.PortfolioManager.Repository
         {
             var action = stock.CorporateActions[id];
 
-            var filter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", stock.Id),
-                    Builders<BsonDocument>.Filter.Eq("corporateActions._id", id)
-                    }
-                );
+            var filter = Builders<BsonDocument>.Filter.Eq("_id", stock.Id);
 
             var addValue = Builders<BsonDocument>.Update
                 .Push("corporateActions", action);

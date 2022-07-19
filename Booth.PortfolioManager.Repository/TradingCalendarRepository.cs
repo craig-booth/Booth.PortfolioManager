@@ -54,8 +54,8 @@ namespace Booth.PortfolioManager.Repository
                 .Push("years", new BsonDocument()
                     {
                         { "year", year},
-                        { "days", calendar.NonTradingDays(year).ToBsonDocument()},
-                });
+                        { "days", new BsonArray(calendar.NonTradingDays(year).Select(x => x.ToBsonDocument()))},
+                }); 
 
             _Collection.BulkWrite(new[]
             {

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29424.173
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Domain", "Booth.PortfolioManager.Domain\Booth.PortfolioManager.Domain.csproj", "{D05D91A0-39C6-4B1D-88D4-D6005EA7599B}"
 EndProject
@@ -23,9 +23,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Jenkinsfile = Jenkinsfile
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booth.PortfolioManager.Repository", "Booth.PortfolioManager.Repository\Booth.PortfolioManager.Repository.csproj", "{8C1CB2F8-90A2-4B99-A410-68E5BA548CCA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Repository", "Booth.PortfolioManager.Repository\Booth.PortfolioManager.Repository.csproj", "{8C1CB2F8-90A2-4B99-A410-68E5BA548CCA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Booth.PortfolioManager.DataMigration", "Booth.PortfolioManager.DataMigration\Booth.PortfolioManager.DataMigration.csproj", "{B22A857E-AA46-4DEF-826C-B669BE5599C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.DataMigration", "Booth.PortfolioManager.DataMigration\Booth.PortfolioManager.DataMigration.csproj", "{B22A857E-AA46-4DEF-826C-B669BE5599C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
