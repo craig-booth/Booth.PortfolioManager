@@ -15,6 +15,7 @@ namespace Booth.PortfolioManager.Repository
 
     public interface IPortfolioManagerDatabase
     {
+        void Configure(IPortfolioFactory portfolioFactory, IStockResolver stockResolver);
         IMongoCollection<BsonDocument> GetCollection(string name);
         IMongoCollection<T> GetCollection<T>(string name);
     }
@@ -22,11 +23,14 @@ namespace Booth.PortfolioManager.Repository
     public class PortfolioManagerDatabase : IPortfolioManagerDatabase
     {
         private readonly IMongoDatabase _Database;
-        public PortfolioManagerDatabase(string connectionString, string databaseName, IPortfolioFactory portfolioFactory, IStockResolver stockResolver)
+        public PortfolioManagerDatabase(string connectionString, string databaseName)
         {
             var client = new MongoClient(connectionString);
             _Database = client.GetDatabase(databaseName);
+        }
 
+        public void Configure(IPortfolioFactory portfolioFactory, IStockResolver stockResolver)
+        {
             SerializationProvider.Configure(portfolioFactory, stockResolver);
         }
 

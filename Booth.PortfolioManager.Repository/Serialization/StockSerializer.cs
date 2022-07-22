@@ -121,7 +121,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
                     stock.CorporateActions.Add(action);
             }
 
-            if (delistingDate != Date.MaxValue)
+            if (delistingDate != Date.MinValue)
             {
                 stock.DeList(delistingDate);
             }

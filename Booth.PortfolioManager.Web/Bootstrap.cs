@@ -52,12 +52,14 @@ namespace Booth.PortfolioManager.Web
             else
                 services.AddJwtAuthetication(jwtTokenConfigProvider);
 
-            // Generic classes
+            // Caches classes
             services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
+
+            // Database
+            services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(settings.ConnectionString, settings.Database));
 
 
             // Repositories
-            services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(settings.ConnectionString, settings.Database, x.GetRequiredService<IPortfolioFactory>(), x.GetRequiredService<IStockResolver>()));
             services.AddScoped<IPortfolioRepository, PortfolioRepository>();
             services.AddScoped<IStockRepository, StockRepository>();
             services.AddScoped<IStockPriceRepository, StockPriceRepository>();
@@ -88,10 +90,9 @@ namespace Booth.PortfolioManager.Web
             services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().ReadOnlyPortfolio);
             services.AddScoped<IPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().Portfolio);
             services.AddScoped<IPortfolioAccessor, PortfolioAccessor>();
-            services.AddSingleton<IPortfolioFactory, PortfolioFactory>();
-            services.AddSingleton<IPortfolioCache, PortfolioCache>();
-            services.AddSingleton<IStockResolver, StockResolver>();
-            services.AddSingleton<IStockQuery, StockQuery>();
+            services.AddScoped<IPortfolioFactory, PortfolioFactory>();
+            services.AddScoped<IStockResolver, StockResolver>();
+            services.AddScoped<IStockQuery, StockQuery>();
 
             return services;
         }
@@ -122,6 +123,12 @@ namespace Booth.PortfolioManager.Web
 
         public static IServiceProvider InitializeStockCache(this IServiceProvider serviceProvider)
         {
+            var database = serviceProvider.GetRequiredService<IPortfolioManagerDatabase>();
+
+            var portfolioFactory = serviceProvider.GetRequiredService<IPortfolioFactory>();
+            var stockResolver = serviceProvider.GetRequiredService<IStockResolver>();
+            database.Configure(portfolioFactory, stockResolver);
+
             var stockRepository = serviceProvider.GetRequiredService<IStockRepository>();
             var stockCache = serviceProvider.GetRequiredService<IEntityCache<Stock>>();
             stockCache.PopulateCache(stockRepository);
