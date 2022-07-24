@@ -39,6 +39,7 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public new void Add(CorporateAction action)
         {
+            action.Stock = _Stock;
             base.Add(action);
         }
         protected void PublishEvent(Event @event)

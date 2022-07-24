@@ -31,6 +31,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
             string portfolioName = "";
             Guid owner;
             List<PortfolioTransaction> transactions = null;
+            List<Guid> participateInDrp = null;
 
             bsonReader.ReadStartDocument();
             while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
@@ -50,6 +51,10 @@ namespace Booth.PortfolioManager.Repository.Serialization
                         break;
                     case "transactions":
                         transactions = BsonSerializer.Deserialize<List<PortfolioTransaction>>(bsonReader);
+                        break;
+
+                    case "participateInDrp":
+                        participateInDrp = BsonSerializer.Deserialize<List<Guid>>(bsonReader);
                         break;
                 }
             }
@@ -80,6 +85,12 @@ namespace Booth.PortfolioManager.Repository.Serialization
                 }
             }
 
+
+            foreach (var stockId in participateInDrp)
+            {
+                portfolio.ChangeDrpParticipation(stockId, true);
+            }
+
             return portfolio; 
         }
 
@@ -97,6 +108,15 @@ namespace Booth.PortfolioManager.Repository.Serialization
 
             bsonWriter.WriteName("owner");
             BsonSerializer.Serialize<Guid>(bsonWriter, value.Owner);
+
+            bsonWriter.WriteName("participateInDrp");
+            bsonWriter.WriteStartArray();
+            foreach (var holding in value.Holdings.All())
+            {
+                if (holding.Settings.ParticipateInDrp)
+                    BsonSerializer.Serialize<Guid>(bsonWriter, holding.Id);
+            }
+            bsonWriter.WriteEndArray();
 
             bsonWriter.WriteName("transactions");
             BsonSerializer.Serialize<ITransactionList<IPortfolioTransaction>>(bsonWriter, value.Transactions);

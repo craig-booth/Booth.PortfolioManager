@@ -24,7 +24,8 @@ namespace Booth.PortfolioManager.DataMigration
             var factory = new PortfolioFactory(stockResolver);
 
             var eventStore = new MongodbEventStore("mongodb://192.168.1.93:27017", "PortfolioManager");
-            var database = new PortfolioManagerDatabase("mongodb://192.168.1.93:27017", "PortfolioManager2", factory, stockResolver);
+            var database = new PortfolioManagerDatabase("mongodb://192.168.1.93:27017", "PortfolioManager2");
+            database.Configure(factory, stockResolver);
 
             /*
                         var stock = new StapledSecurity(Guid.NewGuid());
@@ -64,10 +65,11 @@ namespace Booth.PortfolioManager.DataMigration
                         portfolio.AquireShares(stock.Id, new Date(2001, 01, 01), 100, 0.02m, 9.95m, true, "test", Guid.NewGuid());
             */
 
-         //   MigrateUsers(eventStore, database);
-           // MigrateTradingCalendars(eventStore, database);
-           //   MigrateStocks(eventStore, database);
-              MigrateStockPriceHistory(eventStore, database);
+            MigrateUsers(eventStore, database);
+            MigrateTradingCalendars(eventStore, database);
+            MigrateStocks(eventStore, database, stockResolver);
+            MigrateStockPriceHistory(eventStore, database);
+            MigratePortfolios(eventStore, database, factory, stockResolver);
 
             // TestPortfolio(portfolio, database);
 
@@ -91,13 +93,19 @@ namespace Booth.PortfolioManager.DataMigration
             var repository = new UserRepository(database);
 
             foreach (var user in eventRepository.All())
-            {                
-                var newUser = new User(user.Id);
-                newUser.Create2(user.UserName, user.Password);
-                if (user.Administator)
-                    newUser.AddAdministratorPrivilage();
+            {
+                var existingUser = repository.Get(user.Id);
 
-                repository.Add(newUser);
+                if (existingUser == null)
+                {
+
+                    var newUser = new User(user.Id);
+                    newUser.Create2(user.UserName, user.Password);
+                    if (user.Administator)
+                        newUser.AddAdministratorPrivilage();
+
+                    repository.Add(newUser);
+                }
             }
 
 
@@ -111,17 +119,21 @@ namespace Booth.PortfolioManager.DataMigration
 
             var repository = new TradingCalendarRepository(database);
 
-            var calendar = eventRepository.Get(TradingCalendarIds.ASX);
-            
-            var newCalendar = new TradingCalendar(calendar.Id);
+            var existingCalander = repository.Get(TradingCalendarIds.ASX);
+            if (existingCalander == null)
+            {
+                var calendar = eventRepository.Get(TradingCalendarIds.ASX);
 
-            foreach (var year in calendar.Years)
-                newCalendar.SetNonTradingDays(year, calendar.NonTradingDays(year));
+                var newCalendar = new TradingCalendar(calendar.Id);
 
-            repository.Add(calendar);
+                foreach (var year in calendar.Years)
+                    newCalendar.SetNonTradingDays(year, calendar.NonTradingDays(year));
+
+                repository.Add(calendar);
+            }
         }
 
-        static void MigrateStocks(MongodbEventStore eventStore, PortfolioManagerDatabase database)
+        static void MigrateStocks(MongodbEventStore eventStore, PortfolioManagerDatabase database, StockResolver stockResolver)
         {
             // Load users from Event Store
             var eventStream = eventStore.GetEventStream<Stock>("Stocks");
@@ -132,6 +144,8 @@ namespace Booth.PortfolioManager.DataMigration
             foreach (var stock in eventRepository.All())
             {
                 var existingStock = repository.Get(stock.Id);
+
+                stockResolver.Add(stock);
 
                 if (existingStock == null)
                     repository.Add(stock);
@@ -168,6 +182,23 @@ namespace Booth.PortfolioManager.DataMigration
                 stockPrices.UpdateClosingPrice(new Date(1997, 07, 21), 5.50m);
                 repository.UpdatePrices(stockPrices, new DateRange(new Date(1997, 07, 17), new Date(1997, 07, 21)));
                 break; */
+            }
+        }
+
+        static void MigratePortfolios(MongodbEventStore eventStore, PortfolioManagerDatabase database, IPortfolioFactory factory, IStockResolver stockResolver)
+        {
+            // Load users from Event Store
+            var eventStream = eventStore.GetEventStream<Portfolio>("Portfolios");
+            var eventRepository = new EventStore.Repository<Portfolio>(eventStream, new PortfolioEntityFactory(factory));
+
+            var repository = new PortfolioRepository(database);
+
+            foreach (var portfolio in eventRepository.All())
+            {
+                var existingPortfolio = repository.Get(portfolio.Id);
+
+                if (existingPortfolio == null)
+                    repository.Add(portfolio);
             }
         }
 

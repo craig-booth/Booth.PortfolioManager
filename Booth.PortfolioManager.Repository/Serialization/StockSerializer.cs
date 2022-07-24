@@ -118,7 +118,9 @@ namespace Booth.PortfolioManager.Repository.Serialization
             if (corporateActions != null)
             {
                 foreach (var action in corporateActions)
+                {
                     stock.CorporateActions.Add(action);
+                }
             }
 
             if (delistingDate != Date.MinValue)

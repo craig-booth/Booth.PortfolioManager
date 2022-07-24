@@ -101,7 +101,15 @@ namespace Booth.PortfolioManager.Web
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                scope.ServiceProvider.InitializeStockCache();
+                var database = scope.ServiceProvider.GetRequiredService<IPortfolioManagerDatabase>();
+
+                var portfolioFactory = scope.ServiceProvider.GetRequiredService<IPortfolioFactory>();
+                var stockResolver = scope.ServiceProvider.GetRequiredService<IStockResolver>();
+                database.Configure(portfolioFactory, stockResolver);
+
+
+                InitializeCalendarCache(scope.ServiceProvider);
+                InitializeStockCache(scope.ServiceProvider);
             }
 
             return app;
@@ -121,14 +129,17 @@ namespace Booth.PortfolioManager.Web
             return services;
         }
 
-        public static IServiceProvider InitializeStockCache(this IServiceProvider serviceProvider)
+        private static void InitializeCalendarCache(IServiceProvider serviceProvider)
         {
-            var database = serviceProvider.GetRequiredService<IPortfolioManagerDatabase>();
+            var repository = serviceProvider.GetRequiredService<ITradingCalendarRepository>();
+            var cache = serviceProvider.GetRequiredService<IEntityCache<TradingCalendar>>();
 
-            var portfolioFactory = serviceProvider.GetRequiredService<IPortfolioFactory>();
-            var stockResolver = serviceProvider.GetRequiredService<IStockResolver>();
-            database.Configure(portfolioFactory, stockResolver);
+            var calendar = repository.Get(TradingCalendarIds.ASX);
+            cache.Add(calendar);  
+        }
 
+        private static void InitializeStockCache(IServiceProvider serviceProvider)
+        {
             var stockRepository = serviceProvider.GetRequiredService<IStockRepository>();
             var stockCache = serviceProvider.GetRequiredService<IEntityCache<Stock>>();
             stockCache.PopulateCache(stockRepository);
@@ -144,9 +155,8 @@ namespace Booth.PortfolioManager.Web
                 if (stockPriceHistory != null)
                     stock.SetPriceHistory(stockPriceHistory);
             }
-
-            return serviceProvider;
         }
+
         private static void AddJwtAuthetication(this IServiceCollection services, IJwtTokenConfigurationProvider jwtTokenConfigProvider)
         {
              services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

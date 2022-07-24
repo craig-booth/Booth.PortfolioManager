@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     public abstract class CorporateAction : ICorporateAction
     {
         public Guid Id { get; private set; }
-        public IReadOnlyStock Stock { get; private set; }
+        public IReadOnlyStock Stock { get; internal set; }
         public Date Date { get; private set; }
         public string Description { get; private set; }
 

@@ -27,7 +27,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
         {
             var conventions = new ConventionPack();
             conventions.Add(new CamelCaseElementNameConvention());
-            ConventionRegistry.Register("PortfolioManager", conventions, t => ConventionFilter(t)); 
+            ConventionRegistry.Register("PortfolioManager", conventions, t => ConventionApplies(t)); 
 
             BsonSerializer.RegisterSerializationProvider(new SerializationProvider());
             BsonSerializer.RegisterSerializer(typeof(Date), new DateSerializer()); 
@@ -38,12 +38,14 @@ namespace Booth.PortfolioManager.Repository.Serialization
             PortfolioRepository.ConfigureSerializaton(portfolioFactory, stockResolver);
         }
 
-        private static bool ConventionFilter(Type t)
+        private static bool ConventionApplies(Type t)
         {
-            return t.Namespace.StartsWith("Booth.PortfolioManager.Domain")
-                && !t.IsSubclassOf(typeof(Event))
-                && ((t.DeclaringType != null) && !t.DeclaringType.IsSubclassOf(typeof(Event)));
+            var applies = t.Namespace.StartsWith("Booth.PortfolioManager.Domain") && !t.IsSubclassOf(typeof(Event));
 
+            if (t.DeclaringType != null)
+                applies = applies && ConventionApplies(t.DeclaringType);
+
+            return applies;
         }
 
         public IBsonSerializer GetSerializer(Type type)

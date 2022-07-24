@@ -29,7 +29,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             _JwtTokenConfigurationProvider = jwtTokenConfigurationProvider;
         }
 
-        // POST : /api/authenticate       
+        // POST : /authenticate       
         [AllowAnonymous]
         [Route("authenticate")]
         [HttpPost]
