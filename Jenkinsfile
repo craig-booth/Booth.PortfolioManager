@@ -9,13 +9,15 @@ pipeline {
 		TEST_PROJECT3 = './Booth.PortfolioManager.Web.Test/Booth.PortfolioManager.Web.Test.csproj'
 
 		INTTEST_PROJECT = './Booth.PortfolioManager.IntegrationTest/Booth.PortfolioManager.IntegrationTest.csproj'
+
+		PORTAINER_WEBHOOK = credentials('portfoliomanager_webhook')
     }
 
     stages {
 		stage('Build') {
 			agent { 
 				docker { 
-					image 'mcr.microsoft.com/dotnet/sdk:5.0-alpine' 
+					image 'mcr.microsoft.com/dotnet/sdk:6.0-alpine' 
 					reuseNode true
 				}
 			}
@@ -58,7 +60,7 @@ pipeline {
 			steps {
 				script {
 					def dockerImage = docker.build("craigbooth/portfoliomanager")
-					httpRequest httpMode: 'POST', responseHandle: 'NONE', url: 'https://portainer.boothfamily.id.au/api/webhooks/f70bd8fe-e97a-4b36-ab0d-86257c4b33dc', wrapAsMultipart: false
+				    httpRequest httpMode: 'POST', responseHandle: 'NONE', url: '${PORTAINER_WEBHOOK}', wrapAsMultipart: false
 				}
             }
 		}

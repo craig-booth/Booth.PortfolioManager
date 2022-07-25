@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+using MongoDB.Driver;
+using MongoDB.Bson;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web;
@@ -15,6 +17,7 @@ using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Repository;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 
 namespace Booth.PortfolioManager.IntegrationTest.TestFixture
 {
@@ -35,6 +38,9 @@ namespace Booth.PortfolioManager.IntegrationTest.TestFixture
             var userRepository = new InMemoryUserRepository();
             AddUsers(userRepository);
 
+            var calendarRepository = new InMemoryTradingCalendarRepository();
+            AddTradingCalanders(calendarRepository);
+
             var stockRepository = new InMemoryStockRepository();
             AddStocks(stockRepository);
 
@@ -45,10 +51,12 @@ namespace Booth.PortfolioManager.IntegrationTest.TestFixture
 
             builder.ConfigureTestServices(x =>
             {
+                x.AddSingleton<IPortfolioManagerDatabase, TestDatabase>();
                 x.AddSingleton<IPortfolioRepository>(portfolioRepository);
                 x.AddSingleton<IUserRepository>(userRepository);
                 x.AddSingleton<IStockRepository>(stockRepository);
                 x.AddSingleton<IStockPriceRepository>(stockPriceRepository);
+                x.AddSingleton<ITradingCalendarRepository>(calendarRepository);
 
                 x.RemoveAll<IHostedService>();
                 x.AddScoped<IPortfolioAccessor>(_ => _PortfolioAccessor);
@@ -68,6 +76,16 @@ namespace Booth.PortfolioManager.IntegrationTest.TestFixture
             public IPortfolio Portfolio => _Portfolio;
         }
 
+        private class TestDatabase : IPortfolioManagerDatabase
+        {
+            public void Configure(IPortfolioFactory portfolioFactory, IStockResolver stockResolver) { }
+
+            public IMongoCollection<BsonDocument> GetCollection(string name) { return null; }
+
+            public IMongoCollection<T> GetCollection<T>(string name) { return null; }
+
+        }
+
         private void AddUsers(IUserRepository repository)
         {
 
@@ -83,6 +101,12 @@ namespace Booth.PortfolioManager.IntegrationTest.TestFixture
             administrator.Create("AdminUser", "secret");
             administrator.AddAdministratorPrivilage();
             repository.Add(administrator);
+        }
+
+        private void AddTradingCalanders(ITradingCalendarRepository repository)
+        {
+            var calander = new TradingCalendar(TradingCalendarIds.ASX);    
+            repository.Add(calander);
         }
 
         private void AddStocks(IStockRepository repository)

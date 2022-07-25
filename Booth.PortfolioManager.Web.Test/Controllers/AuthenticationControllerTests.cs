@@ -71,8 +71,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             };
             tokenHandler.ValidateToken(response.Value.Token, validationParameters, out var token);
 
-            token.ValidTo.Should().BeCloseTo(DateTime.UtcNow.AddHours(1), 5000);
-
+            token.ValidTo.Should().BeCloseTo(DateTime.UtcNow.AddHours(1), new TimeSpan(0, 0, 5));        
 
             mockRepository.Verify();
         }

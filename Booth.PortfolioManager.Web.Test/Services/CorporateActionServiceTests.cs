@@ -174,7 +174,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     new Domain.CorporateActions.CapitalReturn(Guid.Empty, _StockWithoutCorporateActions, action.ActionDate, "Capital Return", new Date(2001, 01, 15), 10.00m),
                     new Domain.CorporateActions.SplitConsolidation(Guid.Empty, _StockWithoutCorporateActions, action.ActionDate, "Split", 1, 2)
                 })
-            , opts => opts.Excluding(x => x.SelectedMemberPath.EndsWith(".Id")));
+            , opts => opts.Excluding(x => x.Path.EndsWith(".Id")));
 
         }
 
