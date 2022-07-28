@@ -3,25 +3,22 @@ using System.Text;
 using System.Security.Cryptography;
 using System.Collections.Generic;
 
-using Booth.EventStore;
-using Booth.PortfolioManager.Domain.Users.Events;
-
 namespace Booth.PortfolioManager.Domain.Users
 {
 
-    public class User : TrackedEntity
+    public class User : IEntity
     {
+        public Guid Id { get; }
+
         public string UserName { get; private set; }
 
         public string Password { get; private set; }
 
-        public bool Administator { get; private set; }
-
-        private readonly Dictionary<string, string> _Properties = new Dictionary<string, string>();
+        public bool Administrator { get; private set; }
 
         public User(Guid id)
-            : base(id)
         {
+             Id = id;
         }
 
         public void Create(string userName, string password)
@@ -32,29 +29,9 @@ namespace Booth.PortfolioManager.Domain.Users
             if (!ValidatePassword(password))
                 throw new ArgumentException("Password is not valid");
 
-            var hashedPassword = HashPassword(password);
-            var @event = new UserCreatedEvent(Id, Version, userName, hashedPassword);
 
-            Apply(@event);
-            PublishEvent(@event);
-        }
-
-        public void Create2(string userName, string password)
-        {  
-            var @event = new UserCreatedEvent(Id, Version, userName, password);
-
-            Apply(@event);
-            PublishEvent(@event);
-        }
-
-        public void Apply(UserCreatedEvent @event)
-        {
-            Version++;
-
-            UserName = @event.UserName;
-            Password = @event.Password;
-
-            _Properties["UserName"] = UserName;
+            UserName = userName;
+            Password = HashPassword(password);
         }
 
         public void ChangeUserName(string newUserName)
@@ -62,41 +39,17 @@ namespace Booth.PortfolioManager.Domain.Users
             if (!ValidateUserName(newUserName))
                 throw new ArgumentException("Username is not valid");
 
-            var @event = new UserNameChangedEvent(Id, Version, newUserName);
-
-            Apply(@event);
-            PublishEvent(@event);
-        }
-
-        public void Apply(UserNameChangedEvent @event)
-        {
-            Version++;
-
-            UserName = @event.UserName;
-            _Properties["UserName"] = UserName;
+            UserName = newUserName;
         }
 
         public void AddAdministratorPrivilage()
-        { 
-            var @event = new UserAdministratorChangedEvent(Id, Version, true);
-
-            Apply(@event);
-            PublishEvent(@event);
+        {
+            Administrator = true;
         }
 
         public void RemoveAdministratorPrivilage()
         {
-            var @event = new UserAdministratorChangedEvent(Id, Version, false);
-
-            Apply(@event);
-            PublishEvent(@event);
-        }
-
-        public void Apply(UserAdministratorChangedEvent @event)
-        {
-            Version++;
-
-            Administator = @event.Administrator;
+            Administrator = false;
         }
 
         public void ChangePassword(string newPassword)
@@ -109,24 +62,15 @@ namespace Booth.PortfolioManager.Domain.Users
             if (hashedPassword == Password)
                 throw new ArgumentException("Password must not be the same as your existing password");
 
-            var @event = new PasswordChangedEvent(Id, Version, hashedPassword);
-
-            Apply(@event);
-            PublishEvent(@event);
+            Password = hashedPassword;
         }
 
-        public void Apply(PasswordChangedEvent @event)
-        {
-            Version++;
-
-            Password = @event.Password;
-        }
 
         public bool PasswordCorrect(string password)
         {
             var hashedPassword = HashPassword(password);
 
-            return (hashedPassword == Password);
+            return (hashedPassword == Password); 
         }
 
         private bool ValidateUserName(string userName)

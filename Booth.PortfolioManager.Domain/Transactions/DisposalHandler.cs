@@ -10,6 +10,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class DisposalHandler : ITransactionHandler
     {
+        public bool CanCreateHolding => false;
+
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var disposal = transaction as Disposal;

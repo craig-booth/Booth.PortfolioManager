@@ -7,7 +7,6 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
 using Booth.Common;
-using Booth.EventStore;
 using Booth.PortfolioManager.Domain;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Utils;
@@ -27,7 +26,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
         {
             var conventions = new ConventionPack();
             conventions.Add(new CamelCaseElementNameConvention());
-            ConventionRegistry.Register("PortfolioManager", conventions, t => ConventionApplies(t)); 
+            ConventionRegistry.Register("PortfolioManager", conventions, t => t.Namespace.StartsWith("Booth.PortfolioManager.Domain")); 
 
             BsonSerializer.RegisterSerializationProvider(new SerializationProvider());
             BsonSerializer.RegisterSerializer(typeof(Date), new DateSerializer()); 
@@ -36,16 +35,6 @@ namespace Booth.PortfolioManager.Repository.Serialization
             StockPriceRepository.ConfigureSerializaton();
             TradingCalendarRepository.ConfigureSerializaton();
             PortfolioRepository.ConfigureSerializaton(portfolioFactory, stockResolver);
-        }
-
-        private static bool ConventionApplies(Type t)
-        {
-            var applies = t.Namespace.StartsWith("Booth.PortfolioManager.Domain") && !t.IsSubclassOf(typeof(Event));
-
-            if (t.DeclaringType != null)
-                applies = applies && ConventionApplies(t.DeclaringType);
-
-            return applies;
         }
 
         public IBsonSerializer GetSerializer(Type type)

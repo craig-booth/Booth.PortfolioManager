@@ -8,6 +8,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class AquisitionHandler : ITransactionHandler
     {
+        public bool CanCreateHolding => true;
+
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var aquisition = transaction as Aquisition;

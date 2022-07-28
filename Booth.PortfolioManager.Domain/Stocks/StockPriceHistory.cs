@@ -3,28 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Booth.Common;
-using Booth.EventStore;
-using Booth.PortfolioManager.Domain.Stocks.Events;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
     public interface IStockPriceHistory
     {
-        Guid Id { get; }
         Date EarliestDate { get; }
         Date LatestDate { get; }
         decimal GetPrice(Date date);
         IEnumerable<StockPrice> GetPrices(DateRange dateRange);
     }
 
-    public class StockPriceHistory : TrackedEntity, IStockPriceHistory
+    public class StockPriceHistory : IEntity, IStockPriceHistory
     {
         private List<StockPrice> _Prices { get; } = new List<StockPrice>();
 
-        public StockPriceHistory(Guid id)
-            : base(id)
-        {
+        public Guid Id { get; }
 
+        public StockPriceHistory(Guid id)
+        {
+            Id = id;
         }
 
         public Date EarliestDate
@@ -80,25 +78,13 @@ namespace Booth.PortfolioManager.Domain.Stocks
         }
 
         public void UpdateClosingPrice(Date date, decimal closingPrice)
-        {
-            var @event = new ClosingPricesAddedEvent(Id, Version, new ClosingPricesAddedEvent.ClosingPrice[] { new ClosingPricesAddedEvent.ClosingPrice(date, closingPrice) });
-            Apply(@event);
-
-            PublishEvent(@event);
+        {         
+            UpdatePrice(date, closingPrice);
         }
 
         public void UpdateClosingPrices(IEnumerable<StockPrice> closingPrices)
         {
-            var @event = new ClosingPricesAddedEvent(Id, Version, closingPrices.Select(x => new ClosingPricesAddedEvent.ClosingPrice(x.Date, x.Price)));
-            Apply(@event);
-
-            PublishEvent(@event);
-        }
-
-        public void Apply(ClosingPricesAddedEvent @event)
-        {
-            Version++;
-            foreach (var closingPrice in @event.ClosingPrices)
+            foreach (var closingPrice in closingPrices)
                 UpdatePrice(closingPrice.Date, closingPrice.Price);
         }
 

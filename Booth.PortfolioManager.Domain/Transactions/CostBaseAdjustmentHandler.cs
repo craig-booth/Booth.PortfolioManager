@@ -10,6 +10,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class CostBaseAdjustmentHandler : ITransactionHandler
     {
+        public bool CanCreateHolding => false;
+
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var costBaseAdjustment = transaction as CostBaseAdjustment;

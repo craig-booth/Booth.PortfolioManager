@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Booth.Common;
-using Booth.EventStore;
-
-using Booth.PortfolioManager.Domain.TradingCalendars.Events;
 
 namespace Booth.PortfolioManager.Domain.TradingCalendars
 {
@@ -27,13 +24,15 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
         void SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays);
     }
 
-    public class TradingCalendar : TrackedEntity, ITradingCalendar
+    public class TradingCalendar : IEntity, ITradingCalendar
     {
         private List<NonTradingDay> _NonTradingDays = new List<NonTradingDay>();
 
+        public Guid Id { get; }
+
         public TradingCalendar(Guid id)
-            : base(id)
         {
+            Id = id;
         }
 
         public void SetNonTradingDays(int year, IEnumerable<NonTradingDay> nonTradingDays)
@@ -43,19 +42,10 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
             if (invalidDate != null)
                 throw new ArgumentException(String.Format("Date {0} is not in calendar year {1}", invalidDate, year));
 
-            var @event = new NonTradingDaysSetEvent(Id, Version, year, nonTradingDays);
-            Apply(@event);
-
-            PublishEvent(@event);
-        }
-        public void Apply(NonTradingDaysSetEvent @event)
-        {
-            Version++;
-
             // Remove any existing non trading days for the year
-            _NonTradingDays.RemoveAll(x => x.Date.Year == @event.Year);
+            _NonTradingDays.RemoveAll(x => x.Date.Year == year);
 
-            foreach (var nonTradingDay in @event.NonTradingDays)
+            foreach (var nonTradingDay in nonTradingDays)
             {
                 var newNonTradingDay = new NonTradingDay(nonTradingDay.Date, nonTradingDay.Description);
                 var index = _NonTradingDays.BinarySearch(newNonTradingDay);
@@ -76,7 +66,6 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
                 return _NonTradingDays.Select(x => x.Date.Year).Distinct();
             }
         }
-
 
         public bool IsTradingDay(Date date)
         {
@@ -114,12 +103,12 @@ namespace Booth.PortfolioManager.Domain.TradingCalendars
     public class NonTradingDay : IComparable<NonTradingDay>
     {
         public Date Date { get; set; }
-        public string Desciption { get; set; }
+        public string Description { get ; set; }
 
         public NonTradingDay(Date date, string description)
         {
             Date = date;
-            Desciption = description;
+            Description = description;
         }
 
         public int CompareTo(NonTradingDay other)

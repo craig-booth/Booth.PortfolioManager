@@ -65,30 +65,15 @@ namespace Booth.PortfolioManager.Repository.Serialization
             if (transactions != null)
             {
                 foreach (var transaction in transactions)
-                {
-                    if (transaction is Aquisition aquisition)
-                        portfolio.AquireShares(aquisition.Stock.Id, aquisition.Date, aquisition.Units, aquisition.AveragePrice, aquisition.TransactionCosts, aquisition.CreateCashTransaction, aquisition.Comment, aquisition.Id);
-                    else if (transaction is CashTransaction cashTransaction)
-                        portfolio.MakeCashTransaction(cashTransaction.Date, cashTransaction.CashTransactionType, cashTransaction.Amount, cashTransaction.Comment, cashTransaction.Id);
-                    else if (transaction is CostBaseAdjustment costBaseAdjustment)
-                        portfolio.AdjustCostBase(costBaseAdjustment.Stock.Id, costBaseAdjustment.Date, costBaseAdjustment.Percentage, costBaseAdjustment.Comment, costBaseAdjustment.Id);
-                    else if (transaction is Disposal disposal)
-                        portfolio.DisposeOfShares(disposal.Stock.Id, disposal.Date, disposal.Units, disposal.AveragePrice, disposal.TransactionCosts, disposal.CgtMethod, disposal.CreateCashTransaction, disposal.Comment, disposal.Id);
-                    else if (transaction is IncomeReceived income)
-                        portfolio.IncomeReceived(income.Stock.Id, income.RecordDate, income.Date, income.FrankedAmount, income.UnfrankedAmount, income.FrankingCredits, income.Interest, income.TaxDeferred, income.DrpCashBalance, income.CreateCashTransaction, income.Comment, income.Id);
-                    else if (transaction is OpeningBalance openingBalance)
-                        portfolio.AddOpeningBalance(openingBalance.Stock.Id, openingBalance.Date, openingBalance.AquisitionDate, openingBalance.Units, openingBalance.CostBase, openingBalance.Comment, openingBalance.Id);
-                    else if (transaction is ReturnOfCapital returnOfCapital)
-                        portfolio.ReturnOfCapitalReceived(returnOfCapital.Stock.Id, returnOfCapital.Date, returnOfCapital.RecordDate, returnOfCapital.Amount, returnOfCapital.CreateCashTransaction, returnOfCapital.Comment, returnOfCapital.Id);
-                    else if (transaction is UnitCountAdjustment unitCountAdjustment)
-                        portfolio.AdjustUnitCount(unitCountAdjustment.Stock.Id, unitCountAdjustment.Date, unitCountAdjustment.OriginalUnits, unitCountAdjustment.NewUnits, unitCountAdjustment.Comment, unitCountAdjustment.Id);
-                }
+                    portfolio.AddTransaction(transaction);
             }
 
-
-            foreach (var stockId in participateInDrp)
+            if (participateInDrp != null)
             {
-                portfolio.ChangeDrpParticipation(stockId, true);
+                foreach (var stockId in participateInDrp)
+                {
+                    portfolio.ChangeDrpParticipation(stockId, true);
+                }
             }
 
             return portfolio; 

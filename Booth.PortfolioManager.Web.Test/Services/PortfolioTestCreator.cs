@@ -96,9 +96,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
             portfolio.Create("Test", Guid.NewGuid());
 
-            // Remove Events
-            portfolio.FetchEvents();
-
             return portfolio;
         }
 
@@ -122,10 +119,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             portfolio.MakeCashTransaction(new Date(2008, 01, 01), Domain.Transactions.BankAccountTransactionType.Withdrawl, 5000m, "", Guid.NewGuid());
             portfolio.MakeCashTransaction(new Date(2009, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 500m, "", Guid.NewGuid());
-
-
-            // Remove Events
-            portfolio.FetchEvents();
 
             return portfolio;
         }

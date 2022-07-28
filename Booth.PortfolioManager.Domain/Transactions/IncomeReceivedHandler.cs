@@ -9,6 +9,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class IncomeReceivedHandler : ITransactionHandler
     {
+        public bool CanCreateHolding => false;
+
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var incomeReceived = transaction as IncomeReceived;

@@ -8,6 +8,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class ReturnOfCapitalHandler : ITransactionHandler
     {
+        public bool CanCreateHolding => false;
+
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var returnOfCapital = transaction as ReturnOfCapital;

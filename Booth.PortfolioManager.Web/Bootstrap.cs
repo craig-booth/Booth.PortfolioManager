@@ -136,6 +136,12 @@ namespace Booth.PortfolioManager.Web
 
             var calendar = repository.Get(TradingCalendarIds.ASX);
             cache.Add(calendar);  
+
+            foreach (var year in calendar.Years)
+            {
+                repository.UpdateYear(calendar, year);
+            }
+
         }
 
         private static void InitializeStockCache(IServiceProvider serviceProvider)

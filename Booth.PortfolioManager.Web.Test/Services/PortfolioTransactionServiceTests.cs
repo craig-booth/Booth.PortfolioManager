@@ -10,8 +10,6 @@ using Booth.Common;
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.RestApi.Transactions;
-using Booth.PortfolioManager.Domain.Portfolios;
-using Booth.PortfolioManager.Domain.Transactions.Events;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 using Booth.Common;
-using Booth.EventStore;
 
 [assembly: InternalsVisibleToAttribute("Booth.PortfolioManager.Domain.Test")]
 [assembly: InternalsVisibleToAttribute("Booth.PortfolioManager.Web.Test")]

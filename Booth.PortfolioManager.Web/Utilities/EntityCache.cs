@@ -56,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Utilities
     static class EntityCacheExtensions
     {
         public static IEntityCache<T> PopulateCache<T>(this IEntityCache<T> entityCache, IRepository<T> repository)
-            where T : ITrackedEntity
+            where T : IEntity
         {
             entityCache.Clear();
 

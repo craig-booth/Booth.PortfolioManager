@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.8" />
-    <PackageReference Include="Booth.EventStore" Version="1.0.5" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 

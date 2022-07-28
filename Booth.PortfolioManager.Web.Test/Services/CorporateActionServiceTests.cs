@@ -11,8 +11,6 @@ using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Stocks;
-using Booth.PortfolioManager.RestApi.CorporateActions;
-using Booth.PortfolioManager.Domain.CorporateActions.Events;
 using Booth.PortfolioManager.Domain.CorporateActions;
 
 namespace Booth.PortfolioManager.Web.Test.Services
@@ -46,10 +44,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             _StockWithCorporateActions.CorporateActions.AddDividend(_Action2, new Date(2001, 01, 01), "Action 2", new Date(2001, 01, 02), 10.00m, 1.00m, 2.45m);
 
             stockCache.Add(_StockWithCorporateActions);
-
-            // Remove any existing events
-            _StockWithoutCorporateActions.FetchEvents();
-            _StockWithCorporateActions.FetchEvents();
 
             var repository = mockRepository.Create<IStockRepository>();
             repository.Setup(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));

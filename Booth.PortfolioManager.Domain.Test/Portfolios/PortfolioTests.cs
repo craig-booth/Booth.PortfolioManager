@@ -23,10 +23,11 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var stockResolver = mockRepository.Create<IStockResolver>();
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
 
             var id = Guid.NewGuid();
-            var portfolio = new Portfolio(id, stockResolver.Object, transactionHandlers.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(id);
 
             var owner = Guid.NewGuid();
             portfolio.Create("Test", owner);
@@ -47,9 +48,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             Action a = () => portfolio.ChangeDrpParticipation(stock.Id, true);
             
@@ -69,10 +69,9 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
 
             portfolio.ChangeDrpParticipation(stock.Id, true);
@@ -93,16 +92,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            OpeningBalance transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (OpeningBalance)t)
-                .Verifiable();
-
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(handler.Object);
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             portfolio.AddOpeningBalance(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 100, 1000.00m, "Comment", transactionId);
@@ -111,15 +102,22 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             {
                 portfolio.Holdings[stock.Id].EffectivePeriod.Should().Be(new DateRange(new Date(2000, 01, 01), Date.MaxValue));
 
-                transaction.Should().BeEquivalentTo(new
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
                 {
-                    Id = transaction.Id,
+                    Units = 100,
+                    Amount = 1000.00m,
+                    CostBase = 1000.00m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
                     Date = new Date(2000, 01, 01),
                     Stock = stock,
                     Comment = "Comment",
                     Units = 100,
                     CostBase = 1000.00m
-            });
+                });
 
             }
 
@@ -137,30 +135,32 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            OpeningBalance transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (OpeningBalance)t)
-                .Verifiable();
-
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(handler.Object);
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1998, 01, 01), 10, 100.00m, "Existing", Guid.Empty);
             portfolio.AddOpeningBalance(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 100, 1000.00m, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 01, 01),
-                Stock = stock,
-                Comment = "Comment",
-                Units = 100,
-                CostBase = 1000.00m
-            });
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 110,
+                    Amount = 1100.00m,
+                    CostBase = 1100.00m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    Units = 100,
+                    CostBase = 1000.00m
+                });
+            }
 
             mockRepository.Verify();
         }
@@ -176,9 +176,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             Action a = () => portfolio.AdjustCostBase(stock.Id, new Date(2000, 01, 01), 0.50m, "Comment", transactionId);
@@ -199,30 +198,33 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            CostBaseAdjustment transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (CostBaseAdjustment)t)
-                .Verifiable();
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<CostBaseAdjustment>()).Returns(handler.Object);
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
 
             var transactionId = Guid.NewGuid();
             portfolio.AdjustCostBase(stock.Id, new Date(2000, 01, 01), 0.50m, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 01, 01),
-                Stock = stock,
-                Comment = "Comment",
-                Percentage = 0.50m
-            });
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 100,
+                    Amount = 100.00m,
+                    CostBase = 50.00m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    Percentage = 0.50m
+                });
+            }
 
             mockRepository.Verify();
         }
@@ -238,9 +240,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             Action a = () => portfolio.AdjustUnitCount(stock.Id, new Date(2000, 01, 01), 1, 2, "Comment", transactionId);
@@ -261,31 +262,33 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            UnitCountAdjustment transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (UnitCountAdjustment)t)
-                .Verifiable();
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<UnitCountAdjustment>()).Returns(handler.Object);
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
 
             var transactionId = Guid.NewGuid();
             portfolio.AdjustUnitCount(stock.Id, new Date(2000, 01, 01), 1, 2, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 01, 01),
-                Stock = stock,
-                Comment = "Comment",
-                OriginalUnits = 1,
-                NewUnits = 2
-            });
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 200,
+                    Amount = 100.00m,
+                    CostBase = 100.00m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                });
+            }
 
             mockRepository.Verify();
         }
@@ -301,27 +304,26 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            Aquisition transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (Aquisition)t)
-                .Verifiable();
-
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<Aquisition>()).Returns(handler.Object);
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             portfolio.AquireShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, true, "Comment", transactionId);
 
             using (new AssertionScope())
             {
-                portfolio.Holdings[stock.Id].EffectivePeriod.Should().Be(new DateRange(new Date(2000, 01, 01), Date.MaxValue));            
+                portfolio.Holdings[stock.Id].EffectivePeriod.Should().Be(new DateRange(new Date(2000, 01, 01), Date.MaxValue));
 
-                transaction.Should().BeEquivalentTo(new
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
                 {
-                    Id = transaction.Id,
+                    Units = 100,
+                    Amount = 1019.95m,
+                    CostBase = 1019.95m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
                     Date = new Date(2000, 01, 01),
                     Stock = stock,
                     Comment = "Comment",
@@ -330,6 +332,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
                     TransactionCosts = 19.95m,
                     CreateCashTransaction = true
                 });
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(-1019.95m);
             }
 
             mockRepository.Verify();
@@ -346,33 +350,37 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            Aquisition transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (Aquisition)t)
-                .Verifiable();
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<Aquisition>()).Returns(handler.Object);
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
 
             var transactionId = Guid.NewGuid();
             portfolio.AquireShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, true, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 01, 01),
-                Stock = stock,
-                Comment = "Comment",
-                Units = 100,
-                AveragePrice = 10.00m,
-                TransactionCosts = 19.95m,
-                CreateCashTransaction = true
-            });
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 200,
+                    Amount = 1119.95m,
+                    CostBase = 1119.95m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    Units = 100,
+                    AveragePrice = 10.00m,
+                    TransactionCosts = 19.95m,
+                    CreateCashTransaction = true
+                });
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(-1019.95m);
+            }
 
             mockRepository.Verify();
         }
@@ -388,9 +396,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             Action a = () => portfolio.DisposeOfShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, CgtCalculationMethod.MinimizeGain, true, "Comment", transactionId);
@@ -411,34 +418,38 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            Disposal transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (Disposal)t)
-                .Verifiable();
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<Disposal>()).Returns(handler.Object);
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
 
             var transactionId = Guid.NewGuid();
             portfolio.DisposeOfShares(stock.Id, new Date(2000, 01, 01), 100, 10.00m, 19.95m, CgtCalculationMethod.MinimizeGain, true, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 01, 01),
-                Stock = stock,
-                Comment = "Comment",
-                Units = 100,
-                AveragePrice = 10.00m,
-                TransactionCosts = 19.95m,
-                CreateCashTransaction = true,
-                CgtMethod = CgtCalculationMethod.MinimizeGain
-            });
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 0,
+                    Amount = 0.00m,
+                    CostBase = 0.00m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    Units = 100,
+                    AveragePrice = 10.00m,
+                    TransactionCosts = 19.95m,
+                    CreateCashTransaction = true,
+                    CgtMethod = CgtCalculationMethod.MinimizeGain
+                });
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(980.05m);
+            }
 
             mockRepository.Verify();
         }
@@ -454,9 +465,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             Action a = () => portfolio.IncomeReceived(stock.Id, new Date(2000, 01, 01), new Date(2000, 02, 01), 100.00m, 101.00m, 30.00m, 2.00m, 3.00m, 20.00m, true, "Comment", transactionId);
@@ -477,37 +487,34 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            IncomeReceived transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (IncomeReceived)t)
-                .Verifiable();
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<IncomeReceived>()).Returns(handler.Object);
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
 
             var transactionId = Guid.NewGuid();
             portfolio.IncomeReceived(stock.Id, new Date(2000, 01, 01), new Date(2000, 02, 01), 100.00m, 101.00m, 30.00m, 2.00m, 3.00m, 20.00m, true, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 02, 01),
-                Stock = stock,
-                Comment = "Comment",
-                RecordDate = new Date(2000, 01, 01),
-                FrankedAmount = 100.00m,
-                UnfrankedAmount = 101.00m,
-                FrankingCredits = 30.00m,
-                Interest = 2.00m,
-                TaxDeferred = 3.00m,
-                DrpCashBalance = 20.00m,
-                CreateCashTransaction = true
-            });
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 02, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    RecordDate = new Date(2000, 01, 01),
+                    FrankedAmount = 100.00m,
+                    UnfrankedAmount = 101.00m,
+                    FrankingCredits = 30.00m,
+                    Interest = 2.00m,
+                    TaxDeferred = 3.00m,
+                    DrpCashBalance = 20.00m,
+                    CreateCashTransaction = true
+                });
+
+                portfolio.CashAccount.Balance(new Date(2000, 02, 01)).Should().Be(206.00m);
+            }
 
             mockRepository.Verify();
         }
@@ -519,28 +526,25 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             var stockResolver = mockRepository.Create<IStockResolver>();
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            CashTransaction transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (CashTransaction)t)
-                .Verifiable();
-
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<CashTransaction>()).Returns(handler.Object);
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), BankAccountTransactionType.Transfer, 100.00m, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 01, 01),
-                Comment = "Comment",
-                CashTransactionType = BankAccountTransactionType.Transfer,
-                Amount = 100.00m
-            });
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Comment = "Comment",
+                    CashTransactionType = BankAccountTransactionType.Transfer,
+                    Amount = 100.00m
+                });
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(100.00m);
+            }
 
             mockRepository.Verify();
         }
@@ -556,9 +560,8 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
             var transactionId = Guid.NewGuid();
             Action a = () => portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 10.00m, true, "Comment", transactionId);
@@ -579,32 +582,36 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var handler = mockRepository.Create<ITransactionHandler>();
-            ReturnOfCapital transaction = null;
-            handler.Setup(x => x.Apply(It.IsAny<IPortfolioTransaction>(), It.IsAny<IHolding>(), It.IsAny<ICashAccount>()))
-                .Callback<IPortfolioTransaction, IHolding, ICashAccount>((t, h, c) => transaction = (ReturnOfCapital)t)
-                .Verifiable();
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
 
-            var transactionHandlers = mockRepository.Create<IServiceFactory<ITransactionHandler>>();
-            transactionHandlers.Setup(x => x.GetService<ReturnOfCapital>()).Returns(handler.Object);
-            transactionHandlers.Setup(x => x.GetService<OpeningBalance>()).Returns(new OpeningBalanceHandler());
-
-            var portfolio = new Portfolio(Guid.NewGuid(), stockResolver.Object, transactionHandlers.Object);
             portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
 
             var transactionId = Guid.NewGuid();
-            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 10.00m, true, "Comment", transactionId);
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", transactionId);
 
-            transaction.Should().BeEquivalentTo(new
+            using (new AssertionScope())
             {
-                Id = transaction.Id,
-                Date = new Date(2000, 01, 01),
-                Stock = stock,
-                Comment = "Comment",
-                RecordDate = new Date(1999, 01, 01),
-                Amount = 10.00m,
-                CreateCashTransaction = true
-            });
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 100,
+                    Amount = 100.00m,
+                    CostBase = 50.00m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Comment",
+                    RecordDate = new Date(1999, 01, 01),
+                    Amount = 0.50m,
+                    CreateCashTransaction = true
+                });
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(50.00m);
+            }
 
             mockRepository.Verify();
         }

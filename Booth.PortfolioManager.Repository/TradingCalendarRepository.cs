@@ -68,6 +68,5 @@ namespace Booth.PortfolioManager.Repository
         {
             BsonSerializer.RegisterSerializer<TradingCalendar>(new TradingCalendarSerializer());
         }
-
     }
 }

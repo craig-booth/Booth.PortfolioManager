@@ -38,7 +38,7 @@ namespace Booth.PortfolioManager.Web.Services
             result.Year = year;
 
             foreach (var nonTradingDay in tradingCalendar.NonTradingDays(year))
-                result.AddNonTradingDay(nonTradingDay.Date, nonTradingDay.Desciption);
+                result.AddNonTradingDay(nonTradingDay.Date, nonTradingDay.Description);
             
             return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(result);
         }
