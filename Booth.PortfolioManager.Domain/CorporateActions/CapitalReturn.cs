@@ -16,8 +16,8 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         public Date PaymentDate { get; private set; }
         public decimal Amount { get; private set; }
 
-        internal CapitalReturn(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal amount)
-            : base(id, stock, actionDate, description)
+        public CapitalReturn(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal amount)
+            : base(id, stock, actionDate, (description != "") ? description : "Capital Return " + amount.ToString("$#,##0.00###"))
         {
             PaymentDate = paymentDate;
             Amount = amount;

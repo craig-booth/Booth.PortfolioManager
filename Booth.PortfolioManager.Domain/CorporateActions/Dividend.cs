@@ -18,8 +18,8 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         public decimal PercentFranked { get; private set; }
         public decimal DrpPrice { get; private set; }
 
-        internal Dividend(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
-            : base(id, stock, actionDate, description)
+        public Dividend(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date paymentDate, decimal dividendAmount, decimal percentFranked, decimal drpPrice)
+            : base(id, stock, actionDate, (description != "") ? description : "Dividend " + MathUtils.FormatCurrency(dividendAmount, false, true))
         {
             PaymentDate = paymentDate;
             DividendAmount = dividendAmount;

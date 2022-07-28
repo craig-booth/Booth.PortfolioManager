@@ -46,7 +46,7 @@ namespace Booth.PortfolioManager.Web.Services
                 return ServiceResult<CorporateAction>.NotFound();
             }
             
-            var result = corporateAction.ToResponse();
+            var result = corporateAction.ToApi();
 
             return ServiceResult<CorporateAction>.Ok(result);  
         }
@@ -59,7 +59,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             var corporateActions = stock.CorporateActions.InDateRange(dateRange);
 
-            var result = corporateActions.Select(x => x.ToResponse()).ToList();
+            var result = corporateActions.Select(x => x.ToApi()).ToList();
 
             return ServiceResult<List<CorporateAction>>.Ok(result);
         }
@@ -70,46 +70,10 @@ namespace Booth.PortfolioManager.Web.Services
             if (stock == null)
                 return ServiceResult<List<CorporateAction>>.NotFound();
 
-            ServiceResult result;
-            if (corporateAction is RestApi.CorporateActions.CapitalReturn capitalReturn)
-                stock.CorporateActions.AddCapitalReturn(capitalReturn.Id, capitalReturn.ActionDate, capitalReturn.Description, capitalReturn.PaymentDate, capitalReturn.Amount);
-            else if (corporateAction is RestApi.CorporateActions.CompositeAction compositeAction)
-                AddCompositeAction(stock, compositeAction);
-            else if (corporateAction is RestApi.CorporateActions.Dividend dividend)
-                stock.CorporateActions.AddDividend(dividend.Id, dividend.ActionDate, dividend.Description, dividend.PaymentDate, dividend.Amount, dividend.PercentFranked, dividend.DrpPrice);
-            else if (corporateAction is RestApi.CorporateActions.SplitConsolidation splitConsolidation)
-                stock.CorporateActions.AddSplitConsolidation(splitConsolidation.Id, splitConsolidation.ActionDate, splitConsolidation.Description, splitConsolidation.OriginalUnits, splitConsolidation.NewUnits);
-            else if (corporateAction is RestApi.CorporateActions.Transformation transformation)
-            {
-                var resultingStocks = transformation.ResultingStocks.Select(x => new Domain.CorporateActions.Transformation.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBase, x.AquisitionDate));
-                stock.CorporateActions.AddTransformation(transformation.Id, transformation.ActionDate, transformation.Description, transformation.ImplementationDate, transformation.CashComponent, transformation.RolloverRefliefApplies, resultingStocks);
-            }
-            else
-                result = ServiceResult.Error("Unkown Corporate Action type");
-
+            stock.CorporateActions.Add(corporateAction.FromApi());
             _Repository.AddCorporateAction(stock, corporateAction.Id);
 
             return ServiceResult.Ok();
-        }
-
-        private void AddCompositeAction(Stock stock, RestApi.CorporateActions.CompositeAction corporateAction)
-        {
-            var builder = stock.CorporateActions.StartCompositeAction(corporateAction.Id, corporateAction.ActionDate, corporateAction.Description);           
-            foreach (var childAction in corporateAction.ChildActions)
-            {
-                if (childAction is RestApi.CorporateActions.CapitalReturn capitalReturn)
-                    builder.AddCapitalReturn(capitalReturn.Description, capitalReturn.PaymentDate, capitalReturn.Amount);
-                else if (childAction is RestApi.CorporateActions.Dividend dividend)
-                    builder.AddDividend(dividend.Description, dividend.PaymentDate, dividend.Amount, dividend.PercentFranked, dividend.DrpPrice);
-                else if (childAction is RestApi.CorporateActions.SplitConsolidation splitConsolidation)
-                    builder.AddSplitConsolidation(splitConsolidation.Description, splitConsolidation.OriginalUnits, splitConsolidation.NewUnits);
-                else if (childAction is RestApi.CorporateActions.Transformation transformation)
-                {
-                    var resultingStocks = transformation.ResultingStocks.Select(x => new Domain.CorporateActions.Transformation.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBase, x.AquisitionDate));
-                    builder.AddTransformation(transformation.Description, transformation.ImplementationDate, transformation.CashComponent, transformation.RolloverRefliefApplies, resultingStocks);
-                }
-            }
-            builder.Finish();
         }
 
     } 

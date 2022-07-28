@@ -15,8 +15,8 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     {
         public int OriginalUnits { get; private set; }
         public int NewUnits { get; private set; }
-        internal SplitConsolidation(Guid id, IReadOnlyStock stock, Date actionDate, string description, int originalUnits, int newUnits)
-            : base(id, stock, actionDate, description)
+        public SplitConsolidation(Guid id, IReadOnlyStock stock, Date actionDate, string description, int originalUnits, int newUnits)
+            : base(id, stock, actionDate, (description != "") ? description :  (originalUnits <= newUnits) ? String.Format("{0} for {1} Stock Split", originalUnits, newUnits) :  String.Format("{0} for {1} Stock Consolidation", originalUnits, newUnits))
         {
             OriginalUnits = originalUnits;
             NewUnits = newUnits;

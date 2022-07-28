@@ -21,16 +21,13 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
 
 
         [Fact]
-        public void CapitalReturnToResponse()
+        public void CapitalReturnToApi()
         {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
+            var stock = new Stock(Guid.NewGuid());
 
-            var stock = mockRepository.Create<IReadOnlyStock>();
-            stock.SetupGet(x => x.Id).Returns(Guid.NewGuid());
+            var capitalReturn = new CapitalReturn(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 10.30m);
 
-            var capitalReturn = new CapitalReturn(Guid.NewGuid(), stock.Object, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 10.30m);
-
-            var response = capitalReturn.ToResponse();
+            var response = capitalReturn.ToApi();
 
             response.Should().BeEquivalentTo(new
             {
@@ -46,21 +43,47 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         }
 
         [Fact]
-        public void CompositeActionToResponse()
+        public void CapitalReturnFromApi()
         {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
+            var capitalReturn = new RestApi.CorporateActions.CapitalReturn()
+            {
+                Id = Guid.NewGuid(),
+                Stock = Guid.NewGuid(),
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Test",
+                PaymentDate = new Date(2001, 01, 15),
+                Amount = 10.30m
+            };
 
+            var response = capitalReturn.FromApi();
+
+            response.Should().BeEquivalentTo(new
+            {
+                Id = capitalReturn.Id,
+                Date = capitalReturn.ActionDate,
+                Description = capitalReturn.Description,
+                PaymentDate = capitalReturn.PaymentDate,
+                Amount = capitalReturn.Amount
+            });
+
+        }
+
+        [Fact]
+        public void CompositeActionToApi()
+        {
             var stock = new Stock(Guid.NewGuid());
 
             var id = Guid.NewGuid();
-            stock.CorporateActions.StartCompositeAction(id, new Date(2001, 01, 01), "Composite Action")
-                .AddCapitalReturn("Capital Return", new Date(2001, 01, 15), 10.00m)
-                .AddDividend("Dividend", new Date(2001, 01, 15), 10.00m, 0.50m, 1.00m)
-                .Finish();
+            stock.CorporateActions.Add(new CompositeAction(id, stock, new Date(2001, 01, 01), "Composite Action", new ICorporateAction[]
+            {
+                new CapitalReturn(id, stock, new Date(2001, 01, 01), "Capital Return", new Date(2001, 01, 15), 10.00m),
+                new Dividend(id, stock, new Date(2001, 01, 01), "Dividend", new Date(2001, 01, 15), 10.00m, 0.50m, 1.00m)
+            }));
+
 
             var action = stock.CorporateActions[id];
 
-            var response = action.ToResponse();
+            var response = action.ToApi();
 
             response.Should().BeEquivalentTo(new
             {
@@ -95,17 +118,79 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             });
         }
 
+
         [Fact]
-        public void DividendToResponse()
+        public void CompositeActionFromApi()
         {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
+            var stock = new Stock(Guid.NewGuid());
 
-            var stock = mockRepository.Create<IReadOnlyStock>();
-            stock.SetupGet(x => x.Id).Returns(Guid.NewGuid());
+            var id = Guid.NewGuid();
+            var compositeAction = new RestApi.CorporateActions.CompositeAction()
+            {
+                Id = id,
+                Stock = Guid.NewGuid(),
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Composite Action",
+            };
+            compositeAction.ChildActions.Add(new RestApi.CorporateActions.CapitalReturn()
+            {
+                Id = id,
+                Stock = stock.Id,
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Capital Return",
+                PaymentDate = new Date(2001, 01, 15),
+                Amount = 10.00m
+            });
+            compositeAction.ChildActions.Add(new RestApi.CorporateActions.Dividend()
+            {
+                Id = id,
+                Stock = stock.Id,
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Dividend",
+                PaymentDate = new Date(2001, 01, 15),
+                Amount = 10.00m,
+                PercentFranked = 0.50m,
+                DrpPrice = 1.00m
+            });
 
-            var dividend = new Dividend(Guid.NewGuid(), stock.Object, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 10.30m, 0.30m, 1.45m);
 
-            var response = dividend.ToResponse();
+            var response = compositeAction.FromApi();
+
+            response.Should().BeEquivalentTo(new
+            {
+                Id = id,
+                Date = new Date(2001, 01, 01),
+                Description = "Composite Action",
+                ChildActions = new object[]
+                {
+                    new
+                    {
+                        Date = new Date(2001, 01, 01),
+                        Description = "Capital Return",
+                        PaymentDate = new Date(2001, 01, 15),
+                        Amount = 10.00m
+                    },
+                    new
+                    {
+                        Date = new Date(2001, 01, 01),
+                        Description = "Dividend",
+                        PaymentDate = new Date(2001, 01, 15),
+                        DividendAmount = 10.00m,
+                        PercentFranked = 0.50m,
+                        DrpPrice = 1.00m
+                    }
+                }
+            });
+        }
+
+        [Fact]
+        public void DividendToApi()
+        {
+            var stock = new Stock(Guid.NewGuid());
+
+            var dividend = new Dividend(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 10.30m, 0.30m, 1.45m);
+
+            var response = dividend.ToApi();
 
             response.Should().BeEquivalentTo(new
             {
@@ -122,16 +207,42 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         }
 
         [Fact]
-        public void SplitConsolidationToResponse()
+        public void DividendFromApi()
         {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
+            var dividend = new RestApi.CorporateActions.Dividend()
+            {
+                Id = Guid.NewGuid(),
+                Stock = Guid.NewGuid(),
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Test",
+                PaymentDate = new Date(2001, 01, 15),
+                Amount = 10.30m,
+                PercentFranked = 0.50m,
+                DrpPrice = 40.45m
+            };
 
-            var stock = mockRepository.Create<IReadOnlyStock>();
-            stock.SetupGet(x => x.Id).Returns(Guid.NewGuid());
+            var response = dividend.FromApi();
 
-            var split = new SplitConsolidation(Guid.NewGuid(), stock.Object, new Date(2001, 01, 01), "Test", 1, 2);
+            response.Should().BeEquivalentTo(new
+            {
+                Id = dividend.Id,
+                Date = dividend.ActionDate,
+                Description = dividend.Description,
+                PaymentDate = dividend.PaymentDate,
+                DividendAmount = dividend.Amount,
+                PercentFranked = 0.50m,
+                DrpPrice = 40.45m
+            });
+        }
 
-            var response = split.ToResponse();
+        [Fact]
+        public void SplitConsolidationToApi()
+        {
+            var stock = new Stock(Guid.NewGuid());
+
+            var split = new SplitConsolidation(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", 1, 2);
+
+            var response = split.ToApi();
 
             response.Should().BeEquivalentTo(new
             {
@@ -146,21 +257,43 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         }
 
         [Fact]
-        public void TransformationToResponse()
+        public void SplitConsolidationFromApi()
         {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
+            var split = new RestApi.CorporateActions.SplitConsolidation()
+            {
+                Id = Guid.NewGuid(),
+                Stock = Guid.NewGuid(),
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Test",
+                OriginalUnits = 1,
+                NewUnits = 2
+            };
 
-            var stock = mockRepository.Create<IReadOnlyStock>();
-            stock.SetupGet(x => x.Id).Returns(Guid.NewGuid());
+            var response = split.FromApi();
+
+            response.Should().BeEquivalentTo(new
+            {
+                Id = split.Id,
+                Date = split.ActionDate,
+                Description = split.Description,
+                OriginalUnits = 1,
+                NewUnits = 2
+            });
+        }
+
+        [Fact]
+        public void TransformationToApi()
+        {
+            var stock = new Stock(Guid.NewGuid());
 
             var stockId = Guid.NewGuid();
             var resultingStocks = new Transformation.ResultingStock[]
             {
                 new Transformation.ResultingStock(stockId, 1, 2, 0.50m, new Date(2010, 01, 01))
             };
-            var transformation = new Transformation(Guid.NewGuid(), stock.Object, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 1.00m,true, resultingStocks);
+            var transformation = new Transformation(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 1.00m,true, resultingStocks);
 
-            var response = transformation.ToResponse();
+            var response = transformation.ToApi();
 
             response.Should().BeEquivalentTo(new
             {
@@ -182,6 +315,51 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                     }
                 }
             }) ;
+        }
+
+        [Fact]
+        public void TransformationFromApi()
+        {
+            var stockId = Guid.NewGuid();
+
+            var transformation = new RestApi.CorporateActions.Transformation()
+            {
+                Id = Guid.NewGuid(),
+                Stock = Guid.NewGuid(),
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Test",
+                ImplementationDate = new Date(2002, 02, 01),
+                CashComponent = 6.50m,
+            };
+            transformation.ResultingStocks.Add(new RestApi.CorporateActions.Transformation.ResultingStock()
+            {
+                Stock = stockId,
+                OriginalUnits = 1,
+                NewUnits = 2,
+                CostBase = 0.50m,
+                AquisitionDate = new Date(2010, 01, 01)
+            });
+
+            var response = transformation.FromApi();
+
+            response.Should().BeEquivalentTo(new
+            {
+                Id = transformation.Id,
+                Date = transformation.ActionDate,
+                Description = transformation.Description,
+                ImplementationDate = transformation.ImplementationDate,
+                CashComponent = transformation.CashComponent,
+                ResultingStocks = new[]
+                {
+                    new {
+                        Stock = stockId,
+                        OriginalUnits = 1,
+                        NewUnits = 2,
+                        CostBasePercentage = 0.50m,
+                        AquisitionDate = new Date(2010, 01, 01)
+                    }
+                }
+            });
         }
 
     }

@@ -26,8 +26,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         public IReadOnlyStock Stock { get; internal set; }
         public Date Date { get; private set; }
         public string Description { get; private set; }
-
-        internal CorporateAction(Guid id, IReadOnlyStock stock, Date actionDate, string description)
+        public CorporateAction(Guid id, IReadOnlyStock stock, Date actionDate, string description)
         {
             Id = id;
             Stock = stock;

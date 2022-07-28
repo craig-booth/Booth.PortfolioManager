@@ -3,6 +3,7 @@
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Web.Utilities;
 
@@ -31,7 +32,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             arg.List(Stock_ARG.AsxCode, Stock_ARG.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
             _StockCache.Add(arg);
 
-            arg.CorporateActions.AddCapitalReturn(ARG_CapitalReturn, new Date(2001, 01, 01), "ARG Capital Return", new Date(2001, 01, 02), 10.00m);
+            arg.CorporateActions.Add(new CapitalReturn(ARG_CapitalReturn, arg, new Date(2001, 01, 01), "ARG Capital Return", new Date(2001, 01, 02), 10.00m));
 
             var argStockPrice = new StockPriceHistory(arg.Id);
             arg.SetPriceHistory(argStockPrice);
@@ -63,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             wam.List(Stock_WAM.AsxCode, Stock_WAM.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
             _StockCache.Add(wam);
 
-            wam.CorporateActions.AddSplitConsolidation(WAM_Split, new Date(2002, 01, 01), "WAM Split", 1, 2);
+            wam.CorporateActions.Add(new SplitConsolidation(WAM_Split, wam, new Date(2002, 01, 01), "WAM Split", 1, 2));
 
             var wamStockPrice = new StockPriceHistory(wam.Id);
             wam.SetPriceHistory(wamStockPrice);

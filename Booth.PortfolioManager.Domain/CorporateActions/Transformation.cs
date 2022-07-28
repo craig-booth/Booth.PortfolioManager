@@ -24,8 +24,8 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             private set { _ResultingStocks = (List<ResultingStock>)value; }
         } 
 
-        internal Transformation(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<ResultingStock> resultingStocks)
-            : base(id, stock, actionDate, description)
+        public Transformation(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<ResultingStock> resultingStocks)
+            : base(id, stock, actionDate, (description != "") ? description : "Transformation")
         {
             ImplementationDate = implementationDate;
             CashComponent = cashComponent;

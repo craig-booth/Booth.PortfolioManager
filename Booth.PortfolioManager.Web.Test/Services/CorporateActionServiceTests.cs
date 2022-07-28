@@ -40,8 +40,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             _StockWithCorporateActions = new Stock(Guid.NewGuid());
             _StockWithCorporateActions.List("XYZ", "XYZ Pty Ltd", new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
 
-            _StockWithCorporateActions.CorporateActions.AddCapitalReturn(_Action1, new Date(2001, 01, 01), "Action 1", new Date(2001, 01, 02), 10.00m);
-            _StockWithCorporateActions.CorporateActions.AddDividend(_Action2, new Date(2001, 01, 01), "Action 2", new Date(2001, 01, 02), 10.00m, 1.00m, 2.45m);
+            _StockWithCorporateActions.CorporateActions.Add(new CapitalReturn(_Action1, _StockWithCorporateActions, new Date(2001, 01, 01), "Action 1", new Date(2001, 01, 02), 10.00m));
+            _StockWithCorporateActions.CorporateActions.Add(new Dividend(_Action2, _StockWithCorporateActions, new Date(2001, 01, 01), "Action 2", new Date(2001, 01, 02), 10.00m, 1.00m, 2.45m));
 
             stockCache.Add(_StockWithCorporateActions);
 

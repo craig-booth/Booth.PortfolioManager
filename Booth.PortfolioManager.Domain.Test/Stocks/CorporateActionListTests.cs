@@ -24,7 +24,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.AddCapitalReturn(id, new Date(2000, 01, 01), "Test Capital Return", new Date(2000, 02, 01), 10.00m);
+            corporateActionList.Add(new CapitalReturn(id, stock, new Date(2000, 01, 01), "Test Capital Return", new Date(2000, 02, 01), 10.00m));
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -50,7 +50,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.AddCapitalReturn(id, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 10.00m);
+            corporateActionList.Add(new CapitalReturn(id, stock, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 10.00m));
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -77,7 +77,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.StartCompositeAction(id, new Date(2000, 01, 01), "Test Composite Action").Finish();
+            corporateActionList.Add(new CompositeAction(id, stock, new Date(2000, 01, 01), "Test Composite Action", new ICorporateAction[] { }));
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -105,7 +105,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.StartCompositeAction(id, new Date(2000, 01, 01), "").Finish();
+            corporateActionList.Add(new CompositeAction(id, stock, new Date(2000, 01, 01), "", new ICorporateAction[] { }));
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -133,10 +133,11 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.StartCompositeAction(id, new Date(2000, 01, 01), "Test CompositeAction")
-                .AddCapitalReturn("Capital Return", new Date(2000, 02, 01), 10.00m)
-                .AddSplitConsolidation("Split", 1, 2)
-                .Finish();
+            corporateActionList.Add(new CompositeAction(id, stock, new Date(2000, 01, 01), "Test CompositeAction", new ICorporateAction[] {
+                new CapitalReturn(id, stock, new Date(2000, 01, 01),"Capital Return", new Date(2000, 02, 01), 10.00m),
+                new SplitConsolidation(id, stock, new Date(2000, 01, 01), "Split",  1, 2)
+            }));
+
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -167,7 +168,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.AddDividend(id, new Date(2000, 01, 01), "Test Dividend", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m);
+            corporateActionList.Add(new Dividend(id, stock, new Date(2000, 01, 01), "Test Dividend", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m));
 
 
             corporateActionList.Should().SatisfyRespectively(
@@ -196,7 +197,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.AddDividend(id, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m);
+            corporateActionList.Add(new Dividend(id, stock, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 1.20m, 1.00m, 2.50m));
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -224,7 +225,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.AddSplitConsolidation(id, new Date(2000, 01, 01), "Test Split", 1, 2);
+            corporateActionList.Add(new SplitConsolidation(id, stock, new Date(2000, 01, 01), "Test Split", 1, 2));
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -250,7 +251,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var corporateActionList = new CorporateActionList(stock);
 
             var id = Guid.NewGuid();
-            corporateActionList.AddSplitConsolidation(id, new Date(2000, 01, 01), "", 1, 2);
+            corporateActionList.Add(new SplitConsolidation(id, stock, new Date(2000, 01, 01), "", 1, 2));
 
            corporateActionList.Should().SatisfyRespectively(
 
@@ -283,7 +284,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var resultStocks = new Transformation.ResultingStock[] {
                 new Transformation.ResultingStock(stock2.Id, 1, 2, 0.40m, new Date(2020, 02, 01))
             };
-            corporateActionList.AddTransformation(id, new Date(2000, 01, 01), "Test Transformation", new Date(2000, 02, 01), 1.20m, false, resultStocks);
+            corporateActionList.Add(new Transformation(id, stock, new Date(2000, 01, 01), "Test Transformation", new Date(2000, 02, 01), 1.20m, false, resultStocks));
 
             corporateActionList.Should().SatisfyRespectively(
 
@@ -317,7 +318,7 @@ namespace Booth.PortfolioManager.Domain.Test.Stocks
             var resultStocks = new Transformation.ResultingStock[] {
                 new Transformation.ResultingStock(stock2.Id, 1, 2, 0.40m, new Date(2020, 02, 01))
             };
-            corporateActionList.AddTransformation(id, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 1.20m, false, resultStocks);
+            corporateActionList.Add(new Transformation(id, stock, new Date(2000, 01, 01), "", new Date(2000, 02, 01), 1.20m, false, resultStocks));
 
             corporateActionList.Should().SatisfyRespectively(
 

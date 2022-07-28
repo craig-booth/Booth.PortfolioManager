@@ -20,8 +20,8 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             private set { _ChildActions = (List<ICorporateAction>)value; }
         }
 
-        internal CompositeAction(Guid id, IReadOnlyStock stock, Date actionDate, string description, IEnumerable<ICorporateAction> childActions)
-            : base(id, stock, actionDate, description)
+        public CompositeAction(Guid id, IReadOnlyStock stock, Date actionDate, string description, IEnumerable<ICorporateAction> childActions)
+            : base(id, stock, actionDate, (description != "") ? description : "Complex corporate action")
         {
             _ChildActions = new List<ICorporateAction>(childActions);
         }
