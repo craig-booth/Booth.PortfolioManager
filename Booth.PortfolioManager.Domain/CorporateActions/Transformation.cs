@@ -17,11 +17,12 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
         public decimal CashComponent { get; private set; }
         public bool RolloverRefliefApplies { get; private set; }
 
-        private List<ResultingStock> _ResultingStocks = new List<ResultingStock>();
-        public IEnumerable<ResultingStock> ResultingStocks
+        private List<ResultingStock> _ResultingStocks;
+        public IEnumerable<ResultingStock> ResultingStocks 
         {
             get { return _ResultingStocks; }
-        }
+            private set { _ResultingStocks = (List<ResultingStock>)value; }
+        } 
 
         internal Transformation(Guid id, IReadOnlyStock stock, Date actionDate, string description, Date implementationDate, decimal cashComponent, bool rolloverReliefApplies, IEnumerable<ResultingStock> resultingStocks)
             : base(id, stock, actionDate, description)
@@ -29,7 +30,7 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
             ImplementationDate = implementationDate;
             CashComponent = cashComponent;
             RolloverRefliefApplies = rolloverReliefApplies;
-            _ResultingStocks.AddRange(resultingStocks);
+            _ResultingStocks = new List<ResultingStock>(resultingStocks);
         }
 
         public class ResultingStock

@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 
-using Booth.EventStore;
+using Booth.PortfolioManager.Domain;
+using Booth.PortfolioManager.Repository;
 
 namespace Booth.PortfolioManager.Web.Utilities
 {
-    interface IEntityCache<T> where T : IEntity
+    public interface IEntityCache<T> where T : IEntity
     {
         T Get(Guid id);
 
@@ -55,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Utilities
     static class EntityCacheExtensions
     {
         public static IEntityCache<T> PopulateCache<T>(this IEntityCache<T> entityCache, IRepository<T> repository)
-            where T : ITrackedEntity
+            where T : IEntity
         {
             entityCache.Clear();
 

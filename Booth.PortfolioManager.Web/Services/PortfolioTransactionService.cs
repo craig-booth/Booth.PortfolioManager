@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Booth.Common;
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.RestApi.Portfolios;
@@ -27,9 +27,9 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioTransactionService : IPortfolioTransactionService
     {
         private readonly IPortfolio _Portfolio;
-        private readonly IRepository<Portfolio> _Repository;
+        private readonly IPortfolioRepository _Repository;
 
-        public PortfolioTransactionService(IPortfolio portfolio, IRepository<Portfolio> repository)
+        public PortfolioTransactionService(IPortfolio portfolio, IPortfolioRepository repository)
         {
             _Portfolio = portfolio;
             _Repository = repository;
@@ -109,7 +109,7 @@ namespace Booth.PortfolioManager.Web.Services
             else
                 result = ServiceResult.Error("Unkown Transaction type");
 
-            _Repository.Update((Portfolio)_Portfolio);
+            _Repository.AddTransaction((Portfolio)_Portfolio, transaction.Id);
 
             return ServiceResult.Ok();
         }

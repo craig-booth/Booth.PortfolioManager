@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Users;
 
 namespace Booth.PortfolioManager.Web.Services
@@ -15,16 +15,16 @@ namespace Booth.PortfolioManager.Web.Services
 
     class UserService : IUserService
     {
-        private readonly IRepository<User> _UserRepository;
+        private readonly IUserRepository _UserRepository;
 
-        public UserService(IRepository<User> userRepository)
+        public UserService(IUserRepository userRepository)
         {
             _UserRepository = userRepository;
         }
 
         public ServiceResult<User> Authenticate(string userName, string password)
         {
-            var user = _UserRepository.FindFirst("UserName", userName);
+            var user = _UserRepository.GetUserByUserName(userName);
             if (user == null)
                 return ServiceResult<User>.Error("User not found");
 

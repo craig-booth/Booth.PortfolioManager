@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Booth.Common;
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web.Utilities;
 
@@ -26,12 +26,12 @@ namespace Booth.PortfolioManager.Web.Services
         private IStockQuery _StockQuery;
 
         private IEntityCache<Stock> _StockCache;
-        private IRepository<Stock> _StockRepository;
+        private IStockRepository _StockRepository;
 
         private IEntityCache<StockPriceHistory> _StockPriceHistoryCache;
-        private IRepository<StockPriceHistory> _StockPriceHistoryRepository;
+        private IStockPriceRepository _StockPriceHistoryRepository;
   
-        public StockService(IStockQuery stockQuery, IEntityCache<Stock> stockCache, IRepository<Stock> stockRepository, IEntityCache<StockPriceHistory> stockPriceHistoryCache, IRepository<StockPriceHistory> stockPriceHistoryRepository)
+        public StockService(IStockQuery stockQuery, IEntityCache<Stock> stockCache, IStockRepository stockRepository, IEntityCache<StockPriceHistory> stockPriceHistoryCache, IStockPriceRepository stockPriceHistoryRepository)
         {
             _StockQuery = stockQuery;
             _StockCache = stockCache;
@@ -115,7 +115,7 @@ namespace Booth.PortfolioManager.Web.Services
             }
 
             stock.ChangeProperties(changeDate, newAsxCode, newName, newAssetCategory);
-            _StockRepository.Update(stock); 
+            _StockRepository.UpdateProperties(stock, changeDate); 
 
             return ServiceResult.Ok();
         }
@@ -168,6 +168,8 @@ namespace Booth.PortfolioManager.Web.Services
             if (stock.EffectivePeriod.FromDate == Date.MinValue)
                 return ServiceResult.Error("Stock is not listed");
 
+            var firstDate = Date.MaxValue;
+            var lastDate = Date.MinValue;
             foreach (var closingPrice in closingPrices)
             {
                 if (closingPrice.Price < 0.00m)
@@ -175,13 +177,19 @@ namespace Booth.PortfolioManager.Web.Services
 
                 if (closingPrice.Date > stock.EffectivePeriod.ToDate)
                     return ServiceResult.Error("Stock is no listed on {0}", closingPrice.Date.ToShortDateString());
+
+                if (closingPrice.Date < firstDate)
+                    firstDate = closingPrice.Date;
+
+                if (closingPrice.Date > lastDate)
+                    lastDate = closingPrice.Date;
             }
 
 
             var stockPriceHistory = _StockPriceHistoryCache.Get(id);
             stockPriceHistory.UpdateClosingPrices(closingPrices);
 
-            _StockPriceHistoryRepository.Update(stockPriceHistory); 
+            _StockPriceHistoryRepository.UpdatePrices(stockPriceHistory, new DateRange(firstDate, lastDate)); 
 
             return ServiceResult.Ok();
         }
@@ -199,7 +207,7 @@ namespace Booth.PortfolioManager.Web.Services
                 return ServiceResult.Error("Company tax rate must be between 0 and 1");
 
             stock.ChangeDividendRules(changeDate, companyTaxRate, newDividendRoundingRule, drpActive, newDrpMethod);
-            _StockRepository.Update(stock); 
+            _StockRepository.UpdateDividendRules(stock, changeDate); 
 
             return ServiceResult.Ok();
         }

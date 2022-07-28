@@ -91,13 +91,15 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
+            var parcelId = Guid.NewGuid();
             var parcel = mockRepository.Create<IParcel>();
+            parcel.Setup(x => x.Id).Returns(parcelId);
             parcel.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
-            parcel.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
             holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel.Object });
+            holding.Setup(x => x.ReduceParcelCostBase(parcelId, new Date(2020, 01, 01), 100.00m, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 100.00m, "Return of capital for ABC")).Verifiable(); 
@@ -127,19 +129,27 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
+            var parcel1Id = Guid.NewGuid();
             var parcel1 = mockRepository.Create<IParcel>();
+            parcel1.Setup(x => x.Id).Returns(parcel1Id);
             parcel1.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(100, 1000.00m, 1000.00m));
-            parcel1.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 200.00m, transaction)).Verifiable();
+
+            var parcel2Id = Guid.NewGuid();
             var parcel2 = mockRepository.Create<IParcel>();
+            parcel2.Setup(x => x.Id).Returns(parcel2Id);
             parcel2.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 500.00m, 500.00m));
-            parcel2.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
+            
+            var parcel3Id = Guid.NewGuid();
             var parcel3 = mockRepository.Create<IParcel>();
+            parcel3.Setup(x => x.Id).Returns(parcel3Id);
             parcel3.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(200, 1000.00m, 1000.00m));
-            parcel3.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 400.00m, transaction)).Verifiable();
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
             holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel1.Object, parcel2.Object, parcel3.Object });
+            holding.Setup(x => x.ReduceParcelCostBase(parcel1Id, new Date(2020, 01, 01), 200.00m, transaction)).Verifiable();
+            holding.Setup(x => x.ReduceParcelCostBase(parcel2Id, new Date(2020, 01, 01), 100.00m, transaction)).Verifiable();
+            holding.Setup(x => x.ReduceParcelCostBase(parcel3Id, new Date(2020, 01, 01), 400.00m, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
             cashAccount.Setup(x => x.Transfer(new Date(2020, 02, 01), 700.00m, "Return of capital for ABC")).Verifiable();
@@ -170,13 +180,15 @@ namespace Booth.PortfolioManager.Domain.Test.Transactions
 
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
+            var parcelId = Guid.NewGuid();
             var parcel = mockRepository.Create<IParcel>();
+            parcel.Setup(x => x.Id).Returns(parcelId);
             parcel.Setup(x => x.Properties[new Date(2020, 01, 01)]).Returns(new ParcelProperties(50, 1000.00m, 1500.00m));
-            parcel.Setup(x => x.Change(new Date(2020, 01, 01), 0, 0.00m, 100.00m, transaction)).Verifiable();
 
             var holding = mockRepository.Create<IHolding>();
             holding.Setup(x => x.IsEffectiveAt(new Date(2020, 01, 01))).Returns(true);
             holding.Setup(x => x.Parcels(new Date(2020, 01, 01))).Returns(new IParcel[] { parcel.Object });
+            holding.Setup(x => x.ReduceParcelCostBase(parcelId, new Date(2020, 01, 01), 100.00m, transaction)).Verifiable();
 
             var cashAccount = mockRepository.Create<ICashAccount>();
   

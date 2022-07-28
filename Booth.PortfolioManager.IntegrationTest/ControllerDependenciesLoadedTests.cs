@@ -1,18 +1,16 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
+using Xunit.Abstractions;
 using FluentAssertions;
 
 using Booth.Common;
-using System.Linq;
-using FluentAssertions.Common;
-using FluentAssertions.Execution;
-using Xunit.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
+using Booth.PortfolioManager.IntegrationTest.TestFixture;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {

@@ -10,8 +10,7 @@ using FluentAssertions.AspNetCore.Mvc;
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
 using Booth.PortfolioManager.Web.Services;
-using Booth.PortfolioManager.RestApi.Portfolios;
-using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Domain.TradingCalendars;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {
@@ -26,7 +25,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new RestApi.TradingCalendars.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
-            service.Setup(x => x.Get(2010)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(response)).Verifiable();
+            service.Setup(x => x.Get(TradingCalendarIds.ASX, 2010)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(response)).Verifiable();
 
             var controller = new TradingCalendarController(service.Object);
             var result = controller.Get(2010);
@@ -44,7 +43,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var tradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
-            service.Setup(x => x.Update(tradingCalendar)).Returns(ServiceResult.Error("Error message")).Verifiable();
+            service.Setup(x => x.Update(TradingCalendarIds.ASX, tradingCalendar)).Returns(ServiceResult.Error("Error message")).Verifiable();
 
             var controller = new TradingCalendarController(service.Object);
             var result = controller.Update(2010, tradingCalendar);
@@ -62,7 +61,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var tradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
-            service.Setup(x => x.Update(tradingCalendar)).Returns(ServiceResult.Ok()).Verifiable();
+            service.Setup(x => x.Update(TradingCalendarIds.ASX, tradingCalendar)).Returns(ServiceResult.Ok()).Verifiable();
 
             var controller = new TradingCalendarController(service.Object);
             var result = controller.Update(2010, tradingCalendar);

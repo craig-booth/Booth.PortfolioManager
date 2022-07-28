@@ -8,7 +8,7 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Domain.Utils
 {
-    class MinimizeGainCgtComparer : Comparer<IReadOnlyParcel>
+    class MinimizeGainCgtComparer : Comparer<IParcel>
     {
         private Date _DisposalDate;
         public MinimizeGainCgtComparer(Date disposalDate)
@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.Domain.Utils
             _DisposalDate = disposalDate;
         }
 
-        public override int Compare(IReadOnlyParcel a, IReadOnlyParcel b)
+        public override int Compare(IParcel a, IParcel b)
         {
             var discountAppliesA = (CgtUtils.CgtMethodForParcel(a.AquisitionDate, _DisposalDate) == CgtMethod.Discount);
             var discountAppliesB = (CgtUtils.CgtMethodForParcel(b.AquisitionDate, _DisposalDate) == CgtMethod.Discount);

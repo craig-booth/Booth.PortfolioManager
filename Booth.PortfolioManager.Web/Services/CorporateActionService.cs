@@ -4,8 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Booth.Common;
-using Booth.EventStore;
-using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.RestApi.CorporateActions;
 using Booth.PortfolioManager.Web.Mappers;
@@ -23,9 +22,9 @@ namespace Booth.PortfolioManager.Web.Services
     public class CorporateActionService : ICorporateActionService
     {
         private readonly IStockQuery _StockQuery;
-        private readonly IRepository<Stock> _Repository;
+        private readonly IStockRepository _Repository;
 
-        public CorporateActionService(IStockQuery stockQuery, IRepository<Stock> repository)
+        public CorporateActionService(IStockQuery stockQuery, IStockRepository repository)
         {
             _StockQuery = stockQuery;
             _Repository = repository;
@@ -88,7 +87,7 @@ namespace Booth.PortfolioManager.Web.Services
             else
                 result = ServiceResult.Error("Unkown Corporate Action type");
 
-            _Repository.Update(stock);
+            _Repository.AddCorporateAction(stock, corporateAction.Id);
 
             return ServiceResult.Ok();
         }

@@ -10,8 +10,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
 {
     static class PortfolioTestCreator
     {
-        public static ITradingCalendar TradingCalendar = new TradingCalendar(Guid.NewGuid());
-
+        public static EntityCache<TradingCalendar> TradingCalendarCache = new EntityCache<TradingCalendar>();
+       
         private static EntityCache<Stock> _StockCache = new EntityCache<Stock>();
         public static IStockResolver StockResolver = new StockResolver(_StockCache);
 
@@ -24,6 +24,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
         public static Portfolio CreateEmptyPortfolio()
         {
+             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
+            TradingCalendarCache.Add(tradingCalendar);
+
             var arg = new Stock(Stock_ARG.Id);
             arg.List(Stock_ARG.AsxCode, Stock_ARG.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
             _StockCache.Add(arg);
@@ -93,9 +96,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
             portfolio.Create("Test", Guid.NewGuid());
 
-            // Remove Events
-            portfolio.FetchEvents();
-
             return portfolio;
         }
 
@@ -119,10 +119,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             portfolio.MakeCashTransaction(new Date(2008, 01, 01), Domain.Transactions.BankAccountTransactionType.Withdrawl, 5000m, "", Guid.NewGuid());
             portfolio.MakeCashTransaction(new Date(2009, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 500m, "", Guid.NewGuid());
-
-
-            // Remove Events
-            portfolio.FetchEvents();
 
             return portfolio;
         }

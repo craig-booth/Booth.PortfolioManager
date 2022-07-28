@@ -12,21 +12,18 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-using Booth.EventStore;
-using Booth.EventStore.MongoDB;
-using Booth.PortfolioManager.RestApi.Serialization;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.TradingCalendars;
+using Booth.PortfolioManager.RestApi.Serialization;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.DataImporters;
-using Booth.Common;
-using System.Reflection;
-using System.Drawing;
+
 
 namespace Booth.PortfolioManager.Web
 {
@@ -55,26 +52,25 @@ namespace Booth.PortfolioManager.Web
             else
                 services.AddJwtAuthetication(jwtTokenConfigProvider);
 
-            // Generic classes
-            services.AddSingleton(typeof(IRepository<>), typeof(Repository<>));
+            // Caches classes
             services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
 
-            // Event Store
-            services.AddSingleton<IEventStore>(_ => new MongodbEventStore(settings.EventStore, settings.Database));
-            services.AddSingleton<IEventStream<User>>(x => x.GetRequiredService<IEventStore>().GetEventStream<User>("Users"));
-            services.AddSingleton<IEventStream<Stock>>(x => x.GetRequiredService<IEventStore>().GetEventStream<Stock>("Stocks"));
-            services.AddSingleton<IEventStream<StockPriceHistory>>(x => x.GetRequiredService<IEventStore>().GetEventStream<StockPriceHistory>("StockPriceHistory"));
-            services.AddSingleton<IEventStream<TradingCalendar>>(x => x.GetRequiredService<IEventStore>().GetEventStream<TradingCalendar>("TradingCalendar"));
-            services.AddSingleton<IEventStream<Portfolio>>(x => x.GetRequiredService<IEventStore>().GetEventStream<Portfolio>("Portfolios"));
+            // Database
+            services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(settings.ConnectionString, settings.Database));
 
-            // Entity Factories
-            services.AddSingleton<ITrackedEntityFactory<Stock>, StockEntityFactory>();
-            services.AddSingleton<ITrackedEntityFactory<Portfolio>, PortfolioEntityFactory>();
+
+            // Repositories
+            services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+            services.AddScoped<IStockRepository, StockRepository>();
+            services.AddScoped<IStockPriceRepository, StockPriceRepository>();
+            services.AddScoped<ITradingCalendarRepository, TradingCalendarRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+
 
             // Services
-            services.AddSingleton<IUserService, UserService>();
-            services.AddSingleton<IStockService, StockService>();
-            services.AddSingleton<ITradingCalendarService>(x => new TradingCalendarService(x.GetRequiredService<IRepository<TradingCalendar>>(), TradingCalendarIds.ASX));
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IStockService, StockService>();
+            services.AddScoped<ITradingCalendarService, TradingCalendarService>();
             services.AddScoped<ICashAccountService, CashAccountService>();
             services.AddScoped<IPortfolioCapitalGainsService, PortfolioCapitalGainsService>();
             services.AddScoped<IPortfolioCgtLiabilityService, PortfolioCgtLiabilityService>();
@@ -94,11 +90,9 @@ namespace Booth.PortfolioManager.Web
             services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().ReadOnlyPortfolio);
             services.AddScoped<IPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().Portfolio);
             services.AddScoped<IPortfolioAccessor, PortfolioAccessor>();
-            services.AddSingleton<IPortfolioFactory, PortfolioFactory>();
-            services.AddSingleton<IPortfolioCache, PortfolioCache>();
-            services.AddSingleton<IStockResolver, StockResolver>();
-            services.AddSingleton<IStockQuery, StockQuery>();
-            services.AddSingleton<ITradingCalendar>(x => x.GetRequiredService<ITradingCalendarService>().TradingCalendar);
+            services.AddScoped<IPortfolioFactory, PortfolioFactory>();
+            services.AddScoped<IStockResolver, StockResolver>();
+            services.AddScoped<IStockQuery, StockQuery>();
 
             return services;
         }
@@ -107,7 +101,15 @@ namespace Booth.PortfolioManager.Web
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                scope.ServiceProvider.InitializeStockCache();
+                var database = scope.ServiceProvider.GetRequiredService<IPortfolioManagerDatabase>();
+
+                var portfolioFactory = scope.ServiceProvider.GetRequiredService<IPortfolioFactory>();
+                var stockResolver = scope.ServiceProvider.GetRequiredService<IStockResolver>();
+                database.Configure(portfolioFactory, stockResolver);
+
+
+                InitializeCalendarCache(scope.ServiceProvider);
+                InitializeStockCache(scope.ServiceProvider);
             }
 
             return app;
@@ -118,22 +120,37 @@ namespace Booth.PortfolioManager.Web
             services.AddHttpClient<ILiveStockPriceService, AsxDataService>();
             services.AddHttpClient<ITradingDayService, AsxDataService>();
 
-            services.AddSingleton<HistoricalPriceImporter>();
-            services.AddSingleton<LivePriceImporter>();
-            services.AddSingleton<TradingDayImporter>();
+            services.AddScoped<HistoricalPriceImporter>();
+            services.AddScoped<LivePriceImporter>();
+            services.AddScoped<TradingDayImporter>();
 
             services.AddHostedService<DataImportBackgroundService>();
 
             return services;
         }
 
-        public static IServiceProvider InitializeStockCache(this IServiceProvider serviceProvider)
+        private static void InitializeCalendarCache(IServiceProvider serviceProvider)
         {
-            var stockRepository = serviceProvider.GetRequiredService<IRepository<Stock>>();
+            var repository = serviceProvider.GetRequiredService<ITradingCalendarRepository>();
+            var cache = serviceProvider.GetRequiredService<IEntityCache<TradingCalendar>>();
+
+            var calendar = repository.Get(TradingCalendarIds.ASX);
+            cache.Add(calendar);  
+
+            foreach (var year in calendar.Years)
+            {
+                repository.UpdateYear(calendar, year);
+            }
+
+        }
+
+        private static void InitializeStockCache(IServiceProvider serviceProvider)
+        {
+            var stockRepository = serviceProvider.GetRequiredService<IStockRepository>();
             var stockCache = serviceProvider.GetRequiredService<IEntityCache<Stock>>();
             stockCache.PopulateCache(stockRepository);
 
-            var stockPriceRepository = serviceProvider.GetRequiredService<IRepository<StockPriceHistory>>();
+            var stockPriceRepository = serviceProvider.GetRequiredService<IStockPriceRepository>();
             var stockPriceHistoryCache = serviceProvider.GetRequiredService<IEntityCache<StockPriceHistory>>();
             stockPriceHistoryCache.PopulateCache(stockPriceRepository);
 
@@ -144,9 +161,8 @@ namespace Booth.PortfolioManager.Web
                 if (stockPriceHistory != null)
                     stock.SetPriceHistory(stockPriceHistory);
             }
-
-            return serviceProvider;
         }
+
         private static void AddJwtAuthetication(this IServiceCollection services, IJwtTokenConfigurationProvider jwtTokenConfigProvider)
         {
              services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

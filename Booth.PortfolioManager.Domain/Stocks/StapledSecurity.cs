@@ -4,13 +4,11 @@ using System.Linq;
 using Microsoft.CSharp;
 
 using Booth.Common;
-using Booth.EventStore;
 
-using Booth.PortfolioManager.Domain.Stocks.Events;
 
 namespace Booth.PortfolioManager.Domain.Stocks
 {
-    class StapledSecurity : Stock
+    public class StapledSecurity : Stock
     {
         private StapledSecurityChild[] _ChildSecurities;
         public IReadOnlyList<StapledSecurityChild> ChildSecurities
@@ -35,43 +33,28 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public void List(string asxCode, string name, Date date, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
         {
-            var children = childSecurities.Select(x => new StapledSecurityListedEvent.StapledSecurityChild(x.AsxCode, x.Name, x.Trust)).ToArray();
-            
-            var @event = new StapledSecurityListedEvent(Id, Version, asxCode, name, date, category, children);
-            Apply(@event);
+            base.List(asxCode, name, date, false, category);
 
-            PublishEvent(@event);
-        }
+            var children = childSecurities.ToList();
 
-        public void Apply(StapledSecurityListedEvent @event)
-        {
-            Version++;
+            _ChildSecurities = new StapledSecurityChild[children.Count];
+            for (var i = 0; i < children.Count; i++)
+                _ChildSecurities[i] = new StapledSecurityChild(children[i].AsxCode, children[i].Name, children[i].Trust);
 
-            Start(@event.ListingDate);
 
-            var properties = new StockProperties(@event.AsxCode, @event.Name, @event.Category);
-            _Properties.Change(@event.ListingDate, properties);
-
-            _ChildSecurities = new StapledSecurityChild[@event.ChildSecurities.Length];
-            for (var i = 0; i < @event.ChildSecurities.Length; i++)
-                _ChildSecurities[i] = new StapledSecurityChild(@event.ChildSecurities[i].AsxCode, @event.ChildSecurities[i].Name, @event.ChildSecurities[i].Trust);
-            
-            var dividendRules = new DividendRules(0.30m, RoundingRule.Round, false, DrpMethod.Round);
-            _DividendRules.Change(@event.ListingDate, dividendRules);
-
-            var percentages = new ApportionedCurrencyValue[_ChildSecurities.Length];
-            for (var i = 0; i < @event.ChildSecurities.Length; i++)
+            var percentages = new ApportionedCurrencyValue[children.Count];
+            for (var i = 0; i < children.Count; i++)
                 percentages[i].Units = 1;
             MathUtils.ApportionAmount(1.00m, percentages);
-
-            _RelativeNTAs.Change(@event.ListingDate, new RelativeNTA(percentages.Select(x => x.Amount).ToArray()));
+            _RelativeNTAs.Change(date, new RelativeNTA(percentages.Select(x => x.Amount).ToArray()));
         }
 
-        public override void Apply(StockDelistedEvent @event)
-        {
-            base.Apply(@event);
 
-            _RelativeNTAs.End(@event.DelistedDate);
+        public override void DeList(Date date)
+        {
+            _RelativeNTAs.End(date);
+
+            base.DeList(date);
         }
 
         public void SetRelativeNTAs(Date date, IEnumerable<decimal> percentages)
@@ -88,26 +71,8 @@ namespace Booth.PortfolioManager.Domain.Stocks
             if (total != 1.00m)
                 throw new ArgumentException(String.Format("Total percentage must add up to 1.00 but was {0}", total));
 
-            var @event = new RelativeNTAChangedEvent(Id, Version, date, percentagesArray);
-            Apply(@event);
 
-            PublishEvent(@event);
-        }
-
-        public void Apply(RelativeNTAChangedEvent @event)
-        {
-            Version++;
-
-            _RelativeNTAs.Change(@event.Date, new RelativeNTA(@event.Percentages));
-        }
-
-        public override void ApplyEvents(IEnumerable<Event> events)
-        {
-            foreach (var @event in events)
-            {
-                dynamic dynamicEvent = @event;
-                Apply(dynamicEvent);
-            }
+            _RelativeNTAs.Change(date, new RelativeNTA(percentagesArray));
         }
 
     }
@@ -126,9 +91,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
         }
     }
 
-    struct RelativeNTA
+    public struct RelativeNTA
     {
-        public readonly decimal[] Percentages;
+        public decimal[] Percentages { get; private set; }
 
         public RelativeNTA(decimal[] percentages)
         {

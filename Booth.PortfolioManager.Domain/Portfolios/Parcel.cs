@@ -8,19 +8,14 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public interface IReadOnlyParcel : IEffectiveEntity
+    public interface IParcel : IEffectiveEntity
     {
         Date AquisitionDate { get; }
         IEffectiveProperties<ParcelProperties> Properties { get; }
         IEnumerable<ParcelAudit> Audit { get; }
     }
 
-    public interface IParcel : IReadOnlyParcel
-    {          
-        void Change(Date date, int unitChange, decimal amountChange, decimal costBaseChange, IPortfolioTransaction transaction);
-    }
-
-    class Parcel : EffectiveEntity, IParcel, IReadOnlyParcel
+    class Parcel : EffectiveEntity, IParcel
     {
         public Date AquisitionDate { get; private set; }
 

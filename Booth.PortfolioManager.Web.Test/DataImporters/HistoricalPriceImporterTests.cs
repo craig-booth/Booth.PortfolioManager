@@ -34,23 +34,23 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             stock.List("ABC", "ABC Pty Ltd", new Date(2010, 01, 01), false, AssetCategory.InternationalStocks);
             stock.SetPriceHistory(priceHistory.Object);
 
-            var cancellationToken = new CancellationToken();
-            var prices = new DataServices.StockPrice[] { };
-            var dataService = mockRepository.Create<IHistoricalStockPriceService>();
-            dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), Date.Today.AddDays(-1)),  cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
-
             var stockQuery = mockRepository.Create<IStockQuery>();
             stockQuery.Setup(x => x.All()).Returns(new[] { stock });
 
             var stockService = mockRepository.Create<IStockService>();
 
-            var tradingCalendar = mockRepository.Create<ITradingCalendar>();
-            tradingCalendar.Setup(x => x.IsTradingDay(It.IsAny<Date>())).Returns(true);
-            tradingCalendar.Setup(x => x.PreviousTradingDay(Date.Today.AddDays(-1))).Returns(Date.Today.AddDays(-1));
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(tradingCalendar);
+
+            var cancellationToken = new CancellationToken();
+            var prices = new DataServices.StockPrice[] { };
+            var dataService = mockRepository.Create<IHistoricalStockPriceService>();
+            dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1))), cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
 
             var logger = mockRepository.Create<ILogger<HistoricalPriceImporter>>(MockBehavior.Loose);
 
-            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendar.Object, dataService.Object, logger.Object);
+            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarCache.Object, dataService.Object, logger.Object);
 
             await importer.Import(cancellationToken);
 
@@ -69,11 +69,6 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             stock.List("ABC", "ABC Pty Ltd", new Date(2010, 01, 01), false, AssetCategory.InternationalStocks);
             stock.SetPriceHistory(priceHistory.Object);
 
-            var cancellationToken = new CancellationToken();
-            var prices = new DataServices.StockPrice[] { new DataServices.StockPrice("ABC", Date.Today.AddDays(-1), 0.10m) };
-            var dataService = mockRepository.Create<IHistoricalStockPriceService>();
-            dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), Date.Today.AddDays(-1)), cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
-
             var stockQuery = mockRepository.Create<IStockQuery>();
             stockQuery.Setup(x => x.All()).Returns(new[] { stock });
 
@@ -81,13 +76,20 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             IEnumerable<Domain.Stocks.StockPrice> savedPrices = null;
             stockService.Setup(x => x.UpdateClosingPrices(stock.Id, It.IsAny<IEnumerable<Domain.Stocks.StockPrice>>())).Returns(ServiceResult.Ok()).Callback<Guid,IEnumerable<Domain.Stocks.StockPrice>>((a, b) => savedPrices = b).Verifiable();
 
-            var tradingCalendar = mockRepository.Create<ITradingCalendar>();
-            tradingCalendar.Setup(x => x.IsTradingDay(It.IsAny<Date>())).Returns(true);
-            tradingCalendar.Setup(x => x.PreviousTradingDay(Date.Today.AddDays(-1))).Returns(Date.Today.AddDays(-1));
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(tradingCalendar);
 
             var logger = mockRepository.Create<ILogger<HistoricalPriceImporter>>(MockBehavior.Loose);
 
-            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendar.Object, dataService.Object, logger.Object);
+            var cancellationToken = new CancellationToken();
+            var prices = new DataServices.StockPrice[] { new DataServices.StockPrice("ABC", Date.Today.AddDays(-1), 0.10m) };
+            var dataService = mockRepository.Create<IHistoricalStockPriceService>();
+            dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1))), cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
+
+
+
+            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarCache.Object, dataService.Object, logger.Object);
 
             await importer.Import(cancellationToken);
 
@@ -112,11 +114,6 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             stock.List("ABC", "ABC Pty Ltd", new Date(2010, 01, 01), false, AssetCategory.InternationalStocks);
             stock.SetPriceHistory(priceHistory.Object);
 
-            var cancellationToken = new CancellationToken();
-            var prices = new DataServices.StockPrice[] { };
-            var dataService = mockRepository.Create<IHistoricalStockPriceService>();
-            dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), Date.Today.AddDays(-1)), cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
-
             var stockQuery = mockRepository.Create<IStockQuery>();
             stockQuery.Setup(x => x.All()).Returns(new[] { stock });
 
@@ -124,11 +121,16 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             var prices2 = new Domain.Stocks.StockPrice[] { new Domain.Stocks.StockPrice(Date.Today.AddDays(-1), 0.10m) };
             stockService.Setup(x => x.UpdateClosingPrices(stock.Id, prices2.AsEnumerable()));
 
-            var tradingCalendar = mockRepository.Create<ITradingCalendar>();
-            tradingCalendar.Setup(x => x.IsTradingDay(It.IsAny<Date>())).Returns(true);
-            tradingCalendar.Setup(x => x.PreviousTradingDay(Date.Today.AddDays(-1))).Returns(Date.Today.AddDays(-1));
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
+            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
+            tradingCalendarCache.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(tradingCalendar);
 
-            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendar.Object, dataService.Object, null);
+            var cancellationToken = new CancellationToken();
+            var prices = new DataServices.StockPrice[] { };
+            var dataService = mockRepository.Create<IHistoricalStockPriceService>();
+            dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1))), cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
+
+            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarCache.Object, dataService.Object, null);
 
             await importer.Import(cancellationToken);
 

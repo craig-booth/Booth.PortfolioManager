@@ -24,7 +24,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var controllers = TypeUtils.GetSubclassesOf(typeof(ControllerBase), true)
                 .Where(x => x.Assembly.GetName().Name.StartsWith("Booth.PortfolioManager.Web"))
-                .Where(x => !x.IsDecoratedWith<AuthorizeAttribute>());
+                .Where(x => !x.IsDefined(typeof(AuthorizeAttribute)));
 
             using (new AssertionScope())
             {

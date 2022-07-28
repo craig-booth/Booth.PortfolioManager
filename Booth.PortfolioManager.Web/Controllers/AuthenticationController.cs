@@ -29,7 +29,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             _JwtTokenConfigurationProvider = jwtTokenConfigurationProvider;
         }
 
-        // POST : /api/authenticate       
+        // POST : /authenticate       
         [AllowAnonymous]
         [Route("authenticate")]
         [HttpPost]
@@ -45,7 +45,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             var claims = new List<Claim>();
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
             claims.Add(new Claim(ClaimTypes.Name, user.UserName));
-            if (user.Administator)
+            if (user.Administrator)
                 claims.Add(new Claim(ClaimTypes.Role, Role.Administrator));
 
             // Authentication successful so generate jwt token

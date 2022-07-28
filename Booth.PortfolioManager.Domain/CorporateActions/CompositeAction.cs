@@ -13,12 +13,17 @@ namespace Booth.PortfolioManager.Domain.CorporateActions
     public class CompositeAction : CorporateAction
     {
 
-        public IEnumerable<ICorporateAction> ChildActions;
+        private List<ICorporateAction> _ChildActions;
+        public IEnumerable<ICorporateAction> ChildActions
+        {
+            get { return _ChildActions; }
+            private set { _ChildActions = (List<ICorporateAction>)value; }
+        }
 
         internal CompositeAction(Guid id, IReadOnlyStock stock, Date actionDate, string description, IEnumerable<ICorporateAction> childActions)
             : base(id, stock, actionDate, description)
         {
-            ChildActions = childActions;
+            _ChildActions = new List<ICorporateAction>(childActions);
         }
 
         public override IEnumerable<IPortfolioTransaction> GetTransactionList(IReadOnlyHolding holding, IStockResolver stockResolver)

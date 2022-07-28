@@ -9,6 +9,7 @@ using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Stocks;
+using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Services
 {
@@ -22,12 +23,12 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioValueService : IPortfolioValueService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
-        private readonly ITradingCalendar _TradingCalendar;
+        private readonly IEntityCache<TradingCalendar> _TradingCalendarCache;
 
-        public PortfolioValueService(IReadOnlyPortfolio portfolio, ITradingCalendar tradingCalaedar)
+        public PortfolioValueService(IReadOnlyPortfolio portfolio, IEntityCache<TradingCalendar> tradingCalendarCache)
         {
             _Portfolio = portfolio;
-            _TradingCalendar = tradingCalaedar;
+            _TradingCalendarCache = tradingCalendarCache;
         }
  
         public ServiceResult<PortfolioValueResponse> GetValue(DateRange dateRange, ValueFrequency frequency)
@@ -99,12 +100,14 @@ namespace Booth.PortfolioManager.Web.Services
 
         private IEnumerable<Date> GetDates(DateRange dateRange, ValueFrequency frequency)
         {
-            var firstRequestedDate = _TradingCalendar.NextTradingDay(dateRange.FromDate);
-            var lastRequestedDate = _TradingCalendar.PreviousTradingDay(dateRange.ToDate);
+            var tradingCalendar = _TradingCalendarCache.Get(TradingCalendarIds.ASX);
+
+            var firstRequestedDate = tradingCalendar.NextTradingDay(dateRange.FromDate);
+            var lastRequestedDate = tradingCalendar.PreviousTradingDay(dateRange.ToDate);
 
             IEnumerable<Date> dates;
             if (frequency == ValueFrequency.Day)
-                dates= _TradingCalendar.TradingDays(dateRange);
+                dates= tradingCalendar.TradingDays(dateRange);
             else if (frequency == ValueFrequency.Week)
                 dates = DateUtils.WeekEndingDays(dateRange);
             else if (frequency == ValueFrequency.Month)

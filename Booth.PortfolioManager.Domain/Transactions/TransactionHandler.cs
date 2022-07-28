@@ -8,6 +8,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     public interface ITransactionHandler
     {
+        bool CanCreateHolding { get; }
         void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount);
     }
 

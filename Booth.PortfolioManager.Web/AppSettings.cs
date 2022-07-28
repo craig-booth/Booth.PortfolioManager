@@ -10,7 +10,7 @@ namespace Booth.PortfolioManager.Web
 {
     class AppSettings
     {
-        public string EventStore { get; set; }
+        public string ConnectionString { get; set; }
         public string Database { get; set; }
         public bool AllowDebugUserAcccess { get; set; }
 

@@ -10,6 +10,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
 {
     class CostBaseAdjustmentHandler : ITransactionHandler
     {
+        public bool CanCreateHolding => false;
+
         public void Apply(IPortfolioTransaction transaction, IHolding holding, ICashAccount cashAccount)
         {
             var costBaseAdjustment = transaction as CostBaseAdjustment;
@@ -23,7 +25,7 @@ namespace Booth.PortfolioManager.Domain.Transactions
             foreach (var parcel in holding.Parcels(costBaseAdjustment.Date))
             {
                 var costBaseReduction = (parcel.Properties[costBaseAdjustment.Date].CostBase * (1 - costBaseAdjustment.Percentage)).ToCurrency(RoundingRule.Round);
-                parcel.Change(costBaseAdjustment.Date, 0, 0.00m, -costBaseReduction, transaction);
+                holding.ReduceParcelCostBase(parcel.Id, costBaseAdjustment.Date, costBaseReduction, transaction);
             }
         }
     }

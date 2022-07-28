@@ -21,9 +21,9 @@ namespace Booth.PortfolioManager.Web.Test
 
     class ServiceResultAssertions : ReferenceTypeAssertions<ServiceResult, ServiceResultAssertions>
     {
-        public ServiceResultAssertions(ServiceResult result)
+        public ServiceResultAssertions(ServiceResult result) 
+             : base(result)
         {
-            Subject = result;
         }
 
         protected override string Identifier => "service status";
@@ -65,8 +65,9 @@ namespace Booth.PortfolioManager.Web.Test
     class ServiceErrorAssertions : ReferenceTypeAssertions<ServiceResult, ServiceErrorAssertions>
     {
         public ServiceErrorAssertions(ServiceResult result)
+             : base(result)
         {
-            Subject = result;
+
         }
 
         protected override string Identifier => "service errors";

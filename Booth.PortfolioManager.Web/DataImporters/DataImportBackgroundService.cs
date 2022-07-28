@@ -5,10 +5,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 using Booth.Scheduler;
 using Booth.Scheduler.Fluent;
 using Booth.Common;
+
 
 namespace Booth.PortfolioManager.Web.DataImporters
 {
@@ -17,15 +19,12 @@ namespace Booth.PortfolioManager.Web.DataImporters
         private CancellationToken _CancellationToken;
         private Scheduler.Scheduler _Scheduler;
 
-        private readonly HistoricalPriceImporter _HistoricalPriceImporter;
-        private readonly LivePriceImporter _LivePriceImporter;
-        private readonly TradingDayImporter _TradingDayImporter;
+        private readonly IServiceProvider _ServiceProvider;
 
-        public DataImportBackgroundService(HistoricalPriceImporter historicalPriceImporter, LivePriceImporter livePriceImporter, TradingDayImporter tradingDayImporter)
+
+        public DataImportBackgroundService(IServiceProvider servicesProvider)
         {
-            _HistoricalPriceImporter = historicalPriceImporter;
-            _LivePriceImporter = livePriceImporter;
-            _TradingDayImporter = tradingDayImporter;
+            _ServiceProvider = servicesProvider;
 
             _Scheduler = new Scheduler.Scheduler();
             _Scheduler.AddJob("Import Historical Prices", () => ImportHistoricalPrices(), Schedule.EveryDay().At(20, 00), DateTime.Now);
@@ -46,20 +45,35 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         private void ImportHistoricalPrices()
         {
-            var importTask = _HistoricalPriceImporter.Import(_CancellationToken);
-            importTask.Wait();
+            using (var scope = _ServiceProvider.CreateScope())
+            {
+                var importer = scope.ServiceProvider.GetRequiredService<HistoricalPriceImporter>();
+
+                var importTask = importer.Import(_CancellationToken);
+                importTask.Wait();
+            }
         }
 
         private void ImportLivePrices()
         {
-            var importTask = _LivePriceImporter.Import(_CancellationToken);
-            importTask.Wait();
+            using (var scope = _ServiceProvider.CreateScope())
+            {
+                var importer = scope.ServiceProvider.GetRequiredService<LivePriceImporter>();
+
+                var importTask = importer.Import(_CancellationToken);
+                importTask.Wait();
+            }
         }
 
         private void ImportTradingDays()
         {
-            var importTask = _TradingDayImporter.Import(_CancellationToken);
-            importTask.Wait();
+            using (var scope = _ServiceProvider.CreateScope())
+            {
+                var importer = scope.ServiceProvider.GetRequiredService<TradingDayImporter>();
+
+                var importTask = importer.Import(_CancellationToken);
+                importTask.Wait();
+            }
         }
     }
 }

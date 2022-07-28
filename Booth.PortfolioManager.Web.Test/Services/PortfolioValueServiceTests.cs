@@ -19,7 +19,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var service = new PortfolioValueService(null, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(null, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(dateRange, ValueFrequency.Day);
 
@@ -33,7 +33,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(dateRange, ValueFrequency.Day);
 
@@ -59,7 +59,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(dateRange, ValueFrequency.Week);
 
@@ -82,7 +82,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(dateRange, ValueFrequency.Month);
 
@@ -107,7 +107,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(Guid.Empty, dateRange, ValueFrequency.Day);
 
@@ -121,7 +121,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(Guid.NewGuid(), dateRange, ValueFrequency.Day);
 
@@ -136,7 +136,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(PortfolioTestCreator.Stock_ARG.Id, dateRange, ValueFrequency.Day);
 
@@ -161,7 +161,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(PortfolioTestCreator.Stock_ARG.Id, dateRange, ValueFrequency.Week);
 
@@ -184,7 +184,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendar);
+            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
 
             var result = service.GetValue(PortfolioTestCreator.Stock_ARG.Id, dateRange, ValueFrequency.Month);
 

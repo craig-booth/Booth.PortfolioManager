@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-using Booth.EventStore;
+
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
@@ -34,7 +34,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
             if (nonTradingDays.Any())
             {
                 _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
-                _TradingCalendarService.SetNonTradingDays(year, nonTradingDays);
+                _TradingCalendarService.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays);
             }           
         }
     }

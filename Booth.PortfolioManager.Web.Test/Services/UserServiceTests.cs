@@ -6,7 +6,7 @@ using Xunit;
 using FluentAssertions;
 using Moq;
 
-using Booth.EventStore;
+using Booth.PortfolioManager.Repository; 
 using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Web.Services;
 
@@ -21,8 +21,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var repository = mockRepository.Create<IRepository<User>>();
-            repository.Setup(x => x.FindFirst("UserName", "user")).Returns(default(User));
+            var repository = mockRepository.Create<IUserRepository>();
+            repository.Setup(x => x.GetUserByUserName("user")).Returns(default(User));
 
             var service = new UserService(repository.Object);
 
@@ -41,8 +41,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var user = new User(Guid.NewGuid());
             user.Create("user", "password");
 
-            var repository = mockRepository.Create<IRepository<User>>();
-            repository.Setup(x => x.FindFirst("UserName", "user")).Returns(user);
+            var repository = mockRepository.Create<IUserRepository>();
+            repository.Setup(x => x.GetUserByUserName("user")).Returns(user);
 
             var service = new UserService(repository.Object);
 
@@ -61,8 +61,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var user = new User(Guid.NewGuid());
             user.Create("user", "password");
 
-            var repository = mockRepository.Create<IRepository<User>>();
-            repository.Setup(x => x.FindFirst("UserName", "user")).Returns(user);
+            var repository = mockRepository.Create<IUserRepository>();
+            repository.Setup(x => x.GetUserByUserName("user")).Returns(user);
 
             var service = new UserService(repository.Object);
 
