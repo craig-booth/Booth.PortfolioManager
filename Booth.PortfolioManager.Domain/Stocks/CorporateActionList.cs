@@ -28,7 +28,9 @@ namespace Booth.PortfolioManager.Domain.Stocks
 
         public new void Add(CorporateAction action)
         {
-            action.Stock = _Stock;
+            if (action.Stock == null)
+                action.Stock = _Stock;
+
             base.Add(action);
         }     
 

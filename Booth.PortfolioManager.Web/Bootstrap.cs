@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 using Booth.PortfolioManager.Repository;
-using Booth.PortfolioManager.Domain.Users;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.TradingCalendars;
@@ -23,7 +22,7 @@ using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.DataImporters;
-
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web
 {
@@ -84,6 +83,10 @@ namespace Booth.PortfolioManager.Web
             services.AddScoped<IPortfolioTransactionService, PortfolioTransactionService>();
             services.AddScoped<IPortfolioValueService, PortfolioValueService>();
             services.AddScoped<ICorporateActionService, CorporateActionService>();
+
+
+            //Mappers
+            services.AddScoped<ICorporateActionMapper, CorporateActionMapper>();
 
 
             // Others

@@ -12,6 +12,7 @@ using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -29,9 +30,10 @@ namespace Booth.PortfolioManager.Web.Test.Services
         public CorporateActionServiceTests()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
-
+      
             var stockCache = new EntityCache<Stock>();
             var stockQuery = new StockQuery(stockCache);
+            var stockResolver = new StockResolver(stockCache);
 
             _StockWithoutCorporateActions = new Stock(Guid.NewGuid());
             _StockWithoutCorporateActions.List("ABC", "ABC Pty Ltd", new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
@@ -48,7 +50,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IStockRepository>();
             repository.Setup(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
 
-            _Service = new CorporateActionService(stockQuery, repository.Object);
+            _Service = new CorporateActionService(stockQuery, repository.Object, new CorporateActionMapper(stockResolver));
         }
 
 

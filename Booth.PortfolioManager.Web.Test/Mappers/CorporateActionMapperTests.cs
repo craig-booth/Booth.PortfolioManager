@@ -10,9 +10,8 @@ using Moq;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web.Mappers;
-using Booth.PortfolioManager.RestApi.Stocks;
-using System.Linq;
 using Booth.PortfolioManager.Domain.CorporateActions;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Mappers
 {
@@ -23,11 +22,17 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void CapitalReturnToApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
 
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+         
             var capitalReturn = new CapitalReturn(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 10.30m);
 
-            var response = capitalReturn.ToApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.ToApi(capitalReturn);
 
             response.Should().BeEquivalentTo(new
             {
@@ -45,21 +50,30 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void CapitalReturnFromApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
             var capitalReturn = new RestApi.CorporateActions.CapitalReturn()
             {
                 Id = Guid.NewGuid(),
-                Stock = Guid.NewGuid(),
+                Stock = stock.Id,
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Test",
                 PaymentDate = new Date(2001, 01, 15),
                 Amount = 10.30m
             };
 
-            var response = capitalReturn.FromApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.FromApi(capitalReturn);
 
             response.Should().BeEquivalentTo(new
             {
                 Id = capitalReturn.Id,
+                Stock = stock,
                 Date = capitalReturn.ActionDate,
                 Description = capitalReturn.Description,
                 PaymentDate = capitalReturn.PaymentDate,
@@ -71,19 +85,22 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void CompositeActionToApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
 
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
             var id = Guid.NewGuid();
-            stock.CorporateActions.Add(new CompositeAction(id, stock, new Date(2001, 01, 01), "Composite Action", new ICorporateAction[]
+            var action = new CompositeAction(id, stock, new Date(2001, 01, 01), "Composite Action", new ICorporateAction[]
             {
                 new CapitalReturn(id, stock, new Date(2001, 01, 01), "Capital Return", new Date(2001, 01, 15), 10.00m),
                 new Dividend(id, stock, new Date(2001, 01, 01), "Dividend", new Date(2001, 01, 15), 10.00m, 0.50m, 1.00m)
-            }));
+            });
 
-
-            var action = stock.CorporateActions[id];
-
-            var response = action.ToApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.ToApi(action);
 
             response.Should().BeEquivalentTo(new
             {
@@ -122,13 +139,18 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void CompositeActionFromApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
             var id = Guid.NewGuid();
             var compositeAction = new RestApi.CorporateActions.CompositeAction()
             {
                 Id = id,
-                Stock = Guid.NewGuid(),
+                Stock = stock.Id,
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Composite Action",
             };
@@ -154,17 +176,20 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             });
 
 
-            var response = compositeAction.FromApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.FromApi(compositeAction);
 
             response.Should().BeEquivalentTo(new
             {
                 Id = id,
+                Stock = stock,
                 Date = new Date(2001, 01, 01),
                 Description = "Composite Action",
                 ChildActions = new object[]
                 {
                     new
                     {
+                        Stock = stock,
                         Date = new Date(2001, 01, 01),
                         Description = "Capital Return",
                         PaymentDate = new Date(2001, 01, 15),
@@ -172,6 +197,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                     },
                     new
                     {
+                        Stock = stock,
                         Date = new Date(2001, 01, 01),
                         Description = "Dividend",
                         PaymentDate = new Date(2001, 01, 15),
@@ -186,11 +212,17 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void DividendToApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
             var dividend = new Dividend(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 10.30m, 0.30m, 1.45m);
 
-            var response = dividend.ToApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.ToApi(dividend);
 
             response.Should().BeEquivalentTo(new
             {
@@ -209,10 +241,17 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void DividendFromApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
             var dividend = new RestApi.CorporateActions.Dividend()
             {
                 Id = Guid.NewGuid(),
-                Stock = Guid.NewGuid(),
+                Stock = stock.Id,
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Test",
                 PaymentDate = new Date(2001, 01, 15),
@@ -221,11 +260,13 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 DrpPrice = 40.45m
             };
 
-            var response = dividend.FromApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.FromApi(dividend);
 
             response.Should().BeEquivalentTo(new
             {
                 Id = dividend.Id,
+                Stock = stock,
                 Date = dividend.ActionDate,
                 Description = dividend.Description,
                 PaymentDate = dividend.PaymentDate,
@@ -238,11 +279,17 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void SplitConsolidationToApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
             var split = new SplitConsolidation(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", 1, 2);
 
-            var response = split.ToApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.ToApi(split);
 
             response.Should().BeEquivalentTo(new
             {
@@ -259,21 +306,30 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void SplitConsolidationFromApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
             var split = new RestApi.CorporateActions.SplitConsolidation()
             {
                 Id = Guid.NewGuid(),
-                Stock = Guid.NewGuid(),
+                Stock = stock.Id,
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Test",
                 OriginalUnits = 1,
                 NewUnits = 2
             };
 
-            var response = split.FromApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.FromApi(split);
 
             response.Should().BeEquivalentTo(new
             {
                 Id = split.Id,
+                Stock = stock,
                 Date = split.ActionDate,
                 Description = split.Description,
                 OriginalUnits = 1,
@@ -284,7 +340,12 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void TransformationToApi()
         {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
             var stock = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
             var stockId = Guid.NewGuid();
             var resultingStocks = new Transformation.ResultingStock[]
@@ -293,7 +354,8 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             };
             var transformation = new Transformation(Guid.NewGuid(), stock, new Date(2001, 01, 01), "Test", new Date(2001, 01, 15), 1.00m,true, resultingStocks);
 
-            var response = transformation.ToApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.ToApi(transformation);
 
             response.Should().BeEquivalentTo(new
             {
@@ -320,12 +382,19 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         [Fact]
         public void TransformationFromApi()
         {
-            var stockId = Guid.NewGuid();
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            var stock2 = new Stock(Guid.NewGuid());
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+            stockResolver.Setup(x => x.GetStock(stock2.Id)).Returns(stock2);
 
             var transformation = new RestApi.CorporateActions.Transformation()
             {
                 Id = Guid.NewGuid(),
-                Stock = Guid.NewGuid(),
+                Stock = stock.Id,
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Test",
                 ImplementationDate = new Date(2002, 02, 01),
@@ -333,18 +402,20 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             };
             transformation.ResultingStocks.Add(new RestApi.CorporateActions.Transformation.ResultingStock()
             {
-                Stock = stockId,
+                Stock = stock2.Id,
                 OriginalUnits = 1,
                 NewUnits = 2,
                 CostBase = 0.50m,
                 AquisitionDate = new Date(2010, 01, 01)
             });
 
-            var response = transformation.FromApi();
+            var mapper = new CorporateActionMapper(stockResolver.Object);
+            var response = mapper.FromApi(transformation);
 
             response.Should().BeEquivalentTo(new
             {
                 Id = transformation.Id,
+                Stock = stock,
                 Date = transformation.ActionDate,
                 Description = transformation.Description,
                 ImplementationDate = transformation.ImplementationDate,
@@ -352,12 +423,13 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 ResultingStocks = new[]
                 {
                     new {
-                        Stock = stockId,
+                        Stock = stock2.Id,
                         OriginalUnits = 1,
                         NewUnits = 2,
                         CostBasePercentage = 0.50m,
                         AquisitionDate = new Date(2010, 01, 01)
-                    }
+                    },
+
                 }
             });
         }

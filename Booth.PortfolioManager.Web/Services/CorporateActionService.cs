@@ -23,11 +23,13 @@ namespace Booth.PortfolioManager.Web.Services
     {
         private readonly IStockQuery _StockQuery;
         private readonly IStockRepository _Repository;
+        private readonly ICorporateActionMapper _Mapper;
 
-        public CorporateActionService(IStockQuery stockQuery, IStockRepository repository)
+        public CorporateActionService(IStockQuery stockQuery, IStockRepository repository, ICorporateActionMapper mapper)
         {
             _StockQuery = stockQuery;
             _Repository = repository;
+            _Mapper = mapper;
         }
 
         public ServiceResult<CorporateAction> GetCorporateAction(Guid stockId, Guid id)
@@ -46,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Services
                 return ServiceResult<CorporateAction>.NotFound();
             }
             
-            var result = corporateAction.ToApi();
+            var result = _Mapper.ToApi(corporateAction);
 
             return ServiceResult<CorporateAction>.Ok(result);  
         }
@@ -59,7 +61,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             var corporateActions = stock.CorporateActions.InDateRange(dateRange);
 
-            var result = corporateActions.Select(x => x.ToApi()).ToList();
+            var result = corporateActions.Select(x => _Mapper.ToApi(x)).ToList();
 
             return ServiceResult<List<CorporateAction>>.Ok(result);
         }
@@ -70,7 +72,7 @@ namespace Booth.PortfolioManager.Web.Services
             if (stock == null)
                 return ServiceResult<List<CorporateAction>>.NotFound();
 
-            stock.CorporateActions.Add(corporateAction.FromApi());
+            stock.CorporateActions.Add(_Mapper.FromApi(corporateAction));
             _Repository.AddCorporateAction(stock, corporateAction.Id);
 
             return ServiceResult.Ok();

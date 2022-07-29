@@ -4,123 +4,170 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-using Booth.Common;
 using Booth.PortfolioManager.Domain.CorporateActions;
-using Booth.PortfolioManager.RestApi.CorporateActions;
-using Microsoft.AspNetCore.Builder;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Mappers
 {
-    static class CorporateActionMappers
-    {
 
-        public static RestApi.CorporateActions.CorporateAction ToApi(this ICorporateAction action)
+    public interface ICorporateActionMapper
+    {
+        RestApi.CorporateActions.CorporateAction ToApi(ICorporateAction action);
+        Domain.CorporateActions.CorporateAction FromApi(RestApi.CorporateActions.CorporateAction action);
+        RestApi.CorporateActions.CapitalReturn ToApi(Domain.CorporateActions.CapitalReturn action);
+        Domain.CorporateActions.CapitalReturn FromApi(RestApi.CorporateActions.CapitalReturn action);
+        RestApi.CorporateActions.CompositeAction ToApi(Domain.CorporateActions.CompositeAction action);
+        Domain.CorporateActions.CompositeAction FromApi(RestApi.CorporateActions.CompositeAction action);
+        RestApi.CorporateActions.Dividend ToApi(Domain.CorporateActions.Dividend action);
+        Domain.CorporateActions.Dividend FromApi(RestApi.CorporateActions.Dividend action);
+        RestApi.CorporateActions.SplitConsolidation ToApi(Domain.CorporateActions.SplitConsolidation action);
+        Domain.CorporateActions.SplitConsolidation FromApi(RestApi.CorporateActions.SplitConsolidation action);
+        RestApi.CorporateActions.Transformation ToApi(Domain.CorporateActions.Transformation action);
+        Domain.CorporateActions.Transformation FromApi(RestApi.CorporateActions.Transformation action);
+    }
+
+    class CorporateActionMapper : ICorporateActionMapper
+    {
+        private readonly IStockResolver _StockResolver;
+
+        public CorporateActionMapper(IStockResolver stockResover)
+        {
+            _StockResolver = stockResover;  
+        }
+
+        public RestApi.CorporateActions.CorporateAction ToApi(ICorporateAction action)
         {
             if (action is Domain.CorporateActions.CapitalReturn capitalReturn)
-                return capitalReturn.ToApi();
+                return ToApi(capitalReturn);
             else if (action is Domain.CorporateActions.CompositeAction compositeAction)
-                return compositeAction.ToApi();
+                return ToApi(compositeAction);
             else if (action is Domain.CorporateActions.Dividend dividend)
-                return dividend.ToApi();
+                return ToApi(dividend);
             else if (action is Domain.CorporateActions.SplitConsolidation splitConsolidation)
-                return splitConsolidation.ToApi();
+                return ToApi(splitConsolidation);
             else if (action is Domain.CorporateActions.Transformation transformation)
-                return transformation.ToApi();
+                return ToApi(transformation);
             else
                 throw new NotSupportedException();
         }
 
-        public static Domain.CorporateActions.CorporateAction FromApi(this RestApi.CorporateActions.CorporateAction action)
+        public Domain.CorporateActions.CorporateAction FromApi(RestApi.CorporateActions.CorporateAction action)
         {
             if (action is RestApi.CorporateActions.CapitalReturn capitalReturn)
-                return capitalReturn.FromApi();
+                return FromApi(capitalReturn);
             else if (action is RestApi.CorporateActions.CompositeAction compositeAction)
-                return compositeAction.FromApi();
+                return FromApi(compositeAction);
             else if (action is RestApi.CorporateActions.Dividend dividend)
-                return dividend.FromApi();
+                return FromApi(dividend);
             else if (action is RestApi.CorporateActions.SplitConsolidation splitConsolidation)
-                return splitConsolidation.FromApi();
+                return FromApi(splitConsolidation);
             else if (action is RestApi.CorporateActions.Transformation transformation)
-                return transformation.FromApi();
+                return FromApi(transformation);
             else
                 throw new NotSupportedException();
         }
 
-        public static RestApi.CorporateActions.CapitalReturn ToApi(this Domain.CorporateActions.CapitalReturn action)
+
+        public  RestApi.CorporateActions.CapitalReturn ToApi(Domain.CorporateActions.CapitalReturn action)
         {
-            var response = new RestApi.CorporateActions.CapitalReturn(); 
-
-            PopulateCorporateAction(response, action);
-
-            response.PaymentDate = action.PaymentDate;
-            response.Amount = action.Amount;
+            var response = new RestApi.CorporateActions.CapitalReturn()
+            {
+                Id = action.Id,
+                Stock = action.Stock.Id,
+                ActionDate = action.Date,
+                Description = action.Description,
+                PaymentDate = action.PaymentDate,
+                Amount = action.Amount
+            };
 
             return response;
         }
 
-        public static Domain.CorporateActions.CapitalReturn FromApi(this RestApi.CorporateActions.CapitalReturn action)
+        public Domain.CorporateActions.CapitalReturn FromApi(RestApi.CorporateActions.CapitalReturn action)
         {
-            return new Domain.CorporateActions.CapitalReturn(action.Id, null, action.ActionDate, action.Description, action.PaymentDate, action.Amount);
+            var stock = _StockResolver.GetStock(action.Stock);
+            return new Domain.CorporateActions.CapitalReturn(action.Id, stock, action.ActionDate, action.Description, action.PaymentDate, action.Amount);
         }
 
-        public static RestApi.CorporateActions.CompositeAction ToApi(this Domain.CorporateActions.CompositeAction action)
+        public RestApi.CorporateActions.CompositeAction ToApi(Domain.CorporateActions.CompositeAction action)
         {
-            var response = new RestApi.CorporateActions.CompositeAction();
+            var response = new RestApi.CorporateActions.CompositeAction()
+            {
+                Id = action.Id,
+                Stock = action.Stock.Id,
+                ActionDate = action.Date,
+                Description = action.Description
+            };
 
-            PopulateCorporateAction(response, action);
-
-            var childActions = action.ChildActions.Select(x => x.ToApi());
+            var childActions = action.ChildActions.Select(x => ToApi(x));
             response.ChildActions.AddRange(childActions);
 
             return response;
         }
-        public static Domain.CorporateActions.CompositeAction FromApi(this RestApi.CorporateActions.CompositeAction action)
+
+        public Domain.CorporateActions.CompositeAction FromApi(RestApi.CorporateActions.CompositeAction action)
         {
-            return new Domain.CorporateActions.CompositeAction(action.Id, null, action.ActionDate, action.Description, action.ChildActions.Select(x => x.FromApi()));
+            var stock = _StockResolver.GetStock(action.Stock);
+            return new Domain.CorporateActions.CompositeAction(action.Id, stock, action.ActionDate, action.Description, action.ChildActions.Select(x => FromApi(x)));
         }
 
-        public static RestApi.CorporateActions.Dividend ToApi(this Domain.CorporateActions.Dividend action)
+        public RestApi.CorporateActions.Dividend ToApi(Domain.CorporateActions.Dividend action)
         {
-            var response = new RestApi.CorporateActions.Dividend();
+            var response = new RestApi.CorporateActions.Dividend()
+            {
+                Id = action.Id,
+                Stock = action.Stock.Id,
+                ActionDate = action.Date,
+                Description = action.Description,
+                PaymentDate = action.PaymentDate,
+                Amount = action.DividendAmount,
+                PercentFranked = action.PercentFranked,
+                DrpPrice = action.DrpPrice
+            };
 
-            PopulateCorporateAction(response, action);
-
-            response.PaymentDate = action.PaymentDate;
-            response.Amount = action.DividendAmount;
-            response.PercentFranked = action.PercentFranked;
-            response.DrpPrice = action.DrpPrice;
 
             return response;
         }
-        public static Domain.CorporateActions.Dividend FromApi(this RestApi.CorporateActions.Dividend action)
+
+        public Domain.CorporateActions.Dividend FromApi(RestApi.CorporateActions.Dividend action)
         {
-            return new Domain.CorporateActions.Dividend(action.Id, null, action.ActionDate, action.Description, action.PaymentDate, action.Amount, action.PercentFranked, action.DrpPrice);
+            var stock = _StockResolver.GetStock(action.Stock);
+            return new Domain.CorporateActions.Dividend(action.Id, stock, action.ActionDate, action.Description, action.PaymentDate, action.Amount, action.PercentFranked, action.DrpPrice);
         }
 
-        public static RestApi.CorporateActions.SplitConsolidation ToApi(this Domain.CorporateActions.SplitConsolidation action)
+        public RestApi.CorporateActions.SplitConsolidation ToApi(Domain.CorporateActions.SplitConsolidation action)
         {
-            var response = new RestApi.CorporateActions.SplitConsolidation();
+            var response = new RestApi.CorporateActions.SplitConsolidation()
+            {
 
-            PopulateCorporateAction(response, action);
-
-            response.NewUnits = action.NewUnits;
-            response.OriginalUnits = action.OriginalUnits;
+                Id = action.Id,
+                Stock = action.Stock.Id,
+                ActionDate = action.Date,
+                Description = action.Description,
+                NewUnits = action.NewUnits,
+                OriginalUnits = action.OriginalUnits
+            };
 
             return response;
         }
-        public static Domain.CorporateActions.SplitConsolidation FromApi(this RestApi.CorporateActions.SplitConsolidation action)
+
+        public Domain.CorporateActions.SplitConsolidation FromApi(RestApi.CorporateActions.SplitConsolidation action)
         {
-            return new Domain.CorporateActions.SplitConsolidation(action.Id, null, action.ActionDate, action.Description, action.OriginalUnits, action.NewUnits);
+            var stock = _StockResolver.GetStock(action.Stock);
+            return new Domain.CorporateActions.SplitConsolidation(action.Id, stock, action.ActionDate, action.Description, action.OriginalUnits, action.NewUnits);
         }
 
-        public static RestApi.CorporateActions.Transformation ToApi(this Domain.CorporateActions.Transformation action)
+        public RestApi.CorporateActions.Transformation ToApi(Domain.CorporateActions.Transformation action)
         {
-            var response = new RestApi.CorporateActions.Transformation();
-
-            PopulateCorporateAction(response, action);
-
-            response.CashComponent = action.CashComponent;
-            response.RolloverRefliefApplies = action.RolloverRefliefApplies;
+            var response = new RestApi.CorporateActions.Transformation()
+            {
+                Id = action.Id,
+                Stock = action.Stock.Id,
+                ActionDate = action.Date,
+                Description = action.Description,
+                CashComponent = action.CashComponent,
+                RolloverRefliefApplies = action.RolloverRefliefApplies
+            };
 
             var resultStocks = action.ResultingStocks.Select(x => new RestApi.CorporateActions.Transformation.ResultingStock()
             {
@@ -135,18 +182,15 @@ namespace Booth.PortfolioManager.Web.Mappers
 
             return response;
         }
-        public static Domain.CorporateActions.Transformation FromApi(this RestApi.CorporateActions.Transformation action)
+
+        public Domain.CorporateActions.Transformation FromApi(RestApi.CorporateActions.Transformation action)
         {
+            var stock = _StockResolver.GetStock(action.Stock);
+
             var resultingStocks = action.ResultingStocks.Select(x => new Domain.CorporateActions.Transformation.ResultingStock(x.Stock, x.OriginalUnits, x.NewUnits, x.CostBase, x.AquisitionDate));
-            return new Domain.CorporateActions.Transformation(action.Id, null, action.ActionDate, action.Description, action.ImplementationDate, action.CashComponent, action.RolloverRefliefApplies, resultingStocks);
+            return new Domain.CorporateActions.Transformation(action.Id, stock, action.ActionDate, action.Description, action.ImplementationDate, action.CashComponent, action.RolloverRefliefApplies, resultingStocks);
         }
 
-        private static void PopulateCorporateAction(RestApi.CorporateActions.CorporateAction response, Domain.CorporateActions.CorporateAction action)
-        {
-            response.Id = action.Id;
-            response.Stock = action.Stock.Id;
-            response.ActionDate = action.Date;
-            response.Description = action.Description;
-        }
     }
+
 }
