@@ -30,4 +30,9 @@ namespace Booth.PortfolioManager.Domain
         public StockNotFoundException(string message) : base(message) { }
     }
 
+    public class StockChangedException : Exception
+    {
+        public StockChangedException(string message) : base(message) { }
+    }
+
 }

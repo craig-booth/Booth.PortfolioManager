@@ -20,6 +20,9 @@ namespace Booth.PortfolioManager.Domain.Utils
         T this[int index] { get; }
         T this[Guid id] { get; }
 
+        bool Contains(Guid id);
+        bool TryGetValue(Guid id, out T value);
+
         ITransactionRange<T> FromDate(Date date);
         ITransactionRange<T> ToDate(Date date);
 
@@ -127,11 +130,6 @@ namespace Booth.PortfolioManager.Domain.Utils
             {
                 return _Transactions[index];
             }
-
-            set
-            {
-                _Transactions[index] = value;
-            }
         }
 
         public T this[Guid id]
@@ -140,14 +138,16 @@ namespace Booth.PortfolioManager.Domain.Utils
             {
                 return _IdLookup[id];
             }
+        }
 
-            set
-            {
-                if (_IdLookup.ContainsKey(id))
-                    _IdLookup[id] = value;
-                else
-                    throw new KeyNotFoundException();
-            }
+        public bool Contains(Guid id)
+        {
+            return _IdLookup.ContainsKey(id);
+        }
+
+        public bool TryGetValue(Guid id, out T value)
+        {
+            return _IdLookup.TryGetValue(id, out value);
         }
 
         public int Count
@@ -197,6 +197,28 @@ namespace Booth.PortfolioManager.Domain.Utils
                 _Dates.Insert(index, transaction.Date);
                 _Transactions.Insert(index, transaction);
             }
+        }
+        protected void Update(T transaction)
+        {         
+            if (_IdLookup.TryGetValue(transaction.Id, out var existingTransaction))
+            { 
+                if (transaction.Date == existingTransaction.Date)
+                {
+                    _IdLookup[transaction.Id] = transaction;
+
+                    var index = _Transactions.FindIndex(x => x.Id == transaction.Id);
+                    if (index >= 0)
+                        _Transactions[index] = transaction;
+                }
+                else
+                {
+                    // If date has changed then need to remove and add again
+                    Remove(transaction.Id);
+                    Add(transaction);
+                }
+            }
+            else
+                throw new KeyNotFoundException();
         }
 
         protected void Clear()
@@ -278,6 +300,17 @@ namespace Booth.PortfolioManager.Domain.Utils
         protected void RemoveAt(int index)
         {
             var id = _Transactions[index].Id;
+            _IdLookup.Remove(id);
+            _Dates.RemoveAt(index);
+            _Transactions.RemoveAt(index);
+        }
+
+        protected void Remove(Guid id)
+        {
+            var index = _Transactions.FindIndex(x => x.Id == id);
+            if (index < 0)
+                throw new KeyNotFoundException();
+
             _IdLookup.Remove(id);
             _Dates.RemoveAt(index);
             _Transactions.RemoveAt(index);

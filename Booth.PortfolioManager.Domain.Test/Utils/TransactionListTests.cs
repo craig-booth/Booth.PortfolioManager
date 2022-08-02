@@ -19,13 +19,13 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             var list = new TransactionListTestClass();
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
             var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
 
             var entry = list[1];
 
-            entry.Date.Should().Be(new Date(2001, 01, 01));
+            entry.Description.Should().Be("Entry 2");
         }
 
         [Fact]
@@ -34,46 +34,15 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             var list = new TransactionListTestClass();
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
             var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
 
             Action a = () => { var x = list[2]; };
             
             a.Should().Throw<ArgumentOutOfRangeException>();
         }
 
-        [Fact]
-        public void SetByIndex()
-        {
-            var list = new TransactionListTestClass();
-
-            var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
-            var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
-
-            var id3 = Guid.NewGuid();
-            list[0] = new TransactionTestClass(id3,  new Date(2002, 01, 01));
-
-            var entry = list[0];
-            entry.Date.Should().Be(new Date(2002, 01, 01));
-        }
-
-        [Fact]
-        public void SetByIndexNoEntry()
-        {
-            var list = new TransactionListTestClass();
-
-            var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
-            var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
-
-            Action a = () => list[2] = new TransactionTestClass(id, new Date(2002, 01, 01));
-            
-            a.Should().Throw<ArgumentOutOfRangeException>();
-        }
 
         [Fact]
         public void AccessById()
@@ -81,13 +50,13 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             var list = new TransactionListTestClass();
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
             var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
 
             var entry = list[id];
 
-            entry.Date.Should().Be(new Date(2000, 01, 01));
+            entry.Description.Should().Be("Entry 1");
         }
 
         [Fact]
@@ -96,9 +65,9 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             var list = new TransactionListTestClass();
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
             var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
 
             Action a = () => { var x = list[Guid.NewGuid()]; };
             
@@ -106,34 +75,56 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         }
 
         [Fact]
-        public void SetById()
+        public void ContainsIdNotExists()
         {
             var list = new TransactionListTestClass();
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
             var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
 
-            list[id] = new TransactionTestClass(id, new Date(2002, 01, 01));
-
-            var entry = list[id];
-            entry.Date.Should().Be(new Date(2002, 01, 01));
+            list.Contains(Guid.NewGuid()).Should().BeFalse();
         }
 
         [Fact]
-        public void SetByIdNoEntry()
+        public void ContainsIdExists()
         {
             var list = new TransactionListTestClass();
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
             var id2 = Guid.NewGuid();
-            list.Add(id2, new Date(2001, 01, 01));
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
 
-            Action a = () => { list[Guid.NewGuid()] = new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01)); };
-            
-            a.Should().Throw<KeyNotFoundException>();
+            list.Contains(id2).Should().BeTrue();
+        }
+
+        [Fact]
+        public void TryGetValueIdNotExists()
+        {
+            var list = new TransactionListTestClass();
+
+            var id = Guid.NewGuid();
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
+            var id2 = Guid.NewGuid();
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
+
+            list.TryGetValue(Guid.NewGuid(), out var transaction).Should().BeFalse();
+        }
+
+        [Fact]
+        public void TryGetValueIdExists()
+        {
+            var list = new TransactionListTestClass();
+
+            var id = Guid.NewGuid();
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
+            var id2 = Guid.NewGuid();
+            list.Add(new TransactionTestClass(id2, new Date(2001, 01, 01), "Entry 2"));
+
+            list.TryGetValue(id, out var transaction).Should().BeTrue();
+            transaction.Description.Should().Be("Entry 1");
         }
 
         [Fact]
@@ -141,9 +132,9 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         {
             var list = new TransactionListTestClass();
 
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             list.Count.Should().Be(3);
         }
@@ -162,9 +153,9 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         {
             var list = new TransactionListTestClass();
 
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             list.Earliest.Should().Be(new Date(2000, 01, 01));
         }
@@ -182,9 +173,9 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         {
             var list = new TransactionListTestClass();
 
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             list.Latest.Should().Be(new Date(2002, 01, 01));
         }
@@ -202,7 +193,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         {
             var list = new TransactionListTestClass();
 
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
 
             list.Count.Should().Be(1);
         }
@@ -213,10 +204,10 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
             var list = new TransactionListTestClass();
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
 
-            Action a = () => list.Add(id, new Date(2001, 01, 01));
-            
+            Action a = () => list.Add(new TransactionTestClass(id, new Date(2001, 01, 01), "Entry 2"));
+
             a.Should().Throw<ArgumentException>();
         }
 
@@ -224,56 +215,52 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void AddBeforeFirstEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
-            var id = Guid.NewGuid();
-            list.Add(id, new Date(1999, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(1999, 01, 01), "Entry 4"));
 
-            list[0].Id.Should().Be(id);
+            list[0].Description.Should().Be("Entry 4");
         }
 
         [Fact]
         public void AddSameDateAsFirstEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
-            var id = Guid.NewGuid();
-            list.Add(id, new Date(2000, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 4"));
 
-            list[1].Id.Should().Be(id);
+            list[1].Description.Should().Be("Entry 4");
         }
 
         [Fact]
         public void AddInMiddle()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
-            var id = Guid.NewGuid();
-            list.Add(id, new Date(2001, 06, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 06, 01), "Entry 4"));
 
-            list[2].Id.Should().Be(id);
+            list[2].Description.Should().Be("Entry 4");
         }
 
         [Fact]
         public void AddInMiddleOnTheSameDayAsAnExitingEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
-            var id = Guid.NewGuid();
-            list.Add(id, new Date(2001, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
 
-            list[2].Id.Should().Be(id);
+            list[2].Description.Should().Be("Entry 4");
         }
 
 
@@ -281,37 +268,36 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void AddSameDateAsLastEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             var id = Guid.NewGuid();
-            list.Add(id, new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 4"));
 
-            list[3].Id.Should().Be(id);
+            list[3].Description.Should().Be("Entry 4");
         }
 
         [Fact]
         public void AddAfterLastEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
-            var id = Guid.NewGuid();
-            list.Add(id, new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 4"));
 
-            list[3].Id.Should().Be(id);
+            list[3].Description.Should().Be("Entry 4");
         }
 
         [Fact]
         public void Clear()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             list.Clear();
 
@@ -342,11 +328,11 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void IndexOfBeforeFirstEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 5"));
 
             var result = list.IndexOf(new Date(1999, 01, 01), TransationListPosition.First);
 
@@ -357,11 +343,11 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void IndexOfFirstEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 5"));
 
             var result = list.IndexOf(new Date(2000, 01, 01), TransationListPosition.First);
 
@@ -372,11 +358,11 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void IndexOfBetweenTwoDates()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 5"));
 
             var result = list.IndexOf(new Date(2001, 06, 01), TransationListPosition.First);
 
@@ -387,12 +373,12 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void IndexOfMatchingMultipeDatesToGetFirstEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
             var result = list.IndexOf(new Date(2001, 01, 01), TransationListPosition.First);
 
@@ -403,12 +389,12 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void IndexOfMatchingMultipeDatesToGetLastEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
             var result = list.IndexOf(new Date(2001, 01, 01), TransationListPosition.Last);
 
@@ -419,12 +405,12 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void IndexOfSameDateAsLastEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
             var result = list.IndexOf(new Date(2003, 01, 01), TransationListPosition.Last);
 
@@ -435,12 +421,12 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void IndexOfAfterLastEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
             var result = list.IndexOf(new Date(2004, 01, 01), TransationListPosition.Last);
 
@@ -461,13 +447,13 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void EnumerateList()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
-            var result = list.Select(x => x.Date).ToArray();
+            var result = list.Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2000, 01, 01), new Date(2001, 01, 01), new Date(2002, 01, 01) } );
+            result.Should().Equal(new string[] { "Entry 1", "Entry 2", "Entry 3" } );
         }
 
         [Fact]
@@ -484,32 +470,32 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void EnumerateFromDateMatchingMultipleEntries()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
-            var result = list.FromDate(new Date(2001, 01, 01)).Select(x => x.Date).ToArray();
+            var result = list.FromDate(new Date(2001, 01, 01)).Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2001, 01, 01), new Date(2001, 01, 01), new Date(2001, 01, 01), new Date(2002, 01, 01), new Date(2003, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 2", "Entry 3", "Entry 4", "Entry 5", "Entry 6" });
         }
 
         [Fact]
         public void EnumerateFromDateBetweenEntries()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
-            var result = list.FromDate(new Date(2001, 06, 01)).Select(x => x.Date).ToArray();
+            var result = list.FromDate(new Date(2001, 06, 01)).Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2002, 01, 01), new Date(2003, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 5", "Entry 6" });
         }
 
         [Fact]
@@ -517,7 +503,7 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         {
             var list = new TransactionListTestClass();
 
-            var result = list.ToDate(new Date(2000, 01, 01)).Select(x => x.Date).ToArray();
+            var result = list.ToDate(new Date(2000, 01, 01)).Select(x => x.Description).ToArray();
 
             result.Should().BeEmpty();
         }
@@ -526,16 +512,16 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void EnumerateToDateMatchingMultipleEntries()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
-            var result = list.ToDate(new Date(2001, 01, 01)).Select(x => x.Date).ToArray();
+            var result = list.ToDate(new Date(2001, 01, 01)).Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2000, 01, 01), new Date(2001, 01, 01), new Date(2001, 01, 01), new Date(2001, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 1", "Entry 2", "Entry 3", "Entry 4" });
 
         }
 
@@ -543,16 +529,16 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void EnumerateToDateBetweenEntries()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 6"));
 
-            var result = list.ToDate(new Date(2001, 06, 01)).Select(x => x.Date).ToArray();
+            var result = list.ToDate(new Date(2001, 06, 01)).Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2000, 01, 01), new Date(2001, 01, 01), new Date(2001, 01, 01), new Date(2001, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 1", "Entry 2", "Entry 3", "Entry 4" });
         }
 
         [Fact]
@@ -569,36 +555,92 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void EnumerateRangeMatchingMultipleEntries()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 6"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 7"));
 
-            var result = list.InDateRange(new DateRange(new Date(2001, 01, 01), new Date(2002, 01, 01))).Select(x => x.Date).ToArray();
+            var result = list.InDateRange(new DateRange(new Date(2001, 01, 01), new Date(2002, 01, 01))).Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2001, 01, 01), new Date(2001, 01, 01), new Date(2001, 01, 01), new Date(2002, 01, 01), new Date(2002, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 2", "Entry 3", "Entry 4", "Entry 5", "Entry 6" });
         }
 
         [Fact]
         public void EnumerateRangeBetweenEntries()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2003, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 6"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 7"));
 
-            var result = list.InDateRange(new DateRange(new Date(2001, 06, 01), new Date(2002, 06, 01))).Select(x => x.Date).ToArray();
+            var result = list.InDateRange(new DateRange(new Date(2001, 06, 01), new Date(2002, 06, 01))).Select(x => x.Description).ToArray();
 
 
-            result.Should().Equal(new Date[] { new Date(2002, 01, 01), new Date(2002, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 5", "Entry 6" });
 
+        }
+
+        [Fact]
+        public void UpdateEmptyList()
+        {
+            var list = new TransactionListTestClass();
+
+            Action a = () => list.Update(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Updated Entry"));
+
+            a.Should().Throw<KeyNotFoundException>();
+        }
+
+        [Fact]
+        public void UpdateEntryNotExists()
+        {
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
+
+            Action a = () => list.Update(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Updated Entry"));
+
+            a.Should().Throw<KeyNotFoundException>();
+        }
+
+        [Fact]
+        public void UpdateSameIdAndDate()
+        {
+            var id = Guid.NewGuid();
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(id, new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
+
+            list.Update(new TransactionTestClass(id, new Date(2001, 01, 01), "Updated Entry"));
+
+            var result = list.Select(x => x.Description).ToArray();
+            result.Should().Equal(new string[] { "Entry 1", "Updated Entry", "Entry 3" });
+        }
+
+        [Fact]
+        public void UpdateChangeDate()
+        {
+            var id = Guid.NewGuid();
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(id, new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 5"));
+
+            list.Update(new TransactionTestClass(id, new Date(2002, 01, 01), "Updated Entry"));
+
+            var result = list.Select(x => x.Description).ToArray();
+
+            result.Should().Equal(new string[] { "Entry 1", "Entry 3" , "Entry 4", "Updated Entry", "Entry 5" });
         }
 
         [Fact]
@@ -612,12 +654,46 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         }
 
         [Fact]
+        public void RemoveAtItemLessThanZero()
+        {
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 6"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 7"));
+
+            Action a = () => list.RemoveAt(-1);
+
+            a.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [Fact]
+        public void RemoveAtafterLastEntry()
+        {
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 6"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 7"));
+
+            Action a = () => list.RemoveAt(15);
+
+            a.Should().Throw<ArgumentOutOfRangeException>();
+        }
+
+        [Fact]
         public void RemoveAtFirstEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             list.RemoveAt(0);
             var result = list.Select(x => x.Date).ToArray();
@@ -629,29 +705,108 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public void RemoveAtLastEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             list.RemoveAt(2);
-            var result = list.Select(x => x.Date).ToArray();
+            var result = list.Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2000, 01, 01), new Date(2001, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 1", "Entry 2" });
         }
 
         [Fact]
         public void RemoveAtMiddleEntry()
         {
             var list = new TransactionListTestClass();
-            list.Add(Guid.NewGuid(), new Date(2000, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2001, 01, 01));
-            list.Add(Guid.NewGuid(), new Date(2002, 01, 01));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
 
             list.RemoveAt(1);
-            var result = list.Select(x => x.Date).ToArray();
+            var result = list.Select(x => x.Description).ToArray();
 
-            result.Should().Equal(new Date[] { new Date(2000, 01, 01), new Date(2002, 01, 01) });
+            result.Should().Equal(new string[] { "Entry 1", "Entry 3" });
         }
+
+        [Fact]
+        public void RemoveEmptyList()
+        {
+            var list = new TransactionListTestClass();
+
+            Action a = () => list.Remove(Guid.NewGuid());
+
+            a.Should().Throw<KeyNotFoundException>();
+        }
+
+        [Fact]
+        public void RemoveIdNotExists()
+        {
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 6"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2003, 01, 01), "Entry 7"));
+
+            Action a = () => list.Remove(Guid.NewGuid());
+
+            a.Should().Throw<KeyNotFoundException>();
+        }
+
+
+        [Fact]
+        public void RemoveFirstEntry()
+        {
+            var id = Guid.NewGuid();
+
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(id, new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 3"));
+
+            list.Remove(id);
+            var result = list.Select(x => x.Description).ToArray();
+
+            result.Should().Equal(new string[] { "Entry 2", "Entry 3" });
+        }
+
+        [Fact]
+        public void RemoveLastEntry()
+        {
+            var id = Guid.NewGuid();
+
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(id, new Date(2002, 01, 01), "Entry 3"));
+
+            list.Remove(id);
+            var result = list.Select(x => x.Description).ToArray();
+
+            result.Should().Equal(new string[] { "Entry 1", "Entry 2" });
+        }
+
+        [Fact]
+        public void RemoveMiddleEntry()
+        {
+            var id = Guid.NewGuid();
+
+            var list = new TransactionListTestClass();
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2000, 01, 01), "Entry 1"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 2"));
+            list.Add(new TransactionTestClass(id, new Date(2001, 01, 01), "Entry 3"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2001, 01, 01), "Entry 4"));
+            list.Add(new TransactionTestClass(Guid.NewGuid(), new Date(2002, 01, 01), "Entry 5"));
+
+            list.Remove(id);
+            var result = list.Select(x => x.Description).ToArray();
+
+            result.Should().Equal(new string[] { "Entry 1", "Entry 2", "Entry 4", "Entry 5" });
+        }
+
 
     }
 
@@ -661,17 +816,20 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
 
         public Date Date { get; }
 
-        public TransactionTestClass(Guid id, Date date)
+        public string Description { get; }
+
+        public TransactionTestClass(Guid id, Date date, string description)
         {
             Id = id;
             Date = date;
+            Description = description;
         }
     }
     class TransactionListTestClass : TransactionList<TransactionTestClass>
     {
-        public void Add(Guid id, Date date)
+        public new void Add(TransactionTestClass transaction)
         {
-            Add(new TransactionTestClass(id, date));
+            base.Add(transaction);
         }
 
         public new void Clear()
@@ -682,6 +840,26 @@ namespace Booth.PortfolioManager.Domain.Test.Utils
         public new void RemoveAt(int index)
         {
             base.RemoveAt(index);
+        }
+
+        public new void Update(TransactionTestClass transaction)
+        {
+            base.Update(transaction);
+        }
+
+        public new void Remove(Guid id)
+        {
+            base.Remove(id);
+        }
+
+        public new bool Contains(Guid id)
+        {
+            return base.Contains(id);
+        }
+
+        public new bool TryGetValue(Guid id, out TransactionTestClass transaction)
+        {
+            return base.TryGetValue(id, out transaction);
         }
     }
 }

@@ -50,10 +50,49 @@ namespace Booth.PortfolioManager.Web.Controllers
         [HttpPost]
         public ActionResult AddCorporateAction([FromRoute]Guid stockId, [FromBody] CorporateAction corporateAction)
         {
+            if (corporateAction == null)
+                return NotFound();
+            
+            if (corporateAction.Stock != stockId)
+                return BadRequest();
+
             var result = _Service.AddCorporateAction(stockId, corporateAction);
 
             return result.ToActionResult();
         }
+
+        // POST : /api/stocks/{stockId}/corporateactions/{id}
+        [Authorize(Policy.CanMantainStocks)]
+        [Route("{id:guid}")]
+        [HttpPost]
+        public ActionResult UpdateCorporateAction([FromRoute] Guid stockId, [FromRoute] Guid id, [FromBody] CorporateAction corporateAction)
+        {
+            if (corporateAction == null)
+                return NotFound();
+
+            if (corporateAction.Stock != stockId)
+                return BadRequest();
+
+            if (corporateAction.Id != id)
+                return BadRequest();
+
+            var result = _Service.UpdateCorporateAction(stockId, corporateAction);
+
+            return result.ToActionResult();
+        }
+
+        // DELETE : /api/stocks/{stockId}/corporateactions/{id}
+        [Authorize(Policy.CanMantainStocks)]
+        [Route("{id:guid}")]
+        [HttpPost]
+        public ActionResult DeleteCorporateAction([FromRoute] Guid stockId, [FromRoute] Guid id)
+        {
+            var result = _Service.DeleteCorporateAction(stockId, id);
+
+            return result.ToActionResult();
+        }
+
+
 
         private Date DateFromParameter(DateTime? date)
         {

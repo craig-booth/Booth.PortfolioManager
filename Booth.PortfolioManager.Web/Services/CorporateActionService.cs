@@ -17,6 +17,8 @@ namespace Booth.PortfolioManager.Web.Services
         ServiceResult<CorporateAction> GetCorporateAction(Guid stockId, Guid id);
         ServiceResult<List<CorporateAction>> GetCorporateActions(Guid stockId, DateRange dateRange);
         ServiceResult AddCorporateAction(Guid stockId, CorporateAction corporateAction);
+        ServiceResult UpdateCorporateAction(Guid stockId, CorporateAction corporateAction);
+        ServiceResult DeleteCorporateAction(Guid stockId, Guid corporateActionId);
     }
 
     public class CorporateActionService : ICorporateActionService
@@ -70,10 +72,41 @@ namespace Booth.PortfolioManager.Web.Services
         {
             var stock = _StockQuery.Get(stockId);
             if (stock == null)
-                return ServiceResult<List<CorporateAction>>.NotFound();
+                return ServiceResult.NotFound();
 
             stock.CorporateActions.Add(_Mapper.FromApi(corporateAction));
             _Repository.AddCorporateAction(stock, corporateAction.Id);
+
+            return ServiceResult.Ok();
+        }
+
+        public ServiceResult UpdateCorporateAction(Guid stockId, CorporateAction corporateAction)
+        {
+            var stock = _StockQuery.Get(stockId);
+            if (stock == null)
+                return ServiceResult.NotFound();
+
+            if (!stock.CorporateActions.Contains(corporateAction.Id))
+                return ServiceResult.NotFound();
+
+            stock.CorporateActions.Update(_Mapper.FromApi(corporateAction));
+
+            _Repository.UpdateCorporateAction(stock, corporateAction.Id);
+
+            return ServiceResult.Ok();
+        }
+
+        public ServiceResult DeleteCorporateAction(Guid stockId, Guid corporateActionId)
+        {
+            var stock = _StockQuery.Get(stockId);
+            if (stock == null)
+                return ServiceResult.NotFound();
+
+            if (!stock.CorporateActions.Contains(corporateActionId))
+                return ServiceResult.NotFound();
+           
+            stock.CorporateActions.Remove(corporateActionId);
+            _Repository.DeleteCorporateAction(stock, corporateActionId);
 
             return ServiceResult.Ok();
         }

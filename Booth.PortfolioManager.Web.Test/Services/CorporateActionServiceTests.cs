@@ -27,10 +27,10 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
         private readonly CorporateActionService _Service;
 
+        private readonly Mock<IStockRepository> _RepositoryMock;
+
         public CorporateActionServiceTests()
-        {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-      
+        {        
             var stockCache = new EntityCache<Stock>();
             var stockQuery = new StockQuery(stockCache);
             var stockResolver = new StockResolver(stockCache);
@@ -47,10 +47,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             stockCache.Add(_StockWithCorporateActions);
 
-            var repository = mockRepository.Create<IStockRepository>();
-            repository.Setup(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
-
-            _Service = new CorporateActionService(stockQuery, repository.Object, new CorporateActionMapper(stockResolver));
+            _RepositoryMock = new Mock<IStockRepository>(MockBehavior.Loose);
+            _Service = new CorporateActionService(stockQuery, _RepositoryMock.Object, new CorporateActionMapper(stockResolver));
         }
 
 
@@ -126,7 +124,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
             result.Should().HaveOkStatus();
             _StockWithoutCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.CapitalReturn>(
                 new Domain.CorporateActions.CapitalReturn(action.Id, _StockWithoutCorporateActions, action.ActionDate, action.Description, action.PaymentDate, action.Amount)
-                );       
+                );
+
+            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
         }
 
         [Fact]
@@ -172,6 +172,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 })
             , opts => opts.Excluding(x => x.Path.EndsWith(".Id")));
 
+            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
         }
 
         [Fact]
@@ -195,6 +196,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             _StockWithoutCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.Dividend>(
                 new Domain.CorporateActions.Dividend(action.Id, _StockWithoutCorporateActions, action.ActionDate, action.Description, action.PaymentDate, action.Amount, action.PercentFranked, action.DrpPrice)
             );
+
+            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
         }
 
         [Fact]
@@ -217,6 +220,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             _StockWithoutCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.SplitConsolidation>(
                 new Domain.CorporateActions.SplitConsolidation(action.Id, _StockWithoutCorporateActions, action.ActionDate, action.Description, action.OriginalUnits, action.NewUnits)
             );
+
+            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
         }
 
 
@@ -237,7 +242,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 Stock = _StockWithCorporateActions.Id,
                 AquisitionDate = new Date(2001, 04, 01),
-                CostBase = 0.50m,          
+                CostBase = 0.50m,
                 OriginalUnits = 1,
                 NewUnits = 2
             });
@@ -250,6 +255,78 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new Domain.CorporateActions.Transformation.ResultingStock(_StockWithCorporateActions.Id, 1, 2, 0.5m, new Date(2001, 04, 01))
                 }));
+
+            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
+        }
+
+        [Fact]
+        public void UpdateCorporateActionStockNotFound()
+        {
+            var dividend = new RestApi.CorporateActions.Dividend() { Id = _Action1 };
+
+            var result = _Service.UpdateCorporateAction(Guid.NewGuid(), dividend);
+
+            result.Should().HaveNotFoundStatus();
+        }
+
+        [Fact]
+        public void UpdateCorporateActionNotFound()
+        {
+            var dividend = new RestApi.CorporateActions.Dividend() { Id = Guid.NewGuid() };
+
+            var result = _Service.UpdateCorporateAction(_StockWithCorporateActions.Id, dividend);
+
+            result.Should().HaveNotFoundStatus();
+        }
+
+        [Fact]
+        public void UpdateCorporate()
+        {
+            var capitalReturn = new RestApi.CorporateActions.CapitalReturn()
+            {
+                Id = _Action1,
+                Stock = _StockWithCorporateActions.Id,
+                ActionDate = new Date(2001, 01, 01),
+                Description = "Updated",
+                PaymentDate = new Date(2001, 01, 02),
+                Amount = 13.00m
+            };
+
+            var result = _Service.UpdateCorporateAction(_StockWithCorporateActions.Id, capitalReturn);
+
+            result.Should().HaveOkStatus();
+            _StockWithCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.CapitalReturn>(
+                new Domain.CorporateActions.CapitalReturn(_Action1, _StockWithCorporateActions, new Date(2001, 01, 01), "Updated", new Date(2001, 01, 02), 13.00m)
+                );
+
+            _RepositoryMock.Verify(x => x.UpdateCorporateAction(_StockWithCorporateActions, _Action1));
+        }
+
+        [Fact]
+        public void DeleteCorporateActionStockNotFound()
+        {
+            var result = _Service.DeleteCorporateAction(Guid.NewGuid(), _Action1);
+
+            result.Should().HaveNotFoundStatus();
+        }
+
+        [Fact]
+        public void DeleteCorporateActionNotFound()
+        {
+            var result = _Service.DeleteCorporateAction(_StockWithCorporateActions.Id, Guid.NewGuid());
+
+            result.Should().HaveNotFoundStatus();
+        }
+
+        [Fact]
+        public void DeleteCorporate()
+        {
+            var result = _Service.DeleteCorporateAction(_StockWithCorporateActions.Id, _Action1);
+
+            result.Should().HaveOkStatus();
+            _StockWithCorporateActions.CorporateActions.Should().NotContain(x => x.Id == _Action1);
+
+            _RepositoryMock.Verify(x => x.DeleteCorporateAction(_StockWithCorporateActions, _Action1));
         }
     }
 }
