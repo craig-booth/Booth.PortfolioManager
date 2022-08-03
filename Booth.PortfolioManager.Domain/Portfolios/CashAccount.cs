@@ -126,6 +126,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 _Transactions.Add(date, amount, description, type);
         }
 
+        public void Clear()
+        {
+            _Transactions.Clear();
+        }
+
         private class CashTransactionList
             : TransactionList<CashAccountTransaction>
         {
@@ -152,6 +157,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                     for (var i = index + 1; i < Count; i++)
                         this[i].Balance += amount;
                 }
+            }
+
+            public new void Clear()
+            {
+                base.Clear();
             }
         }   
     }

@@ -21,7 +21,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
         public static Guid ARG_CapitalReturn = Guid.NewGuid();
         public static Guid WAM_Split = Guid.NewGuid();
-      
+
+        public static Guid WAM_OpeningBalance = Guid.NewGuid();
 
         public static Portfolio CreateEmptyPortfolio()
         {
@@ -115,7 +116,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             portfolio.IncomeReceived(Stock_ARG.Id, new Date(2005, 01, 02), new Date(2005, 01, 02), 50.00m, 5.00m, 2.00m, 0.00m, 0.00m, 0.00m, true,"",  Guid.NewGuid());
             portfolio.IncomeReceived(Stock_WAM.Id, new Date(2005, 01, 03), new Date(2005, 01, 03), 30.00m, 3.00m, 2.00m, 0.00m, 0.00m, 0.50m, false, "", Guid.NewGuid());
-            portfolio.AddOpeningBalance(Stock_WAM.Id, new Date(2005, 01, 03), new Date(2005, 01, 03), 5, 32.50m, "", Guid.NewGuid());
+            portfolio.AddOpeningBalance(Stock_WAM.Id, new Date(2005, 01, 03), new Date(2005, 01, 03), 5, 32.50m, "", WAM_OpeningBalance);
             portfolio.IncomeReceived(Stock_ARG.Id, new Date(2007, 01, 02), new Date(2007, 01, 02), 70.00m, 15.00m, 2.00m, 0.00m, 0.00m, 0.00m, true, "", Guid.NewGuid());
 
             portfolio.MakeCashTransaction(new Date(2008, 01, 01), Domain.Transactions.BankAccountTransactionType.Withdrawl, 5000m, "", Guid.NewGuid());

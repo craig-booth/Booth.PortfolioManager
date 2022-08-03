@@ -63,9 +63,8 @@ namespace Booth.PortfolioManager.Repository.Serialization
             portfolio.Create(portfolioName, owner);
 
             if (transactions != null)
-            {
-                foreach (var transaction in transactions)
-                    portfolio.AddTransaction(transaction);
+            { 
+                portfolio.AddTransactions(transactions);
             }
 
             if (participateInDrp != null)

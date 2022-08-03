@@ -21,18 +21,22 @@ namespace Booth.PortfolioManager.Web.Services
         ServiceResult<TransactionsResponse> GetTransactions(DateRange dateRange);
         ServiceResult<TransactionsResponse> GetTransactions(Guid stockId, DateRange dateRange);
 
-        ServiceResult ApplyTransaction(Transaction transaction);
+        ServiceResult AddTransaction(Transaction transaction);
+        ServiceResult UpdateTransaction(Guid id, Transaction transaction);
+        ServiceResult DeleteTransaction(Guid id);
     }
     
     public class PortfolioTransactionService : IPortfolioTransactionService
     {
         private readonly IPortfolio _Portfolio;
         private readonly IPortfolioRepository _Repository;
+        private readonly ITransactionMapper _Mapper;
 
-        public PortfolioTransactionService(IPortfolio portfolio, IPortfolioRepository repository)
+        public PortfolioTransactionService(IPortfolio portfolio, IPortfolioRepository repository, ITransactionMapper mapper)
         {
             _Portfolio = portfolio;
             _Repository = repository;
+            _Mapper = mapper;
         }
 
         public ServiceResult<Transaction> GetTransaction(Guid id)
@@ -50,7 +54,7 @@ namespace Booth.PortfolioManager.Web.Services
                 return ServiceResult<Transaction>.NotFound();
             }
 
-            var response = transaction.ToResponse();
+            var response = _Mapper.ToApi(transaction);
 
             return ServiceResult<Transaction>.Ok(response);
         }
@@ -65,7 +69,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             var response = new TransactionsResponse();
 
-            response.Transactions.AddRange(transactions.Select(x => x.ToTransactionItem(dateRange.ToDate)));
+            response.Transactions.AddRange(transactions.Select(x => _Mapper.ToTransactionItem(x, dateRange.ToDate)));
                  
             return ServiceResult<TransactionsResponse>.Ok(response);
         }
@@ -79,37 +83,51 @@ namespace Booth.PortfolioManager.Web.Services
 
             var response = new TransactionsResponse();
 
-            response.Transactions.AddRange(transactions.Select(x => x.ToTransactionItem(dateRange.ToDate)));
+            response.Transactions.AddRange(transactions.Select(x => _Mapper.ToTransactionItem(x, dateRange.ToDate)));
 
             return ServiceResult<TransactionsResponse>.Ok(response);
         }
 
-        public ServiceResult ApplyTransaction(Transaction transaction)
+        public ServiceResult AddTransaction(Transaction transaction)
         {
             if (_Portfolio == null)
                 return ServiceResult<TransactionsResponse>.NotFound();
 
-            ServiceResult result;
-            if (transaction is RestApi.Transactions.Aquisition aquisition)
-                _Portfolio.AquireShares(aquisition.Stock, aquisition.TransactionDate, aquisition.Units, aquisition.AveragePrice, aquisition.TransactionCosts, aquisition.CreateCashTransaction, aquisition.Comment, aquisition.Id);
-            else if (transaction is RestApi.Transactions.CashTransaction cashTransaction)
-                _Portfolio.MakeCashTransaction(cashTransaction.TransactionDate, cashTransaction.CashTransactionType.ToDomain(), cashTransaction.Amount, cashTransaction.Comment, cashTransaction.Id);
-            else if (transaction is RestApi.Transactions.CostBaseAdjustment costBaseAdjustment)
-                _Portfolio.AdjustCostBase(costBaseAdjustment.Stock, costBaseAdjustment.TransactionDate, costBaseAdjustment.Percentage, costBaseAdjustment.Comment, costBaseAdjustment.Id);
-            else if (transaction is RestApi.Transactions.Disposal disposal)
-                _Portfolio.DisposeOfShares(disposal.Stock, disposal.TransactionDate, disposal.Units, disposal.AveragePrice, disposal.TransactionCosts, disposal.CgtMethod.ToDomain(), disposal.CreateCashTransaction, disposal.Comment, disposal.Id);
-            else if (transaction is RestApi.Transactions.IncomeReceived income)
-                _Portfolio.IncomeReceived(income.Stock, income.RecordDate, income.TransactionDate, income.FrankedAmount, income.UnfrankedAmount, income.FrankingCredits, income.Interest, income.TaxDeferred, income.DrpCashBalance, income.CreateCashTransaction, income.Comment, income.Id);
-            else if (transaction is RestApi.Transactions.OpeningBalance openingBalance)
-                _Portfolio.AddOpeningBalance(openingBalance.Stock, openingBalance.TransactionDate, openingBalance.AquisitionDate, openingBalance.Units, openingBalance.CostBase, openingBalance.Comment, openingBalance.Id);
-            else if (transaction is RestApi.Transactions.ReturnOfCapital returnOfCapital)
-                _Portfolio.ReturnOfCapitalReceived(returnOfCapital.Stock, returnOfCapital.TransactionDate, returnOfCapital.RecordDate, returnOfCapital.Amount, returnOfCapital.CreateCashTransaction, returnOfCapital.Comment, returnOfCapital.Id);
-            else if (transaction is RestApi.Transactions.UnitCountAdjustment unitCountAdjustment)
-                _Portfolio.AdjustUnitCount(unitCountAdjustment.Stock, unitCountAdjustment.TransactionDate, unitCountAdjustment.OriginalUnits, unitCountAdjustment.NewUnits, unitCountAdjustment.Comment, unitCountAdjustment.Id);
-            else
-                result = ServiceResult.Error("Unkown Transaction type");
+            var newTransaction = _Mapper.FromApi(transaction);
+            _Portfolio.AddTransaction(newTransaction);
 
             _Repository.AddTransaction((Portfolio)_Portfolio, transaction.Id);
+
+            return ServiceResult.Ok();
+        }
+
+        public ServiceResult UpdateTransaction(Guid id, Transaction transaction)
+        {
+            if (_Portfolio == null)
+                return ServiceResult<TransactionsResponse>.NotFound();
+
+            if (!_Portfolio.Transactions.Contains(transaction.Id))
+                return ServiceResult.NotFound();
+
+            var updatedTransaction = _Mapper.FromApi(transaction);
+            _Portfolio.UpdateTransaction(updatedTransaction);
+
+            _Repository.UpdateTransaction((Portfolio)_Portfolio, transaction.Id);
+
+            return ServiceResult.Ok();
+        }
+
+        public ServiceResult DeleteTransaction(Guid id)
+        {
+            if (_Portfolio == null)
+                return ServiceResult<TransactionsResponse>.NotFound();
+
+            if (!_Portfolio.Transactions.Contains(id))
+                return ServiceResult.NotFound();
+
+            _Portfolio.DeleteTransaction(id);
+
+            _Repository.DeleteTransaction((Portfolio)_Portfolio, id);
 
             return ServiceResult.Ok();
         }

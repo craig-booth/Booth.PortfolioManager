@@ -280,7 +280,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void UpdateCorporate()
+        public void UpdateCorporateAction()
         {
             var capitalReturn = new RestApi.CorporateActions.CapitalReturn()
             {
@@ -319,7 +319,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void DeleteCorporate()
+        public void DeleteCorporateAction()
         {
             var result = _Service.DeleteCorporateAction(_StockWithCorporateActions.Id, _Action1);
 

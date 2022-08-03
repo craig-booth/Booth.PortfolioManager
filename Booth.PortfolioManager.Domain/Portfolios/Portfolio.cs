@@ -26,6 +26,9 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         void ChangeDrpParticipation(Guid stockId, bool participateInDrp);
 
         void AddTransaction(PortfolioTransaction transaction);
+        void UpdateTransaction(PortfolioTransaction transaction);
+        void DeleteTransaction(Guid transactionId);
+
         void AddOpeningBalance(Guid stockId, Date transactionDate, Date aquisitionDate, int units, decimal costBase, string comment, Guid transactionId);
         void AdjustUnitCount(Guid stockId, Date date,int oldCount, int NewCount, string comment, Guid transactionId);
         void AdjustCostBase(Guid stockId, Date date, decimal percentage, string comment, Guid transactionId);
@@ -53,7 +56,7 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         private PortfolioTransactionList _Transactions = new PortfolioTransactionList();
         public IPortfolioTransactionList Transactions => _Transactions;
 
-        private ICashAccount _CashAccount = new CashAccount();
+        private CashAccount _CashAccount = new CashAccount();
         public IReadOnlyCashAccount CashAccount => _CashAccount;
 
         private CgtEventCollection _CgtEvents = new CgtEventCollection();
@@ -91,7 +94,17 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             holding.ChangeDrpParticipation(participateInDrp);
         }
 
-        public void AddTransaction(PortfolioTransaction transaction)
+        private void RecreatePortfolio()
+        {
+            _Holdings.Clear();
+            _CashAccount.Clear();
+            _CgtEvents.Clear();
+
+            foreach (var transaction in _Transactions)
+                ApplyTransaction((PortfolioTransaction)transaction);
+        }
+
+        private void ApplyTransaction(PortfolioTransaction transaction)
         {
             var handler = _TransactionHandlers.GetService(transaction);
 
@@ -112,10 +125,34 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                         throw new NoSharesOwnedException("No shares owned");
                 }
             }
-      
-            handler.Apply(transaction, holding, _CashAccount);
 
+            handler.Apply(transaction, holding, _CashAccount);
+        }
+
+        public void AddTransaction(PortfolioTransaction transaction)
+        {
+            ApplyTransaction(transaction);
             _Transactions.Add(transaction);
+        }
+
+        public void AddTransactions(IEnumerable<PortfolioTransaction> transactions)
+        {
+            foreach (var transaction in transactions)
+                _Transactions.Add(transaction);
+
+            RecreatePortfolio();
+        }
+
+        public void UpdateTransaction(PortfolioTransaction transaction)
+        {
+            _Transactions.Update(transaction);
+            RecreatePortfolio();
+        }
+
+        public void DeleteTransaction(Guid transactionId)
+        {
+            _Transactions.Remove(transactionId);
+            RecreatePortfolio();
         }
 
         public void MakeCashTransaction(Date transactionDate, BankAccountTransactionType type, decimal amount, string comment, Guid transactionId)

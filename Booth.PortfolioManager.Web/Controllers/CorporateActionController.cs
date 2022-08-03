@@ -84,7 +84,7 @@ namespace Booth.PortfolioManager.Web.Controllers
         // DELETE : /api/stocks/{stockId}/corporateactions/{id}
         [Authorize(Policy.CanMantainStocks)]
         [Route("{id:guid}")]
-        [HttpPost]
+        [HttpDelete]
         public ActionResult DeleteCorporateAction([FromRoute] Guid stockId, [FromRoute] Guid id)
         {
             var result = _Service.DeleteCorporateAction(stockId, id);

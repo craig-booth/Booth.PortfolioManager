@@ -15,6 +15,8 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         IEnumerable<IReadOnlyHolding> All();
         IEnumerable<IReadOnlyHolding> All(Date date);
         IEnumerable<IReadOnlyHolding> All(DateRange dateRange);
+
+        void Clear();
     }
 
     class HoldingCollection : IHoldingCollection
@@ -63,6 +65,11 @@ namespace Booth.PortfolioManager.Domain.Portfolios
             _Holdings.Add(stock.Id, holding);
 
             return holding;
+        }
+
+        public void Clear()
+        {
+            _Holdings.Clear();
         }
     }
 }

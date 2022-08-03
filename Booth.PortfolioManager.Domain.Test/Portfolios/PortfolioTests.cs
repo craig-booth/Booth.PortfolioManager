@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Xunit;
 using FluentAssertions;
@@ -615,5 +614,371 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
 
             mockRepository.Verify();
         }
+
+        // Test adding transactions that are not in date order as done when loading from the database.
+        [Fact]
+        public void AddTransactionsOutOfOrder()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            var transactions = new PortfolioTransaction[]
+            {
+                new Disposal()
+                {
+                    Id = Guid.NewGuid(),
+                    Stock = stock,
+                    Date = new Date(2002, 01, 01),
+                    Units = 50,
+                    AveragePrice = 1.20m,
+                    TransactionCosts = 19.95m,
+                    CgtMethod = CgtCalculationMethod.MinimizeGain,
+                    CreateCashTransaction = true,
+                    Comment = ""
+                },
+                new OpeningBalance()
+                {
+                    Id = Guid.NewGuid(),
+                    Stock = stock, 
+                    Date = new Date(1999, 01, 01),
+                    AquisitionDate = new Date(1999, 01, 01),
+                    Units = 100, 
+                    CostBase = 100.00m,
+                    Comment = ""
+                }        
+            };
+
+            portfolio.AddTransactions(transactions);
+
+            using (new AssertionScope())
+            {
+                portfolio.Holdings[stock.Id].Properties[new Date(2002, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 50,
+                    Amount = 50.00m,
+                    CostBase = 50.00m,
+                });
+
+                portfolio.CashAccount.Balance(new Date(2002, 01, 01)).Should().Be(40.05m);
+
+                portfolio.CgtEvents[0].CapitalGain.Should().Be((60.00m - 19.95m) - 50.00m);
+            }
+        }
+
+
+        [Fact]
+        public void UpdateTransactionNotFound()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
+
+            var transactionId = Guid.NewGuid();
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", transactionId);
+
+
+            var updatedTransaction = new ReturnOfCapital()
+            {
+                Id = Guid.NewGuid(),
+                Stock = stock,
+                Date = new Date(2000, 01, 01),
+                RecordDate = new Date(1999, 01, 01),
+                Amount = 0.75m,
+                CreateCashTransaction = true,
+                Comment = "Updated",
+            };
+            Action a = () => portfolio.UpdateTransaction(updatedTransaction);
+            a.Should().Throw<KeyNotFoundException>();
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void UpdateTransactionPriorToDisposal()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
+
+            var transactionId = Guid.NewGuid();
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", transactionId);
+
+            portfolio.DisposeOfShares(stock.Id, new Date(2002, 01, 01), 100, 1.20m, 19.95m, CgtCalculationMethod.MinimizeGain, true, "", Guid.NewGuid());
+
+            var updatedTransaction = new ReturnOfCapital()
+            {
+                Id = transactionId,
+                Stock = stock,
+                Date = new Date(2000, 01, 01),
+                RecordDate = new Date(1999, 01, 01),
+                Amount = 0.75m,
+                CreateCashTransaction = true,
+                Comment = "Updated",
+            };
+            portfolio.UpdateTransaction(updatedTransaction);
+
+
+            using (new AssertionScope())
+            {
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 100,
+                    Amount = 100.00m,
+                    CostBase = 25.00m,
+                });
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(75.00m);
+
+                portfolio.CgtEvents[0].CapitalGain.Should().Be((120.00m - 19.95m) - 25.00m);
+            }
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void UpdateTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
+
+            var transactionId = Guid.NewGuid();
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", transactionId);
+
+
+            var updatedTransaction = new ReturnOfCapital()
+            {
+                Id = transactionId,
+                Stock = stock,
+                Date = new Date(2000, 01, 01),
+                RecordDate = new Date(1999, 01, 01),
+                Amount = 0.75m,
+                CreateCashTransaction = true,
+                Comment = "Updated",
+            };
+            portfolio.UpdateTransaction(updatedTransaction);
+
+
+            using (new AssertionScope())
+            {
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 100,
+                    Amount = 100.00m,
+                    CostBase = 25.00m,
+                });
+
+                portfolio.Transactions[transactionId].Should().BeEquivalentTo(new
+                {
+                    Id = transactionId,
+                    Date = new Date(2000, 01, 01),
+                    Stock = stock,
+                    Comment = "Updated",
+                    RecordDate = new Date(1999, 01, 01),
+                    Amount = 0.75m,
+                    CreateCashTransaction = true
+                });
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(75.00m);
+            }
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void DeleteTransactionNotFound()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
+
+            var transactionId = Guid.NewGuid();
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", transactionId);
+
+
+            Action a = () => portfolio.DeleteTransaction(Guid.NewGuid());
+            a.Should().Throw<KeyNotFoundException>();
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void DeleteTransactionPriorToDisposal()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
+
+            var transactionId = Guid.NewGuid();
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", transactionId);
+
+            portfolio.DisposeOfShares(stock.Id, new Date(2002, 01, 01), 100, 1.20m, 19.95m, CgtCalculationMethod.MinimizeGain, true, "", Guid.NewGuid());
+
+
+            portfolio.DeleteTransaction(transactionId);
+
+
+            using (new AssertionScope())
+            {
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 100,
+                    Amount = 100.00m,
+                    CostBase = 100.00m,
+                });
+
+                portfolio.CashAccount.Balance(new Date(2002, 01, 02)).Should().Be(100.05m);
+
+                portfolio.CgtEvents[0].CapitalGain.Should().Be((120.00m - 19.95m) - 100.00m);
+            }
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void DeleteTransactionRemovingHolding()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            var transactionId = Guid.NewGuid();
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", transactionId);
+
+            portfolio.DeleteTransaction(transactionId);
+
+            portfolio.Holdings[stock.Id].Should().BeNull();
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void DeleteTransactionRemovingHoldingPriorToAnotherTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            var transactionId = Guid.NewGuid();
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", transactionId);
+      
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", Guid.NewGuid());
+
+            Action a = () => portfolio.DeleteTransaction(transactionId);
+
+            a.Should().Throw<NoSharesOwnedException>();
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void DeleteTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var stock = new Stock(Guid.NewGuid());
+            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
+
+            var stockResolver = mockRepository.Create<IStockResolver>();
+            stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
+
+            var portfolioFactory = new PortfolioFactory(stockResolver.Object);
+            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+
+            portfolio.AddOpeningBalance(stock.Id, new Date(1999, 01, 01), new Date(1999, 01, 01), 100, 100.00m, "", Guid.Empty);
+
+            var transactionId = Guid.NewGuid();
+            portfolio.ReturnOfCapitalReceived(stock.Id, new Date(2000, 01, 01), new Date(1999, 01, 01), 0.50m, true, "Comment", transactionId);
+
+            portfolio.DeleteTransaction(transactionId);
+
+
+            using (new AssertionScope())
+            {
+                portfolio.Holdings[stock.Id].Properties[new Date(2000, 01, 01)].Should().BeEquivalentTo(new
+                {
+                    Units = 100,
+                    Amount = 100.00m,
+                    CostBase = 100.00m,
+                });
+
+                portfolio.Transactions.Contains(transactionId).Should().BeFalse();
+
+                portfolio.CashAccount.Balance(new Date(2000, 01, 01)).Should().Be(0.00m);
+            }
+
+            mockRepository.Verify();
+        }
+
+
+
+
     }
 }

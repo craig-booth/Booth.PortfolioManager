@@ -23,6 +23,16 @@ namespace Booth.PortfolioManager.Domain.Transactions
             base.Add(transaction);
         }
 
+        public new void Update(IPortfolioTransaction transaction)
+        {
+            base.Update(transaction);
+        }
+
+        public new void Remove(Guid id)
+        {
+            base.Remove(id);
+        }
+
         public IEnumerable<IPortfolioTransaction> ForHolding(Guid stockId)
         {
             return this.Where(x => (x.Stock != null) && (x.Stock.Id == stockId));

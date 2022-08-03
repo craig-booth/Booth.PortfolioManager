@@ -64,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var transaction = new Aquisition() { Id = transactionId };
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.ApplyTransaction(transaction)).Returns(ServiceResult.Error("Error message")).Verifiable();
+            service.Setup(x => x.AddTransaction(transaction)).Returns(ServiceResult.Error("Error message")).Verifiable();
 
             var controller = new TransactionController();
             var result = controller.AddTransaction(service.Object, transaction);
@@ -83,7 +83,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var transaction = new Aquisition() { Id = transactionId };
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.ApplyTransaction(transaction)).Returns(ServiceResult.Ok()).Verifiable();
+            service.Setup(x => x.AddTransaction(transaction)).Returns(ServiceResult.Ok()).Verifiable();
 
             var controller = new TransactionController();
             var result = controller.AddTransaction(service.Object, transaction);
@@ -91,6 +91,117 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             result.Should().BeOkResult();
 
             mockRepository.VerifyAll();
+        }
+
+        [Fact]
+        public void UpdateTransactionNotFound()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var transactionId = Guid.NewGuid();
+            var transaction = new Aquisition() { Id = transactionId };
+
+            var service = mockRepository.Create<IPortfolioTransactionService>();
+            service.Setup(x => x.UpdateTransaction(transactionId, transaction)).Returns(ServiceResult.NotFound()).Verifiable();
+
+            var controller = new TransactionController();
+            var result = controller.UpdateTransaction(service.Object, transactionId, transaction);
+
+            result.Should().BeNotFoundResult();
+
+            mockRepository.VerifyAll();
+        }
+
+        [Fact]
+        public void UpdateTransactionValidationError()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var transactionId = Guid.NewGuid();
+            var transaction = new Aquisition() { Id = transactionId };
+
+            var service = mockRepository.Create<IPortfolioTransactionService>();
+            service.Setup(x => x.UpdateTransaction(transactionId, transaction)).Returns(ServiceResult.Error("Error message")).Verifiable();
+
+            var controller = new TransactionController();
+            var result = controller.UpdateTransaction(service.Object, transactionId, transaction);
+
+            result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
+
+            mockRepository.VerifyAll(); 
+        }
+
+        [Fact]
+        public void UpdateTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var transactionId = Guid.NewGuid();
+            var transaction = new Aquisition() { Id = transactionId };
+
+            var service = mockRepository.Create<IPortfolioTransactionService>();
+            service.Setup(x => x.UpdateTransaction(transactionId, transaction)).Returns(ServiceResult.Ok()).Verifiable();
+
+            var controller = new TransactionController();
+            var result = controller.UpdateTransaction(service.Object, transactionId, transaction);
+
+            result.Should().BeOkResult();
+
+            mockRepository.VerifyAll(); 
+        }
+
+        [Fact]
+        public void DeleteTransactionNotFound()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var transactionId = Guid.NewGuid();
+
+            var service = mockRepository.Create<IPortfolioTransactionService>();
+            service.Setup(x => x.DeleteTransaction(transactionId)).Returns(ServiceResult.NotFound()).Verifiable();
+
+            var controller = new TransactionController();
+            var result = controller.DeleteTransaction(service.Object, transactionId);
+
+            result.Should().BeNotFoundResult();
+
+            mockRepository.VerifyAll();
+        }
+
+        [Fact]
+        public void DeleteTransactionValidationError()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var transactionId = Guid.NewGuid();
+
+            var service = mockRepository.Create<IPortfolioTransactionService>();
+            service.Setup(x => x.DeleteTransaction(transactionId)).Returns(ServiceResult.Error("Error message")).Verifiable();
+
+            var controller = new TransactionController();
+            var result = controller.DeleteTransaction(service.Object, transactionId);
+
+            result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
+
+            mockRepository.VerifyAll(); 
+        }
+
+        [Fact]
+        public void DeleteTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var transactionId = Guid.NewGuid();
+
+            var service = mockRepository.Create<IPortfolioTransactionService>();
+            service.Setup(x => x.DeleteTransaction(transactionId)).Returns(ServiceResult.Ok()).Verifiable();
+
+            var controller = new TransactionController();
+            var result = controller.DeleteTransaction(service.Object, transactionId);
+
+            result.Should().BeOkResult();
+
+            mockRepository.VerifyAll(); 
         }
 
         [Fact]

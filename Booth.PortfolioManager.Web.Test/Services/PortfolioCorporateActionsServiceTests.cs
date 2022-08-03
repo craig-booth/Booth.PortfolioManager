@@ -13,6 +13,7 @@ using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -65,7 +66,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioCorporateActionsService(null, PortfolioTestCreator.StockResolver);
+            var service = new PortfolioCorporateActionsService(null, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetCorporateActions();
 
@@ -77,7 +78,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetCorporateActions();
 
@@ -98,7 +99,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetCorporateActions(Guid.NewGuid());
 
@@ -110,7 +111,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetCorporateActions(PortfolioTestCreator.Stock_WAM.Id);
 
@@ -130,7 +131,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
 
@@ -142,7 +143,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
 
@@ -154,7 +155,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver);
+            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetTransactionsForCorporateAction(PortfolioTestCreator.Stock_WAM.Id, PortfolioTestCreator.WAM_Split);
 

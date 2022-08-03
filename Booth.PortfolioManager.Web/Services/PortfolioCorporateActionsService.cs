@@ -24,11 +24,13 @@ namespace Booth.PortfolioManager.Web.Services
 
         private readonly IReadOnlyPortfolio _Portfolio;
         private readonly IStockResolver _StockResolver;
+        private readonly ITransactionMapper _Mapper;
 
-        public PortfolioCorporateActionsService(IReadOnlyPortfolio portfolio, IStockResolver stockResolver)
+        public PortfolioCorporateActionsService(IReadOnlyPortfolio portfolio, IStockResolver stockResolver, ITransactionMapper mapper)
         {
             _Portfolio = portfolio;
             _StockResolver = stockResolver;
+            _Mapper = mapper;
         }
 
         public ServiceResult<CorporateActionsResponse> GetCorporateActions()
@@ -101,7 +103,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             var transactions = corporateAction.GetTransactionList(holding, _StockResolver);
 
-            var result = transactions.Select(x => x.ToResponse()).ToList();
+            var result = transactions.Select(x => _Mapper.ToApi(x)).ToList();
 
             return ServiceResult<List<Transaction>>.Ok(result);
         }

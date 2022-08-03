@@ -31,5 +31,10 @@ namespace Booth.PortfolioManager.Domain.Portfolios
                 CgtMethod = cgtMethod
             });
         }
+
+        public new void Clear()
+        {
+            base.Clear();
+        }
     }
 }

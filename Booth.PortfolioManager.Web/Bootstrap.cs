@@ -87,6 +87,7 @@ namespace Booth.PortfolioManager.Web
 
             //Mappers
             services.AddScoped<ICorporateActionMapper, CorporateActionMapper>();
+            services.AddScoped<ITransactionMapper, TransactionMapper>();
 
 
             // Others

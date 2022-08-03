@@ -29,7 +29,25 @@ namespace Booth.PortfolioManager.Web.Controllers
         [HttpPost]
         public ActionResult AddTransaction([FromServices] IPortfolioTransactionService service, [FromBody]Transaction transaction)
         {
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
+
+            return result.ToActionResult();
+        }
+
+        // POST: transactions/id
+        [HttpPost("{id:guid}")]
+        public ActionResult UpdateTransaction([FromServices] IPortfolioTransactionService service, Guid id, [FromBody] Transaction transaction)
+        {
+            var result = service.UpdateTransaction(id, transaction);
+
+            return result.ToActionResult();
+        }
+
+        // DELETE: transactions/id
+        [HttpDelete("{id:guid}")]
+        public ActionResult DeleteTransaction([FromServices] IPortfolioTransactionService service, Guid id)
+        {
+            var result = service.DeleteTransaction(id);
 
             return result.ToActionResult();
         }

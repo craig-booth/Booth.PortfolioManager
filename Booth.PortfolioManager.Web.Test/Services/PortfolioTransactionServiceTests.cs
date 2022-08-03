@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 using Xunit;
 using FluentAssertions;
@@ -10,6 +10,7 @@ using Booth.Common;
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -20,7 +21,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var service = new PortfolioTransactionService(null ,null);
+            var service = new PortfolioTransactionService(null ,null, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetTransactions(dateRange);
 
@@ -32,7 +33,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioTransactionService(portfolio, null);
+            var service = new PortfolioTransactionService(portfolio, null, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var result = service.GetTransaction(Guid.NewGuid());
 
@@ -44,7 +45,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioTransactionService(portfolio, null);
+            var service = new PortfolioTransactionService(portfolio, null, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var id = portfolio.Transactions[1].Id;
             var result = service.GetTransaction(id);
@@ -64,7 +65,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioTransactionService(portfolio, null);
+            var service = new PortfolioTransactionService(portfolio, null, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
             var result = service.GetTransactions(dateRange);
@@ -103,7 +104,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioTransactionService(portfolio, null);
+            var service = new PortfolioTransactionService(portfolio, null, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
             var result = service.GetTransactions(Guid.NewGuid(), dateRange);
@@ -116,7 +117,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
 
-            var service = new PortfolioTransactionService(portfolio, null);
+            var service = new PortfolioTransactionService(portfolio, null, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
             var result = service.GetTransactions(PortfolioTestCreator.Stock_WAM.Id, dateRange);
@@ -136,7 +137,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
 
         [Fact]
-        public void ApplyAquisition()
+        public void AddAquisition()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -157,11 +158,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository> ();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();
 
@@ -171,7 +172,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void ApplyCashTransaction()
+        public void AddCashTransaction()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -190,11 +191,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorBalance = portfolio.CashAccount.Balance(transaction.TransactionDate);
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();
 
@@ -204,7 +205,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void ApplyCostBaseAdjustment()
+        public void AddCostBaseAdjustment()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -222,11 +223,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorCostBase = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase;
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();
 
@@ -236,7 +237,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void ApplyDisposal()
+        public void AddDisposal()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -258,11 +259,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();          
 
@@ -273,7 +274,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
 
         [Fact]
-        public void ApplyIncomeReceived()
+        public void AddIncomeReceived()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -298,11 +299,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorBalance = portfolio.CashAccount.Balance(transaction.TransactionDate);
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();
 
@@ -312,7 +313,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void ApplyOpeningBalance()
+        public void AddOpeningBalance()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -332,11 +333,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();
 
@@ -346,7 +347,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void ApplyReturnOfCapital()
+        public void AddReturnOfCapital()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -366,11 +367,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorCostBase = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].CostBase;
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();
 
@@ -380,7 +381,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void ApplyUnitCountAdjustment()
+        public void AddUnitCountAdjustment()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -399,17 +400,154 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.AddTransaction(portfolio, transaction.Id));
 
-            var service = new PortfolioTransactionService(portfolio, repository.Object);
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
 
             var priorUnits = portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units;
 
-            var result = service.ApplyTransaction(transaction);
+            var result = service.AddTransaction(transaction);
 
             result.Should().HaveOkStatus();
             
             portfolio.Holdings[PortfolioTestCreator.Stock_ARG.Id].Properties[transaction.TransactionDate].Units.Should().Be(priorUnits * 2);
 
             mockRepository.Verify(); 
-        } 
+        }
+
+        [Fact]
+        public void UpdateTransactionNotFound()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+
+            var updatedTransaction = new OpeningBalance()
+            {
+                Id = Guid.NewGuid(),
+                Stock = PortfolioTestCreator.Stock_WAM.Id,
+                TransactionDate = new Date(2005, 01, 03),
+                Comment = "",
+                Description = "",
+                Units = 7,
+                CostBase = 32.50m,
+                AquisitionDate = new Date(2005, 01, 03)
+            };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();        
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
+
+            var result = service.UpdateTransaction(updatedTransaction.Id, updatedTransaction);
+
+            result.Should().HaveNotFoundStatus();
+            portfolio.Holdings[PortfolioTestCreator.Stock_WAM.Id].Properties[new Date(2005, 01, 03)].Units.Should().Be(205);
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void UpdateTransactionIdChanged()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+
+            var updatedTransaction = new OpeningBalance()
+            {
+                Id = Guid.NewGuid(),
+                Stock = PortfolioTestCreator.Stock_WAM.Id,
+                TransactionDate = new Date(2005, 01, 03),
+                Comment = "",
+                Description = "",
+                Units = 7,
+                CostBase = 32.50m,
+                AquisitionDate = new Date(2005, 01, 03)
+            };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
+
+            var result = service.UpdateTransaction(updatedTransaction.Id, updatedTransaction);
+
+            result.Should().HaveNotFoundStatus();
+            portfolio.Holdings[PortfolioTestCreator.Stock_WAM.Id].Properties[new Date(2005, 01, 03)].Units.Should().Be(205);
+
+            mockRepository.Verify();
+        }
+
+
+        [Fact]
+        public void UpdateTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+
+            var updatedTransaction = new OpeningBalance()
+            {
+                Id = PortfolioTestCreator.WAM_OpeningBalance,
+                Stock = PortfolioTestCreator.Stock_WAM.Id,
+                TransactionDate = new Date(2005, 01, 03),
+                Comment = "",
+                Description = "",
+                Units = 7,
+                CostBase = 32.50m,
+                AquisitionDate = new Date(2005, 01, 03)
+            };
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.UpdateTransaction(portfolio, PortfolioTestCreator.WAM_OpeningBalance));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
+
+            var result = service.UpdateTransaction(updatedTransaction.Id, updatedTransaction);
+
+            result.Should().HaveOkStatus();
+            portfolio.Holdings[PortfolioTestCreator.Stock_WAM.Id].Properties[new Date(2005, 01, 03)].Units.Should().Be(207);
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void DeleteTransactionNotFound()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.DeleteTransaction(portfolio, PortfolioTestCreator.WAM_OpeningBalance));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
+
+            var result = service.DeleteTransaction(Guid.NewGuid());
+
+            result.Should().HaveNotFoundStatus();
+
+            portfolio.Holdings[PortfolioTestCreator.Stock_WAM.Id].Properties[new Date(2005, 01, 03)].Units.Should().Be(205);
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void DeleteTransaction()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.DeleteTransaction(portfolio, PortfolioTestCreator.WAM_OpeningBalance));
+
+            var service = new PortfolioTransactionService(portfolio, repository.Object, new TransactionMapper(PortfolioTestCreator.StockResolver));
+
+            var result = service.DeleteTransaction(PortfolioTestCreator.WAM_OpeningBalance);
+
+            result.Should().HaveOkStatus();
+
+            portfolio.Holdings[PortfolioTestCreator.Stock_WAM.Id].Properties[new Date(2005, 01, 03)].Units.Should().Be(200);
+
+            mockRepository.Verify();
+        }
     } 
 }
