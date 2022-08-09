@@ -60,7 +60,7 @@ pipeline {
 			steps {
 				script {
 					def dockerImage = docker.build("craigbooth/portfoliomanager")
-				    httpRequest httpMode: 'POST', responseHandle: 'NONE', url: ${PORTAINER_WEBHOOK}, wrapAsMultipart: false
+				    httpRequest httpMode: 'POST', responseHandle: 'NONE', url: "${PORTAINER_WEBHOOK}", wrapAsMultipart: false
 				}
             }
 		}
