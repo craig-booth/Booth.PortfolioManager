@@ -68,25 +68,18 @@ namespace Booth.PortfolioManager.Repository
         {
             var action = stock.CorporateActions[id];
 
-            var filter = Builders<BsonDocument>.Filter.Eq("_id", stock.Id);
-
             var addValue = Builders<BsonDocument>.Update
                 .Push("corporateActions", action);
 
-            _Collection.UpdateOne(filter, addValue);
+            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", stock.Id), addValue);
         }
 
         public void DeleteCorporateAction(Stock stock, Guid id)
         {
-            var filter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", stock.Id),
-                    Builders<BsonDocument>.Filter.Eq("corporateActions._id", id)
-                    }
-                );
+            var deleteValue = Builders<BsonDocument>.Update
+                .Pull("corporateActions", Builders<BsonDocument>.Filter.Eq("corporateActions._id", id));
 
-            _Collection.DeleteOne(filter);
+            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", stock.Id), deleteValue);
         }
 
         public void UpdateCorporateAction(Stock stock, Guid id)

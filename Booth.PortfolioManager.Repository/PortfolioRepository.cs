@@ -43,18 +43,10 @@ namespace Booth.PortfolioManager.Repository
         {
             var transaction = portfolio.Transactions[id];
 
-            var filter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
-                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
-                    }
-                );
-
             var addValue = Builders<BsonDocument>.Update
                 .Push("transactions", transaction);
 
-            _Collection.UpdateOne(filter, addValue); 
+            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), addValue); 
         }
 
         public void DeleteTransaction(Portfolio portfolio, Guid id)

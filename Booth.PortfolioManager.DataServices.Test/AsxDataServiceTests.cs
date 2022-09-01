@@ -191,6 +191,9 @@ namespace Booth.PortfolioManager.DataServices.Test
         [InlineData(new object[] { 2018, 8 })]
         [InlineData(new object[] { 2019, 8 })]
         [InlineData(new object[] { 2020, 8 })]
+        [InlineData(new object[] { 2021, 8 })]
+        [InlineData(new object[] { 2022, 8 })]
+        [InlineData(new object[] { 2023, 8 })]
         public async void GetNonTradingDays(int year, int expectedCount)
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
@@ -205,8 +208,13 @@ namespace Booth.PortfolioManager.DataServices.Test
             var result = await dataService.GetNonTradingDays(year, CancellationToken.None);
 
             requestMessage.Method.Should().Be(HttpMethod.Get);
-            requestMessage.RequestUri.AbsoluteUri.Should().Be("http://www.asx.com.au/about/" + fileName);
+            if (year <= 2020)
+                requestMessage.RequestUri.AbsoluteUri.Should().Be("http://www.asx.com.au/about/" + fileName);
+            else
+                requestMessage.RequestUri.AbsoluteUri.Should().Be("https://www2.asx.com.au/markets/market-resources/trading-hours-calendar/cash-market-trading-hours/trading-calendar");
             result.Should().HaveCount(expectedCount);
+
+            result.Should().AllSatisfy(x => x.Date.Year.Should().Be(year));
 
             var newYearsDay = new Date(year, 01, 01);
             while (!newYearsDay.WeekDay())

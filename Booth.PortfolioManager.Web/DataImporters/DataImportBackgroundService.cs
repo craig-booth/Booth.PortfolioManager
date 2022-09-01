@@ -36,6 +36,13 @@ namespace Booth.PortfolioManager.Web.DataImporters
         {
             _CancellationToken = stoppingToken;
 
+            // Run the imports immediatley
+            ImportTradingDays();
+            ImportHistoricalPrices();
+            ImportLivePrices();
+
+
+            // Start Scehduler to run imports on schedule
             _Scheduler.Start();
 
             await Task.Delay(-1, stoppingToken);

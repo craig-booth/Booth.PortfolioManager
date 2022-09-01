@@ -32,6 +32,8 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
             var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(null));
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, year)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound());
 
             var logger = mockRepository.Create<ILogger<TradingDayImporter>>(MockBehavior.Loose);
 
@@ -59,6 +61,8 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
             var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(null));
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, year)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound());
             tradingCalendarService.Setup(x => x.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays)).Returns(ServiceResult.Ok);
 
             var logger = mockRepository.Create<ILogger<TradingDayImporter>>(MockBehavior.Loose);
@@ -88,6 +92,8 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
             var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(null));
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, year)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound());
             tradingCalendarService.Setup(x => x.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays)).Returns(ServiceResult.Ok);
 
             var importer = new TradingDayImporter(tradingCalendarService.Object, dataService.Object, null);

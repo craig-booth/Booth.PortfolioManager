@@ -12,6 +12,15 @@ using Booth.PortfolioManager.Domain.TradingCalendars;
 
 namespace Booth.PortfolioManager.DataServices
 {
+    public interface IAsxTradingCalendarParser
+    {
+        bool CanParse(int year);
+        string ResourceUrl(int year);
+        IEnumerable<NonTradingDay> ParseNonTradingDays(string html, int year);        
+    }
+
+
+
     public class AsxDataService : ITradingDayService, ILiveStockPriceService, IHistoricalStockPriceService
     {
         private HttpClient _HttpClient;
@@ -93,7 +102,11 @@ namespace Booth.PortfolioManager.DataServices
 
         public async Task<IEnumerable<NonTradingDay>> GetNonTradingDays(int year, CancellationToken cancellationToken)
         {
-            var url = String.Format("http://www.asx.com.au/about/asx-trading-calendar-{0:d}.htm", year);
+            var parser = GetParser(year);
+            if (parser == null)
+                return null;
+
+            var url = parser.ResourceUrl(year);
             var response = await _HttpClient.GetAsync(url, cancellationToken);
 
             if (cancellationToken.IsCancellationRequested)
@@ -101,59 +114,23 @@ namespace Booth.PortfolioManager.DataServices
 
             var text = await response.Content.ReadAsStringAsync();
 
-
-            return ParseNonTradingDaysResponse(text, year).ToList();
+            return parser.ParseNonTradingDays(text, year).ToList();
         }
 
-
-        private IEnumerable<NonTradingDay> ParseNonTradingDaysResponse(string html, int year)
+        private IAsxTradingCalendarParser GetParser(int year)
         {
-            // Find start of data
-            var start = html.IndexOf("<!-- start content -->");
-            var end = -1;
-            if (start >= 0)
+            var parserTypes = TypeUtils.GetSubclassesOf(typeof(IAsxTradingCalendarParser), true);
+
+            foreach (var parserType in parserTypes)
             {
-                start = html.IndexOf("<tbody>", start);
-                end = html.IndexOf("</tbody>", start);
+                var parser = (IAsxTradingCalendarParser)Activator.CreateInstance(parserType);
+
+                if (parser.CanParse(year))
+                    return parser;
             }
 
-            if ((start >= 0) && (end >= 0))
-            {
-                var data = html.Substring(start, end - start + 8);
-
-                data = data.Replace("&nbsp;", " ");
-
-                var table = XElement.Parse(data);
-
-                foreach (var tableRow in table.Descendants("tr"))
-                {
-                    var cells = tableRow.Descendants("td").ToList();
-                    if (cells.Count >= 4)
-                    {
-                        int cellNumber = 3;
-                        if (cells.Count == 6)
-                            cellNumber = 2;
-
-                        if (GetCellValue(cells[cellNumber]) == "CLOSED")
-                        {
-                            var description = GetCellValue(cells[0]);
-
-                            var dateText = GetCellValue(cells[1]) + " " + year;
-                            if (Date.TryParse(dateText, out var date))
-                                yield return new NonTradingDay(date, description);
-                        }
-                    }
-                }
-            }
+            return null;
         }
 
-        private string GetCellValue(XElement cell)
-        {
-            var sups = cell.Descendants("sup").ToArray();
-            for (var i = 0; i < sups.Length; i++)
-                sups[i].Remove();
-
-            return cell.Value.Trim();
-        }
     }
 }

@@ -27,15 +27,19 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         public async Task Import(CancellationToken cancellationToken)
         {
-            int year = DateTime.Today.Year;
-
-            var nonTradingDays = await _DataService.GetNonTradingDays(year, cancellationToken);
-
-            if (nonTradingDays.Any())
+            for (var year = 2015; year <= DateTime.Today.Year; year++)
             {
-                _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
-                _TradingCalendarService.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays);
-            }           
+                if (_TradingCalendarService.Get(TradingCalendarIds.ASX, year).Status == ServiceStatus.NotFound)
+                {
+                    var nonTradingDays = await _DataService.GetNonTradingDays(year, cancellationToken);
+
+                    if (nonTradingDays.Any())
+                    {
+                        _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
+                        _TradingCalendarService.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays);
+                    }
+                }
+            }         
         }
     }
 }
