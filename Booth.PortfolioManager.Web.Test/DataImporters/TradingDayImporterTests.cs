@@ -9,6 +9,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 
+using Booth.Common;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.DataImporters;
@@ -32,8 +33,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
             var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
-            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(null));
-            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, year)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound());
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns((Guid id, int year) => GetTradingCalendar(id, year));
 
             var logger = mockRepository.Create<ILogger<TradingDayImporter>>(MockBehavior.Loose);
 
@@ -61,9 +61,8 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
             var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
-            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(null));
-            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, year)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound());
-            tradingCalendarService.Setup(x => x.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays)).Returns(ServiceResult.Ok);
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns((Guid id, int year) => GetTradingCalendar(id, year));
+            tradingCalendarService.Setup(x => x.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays)).Returns(ServiceResult.Ok).Verifiable();
 
             var logger = mockRepository.Create<ILogger<TradingDayImporter>>(MockBehavior.Loose);
 
@@ -92,15 +91,29 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             dataService.Setup(x => x.GetNonTradingDays(year, cancellationToken)).Returns(Task<IEnumerable<NonTradingDay>>.FromResult(nonTradingDays.AsEnumerable()));
 
             var tradingCalendarService = mockRepository.Create<ITradingCalendarService>();
-            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(null));
-            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, year)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound());
-            tradingCalendarService.Setup(x => x.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays)).Returns(ServiceResult.Ok);
+            tradingCalendarService.Setup(x => x.Get(TradingCalendarIds.ASX, It.IsAny<int>())).Returns((Guid id, int year) => GetTradingCalendar(id, year));
+            tradingCalendarService.Setup(x => x.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays)).Returns(ServiceResult.Ok).Verifiable();
 
             var importer = new TradingDayImporter(tradingCalendarService.Object, dataService.Object, null);
 
             await importer.Import(cancellationToken);
+
+            mockRepository.Verify();
         }
 
+        private ServiceResult<RestApi.TradingCalendars.TradingCalendar> GetTradingCalendar(Guid id, int requestedYear)
+        {
+            var calendar = new RestApi.TradingCalendars.TradingCalendar()
+            {
+                Year = requestedYear
+            };
+            if (requestedYear < DateTime.Now.Year)
+            {
+                calendar.AddNonTradingDay(new Date(requestedYear, 05, 06), "Birthday");
+            }
+
+            return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(calendar);
+        }
 
     }
 }

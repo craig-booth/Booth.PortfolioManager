@@ -29,14 +29,18 @@ namespace Booth.PortfolioManager.Web.DataImporters
         {
             for (var year = 2015; year <= DateTime.Today.Year; year++)
             {
-                if (_TradingCalendarService.Get(TradingCalendarIds.ASX, year).Status == ServiceStatus.NotFound)
+                var tradingCalendar = _TradingCalendarService.Get(TradingCalendarIds.ASX, year);
+                if (tradingCalendar.Status == ServiceStatus.Ok)
                 {
-                    var nonTradingDays = await _DataService.GetNonTradingDays(year, cancellationToken);
-
-                    if (nonTradingDays.Any())
+                    if (tradingCalendar.Result.NonTradingDays.Count == 0)
                     {
-                        _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
-                        _TradingCalendarService.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays);
+                        var nonTradingDays = await _DataService.GetNonTradingDays(year, cancellationToken);
+
+                        if (nonTradingDays.Any())
+                        {
+                            _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
+                            _TradingCalendarService.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays);
+                        }
                     }
                 }
             }         
