@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
+using static Booth.PortfolioManager.RestApi.TradingCalendars.TradingCalendar;
 
 namespace Booth.PortfolioManager.Web.DataImporters
 {
@@ -27,6 +28,8 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         public async Task Import(CancellationToken cancellationToken)
         {
+            _Logger?.LogInformation("Starting Trading Calendar Import");
+
             for (var year = 2015; year <= DateTime.Today.Year; year++)
             {
                 var tradingCalendar = _TradingCalendarService.Get(TradingCalendarIds.ASX, year);
@@ -34,6 +37,8 @@ namespace Booth.PortfolioManager.Web.DataImporters
                 {
                     if (tradingCalendar.Result.NonTradingDays.Count == 0)
                     {
+                        _Logger?.LogInformation("Fetching data for {0}", year);
+
                         var nonTradingDays = await _DataService.GetNonTradingDays(year, cancellationToken);
 
                         if (nonTradingDays.Any())
@@ -41,7 +46,11 @@ namespace Booth.PortfolioManager.Web.DataImporters
                             _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
                             _TradingCalendarService.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays);
                         }
+                        else
+                            _Logger?.LogInformation("No data found for {0}", year);
                     }
+                    else
+                        _Logger?.LogInformation("Data already exists for {0}", year);
                 }
             }         
         }

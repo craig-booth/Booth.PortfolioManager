@@ -35,6 +35,8 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         public async Task Import(CancellationToken cancellationToken)
         {
+            _Logger?.LogInformation("Starting import of historical price data");
+
             var tradingCalendar = _TradingCalendarCache.Get(TradingCalendarIds.ASX);
 
             var lastExpectedDate = tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1));
@@ -63,6 +65,8 @@ namespace Booth.PortfolioManager.Web.DataImporters
                     }
                      
                 }
+                else
+                    _Logger?.LogInformation("Stock {0} prices up to date. Skipping", stock.Properties.ClosestTo(lastExpectedDate).AsxCode);
             }
         }
     }
