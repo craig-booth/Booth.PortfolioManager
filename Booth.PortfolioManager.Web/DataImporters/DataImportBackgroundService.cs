@@ -38,32 +38,24 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
             var logger = _ServiceProvider.GetRequiredService<ILogger<DataImportBackgroundService>>();
 
-            // Run the data imports initially
-            //  var timer = new Timer(InitialImport, null, TimeSpan.FromSeconds(30), Timeout.InfiniteTimeSpan);
+            // Run the data imports initially (wait 30 seconds to allow for application setup)
             Task.Delay(TimeSpan.FromSeconds(30), stoppingToken).ContinueWith(t => InitialImport());
 
             // and start Scheduler to run data imports on schedule
-            // _Scheduler.Start();
+             _Scheduler.Start();
 
-            logger.LogInformation("Wait");
             await Task.Delay(-1, stoppingToken);
-            logger.LogInformation("End wait");
 
-            // _Scheduler.Stop();
+            _Scheduler.Stop();
         }
 
         private void InitialImport()
         {
             var logger = _ServiceProvider.GetRequiredService<ILogger<DataImportBackgroundService>>();
 
-            logger.LogInformation("Starting initial import now");
-
-            logger.LogInformation("Import Trading Calendar");
-       //     ImportTradingDays();
-            logger.LogInformation("Import Historical Prices");
-        //    ImportHistoricalPrices();
-            logger.LogInformation("Import Live prices");
-        //    ImportLivePrices();
+            ImportTradingDays();
+            ImportHistoricalPrices();
+            ImportLivePrices();
         }
 
         private void ImportHistoricalPrices()
