@@ -36,8 +36,11 @@ namespace Booth.PortfolioManager.Web.DataImporters
         {
             _CancellationToken = stoppingToken;
 
+            var logger = _ServiceProvider.GetRequiredService<ILogger<DataImportBackgroundService>>();
+
             // Run the data imports initially
-            var timer = new Timer(InitialImport, null, TimeSpan.FromSeconds(30), Timeout.InfiniteTimeSpan);
+            logger.LogInformation("Starting initial import in 30 seconds");
+            var timer = new Timer(InitialImport, logger, TimeSpan.FromSeconds(30), Timeout.InfiniteTimeSpan);
 
             // and start Scehduler to run data imports on schedule
            // _Scheduler.Start();
@@ -49,8 +52,15 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
         private void InitialImport(object state)
         {
+            var logger = _ServiceProvider.GetRequiredService<ILogger<DataImportBackgroundService>>();
+
+            logger.LogInformation("Starting initial import now");
+
+            logger.LogInformation("Import Trading Calendar");
             ImportTradingDays();
+            logger.LogInformation("Import Historical Prices");
             ImportHistoricalPrices();
+            logger.LogInformation("Import Live prices");
             ImportLivePrices();
         }
 
