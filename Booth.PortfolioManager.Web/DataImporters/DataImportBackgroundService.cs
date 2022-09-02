@@ -40,11 +40,11 @@ namespace Booth.PortfolioManager.Web.DataImporters
             var timer = new Timer(InitialImport, null, TimeSpan.FromSeconds(30), Timeout.InfiniteTimeSpan);
 
             // and start Scehduler to run data imports on schedule
-            _Scheduler.Start();
+           // _Scheduler.Start();
 
             await Task.Delay(-1, stoppingToken);
 
-            _Scheduler.Stop();
+           // _Scheduler.Stop();
         }
 
         private void InitialImport(object state)
