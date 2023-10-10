@@ -23,6 +23,8 @@ using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.DataImporters;
 using Booth.PortfolioManager.Web.Mappers;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
 
 namespace Booth.PortfolioManager.Web
 {
@@ -55,8 +57,8 @@ namespace Booth.PortfolioManager.Web
             services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
 
             // Database
-            services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(settings.ConnectionString, settings.Database));
-
+            services.AddSingleton<IMongoClient>(new MongoClient(settings.ConnectionString));
+            services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(x.GetRequiredService<IMongoClient>(), settings.Database, x.GetRequiredService<IPortfolioFactory>(), x.GetRequiredService<IStockResolver>()));
 
             // Repositories
             services.AddScoped<IPortfolioRepository, PortfolioRepository>();
@@ -105,13 +107,6 @@ namespace Booth.PortfolioManager.Web
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                var database = scope.ServiceProvider.GetRequiredService<IPortfolioManagerDatabase>();
-
-                var portfolioFactory = scope.ServiceProvider.GetRequiredService<IPortfolioFactory>();
-                var stockResolver = scope.ServiceProvider.GetRequiredService<IStockResolver>();
-                database.Configure(portfolioFactory, stockResolver);
-
-
                 InitializeCalendarCache(scope.ServiceProvider);
                 InitializeStockCache(scope.ServiceProvider);
             }

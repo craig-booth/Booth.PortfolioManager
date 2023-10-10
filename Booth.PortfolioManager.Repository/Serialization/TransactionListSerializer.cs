@@ -10,22 +10,13 @@ using MongoDB.Bson.IO;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Utils;
 using Booth.PortfolioManager.Domain.CorporateActions;
+using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Repository.Serialization
 {
 
     class TransactionListSerializer<T> : SerializerBase<ITransactionList<T>>, IBsonArraySerializer where T : ITransaction
     {
-        private IBsonSerializer<T> _Serializer;
-    //    private IBsonSerializer<Date> _DateSerializer;
-     //   private BsonClassMap _ClassMap;
-
-        public TransactionListSerializer()
-        {
-            _Serializer = BsonSerializer.LookupSerializer<T>();
-      //      _DateSerializer = BsonSerializer.LookupSerializer<Date>();
-      //      _ClassMap = BsonClassMap.LookupClassMap(typeof(T));
-        }
 
         public override ITransactionList<T> Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {       
@@ -37,7 +28,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
             context.Writer.WriteStartArray();
             foreach (var transaction in value)
             {
-                var serializer = BsonSerializer.LookupSerializer<T>();
+                var serializer = BsonSerializer.LookupSerializer<PortfolioTransaction>();
                 serializer.Serialize(context, transaction);
             }
             context.Writer.WriteEndArray();

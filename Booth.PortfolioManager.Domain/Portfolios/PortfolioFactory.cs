@@ -34,8 +34,15 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public Portfolio CreatePortfolio(Guid id)
         {
+            if (_StockResolver == null)
+                throw new Exception("StockResolver");
+            if (_TransactionHandlers == null)
+                throw new Exception("TransactionHandlers");
+            if (id == null)
+                throw new Exception("Id");
             var portfolio = new Portfolio(id, _StockResolver, _TransactionHandlers);
-
+            if (portfolio == null)
+                throw new Exception("Portfolio");
             return portfolio;
         }
     }

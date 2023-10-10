@@ -17,37 +17,30 @@ namespace Booth.PortfolioManager.Repository.Serialization
     {
         public override Date Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
-            if (context.Reader.CurrentBsonType == BsonType.String)
-            {
-                var value = context.Reader.ReadString();
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return Date.MinValue;
-                }
-                if (Date.TryParseExact(value, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None, out Date date))
-                    return date;
-                else
-                    return Date.MinValue;
-            }
-            else if (context.Reader.CurrentBsonType == BsonType.DateTime)
-            {
-                var value = context.Reader.ReadDateTime();
-                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(value).DateTime;
+            var type = context.Reader.GetCurrentBsonType();
 
-                return new Date(dateTime);
-            }
-            else if (context.Reader.CurrentBsonType == BsonType.Timestamp)
+            switch (type)
             {
-                var value = context.Reader.ReadTimestamp();
-                var dateTime = DateTimeOffset.FromUnixTimeMilliseconds(value).DateTime;
+                case BsonType.String:
+                    var stringValue = context.Reader.ReadString();
+                    if (string.IsNullOrWhiteSpace(stringValue))
+                        return Date.MinValue;
+                    
+                    if (Date.TryParseExact(stringValue, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None, out Date date))
+                        return date;
 
-                return new Date(dateTime);
+                    break;
+
+                case BsonType.DateTime:
+                    var dateTimeValue = context.Reader.ReadDateTime();
+                    return new Date(DateTimeOffset.FromUnixTimeMilliseconds(dateTimeValue).DateTime);
+
+                case BsonType.Timestamp:
+                    var timeStampValue = context.Reader.ReadTimestamp();
+                    return new Date(DateTimeOffset.FromUnixTimeMilliseconds(timeStampValue).DateTime);
             }
-            else
-            {
-                context.Reader.SkipValue();
-                return Date.MinValue;
-            }
+
+            return Date.MinValue;
         }
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Date value)

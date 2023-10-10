@@ -59,7 +59,11 @@ namespace Booth.PortfolioManager.Repository.Serialization
                 }
             }
 
+            if (_Factory == null)
+                throw new Exception("Help");
             var portfolio = _Factory.CreatePortfolio(id);
+            if (portfolio == null)
+                throw new Exception("Help !!!!!!!!");
             portfolio.Create(portfolioName, owner);
 
             if (transactions != null)

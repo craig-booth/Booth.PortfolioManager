@@ -21,13 +21,13 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public void AnonymousUserShouldNotHaveAccess()
+        public async void AnonymousUserShouldNotHaveAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
 
-            Func<Task> a = async () => await client.Stocks.Get(Ids.BHP);
+            Func<Task> a = () => client.Stocks.Get(Ids.BHP);
 
-            a.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
@@ -55,9 +55,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Category = RestApi.Stocks.AssetCategory.AustralianStocks,
             };
 
-            Func<Task> a = async () => await client.Stocks.ChangeStock(command);
+            Func<Task> a = () => client.Stocks.ChangeStock(command);
 
-            a.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]

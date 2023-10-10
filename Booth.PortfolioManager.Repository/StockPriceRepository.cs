@@ -66,10 +66,5 @@ namespace Booth.PortfolioManager.Repository
             });
         }
 
-        public static void ConfigureSerializaton()
-        {
-            BsonSerializer.RegisterSerializer<StockPriceHistory>(new StockPriceHistorySerializer());
-            BsonSerializer.RegisterSerializer<StockPrice>(new StockPriceSerializer());
-        }
     }
 }

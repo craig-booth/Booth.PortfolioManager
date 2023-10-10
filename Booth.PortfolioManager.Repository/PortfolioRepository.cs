@@ -52,12 +52,7 @@ namespace Booth.PortfolioManager.Repository
         public void DeleteTransaction(Portfolio portfolio, Guid id)
         {
             var filter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
-                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
-                    }
-                );
+                .And(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), Builders<BsonDocument>.Filter.Eq("transactions._id", id));
 
             _Collection.DeleteOne(filter); 
         }
@@ -67,12 +62,7 @@ namespace Booth.PortfolioManager.Repository
             var transaction = portfolio.Transactions[id];
 
             var filter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
-                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
-                    }
-                );
+                .And(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), Builders<BsonDocument>.Filter.Eq("transactions._id", id));
 
             var updateValue = Builders<BsonDocument>.Update
                 .Set("transactions.$", transaction);
@@ -80,20 +70,5 @@ namespace Booth.PortfolioManager.Repository
             _Collection.UpdateOne(filter, updateValue); 
         }
 
-        public static void ConfigureSerializaton(IPortfolioFactory factory, IStockResolver stockResolver)
-        {
-            BsonSerializer.RegisterSerializer<Portfolio>(new PortfolioSerializer(factory));
-
-            BsonClassMap.RegisterClassMap<PortfolioTransaction>(cm =>
-            {
-                cm.AutoMap();
-                // This won't be needed if PortfolioTransaction can contain the AsxCode
-                cm.MapProperty(c => c.Stock).SetSerializer(new PortfolioTransactionStockSerializer(stockResolver));
-            });
-
-            var transactionTypes = typeof(PortfolioTransaction).GetSubclassesOf(true);
-            foreach (var transactionType in transactionTypes)
-                BsonClassMap.LookupClassMap(transactionType);
-        }
     }
 }

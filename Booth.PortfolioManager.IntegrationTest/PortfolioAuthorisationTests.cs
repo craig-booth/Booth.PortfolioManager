@@ -21,14 +21,14 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public void AnonymousUserShouldNotHaveAccess()
+        public async void AnonymousUserShouldNotHaveAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
             client.SetPortfolio(Ids.PortfolioId);
 
-            Func<Task> a = async () => await client.Portfolio.GetProperties();
+            Func<Task> a = () => client.Portfolio.GetProperties();
 
-            a.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
 
         [Fact]
@@ -38,9 +38,9 @@ namespace Booth.PortfolioManager.IntegrationTest
             await client.Authenticate("StandardUser2", "secret");
             client.SetPortfolio(Ids.PortfolioId);
 
-            Func<Task> a = async () => await client.Portfolio.GetProperties();
+            Func<Task> a = () => client.Portfolio.GetProperties();
 
-            a.Should().ThrowAsync<RestException>().Result.Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
