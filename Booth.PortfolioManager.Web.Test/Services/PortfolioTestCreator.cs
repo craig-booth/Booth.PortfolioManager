@@ -15,6 +15,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
        
         private static EntityCache<Stock> _StockCache = new EntityCache<Stock>();
         public static IStockResolver StockResolver = new StockResolver(_StockCache);
+        public static IPortfolioFactory PortfolioFactory = new PortfolioFactory(StockResolver);
 
         public static RestApi.Portfolios.Stock Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
         public static RestApi.Portfolios.Stock Stock_WAM = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
@@ -24,9 +25,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
         public static Guid WAM_OpeningBalance = Guid.NewGuid();
 
-        public static Portfolio CreateEmptyPortfolio()
+        static PortfolioTestCreator()
         {
-             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
+            var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             TradingCalendarCache.Add(tradingCalendar);
 
             var arg = new Stock(Stock_ARG.Id);
@@ -93,9 +94,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             wamStockPrice.UpdateClosingPrice(new Date(2007, 01, 02), 0.90m);
             wamStockPrice.UpdateClosingPrice(new Date(2009, 01, 02), 1.30m);
             wamStockPrice.UpdateClosingPrice(new Date(2010, 01, 01), 1.50m);
+        }
 
-            var portfolioFactory = new PortfolioFactory(StockResolver);
-            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+        public static Portfolio CreateEmptyPortfolio()
+        {
+            var portfolio = PortfolioFactory.CreatePortfolio(Guid.NewGuid());
             portfolio.Create("Test", Guid.NewGuid());
 
             return portfolio;

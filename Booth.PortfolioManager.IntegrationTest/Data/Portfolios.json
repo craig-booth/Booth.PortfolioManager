@@ -1,0 +1,124 @@
+﻿{
+  "_id": {
+    "$binary": {
+      "base64": "/DaPSkxJR0e1j5P6FpoPiQ==",
+      "subType": "03"
+    }
+  },
+  "name": "Test",
+  "owner": {
+    "$binary": {
+      "base64": "39YYXgTW8UCLqUNUYQdd7g==",
+      "subType": "03"
+    }
+  },
+  "participateInDrp": [],
+  "transactions": [
+    {
+      "_t": "CashTransaction",
+      "_id": {
+        "$binary": {
+          "base64": "UZJpUG1LgkuytNoKsLJwzQ==",
+          "subType": "03"
+        }
+      },
+      "date": "2020-01-01",
+      "stock": {
+        "$binary": {
+          "base64": "AAAAAAAAAAAAAAAAAAAAAA==",
+          "subType": "03"
+        }
+      },
+      "comment": "Initial Deposit",
+      "cashTransactionType": 0,
+      "amount": "9000"
+    },
+    {
+      "_t": "Aquisition",
+      "_id": {
+        "$binary": {
+          "base64": "tGwP5ASyQEyx5vbNruxCrA==",
+          "subType": "03"
+        }
+      },
+      "date": "2020-01-10",
+      "stock": {
+        "$binary": {
+          "base64": "F5It8V5JyEKFaTSwZ3VdBA==",
+          "subType": "03"
+        }
+      },
+      "comment": "",
+      "units": 100,
+      "averagePrice": "20.26",
+      "transactionCosts": "19.95",
+      "createCashTransaction": true
+    },
+    {
+      "_t": "IncomeReceived",
+      "_id": {
+        "$binary": {
+          "base64": "iYdcVHqIIUGJ56EgILJNBw==",
+          "subType": "03"
+        }
+      },
+      "date": "2020-03-04",
+      "stock": {
+        "$binary": {
+          "base64": "F5It8V5JyEKFaTSwZ3VdBA==",
+          "subType": "03"
+        }
+      },
+      "comment": "Dividend $0.15",
+      "recordDate": "2020-03-01",
+      "frankedAmount": "167.95",
+      "unfrankedAmount": "0",
+      "frankingCredits": "86.26",
+      "interest": "0",
+      "taxDeferred": "0",
+      "createCashTransaction": false,
+      "drpCashBalance": "0"
+    },
+    {
+      "_t": "Disposal",
+      "_id": {
+        "$binary": {
+          "base64": "5UiDV0cszE2UQJRWl+pJqA==",
+          "subType": "03"
+        }
+      },
+      "date": "2020-08-23",
+      "stock": {
+        "$binary": {
+          "base64": "F5It8V5JyEKFaTSwZ3VdBA==",
+          "subType": "03"
+        }
+      },
+      "comment": "",
+      "units": 50,
+      "averagePrice": "51.40",
+      "transactionCosts": "29.95",
+      "cgtMethod": 0,
+      "createCashTransaction": true
+    },
+    {
+      "_t": "CashTransaction",
+      "_id": {
+        "$binary": {
+          "base64": "UVv83Xf8hkqXxIDWwN0GXA==",
+          "subType": "03"
+        }
+      },
+      "date": "2020-09-01",
+      "stock": {
+        "$binary": {
+          "base64": "AAAAAAAAAAAAAAAAAAAAAA==",
+          "subType": "03"
+        }
+      },
+      "comment": "Withdrawl",
+      "cashTransactionType": 0,
+      "amount": "200"
+    }
+  ]
+}

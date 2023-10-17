@@ -1,0 +1,3486 @@
+﻿{
+  "_id": {
+    "$binary": {
+      "base64": "F5It8V5JyEKFaTSwZ3VdBA==",
+      "subType": "03"
+    }
+  },
+  "closingPrices": [
+    {
+      "date": "2020-01-02",
+      "price": { "$numberDecimal": "50.19" }
+    },
+    {
+      "date": "2020-01-03",
+      "price": { "$numberDecimal": "50.33" }
+    },
+    {
+      "date": "2020-01-06",
+      "price": { "$numberDecimal": "50.52" }
+    },
+    {
+      "date": "2020-01-07",
+      "price": { "$numberDecimal": "50.31" }
+    },
+    {
+      "date": "2020-01-08",
+      "price": { "$numberDecimal": "50.34" }
+    },
+    {
+      "date": "2020-01-09",
+      "price": { "$numberDecimal": "50.14" }
+    },
+    {
+      "date": "2020-01-10",
+      "price": { "$numberDecimal": "50.23" }
+    },
+    {
+      "date": "2020-01-13",
+      "price": { "$numberDecimal": "50.35" }
+    },
+    {
+      "date": "2020-01-14",
+      "price": { "$numberDecimal": "50.27" }
+    },
+    {
+      "date": "2020-01-15",
+      "price": { "$numberDecimal": "50.3" }
+    },
+    {
+      "date": "2020-01-16",
+      "price": { "$numberDecimal": "50.43" }
+    },
+    {
+      "date": "2020-01-17",
+      "price": { "$numberDecimal": "50.41" }
+    },
+    {
+      "date": "2020-01-20",
+      "price": { "$numberDecimal": "50.42" }
+    },
+    {
+      "date": "2020-01-21",
+      "price": { "$numberDecimal": "50.4" }
+    },
+    {
+      "date": "2020-01-22",
+      "price": { "$numberDecimal": "50.41" }
+    },
+    {
+      "date": "2020-01-23",
+      "price": { "$numberDecimal": "50.51" }
+    },
+    {
+      "date": "2020-01-24",
+      "price": { "$numberDecimal": "50.6" }
+    },
+    {
+      "date": "2020-01-28",
+      "price": { "$numberDecimal": "50.95" }
+    },
+    {
+      "date": "2020-01-29",
+      "price": { "$numberDecimal": "50.89" }
+    },
+    {
+      "date": "2020-01-30",
+      "price": { "$numberDecimal": "51.07" }
+    },
+    {
+      "date": "2020-01-31",
+      "price": { "$numberDecimal": "51.02" }
+    },
+    {
+      "date": "2020-02-03",
+      "price": { "$numberDecimal": "51.17" }
+    },
+    {
+      "date": "2020-02-04",
+      "price": { "$numberDecimal": "51.08" }
+    },
+    {
+      "date": "2020-02-05",
+      "price": { "$numberDecimal": "51.03" }
+    },
+    {
+      "date": "2020-02-06",
+      "price": { "$numberDecimal": "50.87" }
+    },
+    {
+      "date": "2020-02-07",
+      "price": { "$numberDecimal": "50.96" }
+    },
+    {
+      "date": "2020-02-10",
+      "price": { "$numberDecimal": "51.19" }
+    },
+    {
+      "date": "2020-02-11",
+      "price": { "$numberDecimal": "51.13" }
+    },
+    {
+      "date": "2020-02-12",
+      "price": { "$numberDecimal": "51.07" }
+    },
+    {
+      "date": "2020-02-13",
+      "price": { "$numberDecimal": "51.11" }
+    },
+    {
+      "date": "2020-02-14",
+      "price": { "$numberDecimal": "51.02" }
+    },
+    {
+      "date": "2020-02-17",
+      "price": { "$numberDecimal": "51.16" }
+    },
+    {
+      "date": "2020-02-18",
+      "price": { "$numberDecimal": "51.28" }
+    },
+    {
+      "date": "2020-02-19",
+      "price": { "$numberDecimal": "51.06" }
+    },
+    {
+      "date": "2020-02-20",
+      "price": { "$numberDecimal": "51.25" }
+    },
+    {
+      "date": "2020-02-21",
+      "price": { "$numberDecimal": "51.36" }
+    },
+    {
+      "date": "2020-02-24",
+      "price": { "$numberDecimal": "51.5" }
+    },
+    {
+      "date": "2020-02-25",
+      "price": { "$numberDecimal": "51.63" }
+    },
+    {
+      "date": "2020-02-26",
+      "price": { "$numberDecimal": "51.44" }
+    },
+    {
+      "date": "2020-02-27",
+      "price": { "$numberDecimal": "51.55" }
+    },
+    {
+      "date": "2020-02-28",
+      "price": { "$numberDecimal": "51.37" }
+    },
+    {
+      "date": "2020-03-02",
+      "price": { "$numberDecimal": "51.54" }
+    },
+    {
+      "date": "2020-03-03",
+      "price": { "$numberDecimal": "51.62" }
+    },
+    {
+      "date": "2020-03-04",
+      "price": { "$numberDecimal": "51.68" }
+    },
+    {
+      "date": "2020-03-05",
+      "price": { "$numberDecimal": "51.75" }
+    },
+    {
+      "date": "2020-03-06",
+      "price": { "$numberDecimal": "52" }
+    },
+    {
+      "date": "2020-03-09",
+      "price": { "$numberDecimal": "52.28" }
+    },
+    {
+      "date": "2020-03-10",
+      "price": { "$numberDecimal": "51.38" }
+    },
+    {
+      "date": "2020-03-11",
+      "price": { "$numberDecimal": "51.48" }
+    },
+    {
+      "date": "2020-03-12",
+      "price": { "$numberDecimal": "50.76" }
+    },
+    {
+      "date": "2020-03-13",
+      "price": { "$numberDecimal": "49.18" }
+    },
+    {
+      "date": "2020-03-16",
+      "price": { "$numberDecimal": "48.39" }
+    },
+    {
+      "date": "2020-03-17",
+      "price": { "$numberDecimal": "48" }
+    },
+    {
+      "date": "2020-03-18",
+      "price": { "$numberDecimal": "47.44" }
+    },
+    {
+      "date": "2020-03-19",
+      "price": { "$numberDecimal": "47.25" }
+    },
+    {
+      "date": "2020-03-20",
+      "price": { "$numberDecimal": "46.77" }
+    },
+    {
+      "date": "2020-03-23",
+      "price": { "$numberDecimal": "42.5" }
+    },
+    {
+      "date": "2020-03-24",
+      "price": { "$numberDecimal": "44.42" }
+    },
+    {
+      "date": "2020-03-25",
+      "price": { "$numberDecimal": "46" }
+    },
+    {
+      "date": "2020-03-26",
+      "price": { "$numberDecimal": "45.64" }
+    },
+    {
+      "date": "2020-03-27",
+      "price": { "$numberDecimal": "47.3" }
+    },
+    {
+      "date": "2020-03-30",
+      "price": { "$numberDecimal": "47.25" }
+    },
+    {
+      "date": "2020-03-31",
+      "price": { "$numberDecimal": "47.75" }
+    },
+    {
+      "date": "2020-04-01",
+      "price": { "$numberDecimal": "47.81" }
+    },
+    {
+      "date": "2020-04-02",
+      "price": { "$numberDecimal": "47.91" }
+    },
+    {
+      "date": "2020-04-03",
+      "price": { "$numberDecimal": "47.55" }
+    },
+    {
+      "date": "2020-04-06",
+      "price": { "$numberDecimal": "47.68" }
+    },
+    {
+      "date": "2020-04-07",
+      "price": { "$numberDecimal": "47.88" }
+    },
+    {
+      "date": "2020-04-08",
+      "price": { "$numberDecimal": "47.33" }
+    },
+    {
+      "date": "2020-04-09",
+      "price": { "$numberDecimal": "47.68" }
+    },
+    {
+      "date": "2020-04-14",
+      "price": { "$numberDecimal": "48.38" }
+    },
+    {
+      "date": "2020-04-15",
+      "price": { "$numberDecimal": "48.43" }
+    },
+    {
+      "date": "2020-04-16",
+      "price": { "$numberDecimal": "48.82" }
+    },
+    {
+      "date": "2020-04-17",
+      "price": { "$numberDecimal": "48.98" }
+    },
+    {
+      "date": "2020-04-20",
+      "price": { "$numberDecimal": "49.12" }
+    },
+    {
+      "date": "2020-04-21",
+      "price": { "$numberDecimal": "49.61" }
+    },
+    {
+      "date": "2020-04-22",
+      "price": { "$numberDecimal": "49.88" }
+    },
+    {
+      "date": "2020-04-23",
+      "price": { "$numberDecimal": "49.09" }
+    },
+    {
+      "date": "2020-04-24",
+      "price": { "$numberDecimal": "49.3" }
+    },
+    {
+      "date": "2020-04-27",
+      "price": { "$numberDecimal": "49.18" }
+    },
+    {
+      "date": "2020-04-28",
+      "price": { "$numberDecimal": "49.07" }
+    },
+    {
+      "date": "2020-04-29",
+      "price": { "$numberDecimal": "49.73" }
+    },
+    {
+      "date": "2020-04-30",
+      "price": { "$numberDecimal": "49.4" }
+    },
+    {
+      "date": "2020-05-01",
+      "price": { "$numberDecimal": "49.73" }
+    },
+    {
+      "date": "2020-05-04",
+      "price": { "$numberDecimal": "49.26" }
+    },
+    {
+      "date": "2020-05-05",
+      "price": { "$numberDecimal": "49.47" }
+    },
+    {
+      "date": "2020-05-06",
+      "price": { "$numberDecimal": "49.75" }
+    },
+    {
+      "date": "2020-05-07",
+      "price": { "$numberDecimal": "49.42" }
+    },
+    {
+      "date": "2020-05-08",
+      "price": { "$numberDecimal": "49.72" }
+    },
+    {
+      "date": "2020-05-11",
+      "price": { "$numberDecimal": "49.43" }
+    },
+    {
+      "date": "2020-05-12",
+      "price": { "$numberDecimal": "49.44" }
+    },
+    {
+      "date": "2020-05-13",
+      "price": { "$numberDecimal": "49.18" }
+    },
+    {
+      "date": "2020-05-14",
+      "price": { "$numberDecimal": "49.5" }
+    },
+    {
+      "date": "2020-05-15",
+      "price": { "$numberDecimal": "49.34" }
+    },
+    {
+      "date": "2020-05-18",
+      "price": { "$numberDecimal": "49.37" }
+    },
+    {
+      "date": "2020-05-19",
+      "price": { "$numberDecimal": "49.3" }
+    },
+    {
+      "date": "2020-05-20",
+      "price": { "$numberDecimal": "49.43" }
+    },
+    {
+      "date": "2020-05-21",
+      "price": { "$numberDecimal": "49.82" }
+    },
+    {
+      "date": "2020-05-22",
+      "price": { "$numberDecimal": "49.91" }
+    },
+    {
+      "date": "2020-05-25",
+      "price": { "$numberDecimal": "49.9" }
+    },
+    {
+      "date": "2020-05-26",
+      "price": { "$numberDecimal": "49.89" }
+    },
+    {
+      "date": "2020-05-27",
+      "price": { "$numberDecimal": "49.99" }
+    },
+    {
+      "date": "2020-05-28",
+      "price": { "$numberDecimal": "49.95" }
+    },
+    {
+      "date": "2020-05-29",
+      "price": { "$numberDecimal": "50.03" }
+    },
+    {
+      "date": "2020-06-01",
+      "price": { "$numberDecimal": "50.25" }
+    },
+    {
+      "date": "2020-06-02",
+      "price": { "$numberDecimal": "50.09" }
+    },
+    {
+      "date": "2020-06-03",
+      "price": { "$numberDecimal": "50.08" }
+    },
+    {
+      "date": "2020-06-04",
+      "price": { "$numberDecimal": "50.46" }
+    },
+    {
+      "date": "2020-06-05",
+      "price": { "$numberDecimal": "50.19" }
+    },
+    {
+      "date": "2020-06-09",
+      "price": { "$numberDecimal": "50.71" }
+    },
+    {
+      "date": "2020-06-10",
+      "price": { "$numberDecimal": "50.53" }
+    },
+    {
+      "date": "2020-06-11",
+      "price": { "$numberDecimal": "50.79" }
+    },
+    {
+      "date": "2020-06-12",
+      "price": { "$numberDecimal": "50.65" }
+    },
+    {
+      "date": "2020-06-15",
+      "price": { "$numberDecimal": "50.55" }
+    },
+    {
+      "date": "2020-06-16",
+      "price": { "$numberDecimal": "50.57" }
+    },
+    {
+      "date": "2020-06-17",
+      "price": { "$numberDecimal": "50.65" }
+    },
+    {
+      "date": "2020-06-18",
+      "price": { "$numberDecimal": "50.87" }
+    },
+    {
+      "date": "2020-06-19",
+      "price": { "$numberDecimal": "50.95" }
+    },
+    {
+      "date": "2020-06-22",
+      "price": { "$numberDecimal": "50.92" }
+    },
+    {
+      "date": "2020-06-23",
+      "price": { "$numberDecimal": "50.98" }
+    },
+    {
+      "date": "2020-06-24",
+      "price": { "$numberDecimal": "50.78" }
+    },
+    {
+      "date": "2020-06-25",
+      "price": { "$numberDecimal": "50.95" }
+    },
+    {
+      "date": "2020-06-26",
+      "price": { "$numberDecimal": "50.98" }
+    },
+    {
+      "date": "2020-06-29",
+      "price": { "$numberDecimal": "51.06" }
+    },
+    {
+      "date": "2020-06-30",
+      "price": { "$numberDecimal": "50.95" }
+    },
+    {
+      "date": "2020-07-01",
+      "price": { "$numberDecimal": "50.61" }
+    },
+    {
+      "date": "2020-07-02",
+      "price": { "$numberDecimal": "50.67" }
+    },
+    {
+      "date": "2020-07-03",
+      "price": { "$numberDecimal": "50.78" }
+    },
+    {
+      "date": "2020-07-06",
+      "price": { "$numberDecimal": "50.78" }
+    },
+    {
+      "date": "2020-07-07",
+      "price": { "$numberDecimal": "50.87" }
+    },
+    {
+      "date": "2020-07-08",
+      "price": { "$numberDecimal": "50.93" }
+    },
+    {
+      "date": "2020-07-09",
+      "price": { "$numberDecimal": "50.93" }
+    },
+    {
+      "date": "2020-07-10",
+      "price": { "$numberDecimal": "50.96" }
+    },
+    {
+      "date": "2020-07-13",
+      "price": { "$numberDecimal": "50.87" }
+    },
+    {
+      "date": "2020-07-14",
+      "price": { "$numberDecimal": "50.98" }
+    },
+    {
+      "date": "2020-07-15",
+      "price": { "$numberDecimal": "51.09" }
+    },
+    {
+      "date": "2020-07-16",
+      "price": { "$numberDecimal": "51.09" }
+    },
+    {
+      "date": "2020-07-17",
+      "price": { "$numberDecimal": "51.23" }
+    },
+    {
+      "date": "2020-07-20",
+      "price": { "$numberDecimal": "51.24" }
+    },
+    {
+      "date": "2020-07-21",
+      "price": { "$numberDecimal": "51.34" }
+    },
+    {
+      "date": "2020-07-22",
+      "price": { "$numberDecimal": "51.22" }
+    },
+    {
+      "date": "2020-07-23",
+      "price": { "$numberDecimal": "51.37" }
+    },
+    {
+      "date": "2020-07-24",
+      "price": { "$numberDecimal": "51.58" }
+    },
+    {
+      "date": "2020-07-27",
+      "price": { "$numberDecimal": "51.56" }
+    },
+    {
+      "date": "2020-07-28",
+      "price": { "$numberDecimal": "51.45" }
+    },
+    {
+      "date": "2020-07-29",
+      "price": { "$numberDecimal": "51.42" }
+    },
+    {
+      "date": "2020-07-30",
+      "price": { "$numberDecimal": "51.58" }
+    },
+    {
+      "date": "2020-07-31",
+      "price": { "$numberDecimal": "51.7" }
+    },
+    {
+      "date": "2020-08-03",
+      "price": { "$numberDecimal": "51.66" }
+    },
+    {
+      "date": "2020-08-04",
+      "price": { "$numberDecimal": "51.5" }
+    },
+    {
+      "date": "2020-08-05",
+      "price": { "$numberDecimal": "51.62" }
+    },
+    {
+      "date": "2020-08-06",
+      "price": { "$numberDecimal": "51.58" }
+    },
+    {
+      "date": "2020-08-07",
+      "price": { "$numberDecimal": "51.71" }
+    },
+    {
+      "date": "2020-08-10",
+      "price": { "$numberDecimal": "51.79" }
+    },
+    {
+      "date": "2020-08-11",
+      "price": { "$numberDecimal": "51.79" }
+    },
+    {
+      "date": "2020-08-12",
+      "price": { "$numberDecimal": "51.61" }
+    },
+    {
+      "date": "2020-08-13",
+      "price": { "$numberDecimal": "51.55" }
+    },
+    {
+      "date": "2020-08-14",
+      "price": { "$numberDecimal": "51.43" }
+    },
+    {
+      "date": "2020-08-17",
+      "price": { "$numberDecimal": "51.37" }
+    },
+    {
+      "date": "2020-08-18",
+      "price": { "$numberDecimal": "51.4" }
+    },
+    {
+      "date": "2020-08-19",
+      "price": { "$numberDecimal": "51.45" }
+    },
+    {
+      "date": "2020-08-20",
+      "price": { "$numberDecimal": "51.41" }
+    },
+    {
+      "date": "2020-08-21",
+      "price": { "$numberDecimal": "51.45" }
+    },
+    {
+      "date": "2020-08-24",
+      "price": { "$numberDecimal": "51.52" }
+    },
+    {
+      "date": "2020-08-25",
+      "price": { "$numberDecimal": "51.44" }
+    },
+    {
+      "date": "2020-08-26",
+      "price": { "$numberDecimal": "51.25" }
+    },
+    {
+      "date": "2020-08-27",
+      "price": { "$numberDecimal": "51.33" }
+    },
+    {
+      "date": "2020-08-28",
+      "price": { "$numberDecimal": "51.09" }
+    },
+    {
+      "date": "2020-08-31",
+      "price": { "$numberDecimal": "51.22" }
+    },
+    {
+      "date": "2020-09-01",
+      "price": { "$numberDecimal": "51.23" }
+    },
+    {
+      "date": "2020-09-02",
+      "price": { "$numberDecimal": "51.38" }
+    },
+    {
+      "date": "2020-09-03",
+      "price": { "$numberDecimal": "51.5" }
+    },
+    {
+      "date": "2020-09-04",
+      "price": { "$numberDecimal": "51.56" }
+    },
+    {
+      "date": "2020-09-07",
+      "price": { "$numberDecimal": "51.35" }
+    },
+    {
+      "date": "2020-09-08",
+      "price": { "$numberDecimal": "51.4" }
+    },
+    {
+      "date": "2020-09-09",
+      "price": { "$numberDecimal": "51.45" }
+    },
+    {
+      "date": "2020-09-10",
+      "price": { "$numberDecimal": "51.33" }
+    },
+    {
+      "date": "2020-09-11",
+      "price": { "$numberDecimal": "51.38" }
+    },
+    {
+      "date": "2020-09-14",
+      "price": { "$numberDecimal": "51.49" }
+    },
+    {
+      "date": "2020-09-15",
+      "price": { "$numberDecimal": "51.42" }
+    },
+    {
+      "date": "2020-09-16",
+      "price": { "$numberDecimal": "51.49" }
+    },
+    {
+      "date": "2020-09-17",
+      "price": { "$numberDecimal": "51.38" }
+    },
+    {
+      "date": "2020-09-18",
+      "price": { "$numberDecimal": "51.53" }
+    },
+    {
+      "date": "2020-09-21",
+      "price": { "$numberDecimal": "51.43" }
+    },
+    {
+      "date": "2020-09-22",
+      "price": { "$numberDecimal": "51.42" }
+    },
+    {
+      "date": "2020-09-23",
+      "price": { "$numberDecimal": "51.53" }
+    },
+    {
+      "date": "2020-09-24",
+      "price": { "$numberDecimal": "51.4" }
+    },
+    {
+      "date": "2020-09-25",
+      "price": { "$numberDecimal": "51.39" }
+    },
+    {
+      "date": "2020-09-28",
+      "price": { "$numberDecimal": "51.35" }
+    },
+    {
+      "date": "2020-09-29",
+      "price": { "$numberDecimal": "51.22" }
+    },
+    {
+      "date": "2020-09-30",
+      "price": { "$numberDecimal": "51.36" }
+    },
+    {
+      "date": "2020-10-01",
+      "price": { "$numberDecimal": "49.02" }
+    },
+    {
+      "date": "2020-10-02",
+      "price": { "$numberDecimal": "49.11" }
+    },
+    {
+      "date": "2020-10-05",
+      "price": { "$numberDecimal": "49.04" }
+    },
+    {
+      "date": "2020-10-06",
+      "price": { "$numberDecimal": "48.98" }
+    },
+    {
+      "date": "2020-10-07",
+      "price": { "$numberDecimal": "49.06" }
+    },
+    {
+      "date": "2020-10-08",
+      "price": { "$numberDecimal": "49.09" }
+    },
+    {
+      "date": "2020-10-09",
+      "price": { "$numberDecimal": "49.2" }
+    },
+    {
+      "date": "2020-10-12",
+      "price": { "$numberDecimal": "49.03" }
+    },
+    {
+      "date": "2020-10-13",
+      "price": { "$numberDecimal": "49.2" }
+    },
+    {
+      "date": "2020-10-14",
+      "price": { "$numberDecimal": "49.28" }
+    },
+    {
+      "date": "2020-10-15",
+      "price": { "$numberDecimal": "49.31" }
+    },
+    {
+      "date": "2020-10-16",
+      "price": { "$numberDecimal": "49.31" }
+    },
+    {
+      "date": "2020-10-19",
+      "price": { "$numberDecimal": "49.3" }
+    },
+    {
+      "date": "2020-10-20",
+      "price": { "$numberDecimal": "49.28" }
+    },
+    {
+      "date": "2020-10-21",
+      "price": { "$numberDecimal": "49.16" }
+    },
+    {
+      "date": "2020-10-22",
+      "price": { "$numberDecimal": "49.2" }
+    },
+    {
+      "date": "2020-10-23",
+      "price": { "$numberDecimal": "49.1" }
+    },
+    {
+      "date": "2020-10-26",
+      "price": { "$numberDecimal": "49.08" }
+    },
+    {
+      "date": "2020-10-27",
+      "price": { "$numberDecimal": "49.15" }
+    },
+    {
+      "date": "2020-10-28",
+      "price": { "$numberDecimal": "49.3" }
+    },
+    {
+      "date": "2020-10-29",
+      "price": { "$numberDecimal": "49.23" }
+    },
+    {
+      "date": "2020-10-30",
+      "price": { "$numberDecimal": "49.17" }
+    },
+    {
+      "date": "2020-11-02",
+      "price": { "$numberDecimal": "49.09" }
+    },
+    {
+      "date": "2020-11-03",
+      "price": { "$numberDecimal": "49.13" }
+    },
+    {
+      "date": "2020-11-04",
+      "price": { "$numberDecimal": "49.21" }
+    },
+    {
+      "date": "2020-11-05",
+      "price": { "$numberDecimal": "49.45" }
+    },
+    {
+      "date": "2020-11-06",
+      "price": { "$numberDecimal": "49.41" }
+    },
+    {
+      "date": "2020-11-09",
+      "price": { "$numberDecimal": "49.48" }
+    },
+    {
+      "date": "2020-11-10",
+      "price": { "$numberDecimal": "49.33" }
+    },
+    {
+      "date": "2020-11-11",
+      "price": { "$numberDecimal": "49.24" }
+    },
+    {
+      "date": "2020-11-12",
+      "price": { "$numberDecimal": "49.33" }
+    },
+    {
+      "date": "2020-11-13",
+      "price": { "$numberDecimal": "49.44" }
+    },
+    {
+      "date": "2020-11-17",
+      "price": { "$numberDecimal": "49.45" }
+    },
+    {
+      "date": "2020-11-18",
+      "price": { "$numberDecimal": "49.59" }
+    },
+    {
+      "date": "2020-11-19",
+      "price": { "$numberDecimal": "49.6" }
+    },
+    {
+      "date": "2020-11-20",
+      "price": { "$numberDecimal": "49.72" }
+    },
+    {
+      "date": "2020-11-23",
+      "price": { "$numberDecimal": "49.75" }
+    },
+    {
+      "date": "2020-11-24",
+      "price": { "$numberDecimal": "49.71" }
+    },
+    {
+      "date": "2020-11-25",
+      "price": { "$numberDecimal": "49.72" }
+    },
+    {
+      "date": "2020-11-26",
+      "price": { "$numberDecimal": "49.7" }
+    },
+    {
+      "date": "2020-11-27",
+      "price": { "$numberDecimal": "49.75" }
+    },
+    {
+      "date": "2020-11-30",
+      "price": { "$numberDecimal": "49.72" }
+    },
+    {
+      "date": "2020-12-01",
+      "price": { "$numberDecimal": "49.79" }
+    },
+    {
+      "date": "2020-12-02",
+      "price": { "$numberDecimal": "49.74" }
+    },
+    {
+      "date": "2020-12-03",
+      "price": { "$numberDecimal": "49.75" }
+    },
+    {
+      "date": "2020-12-04",
+      "price": { "$numberDecimal": "49.71" }
+    },
+    {
+      "date": "2020-12-07",
+      "price": { "$numberDecimal": "49.68" }
+    },
+    {
+      "date": "2020-12-08",
+      "price": { "$numberDecimal": "49.8" }
+    },
+    {
+      "date": "2020-12-09",
+      "price": { "$numberDecimal": "49.8" }
+    },
+    {
+      "date": "2020-12-10",
+      "price": { "$numberDecimal": "49.8" }
+    },
+    {
+      "date": "2020-12-11",
+      "price": { "$numberDecimal": "49.78" }
+    },
+    {
+      "date": "2020-12-14",
+      "price": { "$numberDecimal": "49.81" }
+    },
+    {
+      "date": "2020-12-15",
+      "price": { "$numberDecimal": "49.87" }
+    },
+    {
+      "date": "2020-12-16",
+      "price": { "$numberDecimal": "49.71" }
+    },
+    {
+      "date": "2020-12-17",
+      "price": { "$numberDecimal": "49.82" }
+    },
+    {
+      "date": "2020-12-18",
+      "price": { "$numberDecimal": "49.89" }
+    },
+    {
+      "date": "2020-12-21",
+      "price": { "$numberDecimal": "49.95" }
+    },
+    {
+      "date": "2020-12-22",
+      "price": { "$numberDecimal": "49.73" }
+    },
+    {
+      "date": "2020-12-23",
+      "price": { "$numberDecimal": "49.92" }
+    },
+    {
+      "date": "2020-12-24",
+      "price": { "$numberDecimal": "49.84" }
+    },
+    {
+      "date": "2020-12-29",
+      "price": { "$numberDecimal": "49.92" }
+    },
+    {
+      "date": "2020-12-30",
+      "price": { "$numberDecimal": "49.94" }
+    },
+    {
+      "date": "2020-12-31",
+      "price": { "$numberDecimal": "49.99" }
+    },
+    {
+      "date": "2021-01-04",
+      "price": { "$numberDecimal": "48.78" }
+    },
+    {
+      "date": "2021-01-05",
+      "price": { "$numberDecimal": "48.75" }
+    },
+    {
+      "date": "2021-01-06",
+      "price": { "$numberDecimal": "48.55" }
+    },
+    {
+      "date": "2021-01-07",
+      "price": { "$numberDecimal": "48.38" }
+    },
+    {
+      "date": "2021-01-08",
+      "price": { "$numberDecimal": "48.24" }
+    },
+    {
+      "date": "2021-01-11",
+      "price": { "$numberDecimal": "48.4" }
+    },
+    {
+      "date": "2021-01-12",
+      "price": { "$numberDecimal": "48.24" }
+    },
+    {
+      "date": "2021-01-13",
+      "price": { "$numberDecimal": "48.34" }
+    },
+    {
+      "date": "2021-01-14",
+      "price": { "$numberDecimal": "48.62" }
+    },
+    {
+      "date": "2021-01-15",
+      "price": { "$numberDecimal": "48.64" }
+    },
+    {
+      "date": "2021-01-18",
+      "price": { "$numberDecimal": "48.5" }
+    },
+    {
+      "date": "2021-01-19",
+      "price": { "$numberDecimal": "48.4" }
+    },
+    {
+      "date": "2021-01-20",
+      "price": { "$numberDecimal": "48.53" }
+    },
+    {
+      "date": "2021-01-21",
+      "price": { "$numberDecimal": "48.35" }
+    },
+    {
+      "date": "2021-01-22",
+      "price": { "$numberDecimal": "48.31" }
+    },
+    {
+      "date": "2021-01-25",
+      "price": { "$numberDecimal": "48.47" }
+    },
+    {
+      "date": "2021-01-27",
+      "price": { "$numberDecimal": "48.53" }
+    },
+    {
+      "date": "2021-01-28",
+      "price": { "$numberDecimal": "48.53" }
+    },
+    {
+      "date": "2021-01-29",
+      "price": { "$numberDecimal": "48.45" }
+    },
+    {
+      "date": "2021-02-01",
+      "price": { "$numberDecimal": "48.35" }
+    },
+    {
+      "date": "2021-02-02",
+      "price": { "$numberDecimal": "48.43" }
+    },
+    {
+      "date": "2021-02-03",
+      "price": { "$numberDecimal": "48.26" }
+    },
+    {
+      "date": "2021-02-04",
+      "price": { "$numberDecimal": "48.21" }
+    },
+    {
+      "date": "2021-02-05",
+      "price": { "$numberDecimal": "48.32" }
+    },
+    {
+      "date": "2021-02-08",
+      "price": { "$numberDecimal": "48.13" }
+    },
+    {
+      "date": "2021-02-09",
+      "price": { "$numberDecimal": "48.26" }
+    },
+    {
+      "date": "2021-02-10",
+      "price": { "$numberDecimal": "48.25" }
+    },
+    {
+      "date": "2021-02-11",
+      "price": { "$numberDecimal": "48.2" }
+    },
+    {
+      "date": "2021-02-12",
+      "price": { "$numberDecimal": "48.2" }
+    },
+    {
+      "date": "2021-02-15",
+      "price": { "$numberDecimal": "48.11" }
+    },
+    {
+      "date": "2021-02-16",
+      "price": { "$numberDecimal": "48.14" }
+    },
+    {
+      "date": "2021-02-17",
+      "price": { "$numberDecimal": "47.98" }
+    },
+    {
+      "date": "2021-02-18",
+      "price": { "$numberDecimal": "47.97" }
+    },
+    {
+      "date": "2021-02-19",
+      "price": { "$numberDecimal": "47.99" }
+    },
+    {
+      "date": "2021-02-22",
+      "price": { "$numberDecimal": "47.68" }
+    },
+    {
+      "date": "2021-02-23",
+      "price": { "$numberDecimal": "47.75" }
+    },
+    {
+      "date": "2021-02-24",
+      "price": { "$numberDecimal": "47.73" }
+    },
+    {
+      "date": "2021-02-25",
+      "price": { "$numberDecimal": "47.48" }
+    },
+    {
+      "date": "2021-02-26",
+      "price": { "$numberDecimal": "47.21" }
+    },
+    {
+      "date": "2021-03-01",
+      "price": { "$numberDecimal": "47.64" }
+    },
+    {
+      "date": "2021-03-02",
+      "price": { "$numberDecimal": "47.69" }
+    },
+    {
+      "date": "2021-03-03",
+      "price": { "$numberDecimal": "47.64" }
+    },
+    {
+      "date": "2021-03-04",
+      "price": { "$numberDecimal": "47.55" }
+    },
+    {
+      "date": "2021-03-05",
+      "price": { "$numberDecimal": "47.39" }
+    },
+    {
+      "date": "2021-03-08",
+      "price": { "$numberDecimal": "47.25" }
+    },
+    {
+      "date": "2021-03-09",
+      "price": { "$numberDecimal": "47.28" }
+    },
+    {
+      "date": "2021-03-10",
+      "price": { "$numberDecimal": "47.15" }
+    },
+    {
+      "date": "2021-03-11",
+      "price": { "$numberDecimal": "47.315" }
+    },
+    {
+      "date": "2021-03-12",
+      "price": { "$numberDecimal": "47.39" }
+    },
+    {
+      "date": "2021-03-15",
+      "price": { "$numberDecimal": "47.18" }
+    },
+    {
+      "date": "2021-03-16",
+      "price": { "$numberDecimal": "47.11" }
+    },
+    {
+      "date": "2021-03-17",
+      "price": { "$numberDecimal": "47.06" }
+    },
+    {
+      "date": "2021-03-18",
+      "price": { "$numberDecimal": "47.11" }
+    },
+    {
+      "date": "2021-03-19",
+      "price": { "$numberDecimal": "47.09" }
+    },
+    {
+      "date": "2021-03-22",
+      "price": { "$numberDecimal": "47.22" }
+    },
+    {
+      "date": "2021-03-23",
+      "price": { "$numberDecimal": "47.1" }
+    },
+    {
+      "date": "2021-03-24",
+      "price": { "$numberDecimal": "47.37" }
+    },
+    {
+      "date": "2021-03-25",
+      "price": { "$numberDecimal": "47.37" }
+    },
+    {
+      "date": "2021-03-26",
+      "price": { "$numberDecimal": "47.37" }
+    },
+    {
+      "date": "2021-03-29",
+      "price": { "$numberDecimal": "47.05" }
+    },
+    {
+      "date": "2021-03-30",
+      "price": { "$numberDecimal": "47.06" }
+    },
+    {
+      "date": "2021-03-31",
+      "price": { "$numberDecimal": "46.95" }
+    },
+    {
+      "date": "2021-04-01",
+      "price": { "$numberDecimal": "44.83" }
+    },
+    {
+      "date": "2021-04-06",
+      "price": { "$numberDecimal": "44.95" }
+    },
+    {
+      "date": "2021-04-07",
+      "price": { "$numberDecimal": "45.2" }
+    },
+    {
+      "date": "2021-04-08",
+      "price": { "$numberDecimal": "45.15" }
+    },
+    {
+      "date": "2021-04-09",
+      "price": { "$numberDecimal": "45.08" }
+    },
+    {
+      "date": "2021-04-12",
+      "price": { "$numberDecimal": "45.04" }
+    },
+    {
+      "date": "2021-04-13",
+      "price": { "$numberDecimal": "45" }
+    },
+    {
+      "date": "2021-04-14",
+      "price": { "$numberDecimal": "45.08" }
+    },
+    {
+      "date": "2021-04-15",
+      "price": { "$numberDecimal": "45.03" }
+    },
+    {
+      "date": "2021-04-16",
+      "price": { "$numberDecimal": "45.22" }
+    },
+    {
+      "date": "2021-04-19",
+      "price": { "$numberDecimal": "45.17" }
+    },
+    {
+      "date": "2021-04-20",
+      "price": { "$numberDecimal": "45" }
+    },
+    {
+      "date": "2021-04-21",
+      "price": { "$numberDecimal": "45.15" }
+    },
+    {
+      "date": "2021-04-22",
+      "price": { "$numberDecimal": "45.18" }
+    },
+    {
+      "date": "2021-04-23",
+      "price": { "$numberDecimal": "45.07" }
+    },
+    {
+      "date": "2021-04-26",
+      "price": { "$numberDecimal": "45.25" }
+    },
+    {
+      "date": "2021-04-27",
+      "price": { "$numberDecimal": "45.25" }
+    },
+    {
+      "date": "2021-04-28",
+      "price": { "$numberDecimal": "45.17" }
+    },
+    {
+      "date": "2021-04-29",
+      "price": { "$numberDecimal": "45.17" }
+    },
+    {
+      "date": "2021-04-30",
+      "price": { "$numberDecimal": "45" }
+    },
+    {
+      "date": "2021-05-03",
+      "price": { "$numberDecimal": "45.14" }
+    },
+    {
+      "date": "2021-05-04",
+      "price": { "$numberDecimal": "45.1" }
+    },
+    {
+      "date": "2021-05-05",
+      "price": { "$numberDecimal": "45.16" }
+    },
+    {
+      "date": "2021-05-06",
+      "price": { "$numberDecimal": "45.26" }
+    },
+    {
+      "date": "2021-05-07",
+      "price": { "$numberDecimal": "45.2" }
+    },
+    {
+      "date": "2021-05-10",
+      "price": { "$numberDecimal": "45.29" }
+    },
+    {
+      "date": "2021-05-11",
+      "price": { "$numberDecimal": "45.16" }
+    },
+    {
+      "date": "2021-05-12",
+      "price": { "$numberDecimal": "45.09" }
+    },
+    {
+      "date": "2021-05-13",
+      "price": { "$numberDecimal": "44.99" }
+    },
+    {
+      "date": "2021-05-14",
+      "price": { "$numberDecimal": "45.01" }
+    },
+    {
+      "date": "2021-05-17",
+      "price": { "$numberDecimal": "45.16" }
+    },
+    {
+      "date": "2021-05-18",
+      "price": { "$numberDecimal": "45.05" }
+    },
+    {
+      "date": "2021-05-19",
+      "price": { "$numberDecimal": "45.06" }
+    },
+    {
+      "date": "2021-05-20",
+      "price": { "$numberDecimal": "45.02" }
+    },
+    {
+      "date": "2021-05-21",
+      "price": { "$numberDecimal": "45.04" }
+    },
+    {
+      "date": "2021-05-24",
+      "price": { "$numberDecimal": "45.1" }
+    },
+    {
+      "date": "2021-05-25",
+      "price": { "$numberDecimal": "45.1" }
+    },
+    {
+      "date": "2021-05-26",
+      "price": { "$numberDecimal": "45.22" }
+    },
+    {
+      "date": "2021-05-27",
+      "price": { "$numberDecimal": "45.28" }
+    },
+    {
+      "date": "2021-05-28",
+      "price": { "$numberDecimal": "45.22" }
+    },
+    {
+      "date": "2021-05-31",
+      "price": { "$numberDecimal": "45.3" }
+    },
+    {
+      "date": "2021-06-01",
+      "price": { "$numberDecimal": "45.31" }
+    },
+    {
+      "date": "2021-06-02",
+      "price": { "$numberDecimal": "45.37" }
+    },
+    {
+      "date": "2021-06-03",
+      "price": { "$numberDecimal": "45.36" }
+    },
+    {
+      "date": "2021-06-04",
+      "price": { "$numberDecimal": "45.21" }
+    },
+    {
+      "date": "2021-06-07",
+      "price": { "$numberDecimal": "45.44" }
+    },
+    {
+      "date": "2021-06-08",
+      "price": { "$numberDecimal": "45.46" }
+    },
+    {
+      "date": "2021-06-09",
+      "price": { "$numberDecimal": "45.42" }
+    },
+    {
+      "date": "2021-06-10",
+      "price": { "$numberDecimal": "45.5" }
+    },
+    {
+      "date": "2021-06-11",
+      "price": { "$numberDecimal": "45.6" }
+    },
+    {
+      "date": "2021-06-15",
+      "price": { "$numberDecimal": "45.54" }
+    },
+    {
+      "date": "2021-06-16",
+      "price": { "$numberDecimal": "45.51" }
+    },
+    {
+      "date": "2021-06-17",
+      "price": { "$numberDecimal": "45.4" }
+    },
+    {
+      "date": "2021-06-18",
+      "price": { "$numberDecimal": "45.78" }
+    },
+    {
+      "date": "2021-06-21",
+      "price": { "$numberDecimal": "45.79" }
+    },
+    {
+      "date": "2021-06-22",
+      "price": { "$numberDecimal": "45.52" }
+    },
+    {
+      "date": "2021-06-23",
+      "price": { "$numberDecimal": "45.67" }
+    },
+    {
+      "date": "2021-06-24",
+      "price": { "$numberDecimal": "45.65" }
+    },
+    {
+      "date": "2021-06-25",
+      "price": { "$numberDecimal": "45.57" }
+    },
+    {
+      "date": "2021-06-28",
+      "price": { "$numberDecimal": "45.6" }
+    },
+    {
+      "date": "2021-06-29",
+      "price": { "$numberDecimal": "45.69" }
+    },
+    {
+      "date": "2021-06-30",
+      "price": { "$numberDecimal": "45.57" }
+    },
+    {
+      "date": "2021-07-01",
+      "price": { "$numberDecimal": "45.18" }
+    },
+    {
+      "date": "2021-07-02",
+      "price": { "$numberDecimal": "45.22" }
+    },
+    {
+      "date": "2021-07-05",
+      "price": { "$numberDecimal": "45.34" }
+    },
+    {
+      "date": "2021-07-06",
+      "price": { "$numberDecimal": "45.21" }
+    },
+    {
+      "date": "2021-07-07",
+      "price": { "$numberDecimal": "45.37" }
+    },
+    {
+      "date": "2021-07-08",
+      "price": { "$numberDecimal": "45.55" }
+    },
+    {
+      "date": "2021-07-09",
+      "price": { "$numberDecimal": "45.42" }
+    },
+    {
+      "date": "2021-07-12",
+      "price": { "$numberDecimal": "45.45" }
+    },
+    {
+      "date": "2021-07-13",
+      "price": { "$numberDecimal": "45.44" }
+    },
+    {
+      "date": "2021-07-14",
+      "price": { "$numberDecimal": "45.33" }
+    },
+    {
+      "date": "2021-07-15",
+      "price": { "$numberDecimal": "45.45" }
+    },
+    {
+      "date": "2021-07-16",
+      "price": { "$numberDecimal": "45.53" }
+    },
+    {
+      "date": "2021-07-19",
+      "price": { "$numberDecimal": "45.6" }
+    },
+    {
+      "date": "2021-07-20",
+      "price": { "$numberDecimal": "45.74" }
+    },
+    {
+      "date": "2021-07-21",
+      "price": { "$numberDecimal": "45.69" }
+    },
+    {
+      "date": "2021-07-22",
+      "price": { "$numberDecimal": "45.62" }
+    },
+    {
+      "date": "2021-07-23",
+      "price": { "$numberDecimal": "45.62" }
+    },
+    {
+      "date": "2021-07-26",
+      "price": { "$numberDecimal": "45.76" }
+    },
+    {
+      "date": "2021-07-27",
+      "price": { "$numberDecimal": "45.57" }
+    },
+    {
+      "date": "2021-07-28",
+      "price": { "$numberDecimal": "45.75" }
+    },
+    {
+      "date": "2021-07-29",
+      "price": { "$numberDecimal": "45.84" }
+    },
+    {
+      "date": "2021-07-30",
+      "price": { "$numberDecimal": "45.62" }
+    },
+    {
+      "date": "2021-08-02",
+      "price": { "$numberDecimal": "45.74" }
+    },
+    {
+      "date": "2021-08-03",
+      "price": { "$numberDecimal": "45.75" }
+    },
+    {
+      "date": "2021-08-04",
+      "price": { "$numberDecimal": "45.74" }
+    },
+    {
+      "date": "2021-08-05",
+      "price": { "$numberDecimal": "45.81" }
+    },
+    {
+      "date": "2021-08-06",
+      "price": { "$numberDecimal": "45.71" }
+    },
+    {
+      "date": "2021-08-09",
+      "price": { "$numberDecimal": "45.57" }
+    },
+    {
+      "date": "2021-08-10",
+      "price": { "$numberDecimal": "45.6" }
+    },
+    {
+      "date": "2021-08-11",
+      "price": { "$numberDecimal": "45.42" }
+    },
+    {
+      "date": "2021-08-12",
+      "price": { "$numberDecimal": "45.51" }
+    },
+    {
+      "date": "2021-08-13",
+      "price": { "$numberDecimal": "45.55" }
+    },
+    {
+      "date": "2021-08-16",
+      "price": { "$numberDecimal": "45.74" }
+    },
+    {
+      "date": "2021-08-17",
+      "price": { "$numberDecimal": "45.7" }
+    },
+    {
+      "date": "2021-08-18",
+      "price": { "$numberDecimal": "45.71" }
+    },
+    {
+      "date": "2021-08-19",
+      "price": { "$numberDecimal": "45.63" }
+    },
+    {
+      "date": "2021-08-20",
+      "price": { "$numberDecimal": "45.8" }
+    },
+    {
+      "date": "2021-08-23",
+      "price": { "$numberDecimal": "45.7" }
+    },
+    {
+      "date": "2021-08-24",
+      "price": { "$numberDecimal": "45.7" }
+    },
+    {
+      "date": "2021-08-25",
+      "price": { "$numberDecimal": "45.65" }
+    },
+    {
+      "date": "2021-08-26",
+      "price": { "$numberDecimal": "45.63" }
+    },
+    {
+      "date": "2021-08-27",
+      "price": { "$numberDecimal": "45.64" }
+    },
+    {
+      "date": "2021-08-30",
+      "price": { "$numberDecimal": "45.69" }
+    },
+    {
+      "date": "2021-08-31",
+      "price": { "$numberDecimal": "45.77" }
+    },
+    {
+      "date": "2021-09-01",
+      "price": { "$numberDecimal": "45.63" }
+    },
+    {
+      "date": "2021-09-02",
+      "price": { "$numberDecimal": "45.63" }
+    },
+    {
+      "date": "2021-09-03",
+      "price": { "$numberDecimal": "45.63" }
+    },
+    {
+      "date": "2021-09-06",
+      "price": { "$numberDecimal": "45.66" }
+    },
+    {
+      "date": "2021-09-07",
+      "price": { "$numberDecimal": "45.58" }
+    },
+    {
+      "date": "2021-09-08",
+      "price": { "$numberDecimal": "45.55" }
+    },
+    {
+      "date": "2021-09-09",
+      "price": { "$numberDecimal": "45.57" }
+    },
+    {
+      "date": "2021-09-10",
+      "price": { "$numberDecimal": "45.64" }
+    },
+    {
+      "date": "2021-09-13",
+      "price": { "$numberDecimal": "45.57" }
+    },
+    {
+      "date": "2021-09-14",
+      "price": { "$numberDecimal": "45.67" }
+    },
+    {
+      "date": "2021-09-15",
+      "price": { "$numberDecimal": "45.76" }
+    },
+    {
+      "date": "2021-09-16",
+      "price": { "$numberDecimal": "45.72" }
+    },
+    {
+      "date": "2021-09-17",
+      "price": { "$numberDecimal": "45.58" }
+    },
+    {
+      "date": "2021-09-20",
+      "price": { "$numberDecimal": "45.54" }
+    },
+    {
+      "date": "2021-09-21",
+      "price": { "$numberDecimal": "45.6" }
+    },
+    {
+      "date": "2021-09-22",
+      "price": { "$numberDecimal": "45.64" }
+    },
+    {
+      "date": "2021-09-23",
+      "price": { "$numberDecimal": "45.71" }
+    },
+    {
+      "date": "2021-09-24",
+      "price": { "$numberDecimal": "45.47" }
+    },
+    {
+      "date": "2021-09-27",
+      "price": { "$numberDecimal": "45.43" }
+    },
+    {
+      "date": "2021-09-28",
+      "price": { "$numberDecimal": "45.29" }
+    },
+    {
+      "date": "2021-09-29",
+      "price": { "$numberDecimal": "45.16" }
+    },
+    {
+      "date": "2021-09-30",
+      "price": { "$numberDecimal": "45.26" }
+    },
+    {
+      "date": "2021-10-01",
+      "price": { "$numberDecimal": "45.12" }
+    },
+    {
+      "date": "2021-10-04",
+      "price": { "$numberDecimal": "45.13" }
+    },
+    {
+      "date": "2021-10-05",
+      "price": { "$numberDecimal": "45.07" }
+    },
+    {
+      "date": "2021-10-06",
+      "price": { "$numberDecimal": "44.95" }
+    },
+    {
+      "date": "2021-10-07",
+      "price": { "$numberDecimal": "44.93" }
+    },
+    {
+      "date": "2021-10-08",
+      "price": { "$numberDecimal": "44.87" }
+    },
+    {
+      "date": "2021-10-11",
+      "price": { "$numberDecimal": "44.74" }
+    },
+    {
+      "date": "2021-10-12",
+      "price": { "$numberDecimal": "44.65" }
+    },
+    {
+      "date": "2021-10-13",
+      "price": { "$numberDecimal": "44.73" }
+    },
+    {
+      "date": "2021-10-14",
+      "price": { "$numberDecimal": "44.83" }
+    },
+    {
+      "date": "2021-10-15",
+      "price": { "$numberDecimal": "44.98" }
+    },
+    {
+      "date": "2021-10-18",
+      "price": { "$numberDecimal": "44.85" }
+    },
+    {
+      "date": "2021-10-19",
+      "price": { "$numberDecimal": "44.91" }
+    },
+    {
+      "date": "2021-10-20",
+      "price": { "$numberDecimal": "44.76" }
+    },
+    {
+      "date": "2021-10-21",
+      "price": { "$numberDecimal": "44.74" }
+    },
+    {
+      "date": "2021-10-22",
+      "price": { "$numberDecimal": "44.68" }
+    },
+    {
+      "date": "2021-10-25",
+      "price": { "$numberDecimal": "44.77" }
+    },
+    {
+      "date": "2021-10-26",
+      "price": { "$numberDecimal": "44.8" }
+    },
+    {
+      "date": "2021-10-27",
+      "price": { "$numberDecimal": "44.75" }
+    },
+    {
+      "date": "2021-10-28",
+      "price": { "$numberDecimal": "45.03" }
+    },
+    {
+      "date": "2021-10-29",
+      "price": { "$numberDecimal": "44.9" }
+    },
+    {
+      "date": "2021-11-01",
+      "price": { "$numberDecimal": "44.92" }
+    },
+    {
+      "date": "2021-11-02",
+      "price": { "$numberDecimal": "44.92" }
+    },
+    {
+      "date": "2021-11-03",
+      "price": { "$numberDecimal": "44.98" }
+    },
+    {
+      "date": "2021-11-04",
+      "price": { "$numberDecimal": "44.82" }
+    },
+    {
+      "date": "2021-11-05",
+      "price": { "$numberDecimal": "45.1" }
+    },
+    {
+      "date": "2021-11-08",
+      "price": { "$numberDecimal": "45.23" }
+    },
+    {
+      "date": "2021-11-09",
+      "price": { "$numberDecimal": "45.3" }
+    },
+    {
+      "date": "2021-11-10",
+      "price": { "$numberDecimal": "45.35" }
+    },
+    {
+      "date": "2021-11-11",
+      "price": { "$numberDecimal": "45.09" }
+    },
+    {
+      "date": "2021-11-12",
+      "price": { "$numberDecimal": "45.1" }
+    },
+    {
+      "date": "2021-11-15",
+      "price": { "$numberDecimal": "45.1" }
+    },
+    {
+      "date": "2021-11-16",
+      "price": { "$numberDecimal": "44.9" }
+    },
+    {
+      "date": "2021-11-17",
+      "price": { "$numberDecimal": "44.8" }
+    },
+    {
+      "date": "2021-11-18",
+      "price": { "$numberDecimal": "44.86" }
+    },
+    {
+      "date": "2021-11-19",
+      "price": { "$numberDecimal": "44.87" }
+    },
+    {
+      "date": "2021-11-22",
+      "price": { "$numberDecimal": "45" }
+    },
+    {
+      "date": "2021-11-23",
+      "price": { "$numberDecimal": "44.77" }
+    },
+    {
+      "date": "2021-11-24",
+      "price": { "$numberDecimal": "44.76" }
+    },
+    {
+      "date": "2021-11-25",
+      "price": { "$numberDecimal": "44.74" }
+    },
+    {
+      "date": "2021-11-26",
+      "price": { "$numberDecimal": "44.83" }
+    },
+    {
+      "date": "2021-11-29",
+      "price": { "$numberDecimal": "44.9" }
+    },
+    {
+      "date": "2021-11-30",
+      "price": { "$numberDecimal": "44.84" }
+    },
+    {
+      "date": "2021-12-01",
+      "price": { "$numberDecimal": "44.98" }
+    },
+    {
+      "date": "2021-12-02",
+      "price": { "$numberDecimal": "45.08" }
+    },
+    {
+      "date": "2021-12-03",
+      "price": { "$numberDecimal": "45.14" }
+    },
+    {
+      "date": "2021-12-06",
+      "price": { "$numberDecimal": "45.26" }
+    },
+    {
+      "date": "2021-12-07",
+      "price": { "$numberDecimal": "45.12" }
+    },
+    {
+      "date": "2021-12-08",
+      "price": { "$numberDecimal": "45.21" }
+    },
+    {
+      "date": "2021-12-09",
+      "price": { "$numberDecimal": "45.05" }
+    },
+    {
+      "date": "2021-12-10",
+      "price": { "$numberDecimal": "45.07" }
+    },
+    {
+      "date": "2021-12-13",
+      "price": { "$numberDecimal": "45.08" }
+    },
+    {
+      "date": "2021-12-14",
+      "price": { "$numberDecimal": "45.14" }
+    },
+    {
+      "date": "2021-12-15",
+      "price": { "$numberDecimal": "45.16" }
+    },
+    {
+      "date": "2021-12-16",
+      "price": { "$numberDecimal": "45.11" }
+    },
+    {
+      "date": "2021-12-17",
+      "price": { "$numberDecimal": "45.09" }
+    },
+    {
+      "date": "2021-12-20",
+      "price": { "$numberDecimal": "45.24" }
+    },
+    {
+      "date": "2021-12-21",
+      "price": { "$numberDecimal": "45.14" }
+    },
+    {
+      "date": "2021-12-22",
+      "price": { "$numberDecimal": "45" }
+    },
+    {
+      "date": "2021-12-23",
+      "price": { "$numberDecimal": "44.96" }
+    },
+    {
+      "date": "2021-12-24",
+      "price": { "$numberDecimal": "44.89" }
+    },
+    {
+      "date": "2021-12-29",
+      "price": { "$numberDecimal": "44.96" }
+    },
+    {
+      "date": "2021-12-30",
+      "price": { "$numberDecimal": "44.85" }
+    },
+    {
+      "date": "2021-12-31",
+      "price": { "$numberDecimal": "44.94" }
+    },
+    {
+      "date": "2022-01-04",
+      "price": { "$numberDecimal": "44.45" }
+    },
+    {
+      "date": "2022-01-05",
+      "price": { "$numberDecimal": "44.39" }
+    },
+    {
+      "date": "2022-01-06",
+      "price": { "$numberDecimal": "44.16" }
+    },
+    {
+      "date": "2022-01-07",
+      "price": { "$numberDecimal": "44.24" }
+    },
+    {
+      "date": "2022-01-10",
+      "price": { "$numberDecimal": "44.05" }
+    },
+    {
+      "date": "2022-01-11",
+      "price": { "$numberDecimal": "44.08" }
+    },
+    {
+      "date": "2022-01-12",
+      "price": { "$numberDecimal": "44.13" }
+    },
+    {
+      "date": "2022-01-13",
+      "price": { "$numberDecimal": "44.12" }
+    },
+    {
+      "date": "2022-01-14",
+      "price": { "$numberDecimal": "44.17" }
+    },
+    {
+      "date": "2022-01-17",
+      "price": { "$numberDecimal": "43.93" }
+    },
+    {
+      "date": "2022-01-18",
+      "price": { "$numberDecimal": "43.85" }
+    },
+    {
+      "date": "2022-01-19",
+      "price": { "$numberDecimal": "43.75" }
+    },
+    {
+      "date": "2022-01-20",
+      "price": { "$numberDecimal": "43.83" }
+    },
+    {
+      "date": "2022-01-21",
+      "price": { "$numberDecimal": "43.93" }
+    },
+    {
+      "date": "2022-01-24",
+      "price": { "$numberDecimal": "43.86" }
+    },
+    {
+      "date": "2022-01-25",
+      "price": { "$numberDecimal": "43.85" }
+    },
+    {
+      "date": "2022-01-27",
+      "price": { "$numberDecimal": "43.64" }
+    },
+    {
+      "date": "2022-01-28",
+      "price": { "$numberDecimal": "43.61" }
+    },
+    {
+      "date": "2022-01-31",
+      "price": { "$numberDecimal": "43.65" }
+    },
+    {
+      "date": "2022-02-01",
+      "price": { "$numberDecimal": "43.58" }
+    },
+    {
+      "date": "2022-02-02",
+      "price": { "$numberDecimal": "43.57" }
+    },
+    {
+      "date": "2022-02-03",
+      "price": { "$numberDecimal": "43.66" }
+    },
+    {
+      "date": "2022-02-04",
+      "price": { "$numberDecimal": "43.34" }
+    },
+    {
+      "date": "2022-02-07",
+      "price": { "$numberDecimal": "43.14" }
+    },
+    {
+      "date": "2022-02-08",
+      "price": { "$numberDecimal": "42.94" }
+    },
+    {
+      "date": "2022-02-09",
+      "price": { "$numberDecimal": "42.94" }
+    },
+    {
+      "date": "2022-02-10",
+      "price": { "$numberDecimal": "42.99" }
+    },
+    {
+      "date": "2022-02-11",
+      "price": { "$numberDecimal": "42.7" }
+    },
+    {
+      "date": "2022-02-14",
+      "price": { "$numberDecimal": "42.87" }
+    },
+    {
+      "date": "2022-02-15",
+      "price": { "$numberDecimal": "42.72" }
+    },
+    {
+      "date": "2022-02-16",
+      "price": { "$numberDecimal": "42.56" }
+    },
+    {
+      "date": "2022-02-17",
+      "price": { "$numberDecimal": "42.6" }
+    },
+    {
+      "date": "2022-02-18",
+      "price": { "$numberDecimal": "42.7" }
+    },
+    {
+      "date": "2022-02-21",
+      "price": { "$numberDecimal": "42.78" }
+    },
+    {
+      "date": "2022-02-22",
+      "price": { "$numberDecimal": "42.82" }
+    },
+    {
+      "date": "2022-02-23",
+      "price": { "$numberDecimal": "42.64" }
+    },
+    {
+      "date": "2022-02-24",
+      "price": { "$numberDecimal": "42.59" }
+    },
+    {
+      "date": "2022-02-25",
+      "price": { "$numberDecimal": "42.47" }
+    },
+    {
+      "date": "2022-02-28",
+      "price": { "$numberDecimal": "42.64" }
+    },
+    {
+      "date": "2022-03-01",
+      "price": { "$numberDecimal": "42.74" }
+    },
+    {
+      "date": "2022-03-02",
+      "price": { "$numberDecimal": "42.9" }
+    },
+    {
+      "date": "2022-03-03",
+      "price": { "$numberDecimal": "42.74" }
+    },
+    {
+      "date": "2022-03-04",
+      "price": { "$numberDecimal": "42.75" }
+    },
+    {
+      "date": "2022-03-07",
+      "price": { "$numberDecimal": "42.85" }
+    },
+    {
+      "date": "2022-03-08",
+      "price": { "$numberDecimal": "42.58" }
+    },
+    {
+      "date": "2022-03-09",
+      "price": { "$numberDecimal": "42.37" }
+    },
+    {
+      "date": "2022-03-10",
+      "price": { "$numberDecimal": "42.19" }
+    },
+    {
+      "date": "2022-03-11",
+      "price": { "$numberDecimal": "42.31" }
+    },
+    {
+      "date": "2022-03-14",
+      "price": { "$numberDecimal": "41.83" }
+    },
+    {
+      "date": "2022-03-15",
+      "price": { "$numberDecimal": "41.57" }
+    },
+    {
+      "date": "2022-03-16",
+      "price": { "$numberDecimal": "41.58" }
+    },
+    {
+      "date": "2022-03-17",
+      "price": { "$numberDecimal": "41.7" }
+    },
+    {
+      "date": "2022-03-18",
+      "price": { "$numberDecimal": "41.88" }
+    },
+    {
+      "date": "2022-03-21",
+      "price": { "$numberDecimal": "41.95" }
+    },
+    {
+      "date": "2022-03-22",
+      "price": { "$numberDecimal": "41.56" }
+    },
+    {
+      "date": "2022-03-23",
+      "price": { "$numberDecimal": "41.57" }
+    },
+    {
+      "date": "2022-03-24",
+      "price": { "$numberDecimal": "41.61" }
+    },
+    {
+      "date": "2022-03-25",
+      "price": { "$numberDecimal": "41.61" }
+    },
+    {
+      "date": "2022-03-28",
+      "price": { "$numberDecimal": "41.34" }
+    },
+    {
+      "date": "2022-03-29",
+      "price": { "$numberDecimal": "41.45" }
+    },
+    {
+      "date": "2022-03-30",
+      "price": { "$numberDecimal": "41.68" }
+    },
+    {
+      "date": "2022-03-31",
+      "price": { "$numberDecimal": "41.61" }
+    },
+    {
+      "date": "2022-04-01",
+      "price": { "$numberDecimal": "41.47" }
+    },
+    {
+      "date": "2022-04-04",
+      "price": { "$numberDecimal": "41.48" }
+    },
+    {
+      "date": "2022-04-05",
+      "price": { "$numberDecimal": "41.57" }
+    },
+    {
+      "date": "2022-04-06",
+      "price": { "$numberDecimal": "41.11" }
+    },
+    {
+      "date": "2022-04-07",
+      "price": { "$numberDecimal": "41.21" }
+    },
+    {
+      "date": "2022-04-08",
+      "price": { "$numberDecimal": "41.07" }
+    },
+    {
+      "date": "2022-04-11",
+      "price": { "$numberDecimal": "40.75" }
+    },
+    {
+      "date": "2022-04-12",
+      "price": { "$numberDecimal": "40.52" }
+    },
+    {
+      "date": "2022-04-13",
+      "price": { "$numberDecimal": "40.62" }
+    },
+    {
+      "date": "2022-04-14",
+      "price": { "$numberDecimal": "40.74" }
+    },
+    {
+      "date": "2022-04-19",
+      "price": { "$numberDecimal": "40.46" }
+    },
+    {
+      "date": "2022-04-20",
+      "price": { "$numberDecimal": "40.28" }
+    },
+    {
+      "date": "2022-04-21",
+      "price": { "$numberDecimal": "40.38" }
+    },
+    {
+      "date": "2022-04-22",
+      "price": { "$numberDecimal": "40.08" }
+    },
+    {
+      "date": "2022-04-26",
+      "price": { "$numberDecimal": "40.18" }
+    },
+    {
+      "date": "2022-04-27",
+      "price": { "$numberDecimal": "40.33" }
+    },
+    {
+      "date": "2022-04-28",
+      "price": { "$numberDecimal": "40.11" }
+    },
+    {
+      "date": "2022-04-29",
+      "price": { "$numberDecimal": "40.05" }
+    },
+    {
+      "date": "2022-05-02",
+      "price": { "$numberDecimal": "39.77" }
+    },
+    {
+      "date": "2022-05-03",
+      "price": { "$numberDecimal": "39.78" }
+    },
+    {
+      "date": "2022-05-04",
+      "price": { "$numberDecimal": "39.69" }
+    },
+    {
+      "date": "2022-05-05",
+      "price": { "$numberDecimal": "39.81" }
+    },
+    {
+      "date": "2022-05-06",
+      "price": { "$numberDecimal": "39.63" }
+    },
+    {
+      "date": "2022-05-09",
+      "price": { "$numberDecimal": "39.34" }
+    },
+    {
+      "date": "2022-05-10",
+      "price": { "$numberDecimal": "39.39" }
+    },
+    {
+      "date": "2022-05-11",
+      "price": { "$numberDecimal": "39.54" }
+    },
+    {
+      "date": "2022-05-12",
+      "price": { "$numberDecimal": "39.63" }
+    },
+    {
+      "date": "2022-05-13",
+      "price": { "$numberDecimal": "39.77" }
+    },
+    {
+      "date": "2022-05-16",
+      "price": { "$numberDecimal": "39.63" }
+    },
+    {
+      "date": "2022-05-17",
+      "price": { "$numberDecimal": "39.67" }
+    },
+    {
+      "date": "2022-05-18",
+      "price": { "$numberDecimal": "39.49" }
+    },
+    {
+      "date": "2022-05-19",
+      "price": { "$numberDecimal": "39.55" }
+    },
+    {
+      "date": "2022-05-20",
+      "price": { "$numberDecimal": "39.65" }
+    },
+    {
+      "date": "2022-05-23",
+      "price": { "$numberDecimal": "39.61" }
+    },
+    {
+      "date": "2022-05-24",
+      "price": { "$numberDecimal": "39.62" }
+    },
+    {
+      "date": "2022-05-25",
+      "price": { "$numberDecimal": "39.81" }
+    },
+    {
+      "date": "2022-05-26",
+      "price": { "$numberDecimal": "39.84" }
+    },
+    {
+      "date": "2022-05-27",
+      "price": { "$numberDecimal": "40.01" }
+    },
+    {
+      "date": "2022-05-30",
+      "price": { "$numberDecimal": "39.99" }
+    },
+    {
+      "date": "2022-05-31",
+      "price": { "$numberDecimal": "39.85" }
+    },
+    {
+      "date": "2022-06-01",
+      "price": { "$numberDecimal": "39.83" }
+    },
+    {
+      "date": "2022-06-02",
+      "price": { "$numberDecimal": "39.69" }
+    },
+    {
+      "date": "2022-06-03",
+      "price": { "$numberDecimal": "39.65" }
+    },
+    {
+      "date": "2022-06-06",
+      "price": { "$numberDecimal": "39.63" }
+    },
+    {
+      "date": "2022-06-07",
+      "price": { "$numberDecimal": "39.42" }
+    },
+    {
+      "date": "2022-06-08",
+      "price": { "$numberDecimal": "39.43" }
+    },
+    {
+      "date": "2022-06-09",
+      "price": { "$numberDecimal": "39.35" }
+    },
+    {
+      "date": "2022-06-10",
+      "price": { "$numberDecimal": "39.21" }
+    },
+    {
+      "date": "2022-06-14",
+      "price": { "$numberDecimal": "38.39" }
+    },
+    {
+      "date": "2022-06-15",
+      "price": { "$numberDecimal": "38.14" }
+    },
+    {
+      "date": "2022-06-16",
+      "price": { "$numberDecimal": "38.37" }
+    },
+    {
+      "date": "2022-06-17",
+      "price": { "$numberDecimal": "38.41" }
+    },
+    {
+      "date": "2022-06-20",
+      "price": { "$numberDecimal": "38.43" }
+    },
+    {
+      "date": "2022-06-21",
+      "price": { "$numberDecimal": "38.35" }
+    },
+    {
+      "date": "2022-06-22",
+      "price": { "$numberDecimal": "38.3" }
+    },
+    {
+      "date": "2022-06-23",
+      "price": { "$numberDecimal": "38.49" }
+    },
+    {
+      "date": "2022-06-24",
+      "price": { "$numberDecimal": "38.68" }
+    },
+    {
+      "date": "2022-06-27",
+      "price": { "$numberDecimal": "38.58" }
+    },
+    {
+      "date": "2022-06-28",
+      "price": { "$numberDecimal": "38.7" }
+    },
+    {
+      "date": "2022-06-29",
+      "price": { "$numberDecimal": "38.78" }
+    },
+    {
+      "date": "2022-06-30",
+      "price": { "$numberDecimal": "38.71" }
+    },
+    {
+      "date": "2022-07-01",
+      "price": { "$numberDecimal": "38.74" }
+    },
+    {
+      "date": "2022-07-04",
+      "price": { "$numberDecimal": "38.84" }
+    },
+    {
+      "date": "2022-07-05",
+      "price": { "$numberDecimal": "38.68" }
+    },
+    {
+      "date": "2022-07-06",
+      "price": { "$numberDecimal": "38.93" }
+    },
+    {
+      "date": "2022-07-07",
+      "price": { "$numberDecimal": "38.86" }
+    },
+    {
+      "date": "2022-07-08",
+      "price": { "$numberDecimal": "38.84" }
+    },
+    {
+      "date": "2022-07-11",
+      "price": { "$numberDecimal": "38.71" }
+    },
+    {
+      "date": "2022-07-12",
+      "price": { "$numberDecimal": "38.83" }
+    },
+    {
+      "date": "2022-07-13",
+      "price": { "$numberDecimal": "38.98" }
+    },
+    {
+      "date": "2022-07-14",
+      "price": { "$numberDecimal": "38.87" }
+    },
+    {
+      "date": "2022-07-15",
+      "price": { "$numberDecimal": "38.93" }
+    },
+    {
+      "date": "2022-07-18",
+      "price": { "$numberDecimal": "39.02" }
+    },
+    {
+      "date": "2022-07-19",
+      "price": { "$numberDecimal": "38.99" }
+    },
+    {
+      "date": "2022-07-20",
+      "price": { "$numberDecimal": "38.91" }
+    },
+    {
+      "date": "2022-07-21",
+      "price": { "$numberDecimal": "39.02" }
+    },
+    {
+      "date": "2022-07-22",
+      "price": { "$numberDecimal": "39.25" }
+    },
+    {
+      "date": "2022-07-25",
+      "price": { "$numberDecimal": "39.43" }
+    },
+    {
+      "date": "2022-07-26",
+      "price": { "$numberDecimal": "39.41" }
+    },
+    {
+      "date": "2022-07-27",
+      "price": { "$numberDecimal": "39.51" }
+    },
+    {
+      "date": "2022-07-28",
+      "price": { "$numberDecimal": "39.51" }
+    },
+    {
+      "date": "2022-07-29",
+      "price": { "$numberDecimal": "39.9" }
+    },
+    {
+      "date": "2022-08-01",
+      "price": { "$numberDecimal": "39.9" }
+    },
+    {
+      "date": "2022-08-02",
+      "price": { "$numberDecimal": "40.09" }
+    },
+    {
+      "date": "2022-08-03",
+      "price": { "$numberDecimal": "39.78" }
+    },
+    {
+      "date": "2022-08-04",
+      "price": { "$numberDecimal": "39.83" }
+    },
+    {
+      "date": "2022-08-05",
+      "price": { "$numberDecimal": "39.95" }
+    },
+    {
+      "date": "2022-08-08",
+      "price": { "$numberDecimal": "39.69" }
+    },
+    {
+      "date": "2022-08-09",
+      "price": { "$numberDecimal": "39.79" }
+    },
+    {
+      "date": "2022-08-10",
+      "price": { "$numberDecimal": "39.62" }
+    },
+    {
+      "date": "2022-08-11",
+      "price": { "$numberDecimal": "39.64" }
+    },
+    {
+      "date": "2022-08-12",
+      "price": { "$numberDecimal": "39.51" }
+    },
+    {
+      "date": "2022-08-15",
+      "price": { "$numberDecimal": "39.72" }
+    },
+    {
+      "date": "2022-08-16",
+      "price": { "$numberDecimal": "39.73" }
+    },
+    {
+      "date": "2022-08-17",
+      "price": { "$numberDecimal": "39.68" }
+    },
+    {
+      "date": "2022-08-18",
+      "price": { "$numberDecimal": "39.4" }
+    },
+    {
+      "date": "2022-08-19",
+      "price": { "$numberDecimal": "39.3" }
+    },
+    {
+      "date": "2022-08-22",
+      "price": { "$numberDecimal": "39.22" }
+    },
+    {
+      "date": "2022-08-23",
+      "price": { "$numberDecimal": "38.9" }
+    },
+    {
+      "date": "2022-08-24",
+      "price": { "$numberDecimal": "38.96" }
+    },
+    {
+      "date": "2022-08-25",
+      "price": { "$numberDecimal": "38.76" }
+    },
+    {
+      "date": "2022-08-26",
+      "price": { "$numberDecimal": "38.93" }
+    },
+    {
+      "date": "2022-08-29",
+      "price": { "$numberDecimal": "38.72" }
+    },
+    {
+      "date": "2022-08-30",
+      "price": { "$numberDecimal": "38.83" }
+    },
+    {
+      "date": "2022-08-31",
+      "price": { "$numberDecimal": "38.73" }
+    },
+    {
+      "date": "2022-09-01",
+      "price": { "$numberDecimal": "38.46" }
+    },
+    {
+      "date": "2022-09-02",
+      "price": { "$numberDecimal": "38.29" }
+    },
+    {
+      "date": "2022-09-05",
+      "price": { "$numberDecimal": "38.52" }
+    },
+    {
+      "date": "2022-09-06",
+      "price": { "$numberDecimal": "38.44" }
+    },
+    {
+      "date": "2022-09-07",
+      "price": { "$numberDecimal": "38.11" }
+    },
+    {
+      "date": "2022-09-08",
+      "price": { "$numberDecimal": "38.4" }
+    },
+    {
+      "date": "2022-09-09",
+      "price": { "$numberDecimal": "38.27" }
+    },
+    {
+      "date": "2022-09-12",
+      "price": { "$numberDecimal": "38.21" }
+    },
+    {
+      "date": "2022-09-13",
+      "price": { "$numberDecimal": "38.27" }
+    },
+    {
+      "date": "2022-09-14",
+      "price": { "$numberDecimal": "38.13" }
+    },
+    {
+      "date": "2022-09-15",
+      "price": { "$numberDecimal": "38.17" }
+    },
+    {
+      "date": "2022-09-16",
+      "price": { "$numberDecimal": "38.04" }
+    },
+    {
+      "date": "2022-09-19",
+      "price": { "$numberDecimal": "37.98" }
+    },
+    {
+      "date": "2022-09-20",
+      "price": { "$numberDecimal": "38.08" }
+    },
+    {
+      "date": "2022-09-21",
+      "price": { "$numberDecimal": "37.89" }
+    },
+    {
+      "date": "2022-09-23",
+      "price": { "$numberDecimal": "37.53" }
+    },
+    {
+      "date": "2022-09-26",
+      "price": { "$numberDecimal": "37.38" }
+    },
+    {
+      "date": "2022-09-27",
+      "price": { "$numberDecimal": "37.13" }
+    },
+    {
+      "date": "2022-09-28",
+      "price": { "$numberDecimal": "36.69" }
+    },
+    {
+      "date": "2022-09-29",
+      "price": { "$numberDecimal": "36.91" }
+    },
+    {
+      "date": "2022-09-30",
+      "price": { "$numberDecimal": "36.91" }
+    },
+    {
+      "date": "2022-10-03",
+      "price": { "$numberDecimal": "36.78" }
+    },
+    {
+      "date": "2022-10-04",
+      "price": { "$numberDecimal": "37.14" }
+    },
+    {
+      "date": "2022-10-05",
+      "price": { "$numberDecimal": "37.18" }
+    },
+    {
+      "date": "2022-10-06",
+      "price": { "$numberDecimal": "36.95" }
+    },
+    {
+      "date": "2022-10-07",
+      "price": { "$numberDecimal": "36.87" }
+    },
+    {
+      "date": "2022-10-10",
+      "price": { "$numberDecimal": "36.64" }
+    },
+    {
+      "date": "2022-10-11",
+      "price": { "$numberDecimal": "36.51" }
+    },
+    {
+      "date": "2022-10-12",
+      "price": { "$numberDecimal": "36.47" }
+    },
+    {
+      "date": "2022-10-13",
+      "price": { "$numberDecimal": "36.37" }
+    },
+    {
+      "date": "2022-10-14",
+      "price": { "$numberDecimal": "36.38" }
+    },
+    {
+      "date": "2022-10-17",
+      "price": { "$numberDecimal": "36.25" }
+    },
+    {
+      "date": "2022-10-18",
+      "price": { "$numberDecimal": "36.44" }
+    },
+    {
+      "date": "2022-10-19",
+      "price": { "$numberDecimal": "36.28" }
+    },
+    {
+      "date": "2022-10-20",
+      "price": { "$numberDecimal": "36.17" }
+    },
+    {
+      "date": "2022-10-21",
+      "price": { "$numberDecimal": "35.85" }
+    },
+    {
+      "date": "2022-10-24",
+      "price": { "$numberDecimal": "36.09" }
+    },
+    {
+      "date": "2022-10-25",
+      "price": { "$numberDecimal": "36.08" }
+    },
+    {
+      "date": "2022-10-26",
+      "price": { "$numberDecimal": "36.33" }
+    },
+    {
+      "date": "2022-10-27",
+      "price": { "$numberDecimal": "36.48" }
+    },
+    {
+      "date": "2022-10-28",
+      "price": { "$numberDecimal": "36.67" }
+    },
+    {
+      "date": "2022-10-31",
+      "price": { "$numberDecimal": "36.56" }
+    },
+    {
+      "date": "2022-11-01",
+      "price": { "$numberDecimal": "36.53" }
+    },
+    {
+      "date": "2022-11-02",
+      "price": { "$numberDecimal": "36.6" }
+    },
+    {
+      "date": "2022-11-03",
+      "price": { "$numberDecimal": "36.52" }
+    },
+    {
+      "date": "2022-11-04",
+      "price": { "$numberDecimal": "36.44" }
+    },
+    {
+      "date": "2022-11-07",
+      "price": { "$numberDecimal": "36.44" }
+    },
+    {
+      "date": "2022-11-08",
+      "price": { "$numberDecimal": "36.27" }
+    },
+    {
+      "date": "2022-11-09",
+      "price": { "$numberDecimal": "36.46" }
+    },
+    {
+      "date": "2022-11-10",
+      "price": { "$numberDecimal": "36.58" }
+    },
+    {
+      "date": "2022-11-11",
+      "price": { "$numberDecimal": "37.02" }
+    },
+    {
+      "date": "2022-11-14",
+      "price": { "$numberDecimal": "37.04" }
+    },
+    {
+      "date": "2022-11-15",
+      "price": { "$numberDecimal": "37.11" }
+    },
+    {
+      "date": "2022-11-16",
+      "price": { "$numberDecimal": "37.31" }
+    },
+    {
+      "date": "2022-11-17",
+      "price": { "$numberDecimal": "37.42" }
+    },
+    {
+      "date": "2022-11-18",
+      "price": { "$numberDecimal": "37.45" }
+    },
+    {
+      "date": "2022-11-21",
+      "price": { "$numberDecimal": "37.47" }
+    },
+    {
+      "date": "2022-11-22",
+      "price": { "$numberDecimal": "37.45" }
+    },
+    {
+      "date": "2022-11-23",
+      "price": { "$numberDecimal": "37.57" }
+    },
+    {
+      "date": "2022-11-24",
+      "price": { "$numberDecimal": "37.74" }
+    },
+    {
+      "date": "2022-11-25",
+      "price": { "$numberDecimal": "37.82" }
+    },
+    {
+      "date": "2022-11-28",
+      "price": { "$numberDecimal": "37.81" }
+    },
+    {
+      "date": "2022-11-29",
+      "price": { "$numberDecimal": "37.64" }
+    },
+    {
+      "date": "2022-11-30",
+      "price": { "$numberDecimal": "37.73" }
+    },
+    {
+      "date": "2022-12-01",
+      "price": { "$numberDecimal": "37.92" }
+    },
+    {
+      "date": "2022-12-02",
+      "price": { "$numberDecimal": "38.1" }
+    },
+    {
+      "date": "2022-12-05",
+      "price": { "$numberDecimal": "38.11" }
+    },
+    {
+      "date": "2022-12-06",
+      "price": { "$numberDecimal": "38.12" }
+    },
+    {
+      "date": "2022-12-07",
+      "price": { "$numberDecimal": "38.19" }
+    },
+    {
+      "date": "2022-12-08",
+      "price": { "$numberDecimal": "38.29" }
+    },
+    {
+      "date": "2022-12-09",
+      "price": { "$numberDecimal": "38.39" }
+    },
+    {
+      "date": "2022-12-12",
+      "price": { "$numberDecimal": "38.18" }
+    },
+    {
+      "date": "2022-12-13",
+      "price": { "$numberDecimal": "38.1" }
+    },
+    {
+      "date": "2022-12-14",
+      "price": { "$numberDecimal": "38.29" }
+    },
+    {
+      "date": "2022-12-15",
+      "price": { "$numberDecimal": "38.25" }
+    },
+    {
+      "date": "2022-12-16",
+      "price": { "$numberDecimal": "38.23" }
+    },
+    {
+      "date": "2022-12-19",
+      "price": { "$numberDecimal": "38.1" }
+    },
+    {
+      "date": "2022-12-20",
+      "price": { "$numberDecimal": "37.82" }
+    },
+    {
+      "date": "2022-12-21",
+      "price": { "$numberDecimal": "37.75" }
+    },
+    {
+      "date": "2022-12-22",
+      "price": { "$numberDecimal": "37.84" }
+    },
+    {
+      "date": "2022-12-23",
+      "price": { "$numberDecimal": "37.78" }
+    },
+    {
+      "date": "2022-12-28",
+      "price": { "$numberDecimal": "37.47" }
+    },
+    {
+      "date": "2022-12-29",
+      "price": { "$numberDecimal": "37.49" }
+    },
+    {
+      "date": "2022-12-30",
+      "price": { "$numberDecimal": "37.48" }
+    },
+    {
+      "date": "2023-01-03",
+      "price": { "$numberDecimal": "37.31" }
+    },
+    {
+      "date": "2023-01-04",
+      "price": { "$numberDecimal": "37.41" }
+    },
+    {
+      "date": "2023-01-05",
+      "price": { "$numberDecimal": "37.39" }
+    },
+    {
+      "date": "2023-01-06",
+      "price": { "$numberDecimal": "37.46" }
+    },
+    {
+      "date": "2023-01-09",
+      "price": { "$numberDecimal": "37.64" }
+    },
+    {
+      "date": "2023-01-10",
+      "price": { "$numberDecimal": "37.74" }
+    },
+    {
+      "date": "2023-01-11",
+      "price": { "$numberDecimal": "37.74" }
+    },
+    {
+      "date": "2023-01-12",
+      "price": { "$numberDecimal": "37.91" }
+    },
+    {
+      "date": "2023-01-13",
+      "price": { "$numberDecimal": "38.02" }
+    },
+    {
+      "date": "2023-01-16",
+      "price": { "$numberDecimal": "38.04" }
+    },
+    {
+      "date": "2023-01-17",
+      "price": { "$numberDecimal": "37.98" }
+    },
+    {
+      "date": "2023-01-18",
+      "price": { "$numberDecimal": "38.23" }
+    },
+    {
+      "date": "2023-01-19",
+      "price": { "$numberDecimal": "38.42" }
+    },
+    {
+      "date": "2023-01-20",
+      "price": { "$numberDecimal": "38.27" }
+    },
+    {
+      "date": "2023-01-23",
+      "price": { "$numberDecimal": "38.13" }
+    },
+    {
+      "date": "2023-01-24",
+      "price": { "$numberDecimal": "38.03" }
+    },
+    {
+      "date": "2023-01-25",
+      "price": { "$numberDecimal": "38.17" }
+    },
+    {
+      "date": "2023-01-27",
+      "price": { "$numberDecimal": "38.03" }
+    },
+    {
+      "date": "2023-01-30",
+      "price": { "$numberDecimal": "38.09" }
+    },
+    {
+      "date": "2023-01-31",
+      "price": { "$numberDecimal": "38.07" }
+    },
+    {
+      "date": "2023-02-01",
+      "price": { "$numberDecimal": "38.1" }
+    },
+    {
+      "date": "2023-02-02",
+      "price": { "$numberDecimal": "38.31" }
+    },
+    {
+      "date": "2023-02-03",
+      "price": { "$numberDecimal": "38.5" }
+    },
+    {
+      "date": "2023-02-06",
+      "price": { "$numberDecimal": "38.24" }
+    },
+    {
+      "date": "2023-02-07",
+      "price": { "$numberDecimal": "38.09" }
+    },
+    {
+      "date": "2023-02-08",
+      "price": { "$numberDecimal": "38.04" }
+    },
+    {
+      "date": "2023-02-09",
+      "price": { "$numberDecimal": "38.05" }
+    },
+    {
+      "date": "2023-02-10",
+      "price": { "$numberDecimal": "37.96" }
+    },
+    {
+      "date": "2023-02-13",
+      "price": { "$numberDecimal": "37.78" }
+    },
+    {
+      "date": "2023-02-14",
+      "price": { "$numberDecimal": "37.87" }
+    },
+    {
+      "date": "2023-02-15",
+      "price": { "$numberDecimal": "37.77" }
+    },
+    {
+      "date": "2023-02-16",
+      "price": { "$numberDecimal": "37.65" }
+    },
+    {
+      "date": "2023-02-17",
+      "price": { "$numberDecimal": "37.49" }
+    },
+    {
+      "date": "2023-02-20",
+      "price": { "$numberDecimal": "37.52" }
+    },
+    {
+      "date": "2023-02-21",
+      "price": { "$numberDecimal": "37.46" }
+    },
+    {
+      "date": "2023-02-22",
+      "price": { "$numberDecimal": "37.35" }
+    },
+    {
+      "date": "2023-02-23",
+      "price": { "$numberDecimal": "37.32" }
+    },
+    {
+      "date": "2023-02-24",
+      "price": { "$numberDecimal": "37.48" }
+    },
+    {
+      "date": "2023-02-27",
+      "price": { "$numberDecimal": "37.24" }
+    },
+    {
+      "date": "2023-02-28",
+      "price": { "$numberDecimal": "37.22" }
+    },
+    {
+      "date": "2023-03-01",
+      "price": { "$numberDecimal": "37.2" }
+    },
+    {
+      "date": "2023-03-02",
+      "price": { "$numberDecimal": "37.02" }
+    },
+    {
+      "date": "2023-03-03",
+      "price": { "$numberDecimal": "37.08" }
+    },
+    {
+      "date": "2023-03-06",
+      "price": { "$numberDecimal": "37.28" }
+    },
+    {
+      "date": "2023-03-07",
+      "price": { "$numberDecimal": "37.2" }
+    },
+    {
+      "date": "2023-03-08",
+      "price": { "$numberDecimal": "37.12" }
+    },
+    {
+      "date": "2023-03-09",
+      "price": { "$numberDecimal": "37.17" }
+    },
+    {
+      "date": "2023-03-10",
+      "price": { "$numberDecimal": "37.45" }
+    },
+    {
+      "date": "2023-03-13",
+      "price": { "$numberDecimal": "37.6" }
+    },
+    {
+      "date": "2023-03-14",
+      "price": { "$numberDecimal": "37.73" }
+    },
+    {
+      "date": "2023-03-15",
+      "price": { "$numberDecimal": "37.5" }
+    },
+    {
+      "date": "2023-03-16",
+      "price": { "$numberDecimal": "37.77" }
+    },
+    {
+      "date": "2023-03-17",
+      "price": { "$numberDecimal": "37.68" }
+    },
+    {
+      "date": "2023-03-20",
+      "price": { "$numberDecimal": "37.87" }
+    },
+    {
+      "date": "2023-03-21",
+      "price": { "$numberDecimal": "37.93" }
+    },
+    {
+      "date": "2023-03-22",
+      "price": { "$numberDecimal": "37.78" }
+    },
+    {
+      "date": "2023-03-23",
+      "price": { "$numberDecimal": "38.05" }
+    },
+    {
+      "date": "2023-03-24",
+      "price": { "$numberDecimal": "38.1" }
+    },
+    {
+      "date": "2023-03-27",
+      "price": { "$numberDecimal": "38.16" }
+    },
+    {
+      "date": "2023-03-28",
+      "price": { "$numberDecimal": "37.91" }
+    },
+    {
+      "date": "2023-03-29",
+      "price": { "$numberDecimal": "37.74" }
+    },
+    {
+      "date": "2023-03-30",
+      "price": { "$numberDecimal": "37.75" }
+    },
+    {
+      "date": "2023-03-31",
+      "price": { "$numberDecimal": "37.86" }
+    },
+    {
+      "date": "2023-04-03",
+      "price": { "$numberDecimal": "37.67" }
+    },
+    {
+      "date": "2023-04-04",
+      "price": { "$numberDecimal": "37.97" }
+    },
+    {
+      "date": "2023-04-05",
+      "price": { "$numberDecimal": "38.04" }
+    },
+    {
+      "date": "2023-04-06",
+      "price": { "$numberDecimal": "38.13" }
+    },
+    {
+      "date": "2023-04-11",
+      "price": { "$numberDecimal": "38.03" }
+    },
+    {
+      "date": "2023-04-12",
+      "price": { "$numberDecimal": "37.97" }
+    },
+    {
+      "date": "2023-04-13",
+      "price": { "$numberDecimal": "37.97" }
+    },
+    {
+      "date": "2023-04-14",
+      "price": { "$numberDecimal": "37.9" }
+    },
+    {
+      "date": "2023-04-17",
+      "price": { "$numberDecimal": "37.8" }
+    },
+    {
+      "date": "2023-04-18",
+      "price": { "$numberDecimal": "37.73" }
+    },
+    {
+      "date": "2023-04-19",
+      "price": { "$numberDecimal": "37.69" }
+    },
+    {
+      "date": "2023-04-20",
+      "price": { "$numberDecimal": "37.64" }
+    },
+    {
+      "date": "2023-04-21",
+      "price": { "$numberDecimal": "37.83" }
+    },
+    {
+      "date": "2023-04-24",
+      "price": { "$numberDecimal": "37.72" }
+    },
+    {
+      "date": "2023-04-26",
+      "price": { "$numberDecimal": "38" }
+    },
+    {
+      "date": "2023-04-27",
+      "price": { "$numberDecimal": "37.92" }
+    },
+    {
+      "date": "2023-04-28",
+      "price": { "$numberDecimal": "37.82" }
+    },
+    {
+      "date": "2023-05-01",
+      "price": { "$numberDecimal": "37.96" }
+    },
+    {
+      "date": "2023-05-02",
+      "price": { "$numberDecimal": "37.78" }
+    },
+    {
+      "date": "2023-05-03",
+      "price": { "$numberDecimal": "37.97" }
+    },
+    {
+      "date": "2023-05-04",
+      "price": { "$numberDecimal": "38.16" }
+    },
+    {
+      "date": "2023-05-05",
+      "price": { "$numberDecimal": "37.99" }
+    },
+    {
+      "date": "2023-05-08",
+      "price": { "$numberDecimal": "37.97" }
+    },
+    {
+      "date": "2023-05-09",
+      "price": { "$numberDecimal": "37.77" }
+    },
+    {
+      "date": "2023-05-10",
+      "price": { "$numberDecimal": "37.7" }
+    },
+    {
+      "date": "2023-05-11",
+      "price": { "$numberDecimal": "37.86" }
+    },
+    {
+      "date": "2023-05-12",
+      "price": { "$numberDecimal": "38.1" }
+    },
+    {
+      "date": "2023-06-02",
+      "price": { "$numberDecimal": "37.73" }
+    },
+    {
+      "date": "2023-06-05",
+      "price": { "$numberDecimal": "37.55" }
+    },
+    {
+      "date": "2023-06-06",
+      "price": { "$numberDecimal": "37.55" }
+    },
+    {
+      "date": "2023-06-07",
+      "price": { "$numberDecimal": "37.62" }
+    },
+    {
+      "date": "2023-06-08",
+      "price": { "$numberDecimal": "37.44" }
+    },
+    {
+      "date": "2023-06-09",
+      "price": { "$numberDecimal": "37.53" }
+    },
+    {
+      "date": "2023-06-13",
+      "price": { "$numberDecimal": "37.56" }
+    },
+    {
+      "date": "2023-06-14",
+      "price": { "$numberDecimal": "37.47" }
+    },
+    {
+      "date": "2023-06-15",
+      "price": { "$numberDecimal": "37.42" }
+    },
+    {
+      "date": "2023-06-16",
+      "price": { "$numberDecimal": "37.57" }
+    },
+    {
+      "date": "2023-06-19",
+      "price": { "$numberDecimal": "37.55" }
+    },
+    {
+      "date": "2023-06-20",
+      "price": { "$numberDecimal": "37.5" }
+    },
+    {
+      "date": "2023-06-21",
+      "price": { "$numberDecimal": "37.6" }
+    },
+    {
+      "date": "2023-06-22",
+      "price": { "$numberDecimal": "37.65" }
+    },
+    {
+      "date": "2023-06-23",
+      "price": { "$numberDecimal": "37.52" }
+    },
+    {
+      "date": "2023-06-26",
+      "price": { "$numberDecimal": "37.67" }
+    },
+    {
+      "date": "2023-06-27",
+      "price": { "$numberDecimal": "37.67" }
+    },
+    {
+      "date": "2023-06-28",
+      "price": { "$numberDecimal": "37.62" }
+    },
+    {
+      "date": "2023-06-29",
+      "price": { "$numberDecimal": "37.59" }
+    },
+    {
+      "date": "2023-06-30",
+      "price": { "$numberDecimal": "37.52" }
+    }
+  ]
+}

@@ -128,10 +128,10 @@ namespace Booth.PortfolioManager.Web.Controllers
                 dateRange = new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today);
             else if ((fromDate != null) && (toDate == null))
                 dateRange = new DateRange(new Date(fromDate!.Value), new Date(fromDate!.Value).AddYears(1).AddDays(-1));
-            else if ((fromDate != null) && (toDate == null))
+            else if ((fromDate == null) && (toDate != null))
                 dateRange = new DateRange(new Date(toDate!.Value).AddYears(-1).AddDays(1), new Date(toDate!.Value));
             else
-                dateRange = new DateRange(new Date(toDate!.Value), new Date(toDate!.Value));
+                dateRange = new DateRange(new Date(fromDate!.Value), new Date(toDate!.Value));
 
             return Ok(stock.ToPriceResponse(dateRange)); 
         }
@@ -141,11 +141,7 @@ namespace Booth.PortfolioManager.Web.Controllers
         [HttpPost]
         public ActionResult CreateStock([FromBody] CreateStockCommand command)
         {
-            ServiceResult result;
-         //   if (command.ChildSecurities.Count == 0)
-                result = _StockService.ListStock(command.Id, command.AsxCode, command.Name, command.ListingDate, command.Trust, command.Category.ToDomain());
-            //  else
-            //      result = _StockService.ListStapledSecurity(command.Id, command.AsxCode, command.Name, command.ListingDate, command.Category, command.ChildSecurities.Select(x => new StapledSecurityChild(x.ASXCode, x.Name, x.Trust)));
+            var result = _StockService.ListStock(command.Id, command.AsxCode, command.Name, command.ListingDate, command.Trust, command.Category.ToDomain());
 
             return result.ToActionResult();
         }

@@ -1,0 +1,33 @@
+﻿{
+  "_id": {
+    "$binary": {
+      "base64": "39YYXgTW8UCLqUNUYQdd7g==",
+      "subType": "03"
+    }
+  },
+  "userName": "StandardUser",
+  "password": "b3a8deb9283b154ae3f5606a323d066d246e7440e2d8d4c9a87aa61b95183a26",
+  "administrator": false
+}
+{
+  "_id": {
+    "$binary": {
+      "base64": "vBABmTzYwEOmuRruMa8zsg==",
+      "subType": "03"
+    }
+  },
+  "userName": "StandardUser2",
+  "password": "b3a8deb9283b154ae3f5606a323d066d246e7440e2d8d4c9a87aa61b95183a26",
+  "administrator": false
+}
+{
+  "_id": {
+    "$binary": {
+      "base64": "1alnYIOqokC8waHDFWL1uw==",
+      "subType": "03"
+    }
+  },
+  "userName": "AdminUser",
+  "password": "b3a8deb9283b154ae3f5606a323d066d246e7440e2d8d4c9a87aa61b95183a26",
+  "administrator": true
+}

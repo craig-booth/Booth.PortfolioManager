@@ -64,7 +64,15 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
         public Date StartDate
         {
-            get { return DateUtils.Earlist(_Transactions.Earliest, _CashAccount.Transactions.Earliest); }
+            get {
+                if (_Transactions.Earliest == Date.MinValue)
+                    return _CashAccount.Transactions.Earliest;
+
+                if (_CashAccount.Transactions.Earliest == Date.MinValue)
+                    return _Transactions.Earliest;
+
+                return DateUtils.Earlist(_Transactions.Earliest, _CashAccount.Transactions.Earliest); 
+            }
         }
 
         public Date EndDate

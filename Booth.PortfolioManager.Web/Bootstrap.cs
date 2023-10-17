@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using MongoDB.Driver;
+using Microsoft.Extensions.Caching.Memory;
 
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Stocks;
@@ -23,8 +25,7 @@ using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.DataImporters;
 using Booth.PortfolioManager.Web.Mappers;
-using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
+using Booth.PortfolioManager.Web.CachedRepositories;
 
 namespace Booth.PortfolioManager.Web
 {
@@ -33,7 +34,6 @@ namespace Booth.PortfolioManager.Web
 
         public static IServiceCollection AddPortfolioManagerServices(this IServiceCollection services, AppSettings settings)
         {
-            services.AddSingleton<AppSettings>(settings);
             services.AddTransient<IConfigureOptions<MvcNewtonsoftJsonOptions>, RestApiMvcJsonOptions>();
 
             IJwtTokenConfigurationProvider jwtTokenConfigProvider;
@@ -54,6 +54,7 @@ namespace Booth.PortfolioManager.Web
                 services.AddJwtAuthetication(jwtTokenConfigProvider);
 
             // Caches classes
+            services.AddSingleton<IMemoryCache, MemoryCache>(); 
             services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
 
             // Database
@@ -61,7 +62,7 @@ namespace Booth.PortfolioManager.Web
             services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(x.GetRequiredService<IMongoClient>(), settings.Database, x.GetRequiredService<IPortfolioFactory>(), x.GetRequiredService<IStockResolver>()));
 
             // Repositories
-            services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+            services.AddScoped<IPortfolioRepository>(x => new CachedPortfolioRepository(new PortfolioRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IMemoryCache>()));
             services.AddScoped<IStockRepository, StockRepository>();
             services.AddScoped<IStockPriceRepository, StockPriceRepository>();
             services.AddScoped<ITradingCalendarRepository, TradingCalendarRepository>();
@@ -93,9 +94,9 @@ namespace Booth.PortfolioManager.Web
 
 
             // Others
-            services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().ReadOnlyPortfolio);
-            services.AddScoped<IPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().Portfolio);
-            services.AddScoped<IPortfolioAccessor, PortfolioAccessor>();
+            services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().ReadOnlyPortfolio);
+            services.AddScoped<IPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().Portfolio);
+            services.AddScoped<IHttpContextPortfolioAccessor, HttpContextPortfolioAccessor>();
             services.AddScoped<IPortfolioFactory, PortfolioFactory>();
             services.AddScoped<IStockResolver, StockResolver>();
             services.AddScoped<IStockQuery, StockQuery>();

@@ -23,6 +23,7 @@ namespace Booth.PortfolioManager.Web
         public void ConfigureServices(IServiceCollection services)
         {
             var settings = Configuration.GetSection("Settings").Get<AppSettings>();
+
             services.AddPortfolioManagerServices(settings)
                 .AddDataImportService();
 

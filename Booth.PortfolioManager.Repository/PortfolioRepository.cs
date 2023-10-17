@@ -12,6 +12,7 @@ using Booth.PortfolioManager.Domain;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Repository.Serialization;
+using System.Transactions;
 
 namespace Booth.PortfolioManager.Repository
 {
@@ -51,10 +52,10 @@ namespace Booth.PortfolioManager.Repository
 
         public void DeleteTransaction(Portfolio portfolio, Guid id)
         {
-            var filter = Builders<BsonDocument>.Filter
-                .And(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), Builders<BsonDocument>.Filter.Eq("transactions._id", id));
+            var updateValue = Builders<BsonDocument>.Update
+                .PullFilter("transactions", Builders<BsonDocument>.Filter.Eq("_id", id));
 
-            _Collection.DeleteOne(filter); 
+            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), updateValue);
         }
 
         public void UpdateTransaction(Portfolio portfolio, Guid id)

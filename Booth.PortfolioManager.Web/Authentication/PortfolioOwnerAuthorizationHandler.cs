@@ -16,21 +16,27 @@ namespace Booth.PortfolioManager.Web.Authentication
     {
         private readonly IReadOnlyPortfolio _Portfolio;
 
-        public PortfolioOwnerAuthorizationHandler(IPortfolioAccessor portfolioAccessor)
+        public PortfolioOwnerAuthorizationHandler(IHttpContextPortfolioAccessor portfolioAccessor)
         {
             _Portfolio = portfolioAccessor.ReadOnlyPortfolio;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PortfolioOwnerRequirement requirement)
         {
-            if ((_Portfolio != null) && (context.User.Identity.IsAuthenticated))
+            if (context.User.Identity.IsAuthenticated)
             {
-                var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
-
-                var userId = new Guid(userIdClaim.Value);
-                if (_Portfolio.Owner == userId)
+                if (_Portfolio == null)
                     context.Succeed(requirement);
+                else
+                {
+                    var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
+
+                    var userId = new Guid(userIdClaim.Value);
+                    if (_Portfolio.Owner == userId)
+                        context.Succeed(requirement);
+                }                   
             }
+
 
             return Task.CompletedTask;
         }
