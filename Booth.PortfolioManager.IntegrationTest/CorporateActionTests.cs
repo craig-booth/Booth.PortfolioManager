@@ -9,7 +9,6 @@ using FluentAssertions;
 
 using Booth.Common;
 using Booth.PortfolioManager.RestApi.Client;
-using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Stocks;
 
 namespace Booth.PortfolioManager.IntegrationTest

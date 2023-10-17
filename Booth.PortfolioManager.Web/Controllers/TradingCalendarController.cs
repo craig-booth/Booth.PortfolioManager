@@ -13,7 +13,7 @@ using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Controllers
 {
-    [Route("api/tradingcalendar")]
+    [Route("api/tradingcalendars")]
     [Authorize]
     [ApiController]
     public class TradingCalendarController : ControllerBase
