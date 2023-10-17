@@ -50,9 +50,9 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET: properties
         [Route("{id:guid}/changedrpparticipation")]
         [HttpPost]
-        public ActionResult ChangeDrpParticipation([FromServices] IPortfolio portfolio, [FromServices] IPortfolioService service, [FromRoute] Guid id, [FromQuery] bool participate)
+        public ActionResult ChangeDrpParticipation([FromServices] IPortfolio portfolio, [FromServices] IPortfolioService service, [FromRoute] Guid id, [FromBody] ChangeDrpParticipationCommand command)
         {
-            var result = service.ChangeDrpParticipation(portfolio, id, participate);
+            var result = service.ChangeDrpParticipation(portfolio, id, command.Participate);
 
             return result.ToActionResult();
         }

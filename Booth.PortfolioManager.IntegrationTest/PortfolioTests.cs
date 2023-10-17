@@ -7,8 +7,7 @@ using FluentAssertions;
 using Booth.Common;
 using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Portfolios;
-using Booth.PortfolioManager.Web.Services;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace Booth.PortfolioManager.IntegrationTest
 {

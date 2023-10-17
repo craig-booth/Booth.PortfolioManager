@@ -13,6 +13,7 @@ using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Repository.Serialization;
 using System.Transactions;
+using MongoDB.Bson.IO;
 
 namespace Booth.PortfolioManager.Repository
 {
@@ -33,9 +34,12 @@ namespace Booth.PortfolioManager.Repository
 
         public override void Update(Portfolio entity)
         {
+            var drpHoldings = entity.Holdings.All().Where(x => x.Settings.ParticipateInDrp).Select(x => x.Id).ToArray();
+
             var bson = Builders<BsonDocument>.Update
             .Set("name", entity.Name)
-            .Set("owner", entity.Owner);
+            .Set("owner", entity.Owner)
+            .Set("participateInDrp", drpHoldings);
 
             _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
         }

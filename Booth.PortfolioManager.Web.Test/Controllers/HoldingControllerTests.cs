@@ -195,7 +195,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             service.Setup(x => x.ChangeDrpParticipation(portfolio.Object, stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.NotFound()).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, true);
+            var command = new ChangeDrpParticipationCommand()
+            {
+                Holding = stockId,
+                Participate = true
+            };
+            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
 
             result.Should().BeNotFoundResult();
 
@@ -215,7 +220,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             service.Setup(x => x.ChangeDrpParticipation(portfolio.Object, stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.Ok()).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, true);
+            var command = new ChangeDrpParticipationCommand()
+            {
+                Holding = stockId,
+                Participate = true
+            };
+            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
 
             result.Should().BeOkResult();
 
