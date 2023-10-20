@@ -54,7 +54,6 @@ namespace Booth.PortfolioManager.Web
                 services.AddJwtAuthetication(jwtTokenConfigProvider);
 
             // Caches classes
-            services.AddSingleton<IMemoryCache, MemoryCache>(); 
             services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
 
             // Database
@@ -63,9 +62,9 @@ namespace Booth.PortfolioManager.Web
 
             // Repositories
             services.AddScoped<IPortfolioRepository>(x => new CachedPortfolioRepository(new PortfolioRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IMemoryCache>()));
-            services.AddScoped<IStockRepository, StockRepository>();
-            services.AddScoped<IStockPriceRepository, StockPriceRepository>();
-            services.AddScoped<ITradingCalendarRepository, TradingCalendarRepository>();
+            services.AddScoped<IStockRepository>(x => new CachedStockRepository(new StockRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IEntityCache<Stock>>()));
+            services.AddScoped<IStockPriceRepository>(x => new CachedStockPriceRepository(new StockPriceRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IEntityCache<StockPriceHistory>>()));
+            services.AddScoped<ITradingCalendarRepository>(x => new CachedTradingCalendarRepository(new TradingCalendarRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IMemoryCache>()));
             services.AddScoped<IUserRepository, UserRepository>();
 
 
@@ -108,7 +107,6 @@ namespace Booth.PortfolioManager.Web
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                InitializeCalendarCache(scope.ServiceProvider);
                 InitializeStockCache(scope.ServiceProvider);
             }
 
@@ -129,30 +127,18 @@ namespace Booth.PortfolioManager.Web
             return services;
         }
 
-        private static void InitializeCalendarCache(IServiceProvider serviceProvider)
-        {
-            var repository = serviceProvider.GetRequiredService<ITradingCalendarRepository>();
-            var cache = serviceProvider.GetRequiredService<IEntityCache<TradingCalendar>>();
-
-            var calendar = repository.Get(TradingCalendarIds.ASX);
-            cache.Add(calendar);  
-
-            foreach (var year in calendar.Years)
-            {
-                repository.UpdateYear(calendar, year);
-            }
-
-        }
-
         private static void InitializeStockCache(IServiceProvider serviceProvider)
         {
+            // Load all entities from the repositories
             var stockRepository = serviceProvider.GetRequiredService<IStockRepository>();
             var stockCache = serviceProvider.GetRequiredService<IEntityCache<Stock>>();
-            stockCache.PopulateCache(stockRepository);
+            stockCache.Clear();
+            stockRepository.All();
 
             var stockPriceRepository = serviceProvider.GetRequiredService<IStockPriceRepository>();
             var stockPriceHistoryCache = serviceProvider.GetRequiredService<IEntityCache<StockPriceHistory>>();
-            stockPriceHistoryCache.PopulateCache(stockPriceRepository);
+            stockPriceHistoryCache.Clear();
+            stockPriceRepository.All();
 
             // Hook up stock prices to stocks
             foreach (var stock in stockCache.All())

@@ -9,10 +9,7 @@ using Mongo2Go;
 using Xunit;
 
 using Booth.PortfolioManager.Web;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Caching.Memory;
-using System.Collections.Generic;
-using Microsoft.Extensions.Primitives;
+
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -24,7 +21,7 @@ namespace Booth.PortfolioManager.IntegrationTest
 
         public IntegrationTestFixture()
         {
-            _DBRunner = MongoDbRunner.StartForDebugging();
+            _DBRunner = MongoDbRunner.Start();
             _ConnectionString = _DBRunner.ConnectionString;
 
             _DBRunner.Import(_Database, "TradingCalendar", @".\data\TradingCalendar.json", true);
@@ -47,6 +44,30 @@ namespace Booth.PortfolioManager.IntegrationTest
             {
                 x.RemoveAll<IHostedService>();
             });
+        }
+
+        private char _AsxCodeChar1 = 'A';
+        private char _AsxCodeChar2 = 'A';
+        private char _AsxCodeChar3 = 'A';
+        public string GenerateUniqueAsxCode()
+        {
+            var asxCode = new String(new[] { _AsxCodeChar1, _AsxCodeChar2, _AsxCodeChar3 });
+
+            if (_AsxCodeChar3 != 'Z')
+                _AsxCodeChar3++;
+            else if (_AsxCodeChar2 != 'Z')
+            {
+                _AsxCodeChar2++;
+                _AsxCodeChar3 = 'A';
+            }
+            else
+            {
+                _AsxCodeChar1++;
+                _AsxCodeChar2 = 'A';
+                _AsxCodeChar3 = 'A';
+            }                
+
+            return asxCode;
         }
 
         protected override void Dispose(bool disposing)

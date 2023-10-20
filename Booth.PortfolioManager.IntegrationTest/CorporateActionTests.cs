@@ -33,7 +33,7 @@ namespace Booth.PortfolioManager.IntegrationTest
             {
                 Id = stockId,
                 ListingDate = new Date(2010, 01, 01),
-                AsxCode = "AAA",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };
@@ -66,7 +66,7 @@ namespace Booth.PortfolioManager.IntegrationTest
             {
                 Id = stockId,
                 ListingDate = new Date(2010, 01, 01),
-                AsxCode = "BBB",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };
@@ -110,7 +110,7 @@ namespace Booth.PortfolioManager.IntegrationTest
             {
                 Id = stockId,
                 ListingDate = new Date(2010, 01, 01),
-                AsxCode = "CCC",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };
@@ -173,7 +173,7 @@ namespace Booth.PortfolioManager.IntegrationTest
             {
                 Id = stockId,
                 ListingDate = new Date(2010, 01, 01),
-                AsxCode = "DDD",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };

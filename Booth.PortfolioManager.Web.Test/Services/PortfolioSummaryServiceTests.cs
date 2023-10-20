@@ -14,8 +14,16 @@ using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioSummaryServiceTests
     {
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioSummaryServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -29,7 +37,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetSummary()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioSummaryService(portfolio);
 
@@ -48,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.Holding()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         Units = 250,
                         Value = 500m,
                         Cost = 299.87m,
@@ -56,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.Holding()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         Units = 205,
                         Value = 307.50m,
                         Cost = 292.45m,

@@ -19,17 +19,15 @@ namespace Booth.PortfolioManager.Web.Services
     class TradingCalendarService : ITradingCalendarService
     {
         private ITradingCalendarRepository _Repository;
-        private IEntityCache<TradingCalendar> _Cache;
 
-        public TradingCalendarService(IEntityCache<TradingCalendar> cache, ITradingCalendarRepository repository)
+        public TradingCalendarService(ITradingCalendarRepository repository)
         {
-            _Repository = repository;
-            _Cache = cache;          
+            _Repository = repository;        
         }
 
         public ServiceResult<RestApi.TradingCalendars.TradingCalendar> Get(Guid calendarId, int year)
         {
-            var tradingCalendar = _Cache.Get(calendarId);
+            var tradingCalendar = _Repository.Get(calendarId);
             if (tradingCalendar == null)
                 return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound();
 
@@ -52,7 +50,7 @@ namespace Booth.PortfolioManager.Web.Services
 
         public ServiceResult SetNonTradingDays(Guid calendarId, int year, IEnumerable<NonTradingDay> nonTradingDays)
         {
-            var tradingCalendar = _Cache.Get(calendarId);
+            var tradingCalendar = _Repository.Get(calendarId);
             if (tradingCalendar == null)
                 return ServiceResult.NotFound();
 

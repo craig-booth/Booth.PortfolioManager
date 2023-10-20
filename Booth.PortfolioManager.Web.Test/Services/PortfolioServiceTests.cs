@@ -15,8 +15,17 @@ using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioServiceTests
     {
+
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -24,7 +33,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var repository = mockRepository.Create<IPortfolioRepository>();
 
-            var service = new PortfolioService(PortfolioTestCreator.PortfolioFactory, repository.Object);
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
             var result = service.ChangeDrpParticipation(null, Guid.NewGuid(), true);
 
@@ -40,11 +49,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var repository = mockRepository.Create<IPortfolioRepository>();
            
-            var service = new PortfolioService(PortfolioTestCreator.PortfolioFactory, repository.Object);
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
             var result = service.ChangeDrpParticipation(portfolio, Guid.NewGuid(), true);
 
@@ -59,14 +68,14 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.Update(It.Is<Portfolio>(x => x.Id == portfolio.Id))).Verifiable();     
 
-            var service = new PortfolioService(PortfolioTestCreator.PortfolioFactory, repository.Object);
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
-            var result = service.ChangeDrpParticipation(portfolio, PortfolioTestCreator.Stock_ARG.Id, true);
+            var result = service.ChangeDrpParticipation(portfolio, _Fixture.Stock_ARG.Id, true);
 
             result.Should().HaveOkStatus();
 
@@ -83,7 +92,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var repository = mockRepository.Create<IPortfolioRepository>();
             repository.Setup(x => x.Add(It.Is<Portfolio>(x => x.Id == portfolioId))).Verifiable();
 
-            var service = new PortfolioService(PortfolioTestCreator.PortfolioFactory, repository.Object);
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
             var result = service.CreatePortfolio(portfolioId, "My Portfolio", Guid.NewGuid());
 

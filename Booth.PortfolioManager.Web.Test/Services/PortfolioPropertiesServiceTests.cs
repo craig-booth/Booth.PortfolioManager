@@ -11,8 +11,16 @@ using Booth.PortfolioManager.Domain;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioPropertiesServiceTests
     {
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioPropertiesServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -26,9 +34,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetProperties()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            portfolio.ChangeDrpParticipation(PortfolioTestCreator.Stock_WAM.Id, true);
+            portfolio.ChangeDrpParticipation(_Fixture.Stock_WAM.Id, true);
 
             var service = new PortfolioPropertiesService(portfolio);
 
@@ -44,14 +52,14 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.HoldingProperties()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         StartDate = new Date(2000, 01, 01),
                         EndDate = Date.MaxValue,
                         ParticipatingInDrp = false
                     },
                     new RestApi.Portfolios.HoldingProperties()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         StartDate = new Date(2000, 01, 01),
                         EndDate = Date.MaxValue,
                         ParticipatingInDrp = true

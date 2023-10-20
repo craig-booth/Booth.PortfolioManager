@@ -11,8 +11,16 @@ using Booth.PortfolioManager.RestApi.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioCgtLiabilityServiceTests
     {
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioCgtLiabilityServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -30,7 +38,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2003, 07, 01), new Date(2004, 06, 30));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCgtLiabilityService(portfolio);
 
@@ -55,7 +63,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 { 
                     new CgtLiabilityResponse.CgtLiabilityEvent()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         EventDate = new Date(2004, 01, 01),
                         CostBase = 59.98m,
                         AmountReceived = 31.05m,

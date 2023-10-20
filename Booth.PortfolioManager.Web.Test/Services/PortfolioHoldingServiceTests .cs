@@ -10,8 +10,16 @@ using Booth.PortfolioManager.Web.Services;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioHoldingServiceTests
     {
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioHoldingServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -25,7 +33,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingsAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 
@@ -35,7 +43,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 new RestApi.Portfolios.Holding()
                 {
-                    Stock = PortfolioTestCreator.Stock_ARG,
+                    Stock = _Fixture.Stock_ARG,
                     Units = 100,
                     Value = 100.00m,
                     Cost = 119.95m,
@@ -43,7 +51,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 },
                 new RestApi.Portfolios.Holding()
                 {
-                    Stock = PortfolioTestCreator.Stock_WAM,
+                    Stock = _Fixture.Stock_WAM,
                     Units = 200,
                     Value = 240.00m,
                     Cost = 259.95m,
@@ -56,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingsInDateRange()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 
@@ -66,7 +74,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 new RestApi.Portfolios.Holding()
                 {
-                    Stock = PortfolioTestCreator.Stock_ARG,
+                    Stock = _Fixture.Stock_ARG,
                     Units = 200,
                     Value = 198.00m,
                     Cost = 239.90m,
@@ -74,7 +82,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 },
                 new RestApi.Portfolios.Holding()
                 {
-                    Stock = PortfolioTestCreator.Stock_WAM,
+                    Stock = _Fixture.Stock_WAM,
                     Units = 200,
                     Value = 254.00m,
                     Cost = 259.95m,
@@ -86,7 +94,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingAtDateStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 
@@ -98,15 +106,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetHoldingAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioHoldingService(portfolio);
 
-            var result = service.GetHolding(PortfolioTestCreator.Stock_ARG.Id, new Date(2000, 01, 01));
+            var result = service.GetHolding(_Fixture.Stock_ARG.Id, new Date(2000, 01, 01));
 
             result.Result.Should().BeEquivalentTo(new RestApi.Portfolios.Holding()
             {
-                Stock = PortfolioTestCreator.Stock_ARG,
+                Stock = _Fixture.Stock_ARG,
                 Units = 100,
                 Value = 100.00m,
                 Cost = 119.95m,

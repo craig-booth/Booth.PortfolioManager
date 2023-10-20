@@ -16,6 +16,7 @@ using Booth.PortfolioManager.RestApi.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+
     public class CashAccountServiceTests
     {
         [Fact]

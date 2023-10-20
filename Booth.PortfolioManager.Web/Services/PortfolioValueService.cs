@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.TradingCalendars;
+using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Stocks;
 using Booth.PortfolioManager.Web.Utilities;
@@ -23,12 +24,12 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioValueService : IPortfolioValueService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
-        private readonly IEntityCache<TradingCalendar> _TradingCalendarCache;
+        private readonly ITradingCalendarRepository _TradingCalendarRepository;
 
-        public PortfolioValueService(IReadOnlyPortfolio portfolio, IEntityCache<TradingCalendar> tradingCalendarCache)
+        public PortfolioValueService(IReadOnlyPortfolio portfolio, ITradingCalendarRepository tradingCalendarRepository)
         {
             _Portfolio = portfolio;
-            _TradingCalendarCache = tradingCalendarCache;
+            _TradingCalendarRepository = tradingCalendarRepository;
         }
  
         public ServiceResult<PortfolioValueResponse> GetValue(DateRange dateRange, ValueFrequency frequency)
@@ -100,7 +101,7 @@ namespace Booth.PortfolioManager.Web.Services
 
         private IEnumerable<Date> GetDates(DateRange dateRange, ValueFrequency frequency)
         {
-            var tradingCalendar = _TradingCalendarCache.Get(TradingCalendarIds.ASX);
+            var tradingCalendar = _TradingCalendarRepository.Get(TradingCalendarIds.ASX);
 
             var firstRequestedDate = tradingCalendar.NextTradingDay(dateRange.FromDate);
             var lastRequestedDate = tradingCalendar.PreviousTradingDay(dateRange.ToDate);

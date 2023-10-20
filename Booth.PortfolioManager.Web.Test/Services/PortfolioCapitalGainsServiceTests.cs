@@ -6,8 +6,15 @@ using Xunit;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioCapitalGainsServiceTests
     {
+        private readonly ServicesTestFixture _Fixture;
+        public PortfolioCapitalGainsServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -21,7 +28,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGains()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -33,7 +40,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 50,
                         CostBase = 59.97m,
@@ -44,7 +51,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -55,7 +62,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -66,7 +73,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 200,
                         CostBase = 259.95m,
@@ -77,7 +84,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2005, 01, 03),
                         Units = 5,
                         CostBase = 32.50m,
@@ -94,7 +101,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGainsStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -106,11 +113,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGainsStockNotOwnedAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(1999, 01, 01));
+            var result = service.GetCapitalGains(_Fixture.Stock_ARG.Id, new Date(1999, 01, 01));
 
             result.Result.UnrealisedGains.Should().BeEmpty();
         }
@@ -118,11 +125,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCapitalGainsStockOwnedAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(2010, 01, 01));
+            var result = service.GetCapitalGains(_Fixture.Stock_ARG.Id, new Date(2010, 01, 01));
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -130,7 +137,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 50,
                         CostBase = 59.97m,
@@ -141,7 +148,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -152,7 +159,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.SimpleUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -169,7 +176,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGains()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture    .CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -181,7 +188,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 50,
                         CostBase = 59.97m,
@@ -212,7 +219,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -234,7 +241,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -256,7 +263,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 200,
                         CostBase = 259.95m,
@@ -278,7 +285,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2005, 01, 03),
                         Units = 5,
                         CostBase = 32.50m,
@@ -306,7 +313,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGainsStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
@@ -318,11 +325,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGainsStockNotOwnedAtDate()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetDetailedCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(1999, 01, 01));
+            var result = service.GetDetailedCapitalGains(_Fixture.Stock_ARG.Id, new Date(1999, 01, 01));
 
             result.Result.UnrealisedGains.Should().BeEmpty();
         }
@@ -330,11 +337,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetGetDetailedCapitalGainsCapitalGainsStockOwnedtDate()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioCapitalGainsService(portfolio);
 
-            var result = service.GetDetailedCapitalGains(PortfolioTestCreator.Stock_ARG.Id, new Date(2010, 01, 01));
+            var result = service.GetDetailedCapitalGains(_Fixture.Stock_ARG.Id, new Date(2010, 01, 01));
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -342,7 +349,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
                         Units = 50,
                         CostBase = 59.97m,
@@ -373,7 +380,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,
@@ -395,7 +402,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.DetailedUnrealisedGainsItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
                         Units = 100,
                         CostBase = 119.95m,

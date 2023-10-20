@@ -52,7 +52,7 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Id = Guid.NewGuid(),
                 Name = "Test",
                 ListingDate = new Date(2021, 01, 02),
-                AsxCode = "TST",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
                 Category = AssetCategory.AustralianStocks,
             };
 
@@ -73,7 +73,7 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Id = Guid.NewGuid(),
                 Name = "Test",
                 ListingDate = new Date(2021, 01, 02),
-                AsxCode = "TST",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
                 Category = AssetCategory.AustralianStocks,
             };
 

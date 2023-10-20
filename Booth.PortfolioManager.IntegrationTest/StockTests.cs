@@ -7,7 +7,7 @@ using FluentAssertions;
 using Booth.Common;
 using Booth.PortfolioManager.RestApi.Client;
 using Booth.PortfolioManager.RestApi.Stocks;
-
+using MongoDB.Driver;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -28,12 +28,13 @@ namespace Booth.PortfolioManager.IntegrationTest
             await client.Authenticate(Integration.AdminUser, Integration.Password);
 
             var stockId = Guid.NewGuid();
+            var asxCode = _Fixture.GenerateUniqueAsxCode();
             var command = new CreateStockCommand()
             {
                 Id = stockId,
                 ListingDate = new Date(2003, 06, 01),
-                AsxCode = "AAA",
-                Name = "AAA Company",
+                AsxCode = asxCode,
+                Name = "Test",
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
@@ -41,7 +42,7 @@ namespace Booth.PortfolioManager.IntegrationTest
 
             var stock = await client.Stocks.Get(stockId);
 
-            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = "AAA", Name = "AAA Company", Category = AssetCategory.AustralianStocks, Trust = false, ListingDate = new Date(2003, 06, 01) });
+            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "Test", Category = AssetCategory.AustralianStocks, Trust = false, ListingDate = new Date(2003, 06, 01) });
         }
 
         [Fact]
@@ -51,12 +52,13 @@ namespace Booth.PortfolioManager.IntegrationTest
             await client.Authenticate(Integration.AdminUser, Integration.Password);
 
             var stockId = Guid.NewGuid();
+            var asxCode = _Fixture.GenerateUniqueAsxCode();
             var createCommand = new CreateStockCommand()
             {
                 Id = stockId,
                 ListingDate = new Date(2003, 06, 01),
-                AsxCode = "BBB",
-                Name = "BBB Company",
+                AsxCode = asxCode,
+                Name = "Test",
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
@@ -71,7 +73,7 @@ namespace Booth.PortfolioManager.IntegrationTest
 
             var stock = await client.Stocks.Get(stockId);
 
-            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = "BBB", Name = "BBB Company", Category = AssetCategory.AustralianStocks, Trust = false, ListingDate = new Date(2003, 06, 01), DelistedDate = new Date(2010, 01, 01) });
+            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "Test", Category = AssetCategory.AustralianStocks, Trust = false, ListingDate = new Date(2003, 06, 01), DelistedDate = new Date(2010, 01, 01) });
         }
 
         [Fact]
@@ -81,29 +83,31 @@ namespace Booth.PortfolioManager.IntegrationTest
             await client.Authenticate(Integration.AdminUser, Integration.Password);
 
             var stockId = Guid.NewGuid();
+            
             var createCommand = new CreateStockCommand()
             {
                 Id = stockId,
                 ListingDate = new Date(2003, 06, 01),
-                AsxCode = "CCC",
-                Name = "CCC Company",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
+                Name = "Test",
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
             await client.Stocks.CreateStock(createCommand);
 
+            var asxCode = _Fixture.GenerateUniqueAsxCode();
             var changeCommand = new ChangeStockCommand()
             {
                 Id = stockId,
                 ChangeDate = new Date(2005, 01, 01),
-                AsxCode = "CCC",
-                Name = "CCC Pty Ltd"
+                AsxCode = asxCode,
+                Name = "New Name"
             };
             await client.Stocks.ChangeStock(changeCommand);
 
             var stock = await client.Stocks.Get(stockId);
 
-            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = "CCC", Name = "CCC Pty Ltd", });
+            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "New Name", });
 
         }
 
@@ -114,12 +118,13 @@ namespace Booth.PortfolioManager.IntegrationTest
             await client.Authenticate(Integration.AdminUser, Integration.Password);
 
             var stockId = Guid.NewGuid();
+            var asxCode = _Fixture.GenerateUniqueAsxCode();
             var createCommand = new CreateStockCommand()
             {
                 Id = stockId,
                 ListingDate = new Date(2003, 06, 01),
-                AsxCode = "DDD",
-                Name = "DDD Company",
+                AsxCode = asxCode,
+                Name = "Test",
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
@@ -135,7 +140,7 @@ namespace Booth.PortfolioManager.IntegrationTest
 
             var stock = await client.Stocks.Get(stockId);
 
-            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = "DDD", Name = "DDD Company", CompanyTaxRate = 0.40m });
+            stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "Test", CompanyTaxRate = 0.40m });
 
         }
 
@@ -150,8 +155,8 @@ namespace Booth.PortfolioManager.IntegrationTest
             {
                 Id = stockId,
                 ListingDate = new Date(2003, 06, 01),
-                AsxCode = "EEE",
-                Name = "EEE Company",
+                AsxCode = _Fixture.GenerateUniqueAsxCode(),
+                Name = "Test",
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };

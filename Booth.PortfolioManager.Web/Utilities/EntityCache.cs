@@ -15,6 +15,8 @@ namespace Booth.PortfolioManager.Web.Utilities
         void Remove(Guid id);
         void Clear();
 
+        int Count { get; }
+
         IEnumerable<T> All();
     }
 
@@ -23,6 +25,8 @@ namespace Booth.PortfolioManager.Web.Utilities
         where T : IEntity
     {
         private ConcurrentDictionary<Guid, T> _Entities = new ConcurrentDictionary<Guid, T>();
+
+        public int Count => _Entities.Count;
 
         public T Get(Guid id)
         {
@@ -51,20 +55,7 @@ namespace Booth.PortfolioManager.Web.Utilities
         {
             return _Entities.Values;
         }
-    }
 
-    static class EntityCacheExtensions
-    {
-        public static IEntityCache<T> PopulateCache<T>(this IEntityCache<T> entityCache, IRepository<T> repository)
-            where T : IEntity
-        {
-            entityCache.Clear();
-
-            foreach (var entity in repository.All())
-                entityCache.Add(entity);
-
-            return entityCache;
-        }
     }
 
 }

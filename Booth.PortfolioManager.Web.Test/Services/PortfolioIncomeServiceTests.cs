@@ -11,8 +11,16 @@ using Booth.PortfolioManager.RestApi.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioIncomeServiceTests
     {
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioIncomeServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -31,7 +39,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioIncomeService(portfolio);
 
@@ -43,7 +51,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new IncomeResponse.IncomeItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         UnfrankedAmount = 20.00m,
                         FrankedAmount = 120.00m,
                         FrankingCredits = 4.00m,
@@ -52,7 +60,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new IncomeResponse.IncomeItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         UnfrankedAmount = 3.00m,
                         FrankedAmount = 30.00m,
                         FrankingCredits = 2.00m,

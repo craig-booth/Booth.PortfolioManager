@@ -24,11 +24,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var repository = mockRepository.Create<ITradingCalendarRepository>();
+            repository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(default(TradingCalendar));
 
-            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
-            tradingCalendarCache.Setup(x => x.Get(It.IsAny<Guid>())).Returns(default(TradingCalendar));
-
-            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+            var service = new TradingCalendarService(repository.Object);
 
             var result = service.Get(Guid.NewGuid(), 2010);
 
@@ -45,11 +43,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
+            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
-            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
-
-            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+            var service = new TradingCalendarService(repository.Object);
 
             var result = service.Get(tradingCalendar.Id, 2010);
             var response = result.Result;
@@ -69,11 +65,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
+            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
-            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
-
-            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+            var service = new TradingCalendarService(repository.Object);
 
             var result = service.Get(tradingCalendar.Id, 2000);
             var response = result.Result;
@@ -97,11 +91,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
             tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
             repository.Setup(x => x.UpdateYear(tradingCalendar, 2001));
+            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
-            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
-
-            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+            var service = new TradingCalendarService(repository.Object);
 
             var calendarReference = tradingCalendar;
 
@@ -137,11 +129,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
             tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
             repository.Setup(x => x.UpdateYear(tradingCalendar, 2001));
+            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
 
-            var tradingCalendarCache = mockRepository.Create<IEntityCache<TradingCalendar>>();
-            tradingCalendarCache.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
-
-            var service = new TradingCalendarService(tradingCalendarCache.Object, repository.Object);
+            var service = new TradingCalendarService(repository.Object);
 
             var calendarReference = tradingCalendar;
 
