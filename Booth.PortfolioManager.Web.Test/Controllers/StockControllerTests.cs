@@ -17,6 +17,7 @@ using Booth.PortfolioManager.Web.Mappers;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.RestApi.Stocks;
+using System.Linq;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {
@@ -46,7 +47,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             _StockPriceHistory = mockRepository.Create<IStockPriceHistory>();
             _StockPriceHistory.Setup(x => x.GetPrice(Date.Today)).Returns(12.25m);
-            _StockPriceHistory.Setup(x => x.GetPrices(It.IsAny<DateRange>())).Returns(new[] { new StockPrice(new Date(2010, 01, 01), 0.10m) } );
+            _StockPriceHistory.Setup(x => x.GetPrices(It.IsAny<DateRange>())).Returns<DateRange>(x => DateUtils.Days(x.FromDate, x.ToDate).Select(x => new StockPrice(x, 0.10m)));
 
             _Stock.SetPriceHistory(_StockPriceHistory.Object);
 
@@ -124,25 +125,25 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get("XYZ", null, null, null);
 
+            _StockQueryMock.Verify(x => x.Find(It.IsAny<Func<StockProperties, bool>>()));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.Today));
-
-            _StockQueryMock.Verify(x => x.Find(It.IsAny<Func<StockProperties, bool>>())); 
         }
 
         [Fact]
         public void GetWithQueryAndDate()
         {
-           var response = _Controller.Get("XYZ", new DateTime(2011, 01, 01), null, null);
+            var response = _Controller.Get("XYZ", new DateTime(2011, 01, 01), null, null);
+
+            _StockQueryMock.Verify(x => x.Find(new Date(2011, 01, 01), It.IsAny<Func<StockProperties, bool>>()));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2011, 01, 01)));
-
-            _StockQueryMock.Verify(x => x.Find(new Date(2011, 01, 01), It.IsAny<Func<StockProperties, bool>>())); 
         }
 
         [Fact]
@@ -150,12 +151,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get("XYZ", null, new DateTime(2009, 01, 01), null);
 
+            _StockQueryMock.Verify(x => x.Find(new DateRange(new Date(2009, 01, 01), Date.MaxValue), It.IsAny<Func<StockProperties, bool>>()));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.MaxValue));
-
-            _StockQueryMock.Verify(x => x.Find(new DateRange(new Date(2009, 01, 01), Date.MaxValue), It.IsAny<Func<StockProperties, bool>>())); 
         }
 
         [Fact]
@@ -163,12 +164,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get("XYZ", null, null, new DateTime(2055, 01, 01));
 
+            _StockQueryMock.Verify(x => x.Find(new DateRange(Date.MinValue, new Date(2055, 01, 01)), It.IsAny<Func<StockProperties, bool>>()));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2055, 01, 01)));
-
-            _StockQueryMock.Verify(x => x.Find(new DateRange(Date.MinValue, new Date(2055, 01, 01)), It.IsAny<Func<StockProperties, bool>>())); 
         }
 
         [Fact]
@@ -176,12 +177,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get("XYZ", null, new DateTime(2009, 01, 01), new DateTime(2012, 01, 01));
 
+            _StockQueryMock.Verify(x => x.Find(new DateRange(new Date(2009, 01, 01), new Date(2012, 01, 01)), It.IsAny<Func<StockProperties, bool>>()));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2012, 01, 01)));
-
-            _StockQueryMock.Verify(x => x.Find(new DateRange(new Date(2009, 01, 01), new Date(2012, 01, 01)), It.IsAny<Func<StockProperties, bool>>()));
         }
 
         [Fact]
@@ -197,12 +198,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(null, null, null, null);
 
+            _StockQueryMock.Verify(x => x.All());
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.Today));
-
-            _StockQueryMock.Verify(x => x.All()); 
         }
 
         [Fact]
@@ -210,12 +211,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(null, new DateTime(2011, 01, 01), null, null);
 
+            _StockQueryMock.Verify(x => x.All(new Date(2011, 01, 01)));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2011, 01, 01)));
-
-            _StockQueryMock.Verify(x => x.All(new Date(2011, 01, 01))); 
         }
 
         [Fact]
@@ -223,13 +224,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(null, null, new DateTime(2009, 01, 01), null);
 
+            _StockQueryMock.Verify(x => x.All(new DateRange(new Date(2009, 01, 01), Date.MaxValue)));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.MaxValue));
-
-            _StockQueryMock.Verify(x => x.All(new DateRange(new Date(2009, 01, 01), Date.MaxValue))); 
-
         }
 
         [Fact]
@@ -237,12 +237,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(null, null, null, new DateTime(2055, 01, 01));
 
+            _StockQueryMock.Verify(x => x.All(new DateRange(Date.MinValue, new Date(2055, 01, 01))));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2055, 01, 01)));
-
-            _StockQueryMock.Verify(x => x.All(new DateRange(Date.MinValue, new Date(2055, 01, 01)))); 
 
         }
 
@@ -251,12 +251,12 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(null, null, new DateTime(2009, 01, 01), new DateTime(2012, 01, 01));
 
+            _StockQueryMock.Verify(x => x.All(new DateRange(new Date(2009, 01, 01), new Date(2012, 01, 01))));
+
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2012, 01, 01)));
-
-            _StockQueryMock.Verify(x => x.All(new DateRange(new Date(2009, 01, 01), new Date(2012, 01, 01)))); 
 
         }
 
@@ -301,12 +301,11 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, null, null);
 
             var expectedDateRange = new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today);
+            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
                 .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
-
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
         }
 
         [Fact]
@@ -315,12 +314,11 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, new DateTime(2010, 01, 01), null);
 
             var expectedDateRange = new DateRange(new Date(2010, 01, 01), new Date(2010, 12, 31));
+            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
                 .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
-
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
         }
 
         [Fact]
@@ -329,26 +327,25 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, null, new DateTime(2015, 01, 01));
 
             var expectedDateRange = new DateRange(new Date(2014, 01, 02), new Date(2015, 01, 01));
+            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
                 .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
-
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
         }
 
         [Fact]
         public void GetClosingPricesWithBothDates()
         {
-            var response = _Controller.GetClosingPrices(_Stock.Id, new DateTime(2010, 01, 01), new DateTime(2015, 01, 01));
+            var response = _Controller.GetClosingPrices(_Stock.Id, new DateTime(2010, 01, 01), new DateTime(2010, 01, 20));
 
-            var expectedDateRange = new DateRange(new Date(2010, 01, 01), new Date(2015, 01, 01));
+            var expectedDateRange = new DateRange(new Date(2010, 01, 01), new Date(2010, 01, 20));
+            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
                 .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
 
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
         }
 
         [Fact]

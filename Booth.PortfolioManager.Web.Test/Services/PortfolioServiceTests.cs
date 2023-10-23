@@ -2,24 +2,44 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Moq;
 using Xunit;
 using FluentAssertions;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Services;
+using Booth.PortfolioManager.Domain.Users;
+using Booth.PortfolioManager.Web.Authentication;
+using Booth.PortfolioManager.Repository;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioServiceTests
     {
+
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioService(null);
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var result = service.ChangeDrpParticipation(Guid.NewGuid(), true);
+            var repository = mockRepository.Create<IPortfolioRepository>();
+
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
+
+            var result = service.ChangeDrpParticipation(null, Guid.NewGuid(), true);
 
             result.Should().HaveNotFoundStatus();
+
+            mockRepository.Verify();
         }
 
 
@@ -27,26 +47,58 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void ChangeDrpParticipationStockNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var service = new PortfolioService(portfolio);
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var result = service.ChangeDrpParticipation(Guid.NewGuid(), true);
+            var repository = mockRepository.Create<IPortfolioRepository>();
+           
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
+
+            var result = service.ChangeDrpParticipation(portfolio, Guid.NewGuid(), true);
 
             result.Should().HaveNotFoundStatus();
+
+            mockRepository.Verify();
         }
 
 
         [Fact]
         public void ChangeDrpParticipation()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var service = new PortfolioService(portfolio);
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var result = service.ChangeDrpParticipation(PortfolioTestCreator.Stock_ARG.Id, true);
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.Update(It.Is<Portfolio>(x => x.Id == portfolio.Id))).Verifiable();     
+
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
+
+            var result = service.ChangeDrpParticipation(portfolio, _Fixture.Stock_ARG.Id, true);
 
             result.Should().HaveOkStatus();
+
+            mockRepository.Verify();
+        }
+
+        [Fact]
+        public void CreatePortfolio()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolioId = Guid.NewGuid();
+
+            var repository = mockRepository.Create<IPortfolioRepository>();
+            repository.Setup(x => x.Add(It.Is<Portfolio>(x => x.Id == portfolioId))).Verifiable();
+
+            var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
+
+            var result = service.CreatePortfolio(portfolioId, "My Portfolio", Guid.NewGuid());
+
+            result.Should().HaveOkStatus();
+
+            mockRepository.Verify();
         }
 
     } 

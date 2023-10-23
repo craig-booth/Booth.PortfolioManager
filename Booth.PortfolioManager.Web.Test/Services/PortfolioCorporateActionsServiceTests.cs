@@ -17,56 +17,21 @@ using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioCorporateActionsServiceTests
     {
-
-
-     /*   private readonly Guid _StockWithoutCorporateActions;
-        private readonly Guid _StockWithCorporateActions;
-
-        private readonly Guid _Action1;
-        private readonly Guid _Action2;
-
-        private readonly CorporateActionService _Service;
-
-        private readonly List<Event> _Events = new List<Event>(); */
       
-        public PortfolioCorporateActionsServiceTests()
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioCorporateActionsServiceTests(ServicesTestFixture fixture)
         {
-     /*       var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var stockCache = new EntityCache<Stock>();
-            var stockQuery = new StockQuery(stockCache);
-
-            _StockWithoutCorporateActions = Guid.NewGuid();
-            var stock = new Stock(_StockWithoutCorporateActions);
-            stock.List("ABC", "ABC Pty Ltd", new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
-            stockCache.Add(stock);
-
-            _StockWithCorporateActions = Guid.NewGuid();
-            var stock2 = new Stock(_StockWithCorporateActions);
-            stock2.List("XYZ", "XYZ Pty Ltd", new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
-
-            _Action1 = Guid.NewGuid();
-            stock2.CorporateActions.AddCapitalReturn(_Action1, new Date(2001, 01, 01), "Action 1", new Date(2001, 01, 02), 10.00m);
-
-            _Action2 = Guid.NewGuid();
-            stock2.CorporateActions.AddDividend(_Action2, new Date(2001, 01, 01), "Action 2", new Date(2001, 01, 02), 10.00m, 1.00m, 2.45m);
-
-            stockCache.Add(stock2);
-
-            // Remove any existing events
-            stock.FetchEvents();
-            stock2.FetchEvents();
-
-            var repository = mockRepository.Create<IRepository<Stock>>();
-            repository.Setup(x => x.Update(It.IsAny<Stock>())).Callback<Stock>(x => _Events.AddRange(x.FetchEvents())); */
+            _Fixture = fixture;
         }
 
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioCorporateActionsService(null, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
+            var service = new PortfolioCorporateActionsService(null, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
 
             var result = service.GetCorporateActions();
 
@@ -76,9 +41,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCorporateActions()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
 
             var result = service.GetCorporateActions();
 
@@ -86,8 +51,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 CorporateActions = new[]
                 {
-                    new CorporateActionsResponse.CorporateActionItem() { Id = PortfolioTestCreator.ARG_CapitalReturn, ActionDate = new Date(2001, 01, 01), Stock = PortfolioTestCreator.Stock_ARG, Description = "ARG Capital Return" },
-                    new CorporateActionsResponse.CorporateActionItem() { Id = PortfolioTestCreator.WAM_Split, ActionDate = new Date(2002, 01, 01), Stock = PortfolioTestCreator.Stock_WAM, Description = "WAM Split" },
+                    new CorporateActionsResponse.CorporateActionItem() { Id = _Fixture.ARG_CapitalReturn, ActionDate = new Date(2001, 01, 01), Stock = _Fixture.Stock_ARG, Description = "ARG Capital Return" },
+                    new CorporateActionsResponse.CorporateActionItem() { Id = _Fixture.WAM_Split, ActionDate = new Date(2002, 01, 01), Stock = _Fixture.Stock_WAM, Description = "WAM Split" },
                 }
 
             });
@@ -97,9 +62,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCorporateActionsStockNotOwned()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
 
             var result = service.GetCorporateActions(Guid.NewGuid());
 
@@ -109,17 +74,17 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetCorporateActionsForStock()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
 
-            var result = service.GetCorporateActions(PortfolioTestCreator.Stock_WAM.Id);
+            var result = service.GetCorporateActions(_Fixture.Stock_WAM.Id);
 
             result.Result.Should().BeEquivalentTo(new
             {
                 CorporateActions = new[]
                 {
-                   new CorporateActionsResponse.CorporateActionItem() { Id = PortfolioTestCreator.WAM_Split, ActionDate = new Date(2002, 01, 01), Stock = PortfolioTestCreator.Stock_WAM, Description = "WAM Split" },
+                   new CorporateActionsResponse.CorporateActionItem() { Id = _Fixture.WAM_Split, ActionDate = new Date(2002, 01, 01), Stock = _Fixture.Stock_WAM, Description = "WAM Split" },
                 }
 
             });
@@ -129,9 +94,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForCorporateActionStockNotOwned()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
 
             var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
 
@@ -141,9 +106,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForCorporateActionActionNotFound()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
 
             var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
 
@@ -153,17 +118,17 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetTransactionsForCorporateAction()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, PortfolioTestCreator.StockResolver, new TransactionMapper(PortfolioTestCreator.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
 
-            var result = service.GetTransactionsForCorporateAction(PortfolioTestCreator.Stock_WAM.Id, PortfolioTestCreator.WAM_Split);
+            var result = service.GetTransactionsForCorporateAction(_Fixture.Stock_WAM.Id, _Fixture.WAM_Split);
 
             result.Result.Should().BeEquivalentTo(new []
             {
                 new RestApi.Transactions.UnitCountAdjustment()
                 {
-                    Stock = PortfolioTestCreator.Stock_WAM.Id,
+                    Stock = _Fixture.Stock_WAM.Id,
                     TransactionDate = new Date(2002, 01, 01),
                     Description = "Adjust unit count using ratio 1:2",
                     Comment= "WAM Split",

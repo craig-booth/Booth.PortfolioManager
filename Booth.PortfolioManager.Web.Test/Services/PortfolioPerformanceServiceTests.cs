@@ -11,8 +11,16 @@ using Booth.PortfolioManager.Web.Services;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioPreformanceServiceTests
     {
+        private readonly ServicesTestFixture _Fixture;
+
+        public PortfolioPreformanceServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
         [Fact]
         public void PortfolioNotFound()
         {
@@ -28,7 +36,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void GetPerformance()
         {
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var service = new PortfolioPerformanceService(portfolio);
 
@@ -51,7 +59,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 105.00m,
                         Purchases = 200.00m,
                         Sales = 51.00m,
@@ -64,7 +72,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     },
                     new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_WAM,
+                        Stock = _Fixture.Stock_WAM,
                         OpeningBalance = 230.00m,
                         Purchases = 32.50m,
                         Sales = 0.00m,
@@ -83,9 +91,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void HoldingAquiredAfterPeriodStart()
         {
-            var portfolio = PortfolioTestCreator.CreateEmptyPortfolio();
+            var portfolio = _Fixture.CreateEmptyPortfolio();
 
-            portfolio.AquireShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
+            portfolio.AquireShares(_Fixture.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
 
             var service = new PortfolioPerformanceService(portfolio);
             var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
@@ -107,7 +115,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 0.00m,
                         Purchases = 100.00m,
                         Sales = 0.00m,
@@ -126,10 +134,10 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void HoldingDisposedBeforePeriodEnds()
         {
-            var portfolio = PortfolioTestCreator.CreateEmptyPortfolio();
+            var portfolio = _Fixture.CreateEmptyPortfolio();
 
-            portfolio.AquireShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2000, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
-            portfolio.DisposeOfShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
+            portfolio.AquireShares(_Fixture.Stock_ARG.Id, new Date(2000, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
+            portfolio.DisposeOfShares(_Fixture.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
 
             var service = new PortfolioPerformanceService(portfolio);
             var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
@@ -151,7 +159,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 {
                     new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 105.00m,
                         Purchases = 0.00m,
                         Sales = 120.00m,
@@ -170,10 +178,10 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void HoldingAquiredAndDisposedInPeriod()
         {
-            var portfolio = PortfolioTestCreator.CreateEmptyPortfolio();
+            var portfolio = _Fixture.CreateEmptyPortfolio();
 
-            portfolio.AquireShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
-            portfolio.DisposeOfShares(PortfolioTestCreator.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
+            portfolio.AquireShares(_Fixture.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
+            portfolio.DisposeOfShares(_Fixture.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
 
             var service = new PortfolioPerformanceService(portfolio);
             var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
@@ -195,7 +203,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                  {
                     new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
-                        Stock = PortfolioTestCreator.Stock_ARG,
+                        Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 0.00m,
                         Purchases = 100.00m,
                         Sales = 120.00m,

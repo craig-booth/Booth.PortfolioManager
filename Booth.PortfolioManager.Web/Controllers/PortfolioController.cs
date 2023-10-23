@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 using Booth.Common;
 using Booth.PortfolioManager.RestApi.Portfolios;
@@ -136,6 +137,20 @@ namespace Booth.PortfolioManager.Web.Controllers
         public ActionResult<CorporateActionsResponse> GetCorporateActions([FromServices] IPortfolioCorporateActionsService service)
         {
             var result = service.GetCorporateActions();
+
+            return result.ToActionResult();
+        }
+
+        // POST :
+        [Route("~/api/portfolio")]
+        [HttpPost]
+        public ActionResult CreatePortfolio([FromServices] IPortfolioService service, [FromBody] CreatePortfolioCommand command)
+        {
+            // Retreive the authenticated user
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            var userId = new Guid(userIdClaim.Value);
+
+            var result = service.CreatePortfolio(command.Id, command.Name, userId);
 
             return result.ToActionResult();
         }

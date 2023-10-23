@@ -1,33 +1,47 @@
 ﻿using System;
 
+using Xunit;
+using Moq;
+
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Web.Utilities;
+using Booth.PortfolioManager.Repository;
+
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
-    static class PortfolioTestCreator
+    public class ServicesTestFixture
     {
-        public static EntityCache<TradingCalendar> TradingCalendarCache = new EntityCache<TradingCalendar>();
-       
-        private static EntityCache<Stock> _StockCache = new EntityCache<Stock>();
-        public static IStockResolver StockResolver = new StockResolver(_StockCache);
+        public IStockResolver StockResolver;
+        public IPortfolioFactory PortfolioFactory;
+        public ITradingCalendarRepository TradingCalendarRepository;
 
-        public static RestApi.Portfolios.Stock Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
-        public static RestApi.Portfolios.Stock Stock_WAM = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
+        public RestApi.Portfolios.Stock Stock_ARG;
+        public RestApi.Portfolios.Stock Stock_WAM; 
 
-        public static Guid ARG_CapitalReturn = Guid.NewGuid();
-        public static Guid WAM_Split = Guid.NewGuid();
+        public Guid ARG_CapitalReturn = Guid.NewGuid();
+        public Guid WAM_Split = Guid.NewGuid();
+        public Guid WAM_OpeningBalance = Guid.NewGuid();
 
-        public static Guid WAM_OpeningBalance = Guid.NewGuid();
-
-        public static Portfolio CreateEmptyPortfolio()
+        public ServicesTestFixture()
         {
-             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
-            TradingCalendarCache.Add(tradingCalendar);
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var _StockCache = new EntityCache<Stock>();
+            StockResolver = new StockResolver(_StockCache);
+            PortfolioFactory = new PortfolioFactory(StockResolver);
+
+            var tradingCalendarRepository = mockRepository.Create<ITradingCalendarRepository>();
+            tradingCalendarRepository.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(new TradingCalendar(TradingCalendarIds.ASX));
+            TradingCalendarRepository = tradingCalendarRepository.Object;
+
+            Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
+            Stock_WAM = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
+
 
             var arg = new Stock(Stock_ARG.Id);
             arg.List(Stock_ARG.AsxCode, Stock_ARG.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
@@ -93,28 +107,30 @@ namespace Booth.PortfolioManager.Web.Test.Services
             wamStockPrice.UpdateClosingPrice(new Date(2007, 01, 02), 0.90m);
             wamStockPrice.UpdateClosingPrice(new Date(2009, 01, 02), 1.30m);
             wamStockPrice.UpdateClosingPrice(new Date(2010, 01, 01), 1.50m);
+        }
 
-            var portfolioFactory = new PortfolioFactory(StockResolver);
-            var portfolio = portfolioFactory.CreatePortfolio(Guid.NewGuid());
+        public Portfolio CreateEmptyPortfolio()
+        {
+            var portfolio = PortfolioFactory.CreatePortfolio(Guid.NewGuid());
             portfolio.Create("Test", Guid.NewGuid());
 
             return portfolio;
         }
 
-        public static Portfolio CreateDefaultPortfolio()
+        public Portfolio CreateDefaultPortfolio()
         {
             var portfolio = CreateEmptyPortfolio();
 
             portfolio.MakeCashTransaction(new Date(2000, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 10000m, "", Guid.NewGuid());
             portfolio.AquireShares(Stock_ARG.Id, new Date(2000, 01, 01), 100, 1.00m, 19.95m, true, "", Guid.NewGuid());
-            portfolio.AquireShares(Stock_WAM.Id, new Date(2000, 01, 01), 200, 1.20m, 19.95m, true, "", Guid.NewGuid());      
+            portfolio.AquireShares(Stock_WAM.Id, new Date(2000, 01, 01), 200, 1.20m, 19.95m, true, "", Guid.NewGuid());
 
             portfolio.MakeCashTransaction(new Date(2002, 01, 01), Domain.Transactions.BankAccountTransactionType.Interest, 100m, "", Guid.NewGuid());
             portfolio.AquireShares(Stock_ARG.Id, new Date(2003, 01, 01), 100, 1.00m, 19.95m, true, "", Guid.NewGuid());
             portfolio.DisposeOfShares(Stock_ARG.Id, new Date(2004, 01, 01), 50, 1.02m, 19.95m, Domain.Utils.CgtCalculationMethod.MinimizeGain, true, "", Guid.NewGuid());
             portfolio.AquireShares(Stock_ARG.Id, new Date(2005, 01, 01), 100, 1.00m, 19.95m, true, "", Guid.NewGuid());
 
-            portfolio.IncomeReceived(Stock_ARG.Id, new Date(2005, 01, 02), new Date(2005, 01, 02), 50.00m, 5.00m, 2.00m, 0.00m, 0.00m, 0.00m, true,"",  Guid.NewGuid());
+            portfolio.IncomeReceived(Stock_ARG.Id, new Date(2005, 01, 02), new Date(2005, 01, 02), 50.00m, 5.00m, 2.00m, 0.00m, 0.00m, 0.00m, true, "", Guid.NewGuid());
             portfolio.IncomeReceived(Stock_WAM.Id, new Date(2005, 01, 03), new Date(2005, 01, 03), 30.00m, 3.00m, 2.00m, 0.00m, 0.00m, 0.50m, false, "", Guid.NewGuid());
             portfolio.AddOpeningBalance(Stock_WAM.Id, new Date(2005, 01, 03), new Date(2005, 01, 03), 5, 32.50m, "", WAM_OpeningBalance);
             portfolio.IncomeReceived(Stock_ARG.Id, new Date(2007, 01, 02), new Date(2007, 01, 02), 70.00m, 15.00m, 2.00m, 0.00m, 0.00m, 0.00m, true, "", Guid.NewGuid());
@@ -124,7 +140,16 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             return portfolio;
         }
+    }
+
+    static class Services
+    {
+        public const string Collection = "Services";
+    }
 
 
+    [CollectionDefinition(Services.Collection)]
+    public class ServicesCollection : ICollectionFixture<ServicesTestFixture>
+    {
     }
 }

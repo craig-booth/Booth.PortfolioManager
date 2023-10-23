@@ -109,19 +109,5 @@ namespace Booth.PortfolioManager.Repository
             base.UpdateEffectiveProperties<RelativeNTA>(stock, date, stapledSecurity.RelativeNTAs[date], "relativeNTAs");
         }
 
-        public static void ConfigureSerializaton()
-        {
-            BsonSerializer.RegisterSerializer<Stock>(new StockSerializer());
-
-            BsonClassMap.RegisterClassMap<CorporateAction>(cm =>
-            {
-                cm.AutoMap();
-                cm.UnmapProperty(c => c.Stock);
-            });
-
-            var actionTypes = typeof(CorporateAction).GetSubclassesOf(true);
-            foreach (var actionType in actionTypes)
-                BsonClassMap.LookupClassMap(actionType);
-        }
     }
 }

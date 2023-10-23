@@ -12,6 +12,8 @@ using Booth.PortfolioManager.Domain;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Repository.Serialization;
+using System.Transactions;
+using MongoDB.Bson.IO;
 
 namespace Booth.PortfolioManager.Repository
 {
@@ -32,9 +34,12 @@ namespace Booth.PortfolioManager.Repository
 
         public override void Update(Portfolio entity)
         {
+            var drpHoldings = entity.Holdings.All().Where(x => x.Settings.ParticipateInDrp).Select(x => x.Id).ToArray();
+
             var bson = Builders<BsonDocument>.Update
             .Set("name", entity.Name)
-            .Set("owner", entity.Owner);
+            .Set("owner", entity.Owner)
+            .Set("participateInDrp", drpHoldings);
 
             _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
         }
@@ -51,15 +56,10 @@ namespace Booth.PortfolioManager.Repository
 
         public void DeleteTransaction(Portfolio portfolio, Guid id)
         {
-            var filter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
-                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
-                    }
-                );
+            var updateValue = Builders<BsonDocument>.Update
+                .PullFilter("transactions", Builders<BsonDocument>.Filter.Eq("_id", id));
 
-            _Collection.DeleteOne(filter); 
+            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), updateValue);
         }
 
         public void UpdateTransaction(Portfolio portfolio, Guid id)
@@ -67,12 +67,7 @@ namespace Booth.PortfolioManager.Repository
             var transaction = portfolio.Transactions[id];
 
             var filter = Builders<BsonDocument>.Filter
-                .And(new[]
-                    {
-                    Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id),
-                    Builders<BsonDocument>.Filter.Eq("transactions._id", id)
-                    }
-                );
+                .And(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), Builders<BsonDocument>.Filter.Eq("transactions._id", id));
 
             var updateValue = Builders<BsonDocument>.Update
                 .Set("transactions.$", transaction);
@@ -80,20 +75,5 @@ namespace Booth.PortfolioManager.Repository
             _Collection.UpdateOne(filter, updateValue); 
         }
 
-        public static void ConfigureSerializaton(IPortfolioFactory factory, IStockResolver stockResolver)
-        {
-            BsonSerializer.RegisterSerializer<Portfolio>(new PortfolioSerializer(factory));
-
-            BsonClassMap.RegisterClassMap<PortfolioTransaction>(cm =>
-            {
-                cm.AutoMap();
-                // This won't be needed if PortfolioTransaction can contain the AsxCode
-                cm.MapProperty(c => c.Stock).SetSerializer(new PortfolioTransactionStockSerializer(stockResolver));
-            });
-
-            var transactionTypes = typeof(PortfolioTransaction).GetSubclassesOf(true);
-            foreach (var transactionType in transactionTypes)
-                BsonClassMap.LookupClassMap(transactionType);
-        }
     }
 }

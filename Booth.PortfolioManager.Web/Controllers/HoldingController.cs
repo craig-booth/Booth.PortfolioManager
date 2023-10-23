@@ -11,6 +11,7 @@ using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.Mappers;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Controllers
 {
@@ -49,9 +50,9 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET: properties
         [Route("{id:guid}/changedrpparticipation")]
         [HttpPost]
-        public ActionResult ChangeDrpParticipation([FromServices] IPortfolioService service, [FromRoute] Guid id, [FromQuery] bool participate)
+        public ActionResult ChangeDrpParticipation([FromServices] IPortfolio portfolio, [FromServices] IPortfolioService service, [FromRoute] Guid id, [FromBody] ChangeDrpParticipationCommand command)
         {
-            var result = service.ChangeDrpParticipation(id, participate);
+            var result = service.ChangeDrpParticipation(portfolio, id, command.Participate);
 
             return result.ToActionResult();
         }

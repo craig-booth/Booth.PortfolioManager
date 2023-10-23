@@ -10,17 +10,18 @@ using Xunit;
 using FluentAssertions;
 
 using Booth.Common;
-using Booth.PortfolioManager.IntegrationTest.TestFixture;
 using Booth.PortfolioManager.DataServices;
-using System.Diagnostics;
 
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
-    public class DataServiceTests : IClassFixture<AppTestFixture>
+
+    [Collection(Integration.Collection)]
+    public class DataServiceTests
     {
-        private AppTestFixture _Fixture;
-        public DataServiceTests(AppTestFixture fixture)
+        private readonly IntegrationTestFixture _Fixture;
+
+        public DataServiceTests(IntegrationTestFixture fixture)
         {
             _Fixture = fixture;
         }

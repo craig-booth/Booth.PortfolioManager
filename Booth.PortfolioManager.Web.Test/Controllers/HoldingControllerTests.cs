@@ -12,6 +12,7 @@ using Booth.PortfolioManager.Web.Controllers;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.RestApi.Portfolios;
 
+
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {
     public class HoldingControllerTests
@@ -188,11 +189,18 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
 
+            var portfolio = mockRepository.Create<Domain.Portfolios.IPortfolio>();
+
             var service = mockRepository.Create<IPortfolioService>();
-            service.Setup(x => x.ChangeDrpParticipation(stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.NotFound()).Verifiable();
+            service.Setup(x => x.ChangeDrpParticipation(portfolio.Object, stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.NotFound()).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.ChangeDrpParticipation(service.Object, stockId, true);
+            var command = new ChangeDrpParticipationCommand()
+            {
+                Holding = stockId,
+                Participate = true
+            };
+            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
 
             result.Should().BeNotFoundResult();
 
@@ -206,11 +214,18 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
 
+            var portfolio = mockRepository.Create<Domain.Portfolios.IPortfolio>();
+
             var service = mockRepository.Create<IPortfolioService>();
-            service.Setup(x => x.ChangeDrpParticipation(stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.Ok()).Verifiable();
+            service.Setup(x => x.ChangeDrpParticipation(portfolio.Object, stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.Ok()).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.ChangeDrpParticipation(service.Object, stockId, true);
+            var command = new ChangeDrpParticipationCommand()
+            {
+                Holding = stockId,
+                Participate = true
+            };
+            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
 
             result.Should().BeOkResult();
 

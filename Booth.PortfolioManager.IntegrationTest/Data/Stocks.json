@@ -1,0 +1,63 @@
+﻿{
+  "_id": {
+    "$binary": {
+      "base64": "F5It8V5JyEKFaTSwZ3VdBA==",
+      "subType": "03"
+    }
+  },
+  "listingDate": "2020-01-01",
+  "trust": false,
+  "properties": [
+    {
+      "date": "2020-01-01",
+      "properties": {
+        "asxCode": "ABC",
+        "name": "Test Company",
+        "category": 0
+      }
+    }
+  ],
+  "dividendRules": [
+    {
+      "date": "2020-01-01",
+      "properties": {
+        "companyTaxRate": "0.30",
+        "dividendRoundingRule": 0,
+        "drpActive": true,
+        "drpMethod": 3
+      }
+    }
+  ],
+  "corporateActions": [
+    {
+      "_t": "Dividend",
+      "_id": {
+        "$binary": {
+          "base64": "Jfp5+FgRME6DLFRVGM3ytA==",
+          "subType": "03"
+        }
+      },
+      "date": "2020-06-01",
+      "description": "Dividend $2.12805",
+      "paymentDate": "2020-06-15",
+      "dividendAmount": "2.12805",
+      "percentFranked": "0.0",
+      "drpPrice": "51.0674"
+    },
+    {
+      "_t": "Dividend",
+      "_id": {
+        "$binary": {
+          "base64": "Bm17trKmK0GaJUsFVKKcbg==",
+          "subType": "03"
+        }
+      },
+      "date": "2020-12-01",
+      "description": "Dividend $2.16606",
+      "paymentDate": "2020-12-15",
+      "dividendAmount": "2.16605",
+      "percentFranked": "0.0",
+      "drpPrice": "49.3268"
+    }
+  ]
+}

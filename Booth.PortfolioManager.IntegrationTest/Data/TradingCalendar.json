@@ -1,0 +1,528 @@
+﻿{
+  "_id": {
+    "$binary": {
+      "base64": "S0YuceYcIUuPstZ53/4+4w==",
+      "subType": "03"
+    }
+  },
+  "years": [
+    {
+      "year": 2010,
+      "days": [
+        {
+          "date": "2010-01-01",
+          "description": "New Year’s Day"
+        },
+        {
+          "date": "2010-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2010-04-02",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2010-04-05",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2010-04-26",
+          "description": "ANZAC Day Holiday"
+        },
+        {
+          "date": "2010-06-14",
+          "description": "Queen’s Birthday"
+        },
+        {
+          "date": "2010-12-27",
+          "description": "Christmas Day / Boxing Day"
+        },
+        {
+          "date": "2010-12-28",
+          "description": "Boxing Day / Christmas Day / Proclamation Day"
+        }
+      ]
+    },
+    {
+      "year": 2011,
+      "days": [
+        {
+          "date": "2011-01-03",
+          "description": "New Year’s Day"
+        },
+        {
+          "date": "2011-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2011-04-22",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2011-04-25",
+          "description": "Easter Monday / ANZAC Day Holiday"
+        },
+        {
+          "date": "2011-04-26",
+          "description": "Easter Tuesday / Public Holiday"
+        },
+        {
+          "date": "2011-06-13",
+          "description": "Queen’s Birthday"
+        },
+        {
+          "date": "2011-12-26",
+          "description": "Christmas Day / Boxing Day"
+        },
+        {
+          "date": "2011-12-27",
+          "description": "Boxing Day / Proclamation Day / Christmas Day"
+        }
+      ]
+    },
+    {
+      "year": 2012,
+      "days": [
+        {
+          "date": "2012-01-02",
+          "description": "New Year’s Day"
+        },
+        {
+          "date": "2012-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2012-04-06",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2012-04-09",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2012-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2012-06-11",
+          "description": "Queen’s Birthday"
+        },
+        {
+          "date": "2012-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2012-12-26",
+          "description": "Boxing Day / Proclamation Day"
+        }
+      ]
+    },
+    {
+      "year": 2013,
+      "days": [
+        {
+          "date": "2013-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2013-01-28",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2013-03-29",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2013-04-01",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2013-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2013-06-10",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2013-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2013-12-26",
+          "description": "Boxing Day / Proclamation Day"
+        }
+      ]
+    },
+    {
+      "year": 2014,
+      "days": [
+        {
+          "date": "2014-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2014-01-27",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2014-04-18",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2014-04-21",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2014-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2014-06-09",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2014-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2014-12-26",
+          "description": "Boxing Day / Proclamation Day"
+        }
+      ]
+    },
+    {
+      "year": 2015,
+      "days": [
+        {
+          "date": "2015-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2015-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2015-04-03",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2015-04-06",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2015-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2015-06-08",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2015-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2015-12-28",
+          "description": "Boxing Day / Proclamation Day"
+        }
+      ]
+    },
+    {
+      "year": 2016,
+      "days": [
+        {
+          "date": "2016-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2016-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2016-03-25",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2016-03-28",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2016-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2016-06-13",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2016-12-26",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2016-12-27",
+          "description": "Boxing Day / Proclamation Day / Christmas Day Holiday"
+        }
+      ]
+    },
+    {
+      "year": 2017,
+      "days": [
+        {
+          "date": "2017-01-02",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2017-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2017-04-14",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2017-04-17",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2017-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2017-06-12",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2017-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2017-12-26",
+          "description": "Boxing Day / Proclamation Day / Christmas Day"
+        }
+      ]
+    },
+    {
+      "year": 2018,
+      "days": [
+        {
+          "date": "2018-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2018-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2018-03-30",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2018-04-02",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2018-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2018-06-11",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2018-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2018-12-26",
+          "description": "Boxing Day / Proclamation Day"
+        }
+      ]
+    },
+    {
+      "year": 2019,
+      "days": [
+        {
+          "date": "2019-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2019-01-28",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2019-04-19",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2019-04-22",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2019-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2019-06-10",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2019-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2019-12-26",
+          "description": "Boxing Day / Proclamation Day"
+        }
+      ]
+    },
+    {
+      "year": 2020,
+      "days": [
+        {
+          "date": "2020-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2020-01-27",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2020-04-10",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2020-04-13",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2020-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2020-06-08",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2020-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2020-12-28",
+          "description": "Boxing Day"
+        }
+      ]
+    },
+    {
+      "year": 2021,
+      "days": [
+        {
+          "date": "2021-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2021-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2021-04-02",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2021-04-05",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2021-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2021-06-14",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2021-12-27",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2021-12-28",
+          "description": "Boxing Day"
+        }
+      ]
+    },
+    {
+      "year": 2022,
+      "days": [
+        {
+          "date": "2022-01-03",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2022-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2022-04-15",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2022-04-18",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2022-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2022-06-13",
+          "description": "Queen's Birthday"
+        },
+        {
+          "date": "2022-12-26",
+          "description": "Boxing Day"
+        },
+        {
+          "date": "2022-12-27",
+          "description": "Christmas Day"
+        }
+      ]
+    },
+    {
+      "year": 2023,
+      "days": [
+        {
+          "date": "2023-01-02",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2023-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2023-04-07",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2023-04-10",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2023-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2023-06-12",
+          "description": "King's Birthday"
+        },
+        {
+          "date": "2023-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2023-12-26",
+          "description": "Boxing Day"
+        }
+      ]
+    }
+  ]
+}

@@ -35,7 +35,6 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         public Portfolio CreatePortfolio(Guid id)
         {
             var portfolio = new Portfolio(id, _StockResolver, _TransactionHandlers);
-
             return portfolio;
         }
     }

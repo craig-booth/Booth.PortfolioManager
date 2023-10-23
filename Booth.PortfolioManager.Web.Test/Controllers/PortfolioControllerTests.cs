@@ -12,11 +12,44 @@ using Booth.PortfolioManager.Web.Controllers;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Transactions;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {
     public class PortfolioControllerTests
     {
+        [Fact]
+        public void CreatePortfolio()
+        {
+            var mockRepository = new MockRepository(MockBehavior.Strict);
+
+            var portfolioId = Guid.NewGuid();
+            var name = "My Portfolio";
+            var ownerId = Guid.NewGuid();
+
+            var service = mockRepository.Create<IPortfolioService>();
+            service.Setup(x => x.CreatePortfolio(portfolioId, name, ownerId)).Returns(ServiceResult.Ok()).Verifiable();
+
+
+            var identity = new ClaimsIdentity();
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, ownerId.ToString()));
+
+            var controller = new PortfolioController();
+            controller.ControllerContext.HttpContext = new DefaultHttpContext();
+            controller.ControllerContext.HttpContext.User = new ClaimsPrincipal(identity);
+
+            var command = new CreatePortfolioCommand()
+            {
+                Id = portfolioId,
+                Name = name
+            };
+            var result = controller.CreatePortfolio(service.Object, command);
+
+            result.Should().BeOkResult();
+
+            mockRepository.VerifyAll();
+        }
 
         [Fact]
         public void GetProperties()

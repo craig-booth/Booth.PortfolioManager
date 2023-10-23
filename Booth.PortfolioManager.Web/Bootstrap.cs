@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using MongoDB.Driver;
+using Microsoft.Extensions.Caching.Memory;
 
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Stocks;
@@ -23,6 +25,7 @@ using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.DataImporters;
 using Booth.PortfolioManager.Web.Mappers;
+using Booth.PortfolioManager.Web.CachedRepositories;
 
 namespace Booth.PortfolioManager.Web
 {
@@ -31,7 +34,6 @@ namespace Booth.PortfolioManager.Web
 
         public static IServiceCollection AddPortfolioManagerServices(this IServiceCollection services, AppSettings settings)
         {
-            services.AddSingleton<AppSettings>(settings);
             services.AddTransient<IConfigureOptions<MvcNewtonsoftJsonOptions>, RestApiMvcJsonOptions>();
 
             IJwtTokenConfigurationProvider jwtTokenConfigProvider;
@@ -55,14 +57,14 @@ namespace Booth.PortfolioManager.Web
             services.AddSingleton(typeof(IEntityCache<>), typeof(EntityCache<>));
 
             // Database
-            services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(settings.ConnectionString, settings.Database));
-
+            services.AddSingleton<IMongoClient>(new MongoClient(settings.ConnectionString));
+            services.AddScoped<IPortfolioManagerDatabase>(x => new PortfolioManagerDatabase(x.GetRequiredService<IMongoClient>(), settings.Database, x.GetRequiredService<IPortfolioFactory>(), x.GetRequiredService<IStockResolver>()));
 
             // Repositories
-            services.AddScoped<IPortfolioRepository, PortfolioRepository>();
-            services.AddScoped<IStockRepository, StockRepository>();
-            services.AddScoped<IStockPriceRepository, StockPriceRepository>();
-            services.AddScoped<ITradingCalendarRepository, TradingCalendarRepository>();
+            services.AddScoped<IPortfolioRepository>(x => new CachedPortfolioRepository(new PortfolioRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IMemoryCache>()));
+            services.AddScoped<IStockRepository>(x => new CachedStockRepository(new StockRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IEntityCache<Stock>>()));
+            services.AddScoped<IStockPriceRepository>(x => new CachedStockPriceRepository(new StockPriceRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IEntityCache<StockPriceHistory>>()));
+            services.AddScoped<ITradingCalendarRepository>(x => new CachedTradingCalendarRepository(new TradingCalendarRepository(x.GetRequiredService<IPortfolioManagerDatabase>()), x.GetRequiredService<IMemoryCache>()));
             services.AddScoped<IUserRepository, UserRepository>();
 
 
@@ -91,9 +93,9 @@ namespace Booth.PortfolioManager.Web
 
 
             // Others
-            services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().ReadOnlyPortfolio);
-            services.AddScoped<IPortfolio>(x => x.GetRequiredService<IPortfolioAccessor>().Portfolio);
-            services.AddScoped<IPortfolioAccessor, PortfolioAccessor>();
+            services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().ReadOnlyPortfolio);
+            services.AddScoped<IPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().Portfolio);
+            services.AddScoped<IHttpContextPortfolioAccessor, HttpContextPortfolioAccessor>();
             services.AddScoped<IPortfolioFactory, PortfolioFactory>();
             services.AddScoped<IStockResolver, StockResolver>();
             services.AddScoped<IStockQuery, StockQuery>();
@@ -105,14 +107,6 @@ namespace Booth.PortfolioManager.Web
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                var database = scope.ServiceProvider.GetRequiredService<IPortfolioManagerDatabase>();
-
-                var portfolioFactory = scope.ServiceProvider.GetRequiredService<IPortfolioFactory>();
-                var stockResolver = scope.ServiceProvider.GetRequiredService<IStockResolver>();
-                database.Configure(portfolioFactory, stockResolver);
-
-
-                InitializeCalendarCache(scope.ServiceProvider);
                 InitializeStockCache(scope.ServiceProvider);
             }
 
@@ -133,30 +127,18 @@ namespace Booth.PortfolioManager.Web
             return services;
         }
 
-        private static void InitializeCalendarCache(IServiceProvider serviceProvider)
-        {
-            var repository = serviceProvider.GetRequiredService<ITradingCalendarRepository>();
-            var cache = serviceProvider.GetRequiredService<IEntityCache<TradingCalendar>>();
-
-            var calendar = repository.Get(TradingCalendarIds.ASX);
-            cache.Add(calendar);  
-
-            foreach (var year in calendar.Years)
-            {
-                repository.UpdateYear(calendar, year);
-            }
-
-        }
-
         private static void InitializeStockCache(IServiceProvider serviceProvider)
         {
+            // Load all entities from the repositories
             var stockRepository = serviceProvider.GetRequiredService<IStockRepository>();
             var stockCache = serviceProvider.GetRequiredService<IEntityCache<Stock>>();
-            stockCache.PopulateCache(stockRepository);
+            stockCache.Clear();
+            stockRepository.All();
 
             var stockPriceRepository = serviceProvider.GetRequiredService<IStockPriceRepository>();
             var stockPriceHistoryCache = serviceProvider.GetRequiredService<IEntityCache<StockPriceHistory>>();
-            stockPriceHistoryCache.PopulateCache(stockPriceRepository);
+            stockPriceHistoryCache.Clear();
+            stockPriceRepository.All();
 
             // Hook up stock prices to stocks
             foreach (var stock in stockCache.All())

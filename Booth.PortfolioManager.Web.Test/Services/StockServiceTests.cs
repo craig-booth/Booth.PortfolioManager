@@ -48,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery.Object, stockCache.Object, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery.Object, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ListStock(id, "XYZ", "XYZ Pty Ltd", new Date(2000, 01, 01), true, AssetCategory.AustralianFixedInterest);
 
@@ -75,7 +75,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ListStock(id, "XYZ", "XYZ Pty Ltd", new Date(2000, 01, 01), true, AssetCategory.AustralianFixedInterest);
 
@@ -105,7 +105,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
             stockPriceHistoryRepository.Setup(x => x.Add(It.IsAny<StockPriceHistory>())).Verifiable();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
 
             var result = service.ListStock(id, "XYZ", "XYZ Pty Ltd", new Date(2000, 01, 01), true, AssetCategory.AustralianFixedInterest);
 
@@ -133,7 +133,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = new EntityCache<StockPriceHistory>();
             stockPriceHistoryRepository.Setup(x => x.Add(It.IsAny<StockPriceHistory>())).Verifiable();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
 
             var result = service.ListStock(id, "XYZ", "XYZ Pty Ltd", listingDate, true, AssetCategory.AustralianFixedInterest);
 
@@ -143,10 +143,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
                 stock.Should().BeEquivalentTo(new { Id = id, EffectivePeriod = new DateRange(listingDate, Date.MaxValue) });
                 stock.Properties[listingDate].Should().BeEquivalentTo(new StockProperties("XYZ", "XYZ Pty Ltd", AssetCategory.AustralianFixedInterest));
-
-                stockCache.Get(id).Should().Be(stock);
-
-                stockPriceHistoryCache.Get(id).Should().NotBeNull();
             }
 
             mockRepository.Verify();
@@ -165,7 +161,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.DelistStock(id, new Date(2000, 01, 01));
 
@@ -190,7 +186,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.DelistStock(id, new Date(2000, 01, 01));
 
@@ -216,7 +212,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.DelistStock(id, new Date(2000, 01, 01));
 
@@ -242,7 +238,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.DelistStock(id, new Date(2000, 01, 01));
 
@@ -269,7 +265,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
@@ -293,7 +289,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
@@ -319,7 +315,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
@@ -345,7 +341,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
@@ -374,7 +370,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
@@ -405,7 +401,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianFixedInterest);
 
@@ -432,7 +428,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeStock(id, new Date(2000, 01, 01), "ABC", "ABC Pty Ltd", AssetCategory.AustralianProperty);
 
@@ -459,7 +455,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.UpdateCurrentPrice(id, 10.00m);
 
@@ -483,7 +479,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.UpdateCurrentPrice(id, 10.00m);
 
@@ -509,7 +505,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.UpdateCurrentPrice(id, 10.00m);
 
@@ -534,7 +530,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.UpdateCurrentPrice(id, -10.00m);
             
@@ -563,7 +559,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             stockPriceHistoryCache.Add(stockPriceHistory);
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
 
             var result = service.UpdateCurrentPrice(id, 10.00m);
 
@@ -589,7 +585,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.UpdateClosingPrices(id, new StockPrice[] { });
 
@@ -613,7 +609,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.UpdateClosingPrices(id, new StockPrice[] { });
 
@@ -639,7 +635,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var prices = new StockPrice[]
             {
@@ -676,7 +672,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
             stockPriceHistoryRepository.Setup(x => x.UpdatePrices(stockPriceHistory, new DateRange(new Date(1998, 01, 01), new Date(1999, 01, 01)))).Verifiable();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
 
             var prices = new StockPrice[]
             {
@@ -707,7 +703,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var prices = new StockPrice[]
             {
@@ -743,7 +739,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
             stockPriceHistoryRepository.Setup(x => x.UpdatePrices(stockPriceHistory, new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 03)))).Verifiable();
             
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache, stockPriceHistoryRepository.Object);
 
             var prices = new StockPrice[]
             {
@@ -778,7 +774,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeDividendRules(id, new Date(2000, 01, 01), 0.30m, RoundingRule.Round, true, DrpMethod.Round);
 
@@ -805,7 +801,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeDividendRules(id, new Date(2000, 01, 01), 0.30m, RoundingRule.Round, true, DrpMethod.Round);
 
@@ -831,7 +827,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeDividendRules(id, new Date(2000, 01, 01), -0.30m, RoundingRule.Round, true, DrpMethod.Round);
 
@@ -857,7 +853,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeDividendRules(id, new Date(2000, 01, 01), 1.30m, RoundingRule.Round, true, DrpMethod.Round);
 
@@ -884,7 +880,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             var stockPriceHistoryCache = mockRepository.Create<IEntityCache<StockPriceHistory>>();
             var stockPriceHistoryRepository = mockRepository.Create<IStockPriceRepository>();
 
-            var service = new StockService(stockQuery, stockCache, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
+            var service = new StockService(stockQuery, stockRepository.Object, stockPriceHistoryCache.Object, stockPriceHistoryRepository.Object);
 
             var result = service.ChangeDividendRules(id, new Date(2000, 01, 01), 0.50m, RoundingRule.Round, true, DrpMethod.Round);
 

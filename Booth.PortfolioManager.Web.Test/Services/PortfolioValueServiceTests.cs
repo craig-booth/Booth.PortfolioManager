@@ -9,17 +9,27 @@ using Booth.Common;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Stocks;
+using Microsoft.VisualBasic;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
+    [Collection(Services.Collection)]
     public class PortfolioValueServiceTests
     {
+
+        private readonly ServicesTestFixture _Fixture;
+        public PortfolioValueServiceTests(ServicesTestFixture fixture)
+        {
+            _Fixture = fixture;
+        }
+
+
         [Fact]
         public void PortfolioNotFound()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var service = new PortfolioValueService(null, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(null, _Fixture.TradingCalendarRepository);
 
             var result = service.GetValue(dateRange, ValueFrequency.Day);
 
@@ -31,9 +41,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
             var result = service.GetValue(dateRange, ValueFrequency.Day);
 
@@ -57,9 +67,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 17));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
             var result = service.GetValue(dateRange, ValueFrequency.Week);
 
@@ -80,9 +90,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 05, 25));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
             var result = service.GetValue(dateRange, ValueFrequency.Month);
 
@@ -105,9 +115,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
             var result = service.GetValue(Guid.Empty, dateRange, ValueFrequency.Day);
 
@@ -119,9 +129,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
             var result = service.GetValue(Guid.NewGuid(), dateRange, ValueFrequency.Day);
 
@@ -134,11 +144,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
-            var result = service.GetValue(PortfolioTestCreator.Stock_ARG.Id, dateRange, ValueFrequency.Day);
+            var result = service.GetValue(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Day);
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -159,11 +169,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 17));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
-            var result = service.GetValue(PortfolioTestCreator.Stock_ARG.Id, dateRange, ValueFrequency.Week);
+            var result = service.GetValue(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Week);
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -182,11 +192,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 05, 25));
 
-            var portfolio = PortfolioTestCreator.CreateDefaultPortfolio();
+            var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, PortfolioTestCreator.TradingCalendarCache);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
 
-            var result = service.GetValue(PortfolioTestCreator.Stock_ARG.Id, dateRange, ValueFrequency.Month);
+            var result = service.GetValue(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Month);
 
             result.Result.Should().BeEquivalentTo(new
             {

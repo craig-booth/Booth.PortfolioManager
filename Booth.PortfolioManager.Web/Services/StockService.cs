@@ -24,17 +24,14 @@ namespace Booth.PortfolioManager.Web.Services
     class StockService : IStockService
     {
         private IStockQuery _StockQuery;
-
-        private IEntityCache<Stock> _StockCache;
         private IStockRepository _StockRepository;
 
         private IEntityCache<StockPriceHistory> _StockPriceHistoryCache;
         private IStockPriceRepository _StockPriceHistoryRepository;
   
-        public StockService(IStockQuery stockQuery, IEntityCache<Stock> stockCache, IStockRepository stockRepository, IEntityCache<StockPriceHistory> stockPriceHistoryCache, IStockPriceRepository stockPriceHistoryRepository)
+        public StockService(IStockQuery stockQuery, IStockRepository stockRepository, IEntityCache<StockPriceHistory> stockPriceHistoryCache, IStockPriceRepository stockPriceHistoryRepository)
         {
             _StockQuery = stockQuery;
-            _StockCache = stockCache;
             _StockRepository = stockRepository;
             _StockPriceHistoryCache = stockPriceHistoryCache;
             _StockPriceHistoryRepository = stockPriceHistoryRepository;
@@ -55,7 +52,6 @@ namespace Booth.PortfolioManager.Web.Services
             stock = new Stock(id);
             stock.List(asxCode, name, listingDate, trust, category);
             _StockRepository.Add(stock);
-            _StockCache.Add(stock);
 
             var stockPriceHistory = new StockPriceHistory(id);
             _StockPriceHistoryRepository.Add(stockPriceHistory);
@@ -65,32 +61,6 @@ namespace Booth.PortfolioManager.Web.Services
 
             return ServiceResult.Ok();
         }
-
-        /*      public void ListStapledSecurity(Guid id, string asxCode, string name, Date listingDate, AssetCategory category, IEnumerable<StapledSecurityChild> childSecurities)
-              {
-                  // Check that id is unique
-                  var stock = _StockRepository.Get(id);
-                  if (stock != null)
-                      throw new Exception("Id not unique");
-
-                        if (command.Trust)
-                          return BadRequest("A Stapled security cannot be a trust");
-
-
-                  // Check if stock already exists with this code
-                  var effectivePeriod = new DateRange(listingDate, DateUtils.NoEndDate);
-                  if (_StockQuery.Find(effectivePeriod, y => y.ASXCode == asxCode).Any())
-                      throw new Exception(String.Format("Stock already exists with the code {0} at {1}", asxCode, listingDate));
-
-                  var stapledSecurity = new StapledSecurity(id);
-                  stapledSecurity.List(asxCode, name, category, childSecurities);
-                  _StockRepository.Add(stock);
-                  _StockCache.Add(stock);
-
-                  var stockPriceHistory = new StockPriceHistory(id);
-                  _StockPriceHistoryRepository.Add(stockPriceHistory);
-                  _StockPriceHistoryCache.Add(stockPriceHistory);
-              } */
 
         public ServiceResult ChangeStock(Guid id, Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory)
         {
@@ -212,29 +182,5 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult.Ok();
         }
 
-     /*   public ServiceResult ChangeRelativeNTAs(Guid id, Date date, decimal[] percentages)
-        {
-            // Check that stock exists
-            var stock = _StockQuery.Get(id);
-            if (stock == null)
-                throw new Exception("Stock not found");
-
-            if (stock is StapledSecurity stapledSecurity)
-            {0
-                if (percentages.Length != stapledSecurity.ChildSecurities.Count)
-                {
-                    throw new Exception(String.Format("The number of relative ntas provided ({0}) did not match the number of child securities ({1})", percentages.Length, stapledSecurity.ChildSecurities.Count));
-                }
-
-                stapledSecurity.SetRelativeNTAs(date, percentages);
-                _StockRepository.Update(stock);
-            }
-            else
-            {
-                throw new Exception("Relative NTAs only apply stapled securities");
-            } 
-
-
-        } */
     } 
 }

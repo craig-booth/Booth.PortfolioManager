@@ -63,10 +63,5 @@ namespace Booth.PortfolioManager.Repository
                 new UpdateOneModel<BsonDocument>(notExistsFilter, addYear)
             });  
         }
-
-        public static void ConfigureSerializaton()
-        {
-            BsonSerializer.RegisterSerializer<TradingCalendar>(new TradingCalendarSerializer());
-        }
     }
 }
