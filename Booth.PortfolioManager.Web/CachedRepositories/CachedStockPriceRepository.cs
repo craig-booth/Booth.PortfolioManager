@@ -6,6 +6,7 @@ using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.Common;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Booth.PortfolioManager.Web.CachedRepositories
 {
@@ -25,6 +26,11 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
         {
             _Repository.Add(entity);
             _Cache.Add(entity);
+        }
+
+        public Task AddAsync(StockPriceHistory entity)
+        {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<StockPriceHistory> All()
@@ -52,10 +58,20 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             return _Cache.All();
         }
 
+        public IAsyncEnumerable<StockPriceHistory> AllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Delete(Guid id)
         {
             _Repository.Delete(id);
             _Cache.Remove(id);
+        }
+
+        public Task DeleteAsync(Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public StockPriceHistory Get(Guid id)
@@ -63,7 +79,17 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             return _Cache.Get(id);
         }
 
+        public Task<StockPriceHistory> GetAsync(Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Update(StockPriceHistory entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateAsync(StockPriceHistory entity)
         {
             throw new NotImplementedException();
         }
@@ -73,9 +99,19 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Repository.UpdatePrice(stockPriceHistory, date);
         }
 
+        public Task UpdatePriceAsync(StockPriceHistory stockPriceHistory, Date date)
+        {
+            throw new NotImplementedException();
+        }
+
         public void UpdatePrices(StockPriceHistory stockPriceHistory, DateRange dateRange)
         {
             _Repository.UpdatePrices(stockPriceHistory, dateRange);
+        }
+
+        public Task UpdatePricesAsync(StockPriceHistory stockPriceHistory, DateRange dateRange)
+        {
+            throw new NotImplementedException();
         }
     }
 }

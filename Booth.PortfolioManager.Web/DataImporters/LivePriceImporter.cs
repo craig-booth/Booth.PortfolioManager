@@ -43,7 +43,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
                     {
                         _Logger?.LogInformation("Updating current price for {0}: {1}", stockQuote.AsxCode, stockQuote.Price);
 
-                        _StockService.UpdateCurrentPrice(stock.Id, stockQuote.Price);
+                        await _StockService.UpdateCurrentPriceAsync(stock.Id, stockQuote.Price);
                     }
                         
                 }

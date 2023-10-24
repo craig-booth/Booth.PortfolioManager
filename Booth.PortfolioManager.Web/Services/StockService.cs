@@ -13,21 +13,21 @@ namespace Booth.PortfolioManager.Web.Services
 
     public interface IStockService
     {
-        ServiceResult ListStock(Guid id, string asxCode, string name, Date listingDate, bool trust, AssetCategory category);
-        ServiceResult DelistStock(Guid id, Date date);
-        ServiceResult ChangeStock(Guid id, Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory);
-        ServiceResult UpdateCurrentPrice(Guid id, decimal price);
-        ServiceResult UpdateClosingPrices(Guid id, IEnumerable<StockPrice> closingPrices);
-        ServiceResult ChangeDividendRules(Guid id, Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DrpMethod newDrpMethod);
+        Task<ServiceResult> ListStockAsync(Guid id, string asxCode, string name, Date listingDate, bool trust, AssetCategory category);
+        Task<ServiceResult> DelistStockAsync(Guid id, Date date);
+        Task<ServiceResult> ChangeStockAsync(Guid id, Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory);
+        Task<ServiceResult> UpdateCurrentPriceAsync(Guid id, decimal price);
+        Task<ServiceResult> UpdateClosingPricesAsync(Guid id, IEnumerable<StockPrice> closingPrices);
+        Task<ServiceResult> ChangeDividendRulesAsync(Guid id, Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DrpMethod newDrpMethod);
     } 
     
     class StockService : IStockService
     {
-        private IStockQuery _StockQuery;
-        private IStockRepository _StockRepository;
+        private readonly IStockQuery _StockQuery;
+        private readonly IStockRepository _StockRepository;
 
-        private IEntityCache<StockPriceHistory> _StockPriceHistoryCache;
-        private IStockPriceRepository _StockPriceHistoryRepository;
+        private readonly IEntityCache<StockPriceHistory> _StockPriceHistoryCache;
+        private readonly IStockPriceRepository _StockPriceHistoryRepository;
   
         public StockService(IStockQuery stockQuery, IStockRepository stockRepository, IEntityCache<StockPriceHistory> stockPriceHistoryCache, IStockPriceRepository stockPriceHistoryRepository)
         {
@@ -37,10 +37,10 @@ namespace Booth.PortfolioManager.Web.Services
             _StockPriceHistoryRepository = stockPriceHistoryRepository;
         }
 
-        public ServiceResult ListStock(Guid id, string asxCode, string name, Date listingDate, bool trust, AssetCategory category)
+        public async Task<ServiceResult> ListStockAsync(Guid id, string asxCode, string name, Date listingDate, bool trust, AssetCategory category)
         {
             // Check that id is unique
-            var stock = _StockRepository.Get(id);
+            var stock = await _StockRepository.GetAsync(id);
             if (stock != null)
                 return ServiceResult.Error("A stock with id {0} already exists", id);
 
@@ -62,7 +62,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult.Ok();
         }
 
-        public ServiceResult ChangeStock(Guid id, Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory)
+        public async Task<ServiceResult> ChangeStockAsync(Guid id, Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory)
         {
             var stock = _StockQuery.Get(id);
             if (stock == null)
@@ -90,7 +90,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult.Ok();
         }
 
-        public ServiceResult DelistStock(Guid id, Date date)
+        public async Task<ServiceResult> DelistStockAsync(Guid id, Date date)
         {
             var stock = _StockQuery.Get(id);
             if (stock == null)
@@ -108,7 +108,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult.Ok();
         }
 
-        public ServiceResult UpdateCurrentPrice(Guid id, decimal price)
+        public async Task<ServiceResult> UpdateCurrentPriceAsync(Guid id, decimal price)
         {
             var stock = _StockQuery.Get(id);
             if (stock == null)
@@ -129,7 +129,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult.Ok();
         }
 
-        public ServiceResult UpdateClosingPrices(Guid id, IEnumerable<StockPrice> closingPrices)
+        public async Task<ServiceResult> UpdateClosingPricesAsync(Guid id, IEnumerable<StockPrice> closingPrices)
         {
             var stock = _StockQuery.Get(id);
             if (stock == null)
@@ -164,7 +164,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult.Ok();
         }
 
-        public ServiceResult ChangeDividendRules(Guid id, Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DrpMethod newDrpMethod)
+        public async Task<ServiceResult> ChangeDividendRulesAsync(Guid id, Date changeDate, decimal companyTaxRate, RoundingRule newDividendRoundingRule, bool drpActive, DrpMethod newDrpMethod)
         {
             var stock = _StockQuery.Get(id);
             if (stock == null)

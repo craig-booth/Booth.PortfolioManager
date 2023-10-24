@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -16,8 +15,10 @@ namespace Booth.PortfolioManager.Repository
     public interface IStockPriceRepository : IRepository<StockPriceHistory>
     {
         void UpdatePrice(StockPriceHistory stockPriceHistory, Date date);
-
         void UpdatePrices(StockPriceHistory stockPriceHistory, DateRange dateRange);
+
+        Task UpdatePriceAsync(StockPriceHistory stockPriceHistory, Date date);
+        Task UpdatePricesAsync(StockPriceHistory stockPriceHistory, DateRange dateRange);
     }
 
     public class StockPriceRepository : Repository<StockPriceHistory>, IStockPriceRepository
@@ -28,6 +29,11 @@ namespace Booth.PortfolioManager.Repository
         }
 
         public override void Update(StockPriceHistory entity)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override Task UpdateAsync(StockPriceHistory entity)
         {
             throw new NotSupportedException();
         }
@@ -47,6 +53,11 @@ namespace Booth.PortfolioManager.Repository
             }); 
         }
 
+        public Task UpdatePriceAsync(StockPriceHistory stockPriceHistory, Date date)
+        {
+            throw new NotImplementedException();
+        }
+
         public void UpdatePrices(StockPriceHistory stockPriceHistory, DateRange dateRange)
         {
             var removePrices = Builders<BsonDocument>.Update
@@ -64,6 +75,11 @@ namespace Booth.PortfolioManager.Repository
                 new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", stockPriceHistory.Id), removePrices),
                 new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", stockPriceHistory.Id), addPrices),
             });
+        }
+
+        public Task UpdatePricesAsync(StockPriceHistory stockPriceHistory, DateRange dateRange)
+        {
+            throw new NotImplementedException();
         }
 
     }

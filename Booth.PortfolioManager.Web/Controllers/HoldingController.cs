@@ -60,11 +60,11 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET: id/value?fromDate&toDate
         [Route("{id:guid}/value")]
         [HttpGet]
-        public ActionResult<PortfolioValueResponse> GetValue([FromServices] IPortfolioValueService service, [FromRoute]Guid id, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] ValueFrequency? frequency)
+        public async Task<ActionResult<PortfolioValueResponse>> GetValue([FromServices] IPortfolioValueService service, [FromRoute]Guid id, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] ValueFrequency? frequency)
         {
             var requestedFrequency = frequency == null ? ValueFrequency.Day : frequency!.Value;
 
-            var result = service.GetValue(id, DateRangeFromParameter(fromDate, toDate), requestedFrequency);
+            var result = await service.GetValue(id, DateRangeFromParameter(fromDate, toDate), requestedFrequency);
 
             return result.ToActionResult<PortfolioValueResponse>();
         } 

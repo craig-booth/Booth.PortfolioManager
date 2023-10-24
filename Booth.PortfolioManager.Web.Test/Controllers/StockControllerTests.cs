@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 using Xunit;
 using Moq;
@@ -67,29 +64,29 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Setup(x => x.Find(It.IsAny<DateRange>(), It.IsAny<Func<StockProperties, bool>>())).Returns(new[] { _Stock });
 
             _StockServiceMock = mockRepository.Create<IStockService>();
-            _StockServiceMock.Setup(x => x.ChangeDividendRules(_MissingStockId, It.IsAny<Date>(), It.IsAny<decimal>(), It.IsAny<RoundingRule>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.DrpMethod>())).Returns(ServiceResult.NotFound());
-            _StockServiceMock.Setup(x => x.ChangeDividendRules(_ValidationErrorId, It.IsAny<Date>(), It.IsAny<decimal>(), It.IsAny<RoundingRule>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.DrpMethod>())).Returns(ServiceResult.Error("Dummy Error"));
-            _StockServiceMock.Setup(x => x.ChangeDividendRules(_Stock.Id, It.IsAny<Date>(), It.IsAny<decimal>(), It.IsAny<RoundingRule>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.DrpMethod>())).Returns(ServiceResult.Ok());
+            _StockServiceMock.Setup(x => x.ChangeDividendRulesAsync(_MissingStockId, It.IsAny<Date>(), It.IsAny<decimal>(), It.IsAny<RoundingRule>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.DrpMethod>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.NotFound()));
+            _StockServiceMock.Setup(x => x.ChangeDividendRulesAsync(_ValidationErrorId, It.IsAny<Date>(), It.IsAny<decimal>(), It.IsAny<RoundingRule>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.DrpMethod>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
+            _StockServiceMock.Setup(x => x.ChangeDividendRulesAsync(_Stock.Id, It.IsAny<Date>(), It.IsAny<decimal>(), It.IsAny<RoundingRule>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.DrpMethod>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
 
-            _StockServiceMock.Setup(x => x.ListStock(_MissingStockId, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Date>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(ServiceResult.NotFound());
-            _StockServiceMock.Setup(x => x.ListStock(_ValidationErrorId, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Date>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(ServiceResult.Error("Dummy Error"));
-            _StockServiceMock.Setup(x => x.ListStock(_Stock.Id, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Date>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(ServiceResult.Ok());
+            _StockServiceMock.Setup(x => x.ListStockAsync(_MissingStockId, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Date>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.NotFound()));
+            _StockServiceMock.Setup(x => x.ListStockAsync(_ValidationErrorId, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Date>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
+            _StockServiceMock.Setup(x => x.ListStockAsync(_Stock.Id, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Date>(), It.IsAny<bool>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
 
-            _StockServiceMock.Setup(x => x.ChangeStock(_MissingStockId, It.IsAny<Date>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(ServiceResult.NotFound());
-            _StockServiceMock.Setup(x => x.ChangeStock(_ValidationErrorId, It.IsAny<Date>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(ServiceResult.Error("Dummy Error"));
-            _StockServiceMock.Setup(x => x.ChangeStock(_Stock.Id, It.IsAny<Date>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(ServiceResult.Ok());
+            _StockServiceMock.Setup(x => x.ChangeStockAsync(_MissingStockId, It.IsAny<Date>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.NotFound()));
+            _StockServiceMock.Setup(x => x.ChangeStockAsync(_ValidationErrorId, It.IsAny<Date>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
+            _StockServiceMock.Setup(x => x.ChangeStockAsync(_Stock.Id, It.IsAny<Date>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Domain.Stocks.AssetCategory>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
 
-            _StockServiceMock.Setup(x => x.DelistStock(_MissingStockId, It.IsAny<Date>())).Returns(ServiceResult.NotFound());
-            _StockServiceMock.Setup(x => x.DelistStock(_ValidationErrorId, It.IsAny<Date>())).Returns(ServiceResult.Error("Dummy Error"));
-            _StockServiceMock.Setup(x => x.DelistStock(_Stock.Id, It.IsAny<Date>())).Returns(ServiceResult.Ok());
+            _StockServiceMock.Setup(x => x.DelistStockAsync(_MissingStockId, It.IsAny<Date>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.NotFound()));
+            _StockServiceMock.Setup(x => x.DelistStockAsync(_ValidationErrorId, It.IsAny<Date>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
+            _StockServiceMock.Setup(x => x.DelistStockAsync(_Stock.Id, It.IsAny<Date>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
             
-            _StockServiceMock.Setup(x => x.UpdateClosingPrices(_MissingStockId, It.IsAny<IEnumerable<StockPrice>>())).Returns(ServiceResult.NotFound());
-            _StockServiceMock.Setup(x => x.UpdateClosingPrices(_ValidationErrorId, It.IsAny<IEnumerable<StockPrice>>())).Returns(ServiceResult.Error("Dummy Error"));
-            _StockServiceMock.Setup(x => x.UpdateClosingPrices(_Stock.Id, It.IsAny<IEnumerable<StockPrice>>())).Returns(ServiceResult.Ok());
+            _StockServiceMock.Setup(x => x.UpdateClosingPricesAsync(_MissingStockId, It.IsAny<IEnumerable<StockPrice>>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.NotFound()));
+            _StockServiceMock.Setup(x => x.UpdateClosingPricesAsync(_ValidationErrorId, It.IsAny<IEnumerable<StockPrice>>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
+            _StockServiceMock.Setup(x => x.UpdateClosingPricesAsync(_Stock.Id, It.IsAny<IEnumerable<StockPrice>>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
 
-            _StockServiceMock.Setup(x => x.UpdateCurrentPrice(_MissingStockId, It.IsAny<decimal>())).Returns(ServiceResult.NotFound());
-            _StockServiceMock.Setup(x => x.UpdateCurrentPrice(_ValidationErrorId, It.IsAny<decimal>())).Returns(ServiceResult.Error("Dummy Error"));
-            _StockServiceMock.Setup(x => x.UpdateCurrentPrice(_Stock.Id, It.IsAny<decimal>())).Returns(ServiceResult.Ok());
+            _StockServiceMock.Setup(x => x.UpdateCurrentPriceAsync(_MissingStockId, It.IsAny<decimal>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.NotFound()));
+            _StockServiceMock.Setup(x => x.UpdateCurrentPriceAsync(_ValidationErrorId, It.IsAny<decimal>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
+            _StockServiceMock.Setup(x => x.UpdateCurrentPriceAsync(_Stock.Id, It.IsAny<decimal>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
 
             _Controller = new StockController(_StockServiceMock.Object, _StockQueryMock.Object);
         }
@@ -349,7 +346,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void CreateStockValidationError()
+        public async Task CreateStockValidationError()
         {
             var command = new CreateStockCommand()
             {
@@ -361,13 +358,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
             };
 
-            var response = _Controller.CreateStock(command);
+            var response = await _Controller.CreateStock(command);
 
             response.Should().BeBadRequestObjectResult();
         }
 
         [Fact]
-        public void CreateStock()
+        public async Task CreateStock()
         {
             var command = new CreateStockCommand()
             {
@@ -379,13 +376,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
             };
 
-            var response = _Controller.CreateStock(command);
+            var response = await _Controller.CreateStock(command);
 
             response.Should().BeOkResult();
         }
 
         [Fact]
-        public void ChangeStockInvalidId()
+        public async Task ChangeStockInvalidId()
         {
             var command = new ChangeStockCommand()
             {
@@ -395,14 +392,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 Name = "XYZ Name",
                 Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
             };
-            var response = _Controller.ChangeStock(_MissingStockId, command);
+            var response = await _Controller.ChangeStock(_MissingStockId, command);
 
             response.Should().BeNotFoundResult();
 
         }
 
         [Fact]
-        public void ChangeStockValidationError()
+        public async Task ChangeStockValidationError()
         {
             var command = new ChangeStockCommand()
             {
@@ -412,13 +409,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 Name = "XYZ Name",
                 Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
             };
-            var response = _Controller.ChangeStock(_Stock.Id, command);
+            var response = await _Controller.ChangeStock(_Stock.Id, command);
 
             response.Should().BeBadRequestObjectResult();
         }
 
         [Fact]
-        public void ChangeStock()
+        public async Task ChangeStock()
         {
             var command = new ChangeStockCommand()
             {
@@ -428,91 +425,91 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 Name = "XYZ Name",
                 Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
             };
-            var response = _Controller.ChangeStock(_Stock.Id, command);
+            var response = await _Controller.ChangeStock(_Stock.Id, command);
 
             response.Should().BeOkResult();
 
-            _StockServiceMock.Verify(x => x.ChangeStock(_Stock.Id, new Date(2009, 01, 01), "XYZ", "XYZ Name", Domain.Stocks.AssetCategory.AustralianFixedInterest));
+            _StockServiceMock.Verify(x => x.ChangeStockAsync(_Stock.Id, new Date(2009, 01, 01), "XYZ", "XYZ Name", Domain.Stocks.AssetCategory.AustralianFixedInterest));
         }
 
         [Fact]
-        public void DelistStockInvalidId()
+        public async Task DelistStockInvalidId()
         {
             var command = new DelistStockCommand()
             {
                 Id = _MissingStockId,
                 DelistingDate = new Date(2012, 01, 01)
             };
-            var response = _Controller.DelistStock(_MissingStockId, command);
+            var response = await _Controller.DelistStock(_MissingStockId, command);
 
             response.Should().BeNotFoundResult();
         }
 
         [Fact]
-        public void DelistStockValidationError()
+        public async Task DelistStockValidationError()
         {
             var command = new DelistStockCommand()
             {
                 Id = _ValidationErrorId,
                 DelistingDate = new Date(2012, 01, 01)
             };
-            var response = _Controller.DelistStock(_MissingStockId, command);
+            var response = await _Controller.DelistStock(_MissingStockId, command);
 
             response.Should().BeBadRequestObjectResult();
         }
 
         [Fact]
-        public void DelistStock()
+        public async Task DelistStock()
         {
             var command = new DelistStockCommand()
             {
                 Id = _Stock.Id,
                 DelistingDate = new Date(2012, 01, 01)
             };
-            var response = _Controller.DelistStock(_Stock.Id, command);
+            var response = await _Controller.DelistStock(_Stock.Id, command);
 
             response.Should().BeOkResult();
         }
 
 
         [Fact]
-        public void UpdateClosingPricesInvalidId()
+        public async Task UpdateClosingPricesInvalidId()
         {
             var command = new UpdateClosingPricesCommand()
             {
                 Id = _MissingStockId
             };
-            var response = _Controller.UpdateClosingPrices(_MissingStockId, command);
+            var response = await _Controller.UpdateClosingPrices(_MissingStockId, command);
 
             response.Should().BeNotFoundResult();
         }
 
         [Fact]
-        public void UpdateClosingPricesValidationError()
+        public async Task UpdateClosingPricesValidationError()
         {
             var command = new UpdateClosingPricesCommand()
             {
                 Id = _ValidationErrorId
             };
-            var response = _Controller.UpdateClosingPrices(_ValidationErrorId, command);
+            var response = await _Controller.UpdateClosingPrices(_ValidationErrorId, command);
 
             response.Should().BeBadRequestObjectResult();
         }
 
         [Fact]
-        public void UpdateClosingPrices()
+        public async Task UpdateClosingPrices()
         {
             var command = new UpdateClosingPricesCommand()
             {
                 Id = _Stock.Id
             };
-            var response = _Controller.UpdateClosingPrices(_Stock.Id, command);
+            var response = await _Controller.UpdateClosingPrices(_Stock.Id, command);
 
             response.Should().BeOkResult();
         }
 
         [Fact]
-        public void ChangeDividendRulesInvalidId()
+        public async Task ChangeDividendRulesInvalidId()
         { 
             var command = new ChangeDividendRulesCommand()
             {
@@ -523,13 +520,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 DrpActive = true,
                 DrpMethod = RestApi.Stocks.DrpMethod.RoundUp
             };
-            var response = _Controller.ChangeDividendRules(_MissingStockId, command);
+            var response = await _Controller.ChangeDividendRules(_MissingStockId, command);
 
             response.Should().BeNotFoundResult();   
         }
 
         [Fact]
-        public void ChangeDividendRulesValidationError()
+        public async Task ChangeDividendRulesValidationError()
         {
             var command = new ChangeDividendRulesCommand()
             {
@@ -540,13 +537,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 DrpActive = true,
                 DrpMethod = RestApi.Stocks.DrpMethod.RoundUp
             };
-            var response = _Controller.ChangeDividendRules(_Stock.Id, command);
+            var response = await _Controller.ChangeDividendRules(_Stock.Id, command);
 
             response.Should().BeBadRequestObjectResult();
         }
 
         [Fact]
-        public void ChangeDividendRules()
+        public async Task ChangeDividendRules()
         {
             var command = new ChangeDividendRulesCommand()
             {
@@ -557,11 +554,11 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 DrpActive = true,
                 DrpMethod = RestApi.Stocks.DrpMethod.RoundUp
             };
-            var response = _Controller.ChangeDividendRules(_Stock.Id, command);
+            var response = await _Controller.ChangeDividendRules(_Stock.Id, command);
 
             response.Should().BeOkResult();
 
-            _StockServiceMock.Verify(x => x.ChangeDividendRules(_Stock.Id, new Date(2009, 01, 01), 0.40m, RoundingRule.Truncate, true, Domain.Stocks.DrpMethod.RoundUp));
+            _StockServiceMock.Verify(x => x.ChangeDividendRulesAsync(_Stock.Id, new Date(2009, 01, 01), 0.40m, RoundingRule.Truncate, true, Domain.Stocks.DrpMethod.RoundUp));
         }
 
     }

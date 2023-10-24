@@ -38,7 +38,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
         {
             _Logger?.LogInformation("Starting import of historical price data");
 
-            var tradingCalendar = _TradingCalendarRepository.Get(TradingCalendarIds.ASX);
+            var tradingCalendar = await _TradingCalendarRepository.GetAsync(TradingCalendarIds.ASX);
 
             var lastExpectedDate = tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1));
 
@@ -62,7 +62,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
                     _Logger?.LogInformation("{0} closing prices found", closingPrices.Count);
                     if (closingPrices.Count > 0)
                     {
-                        _StockService.UpdateClosingPrices(stock.Id, closingPrices);
+                        await _StockService.UpdateClosingPricesAsync(stock.Id, closingPrices);
                     }
                      
                 }

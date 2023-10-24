@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using Xunit;
 using Moq;
@@ -233,7 +233,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueNotFound()
+        public async Task GetValueNotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -241,10 +241,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, null, null, null);
+            var result = await controller.GetValue(service.Object, stockId, null, null, null);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -252,7 +252,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueNoDates()
+        public async Task GetValueNoDates()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -260,10 +260,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, null, null, null);
+            var result = await controller.GetValue(service.Object, stockId, null, null, null);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -271,7 +271,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueStartDateOnly()
+        public async Task GetValueStartDateOnly()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -279,10 +279,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, new DateTime(2000, 01, 01), null, null);
+            var result = await controller.GetValue(service.Object, stockId, new DateTime(2000, 01, 01), null, null);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -290,7 +290,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueEndDateOnly()
+        public async Task GetValueEndDateOnly()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -298,10 +298,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, null, new DateTime(2000, 12, 31), null);
+            var result = await controller.GetValue(service.Object, stockId, null, new DateTime(2000, 12, 31), null);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -309,7 +309,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueBothDates()
+        public async Task GetValueBothDates()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -317,10 +317,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31), null);
+            var result = await controller.GetValue(service.Object, stockId, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31), null);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -328,7 +328,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueDaily()
+        public async Task GetValueDaily()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -336,10 +336,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Day)).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Day)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Day);
+            var result = await controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Day);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -347,7 +347,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueWeekly()
+        public async Task GetValueWeekly()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -355,10 +355,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Week)).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Week)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Week);
+            var result = await controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Week);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -366,7 +366,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void GetValueMonthly()
+        public async Task GetValueMonthly()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -374,10 +374,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Month)).Returns(ServiceResult<PortfolioValueResponse>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Month)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
-            var result = controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Month);
+            var result = await controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Month);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 

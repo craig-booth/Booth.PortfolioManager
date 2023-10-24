@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 
 using MongoDB.Driver;
@@ -22,6 +23,9 @@ namespace Booth.PortfolioManager.Repository
         void AddTransaction(Portfolio portfolio, Guid id);
         void DeleteTransaction(Portfolio portfolio, Guid id);
         void UpdateTransaction(Portfolio portfolio, Guid id);
+        Task AddTransactionAsync(Portfolio portfolio, Guid id);
+        Task DeleteTransactionAsync(Portfolio portfolio, Guid id);
+        Task UpdateTransactionAsync(Portfolio portfolio, Guid id);
 
     }
 
@@ -44,6 +48,11 @@ namespace Booth.PortfolioManager.Repository
             _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
         }
 
+        public override Task UpdateAsync(Portfolio entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void AddTransaction(Portfolio portfolio, Guid id)
         {
             var transaction = portfolio.Transactions[id];
@@ -54,12 +63,22 @@ namespace Booth.PortfolioManager.Repository
             _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), addValue); 
         }
 
+        public Task AddTransactionAsync(Portfolio portfolio, Guid id)
+        { 
+            throw new NotImplementedException();
+        }
+
         public void DeleteTransaction(Portfolio portfolio, Guid id)
         {
             var updateValue = Builders<BsonDocument>.Update
                 .PullFilter("transactions", Builders<BsonDocument>.Filter.Eq("_id", id));
 
             _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), updateValue);
+        }
+
+        public Task DeleteTransactionAsync(Portfolio portfolio, Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public void UpdateTransaction(Portfolio portfolio, Guid id)
@@ -75,5 +94,9 @@ namespace Booth.PortfolioManager.Repository
             _Collection.UpdateOne(filter, updateValue); 
         }
 
+        public Task UpdateTransactionAsync(Portfolio portfolio, Guid id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

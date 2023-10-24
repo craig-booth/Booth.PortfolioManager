@@ -93,8 +93,8 @@ namespace Booth.PortfolioManager.Web
 
 
             // Others
-            services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().ReadOnlyPortfolio);
-            services.AddScoped<IPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().Portfolio);
+            services.AddScoped<IReadOnlyPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().GetReadOnlyPortfolio().Result);
+            services.AddScoped<IPortfolio>(x => x.GetRequiredService<IHttpContextPortfolioAccessor>().GetPortfolio().Result);
             services.AddScoped<IHttpContextPortfolioAccessor, HttpContextPortfolioAccessor>();
             services.AddScoped<IPortfolioFactory, PortfolioFactory>();
             services.AddScoped<IStockResolver, StockResolver>();
@@ -170,6 +170,7 @@ namespace Booth.PortfolioManager.Web
             {
                 options.AddPolicy(Policy.IsPortfolioOwner, policy => policy.Requirements.Add(new PortfolioOwnerRequirement()));
                 options.AddPolicy(Policy.CanMantainStocks, policy => policy.RequireRole(Role.Administrator));
+                options.AddPolicy(Policy.CanCreatePortfolio, policy =>  policy.RequireAuthenticatedUser());
             });
         }
 

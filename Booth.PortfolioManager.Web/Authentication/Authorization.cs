@@ -14,5 +14,6 @@ namespace Booth.PortfolioManager.Web.Authentication
     {
         public const string CanMantainStocks = "CanMaintainStocks";
         public const string IsPortfolioOwner = "CanAccessPortfolio";
+        public const string CanCreatePortfolio = "CanCreatePortfolio";
     }
 }

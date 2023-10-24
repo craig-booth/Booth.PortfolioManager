@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 
 using MongoDB.Driver;
@@ -12,20 +12,25 @@ using Booth.PortfolioManager.Domain;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Repository.Serialization;
-
+using System.Threading.Tasks;
 
 namespace Booth.PortfolioManager.Repository
 {
     public interface IStockRepository : IRepository<Stock>
     {
         void UpdateProperties(Stock stock, Date date);
-
         void UpdateDividendRules(Stock stock, Date date);
         void AddCorporateAction(Stock stock, Guid id);
         void DeleteCorporateAction(Stock stock, Guid id);
         void UpdateCorporateAction(Stock stock, Guid id);
-
         void UpdateRelativeNTAs(Stock stock, Date date);
+
+        Task UpdatePropertiesAsync(Stock stock, Date date);
+        Task UpdateDividendRulesAsync(Stock stock, Date date);
+        Task AddCorporateActionAsync(Stock stock, Guid id);
+        Task DeleteCorporateActionAsync(Stock stock, Guid id);
+        Task UpdateCorporateActionAsync(Stock stock, Guid id);
+        Task UpdateRelativeNTAsAsync(Stock stock, Date date);
     }
 
     public class StockRepository : Repository<Stock>, IStockRepository
@@ -33,13 +38,6 @@ namespace Booth.PortfolioManager.Repository
         public StockRepository(IPortfolioManagerDatabase database)
             : base(database, "Stocks")
         {
-        }
-
-        public void Test(Stock entity)
-        {
-            var bson = entity.ToBsonDocument();
-
-            var entity2 = BsonSerializer.Deserialize<Stock>(bson);
         }
 
         public override void Update(Stock entity)
@@ -52,6 +50,11 @@ namespace Booth.PortfolioManager.Repository
                 bson.Set("delistingDate", entity.EffectivePeriod.ToDate);
 
             _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
+        }
+
+        public override Task UpdateAsync(Stock entity)
+        {
+            throw new NotImplementedException();
         }
 
         public void UpdateProperties(Stock stock, Date date)
@@ -109,5 +112,34 @@ namespace Booth.PortfolioManager.Repository
             base.UpdateEffectiveProperties<RelativeNTA>(stock, date, stapledSecurity.RelativeNTAs[date], "relativeNTAs");
         }
 
+        public Task UpdatePropertiesAsync(Stock stock, Date date)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateDividendRulesAsync(Stock stock, Date date)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddCorporateActionAsync(Stock stock, Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteCorporateActionAsync(Stock stock, Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateCorporateActionAsync(Stock stock, Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateRelativeNTAsAsync(Stock stock, Date date)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

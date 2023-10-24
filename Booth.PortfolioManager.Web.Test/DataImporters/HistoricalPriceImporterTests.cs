@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
 
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             var tradingCalendarRepository = mockRepository.Create<ITradingCalendarRepository>();
-            tradingCalendarRepository.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(tradingCalendar);
+            tradingCalendarRepository.Setup(x => x.GetAsync(TradingCalendarIds.ASX)).Returns(Task.FromResult<TradingCalendar>(tradingCalendar)); 
 
             var cancellationToken = new CancellationToken();
             var prices = new DataServices.StockPrice[] { };
@@ -75,11 +75,11 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
 
             var stockService = mockRepository.Create<IStockService>();
             IEnumerable<Domain.Stocks.StockPrice> savedPrices = null;
-            stockService.Setup(x => x.UpdateClosingPrices(stock.Id, It.IsAny<IEnumerable<Domain.Stocks.StockPrice>>())).Returns(ServiceResult.Ok()).Callback<Guid,IEnumerable<Domain.Stocks.StockPrice>>((a, b) => savedPrices = b).Verifiable();
+            stockService.Setup(x => x.UpdateClosingPricesAsync(stock.Id, It.IsAny<IEnumerable<Domain.Stocks.StockPrice>>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok())).Callback<Guid,IEnumerable<Domain.Stocks.StockPrice>>((a, b) => savedPrices = b).Verifiable();
 
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             var tradingCalendarRepository = mockRepository.Create<ITradingCalendarRepository>();
-            tradingCalendarRepository.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(tradingCalendar);
+            tradingCalendarRepository.Setup(x => x.GetAsync(TradingCalendarIds.ASX)).Returns(Task.FromResult<TradingCalendar>(tradingCalendar));
 
             var logger = mockRepository.Create<ILogger<HistoricalPriceImporter>>(MockBehavior.Loose);
 
@@ -120,11 +120,11 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
 
             var stockService = mockRepository.Create<IStockService>();
             var prices2 = new Domain.Stocks.StockPrice[] { new Domain.Stocks.StockPrice(Date.Today.AddDays(-1), 0.10m) };
-            stockService.Setup(x => x.UpdateClosingPrices(stock.Id, prices2.AsEnumerable()));
+            stockService.Setup(x => x.UpdateClosingPricesAsync(stock.Id, prices2.AsEnumerable()));
 
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             var tradingCalendarRepository = mockRepository.Create<ITradingCalendarRepository>();
-            tradingCalendarRepository.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(tradingCalendar);
+            tradingCalendarRepository.Setup(x => x.GetAsync(TradingCalendarIds.ASX)).Returns(Task.FromResult<TradingCalendar>(tradingCalendar));
 
             var cancellationToken = new CancellationToken();
             var prices = new DataServices.StockPrice[] { };

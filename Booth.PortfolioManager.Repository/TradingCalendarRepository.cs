@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
+
 
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -16,6 +17,7 @@ namespace Booth.PortfolioManager.Repository
     public interface ITradingCalendarRepository : IRepository<TradingCalendar>
     {
         void UpdateYear(TradingCalendar calendar, int year);
+        Task UpdateYearAsync(TradingCalendar calendar, int year);
     }
 
     public class TradingCalendarRepository : Repository<TradingCalendar>, ITradingCalendarRepository
@@ -25,6 +27,11 @@ namespace Booth.PortfolioManager.Repository
         {
         }
         public override void Update(TradingCalendar entity)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override Task UpdateAsync(TradingCalendar entity)
         {
             throw new NotSupportedException();
         }
@@ -62,6 +69,11 @@ namespace Booth.PortfolioManager.Repository
                 new UpdateOneModel<BsonDocument>(existsFilter, updateYear),
                 new UpdateOneModel<BsonDocument>(notExistsFilter, addYear)
             });  
+        }
+
+        public Task UpdateYearAsync(TradingCalendar calendar, int year)
+        {
+            throw new NotImplementedException();
         }
     }
 }

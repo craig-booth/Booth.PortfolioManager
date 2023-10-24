@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.RestApi.Portfolios;
@@ -54,13 +55,13 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET: value
         [Route("value")]
         [HttpGet]
-        public ActionResult<PortfolioValueResponse> GetValue([FromServices] IPortfolioValueService service, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] ValueFrequency? frequency)
+        public async Task<ActionResult<PortfolioValueResponse>> GetValue([FromServices] IPortfolioValueService service, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] ValueFrequency? frequency)
         {
             var dateRange = DateRangeFromParameter(fromDate, toDate);
 
             var requestedFrequency = frequency == null ? ValueFrequency.Day : frequency!.Value;
 
-            var result = service.GetValue(dateRange, requestedFrequency);
+            var result = await service.GetValue(dateRange, requestedFrequency);
 
             return result.ToActionResult();
         }
@@ -140,21 +141,6 @@ namespace Booth.PortfolioManager.Web.Controllers
 
             return result.ToActionResult();
         }
-
-        // POST :
-        [Route("~/api/portfolio")]
-        [HttpPost]
-        public ActionResult CreatePortfolio([FromServices] IPortfolioService service, [FromBody] CreatePortfolioCommand command)
-        {
-            // Retreive the authenticated user
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            var userId = new Guid(userIdClaim.Value);
-
-            var result = service.CreatePortfolio(command.Id, command.Name, userId);
-
-            return result.ToActionResult();
-        }
-
 
         private Date DateFromParameter(DateTime? date)
         {

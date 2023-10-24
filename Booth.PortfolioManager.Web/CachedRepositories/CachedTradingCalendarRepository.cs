@@ -7,6 +7,7 @@ using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Portfolios;
 using AngleSharp.Dom;
+using System.Threading.Tasks;
 
 namespace Booth.PortfolioManager.Web.CachedRepositories
 {
@@ -27,7 +28,17 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Repository.Add(entity);          
         }
 
+        public Task AddAsync(TradingCalendar entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public IEnumerable<TradingCalendar> All()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IAsyncEnumerable<TradingCalendar> AllAsync()
         {
             throw new NotImplementedException();
         }
@@ -36,6 +47,11 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
         {
             _Repository.Delete(id);
             _Cache.Remove(id);
+        }
+
+        public Task DeleteAsync(Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public TradingCalendar Get(Guid id)
@@ -66,6 +82,34 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             return entity;
         }
 
+        public async Task<TradingCalendar> GetAsync(Guid id)
+        {
+            if (_Cache.TryGetValue(id, out TradingCalendar entity))
+                return entity;
+
+            try
+            {
+                _Semphore.Wait();
+                if (_Cache.TryGetValue(id, out entity))
+                    return entity;
+
+                entity = await _Repository.GetAsync(id);
+                if (entity != null)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                            .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _Cache.Set(id, entity, cacheEntryOptions);
+                }
+            }
+            finally
+            {
+                _Semphore.Release();
+            }
+
+            return entity;
+        }
+
         public void Update(TradingCalendar entity)
         {
             _Repository.Update(entity);
@@ -73,10 +117,20 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
 
         }
 
+        public Task UpdateAsync(TradingCalendar entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void UpdateYear(TradingCalendar calendar, int year)
         {
             _Repository.UpdateYear(calendar, year);
             _Cache.Remove(calendar.Id);
+        }
+
+        public Task UpdateYearAsync(TradingCalendar calendar, int year)
+        {
+            throw new NotImplementedException();
         }
     }
 }

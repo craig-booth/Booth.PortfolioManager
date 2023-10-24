@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 using Xunit;
 using Moq;
@@ -36,7 +37,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             PortfolioFactory = new PortfolioFactory(StockResolver);
 
             var tradingCalendarRepository = mockRepository.Create<ITradingCalendarRepository>();
-            tradingCalendarRepository.Setup(x => x.Get(TradingCalendarIds.ASX)).Returns(new TradingCalendar(TradingCalendarIds.ASX));
+            tradingCalendarRepository.Setup(x => x.GetAsync(TradingCalendarIds.ASX)).Returns(Task.FromResult<TradingCalendar>(new TradingCalendar(TradingCalendarIds.ASX)));
             TradingCalendarRepository = tradingCalendarRepository.Object;
 
             Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };

@@ -17,8 +17,8 @@ namespace Booth.PortfolioManager.Web.Services
 
     public interface IPortfolioValueService
     {
-        ServiceResult<PortfolioValueResponse> GetValue(DateRange dateRange, ValueFrequency frequency);
-        ServiceResult<PortfolioValueResponse> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency);
+        Task<ServiceResult<PortfolioValueResponse>> GetValue(DateRange dateRange, ValueFrequency frequency);
+        Task<ServiceResult<PortfolioValueResponse>> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency);
     }
 
     public class PortfolioValueService : IPortfolioValueService
@@ -32,14 +32,15 @@ namespace Booth.PortfolioManager.Web.Services
             _TradingCalendarRepository = tradingCalendarRepository;
         }
  
-        public ServiceResult<PortfolioValueResponse> GetValue(DateRange dateRange, ValueFrequency frequency)
+        public async Task<ServiceResult<PortfolioValueResponse>> GetValue(DateRange dateRange, ValueFrequency frequency)
         {
             if (_Portfolio == null)
                 return ServiceResult<PortfolioValueResponse>.NotFound();
 
             var response = new PortfolioValueResponse();
 
-            var dates = GetDates(dateRange, frequency);
+            var tradingCalendar = await _TradingCalendarRepository.GetAsync(TradingCalendarIds.ASX);
+            var dates = GetDates(tradingCalendar, dateRange, frequency);
 
             var holdings = _Portfolio.Holdings.All(dateRange);
 
@@ -72,7 +73,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<PortfolioValueResponse>.Ok(response);
         }
 
-        public ServiceResult<PortfolioValueResponse> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency)
+        public async Task<ServiceResult<PortfolioValueResponse>> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency)
         {
             if (_Portfolio == null)
                 return ServiceResult<PortfolioValueResponse>.NotFound();
@@ -83,7 +84,8 @@ namespace Booth.PortfolioManager.Web.Services
 
             var response = new PortfolioValueResponse();
 
-            var dates = GetDates(dateRange, frequency);
+            var tradingCalendar = await _TradingCalendarRepository.GetAsync(TradingCalendarIds.ASX);
+            var dates = GetDates(tradingCalendar, dateRange, frequency);
 
             foreach (var date in dates)
             {
@@ -99,10 +101,8 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<PortfolioValueResponse>.Ok(response);
         } 
 
-        private IEnumerable<Date> GetDates(DateRange dateRange, ValueFrequency frequency)
+        private IEnumerable<Date> GetDates(ITradingCalendar tradingCalendar, DateRange dateRange, ValueFrequency frequency)
         {
-            var tradingCalendar = _TradingCalendarRepository.Get(TradingCalendarIds.ASX);
-
             var firstRequestedDate = tradingCalendar.NextTradingDay(dateRange.FromDate);
             var lastRequestedDate = tradingCalendar.PreviousTradingDay(dateRange.ToDate);
 

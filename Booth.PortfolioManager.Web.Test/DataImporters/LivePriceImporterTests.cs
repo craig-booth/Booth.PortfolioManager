@@ -69,7 +69,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             stockQuery.Setup(x => x.Get("ABC", Date.Today)).Returns(stock);
 
             var stockService = mockRepository.Create<IStockService>();
-            stockService.Setup(x => x.UpdateCurrentPrice(stock.Id, 0.10m)).Returns(ServiceResult.Ok()).Verifiable();
+            stockService.Setup(x => x.UpdateCurrentPriceAsync(stock.Id, 0.10m)).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok())).Verifiable();
 
             var logger = mockRepository.Create<ILogger<LivePriceImporter>>(MockBehavior.Loose);
 
@@ -99,7 +99,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             stockQuery.Setup(x => x.Get("ABC", Date.Today)).Returns(stock);
 
             var stockService = mockRepository.Create<IStockService>();
-            stockService.Setup(x => x.UpdateCurrentPrice(stock.Id, 0.10m));
+            stockService.Setup(x => x.UpdateCurrentPriceAsync(stock.Id, 0.10m));
 
             var importer = new LivePriceImporter(stockQuery.Object, stockService.Object, dataService.Object, null);
 

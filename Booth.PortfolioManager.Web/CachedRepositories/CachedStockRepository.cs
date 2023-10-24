@@ -8,6 +8,7 @@ using Booth.PortfolioManager.Web.Utilities;
 using System.Threading;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Microsoft.Extensions.Caching.Memory;
+using System.Threading.Tasks;
 
 namespace Booth.PortfolioManager.Web.CachedRepositories
 {
@@ -29,9 +30,19 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Cache.Add(entity);
         }
 
+        public Task AddAsync(Stock entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void AddCorporateAction(Stock stock, Guid id)
         {
             _Repository.AddCorporateAction(stock, id);
+        }
+
+        public Task AddCorporateActionAsync(Stock stock, Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public IEnumerable<Stock> All()
@@ -59,10 +70,20 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             return _Cache.All();
         }
 
+        public IAsyncEnumerable<Stock> AllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Delete(Guid id)
         {
             _Repository.Delete(id);
             _Cache.Remove(id);
+        }
+
+        public Task DeleteAsync(Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public void DeleteCorporateAction(Stock stock, Guid id)
@@ -70,9 +91,19 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Repository.DeleteCorporateAction(stock, id);
         }
 
+        public Task DeleteCorporateActionAsync(Stock stock, Guid id)
+        {
+            throw new NotImplementedException();
+        }
+
         public Stock Get(Guid id)
         {
             return _Cache.Get(id);
+        }
+
+        public Task<Stock> GetAsync(Guid id)
+        {
+            return Task.FromResult<Stock>(_Cache.Get(id));
         }
 
         public void Update(Stock entity)
@@ -80,9 +111,19 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Repository.Update(entity);
         }
 
+        public Task UpdateAsync(Stock entity)
+        {
+            throw new NotImplementedException();
+        }
+
         public void UpdateCorporateAction(Stock stock, Guid id)
         {
             _Repository.UpdateCorporateAction(stock, id);
+        }
+
+        public Task UpdateCorporateActionAsync(Stock stock, Guid id)
+        {
+            throw new NotImplementedException();
         }
 
         public void UpdateDividendRules(Stock stock, Date date)
@@ -90,14 +131,29 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Repository.UpdateDividendRules(stock, date);
         }
 
+        public Task UpdateDividendRulesAsync(Stock stock, Date date)
+        {
+            throw new NotImplementedException();
+        }
+
         public void UpdateProperties(Stock stock, Date date)
         {
             _Repository.UpdateProperties(stock, date);
         }
 
+        public Task UpdatePropertiesAsync(Stock stock, Date date)
+        {
+            throw new NotImplementedException();
+        }
+
         public void UpdateRelativeNTAs(Stock stock, Date date)
         {
             _Repository.UpdateRelativeNTAs(stock, date);
+        }
+
+        public Task UpdateRelativeNTAsAsync(Stock stock, Date date)
+        {
+            throw new NotImplementedException();
         }
     }
 }
