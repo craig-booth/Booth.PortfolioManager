@@ -15,7 +15,6 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
     {
         private readonly ITradingCalendarRepository _Repository;
         private readonly IMemoryCache _Cache;
-        private readonly SemaphoreSlim _Semphore = new SemaphoreSlim(1, 1);
 
         public CachedTradingCalendarRepository(ITradingCalendarRepository repository, IMemoryCache cache)
         {
@@ -56,58 +55,16 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
 
         public TradingCalendar Get(Guid id)
         {
-            if (_Cache.TryGetValue(id, out TradingCalendar entity))
-                return entity;
-
-            try
-            {
-                _Semphore.Wait();
-                if (_Cache.TryGetValue(id, out entity))
-                    return entity;
-
-                entity = _Repository.Get(id);
-                if (entity != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            .SetAbsoluteExpiration(TimeSpan.FromDays(1));
-
-                    _Cache.Set(id, entity, cacheEntryOptions);
-                }
-            }
-            finally
-            {
-                _Semphore.Release();
-            }
-
-            return entity;
+            throw new NotImplementedException();
         }
 
-        public async Task<TradingCalendar> GetAsync(Guid id)
+        public Task<TradingCalendar> GetAsync(Guid id)
         {
-            if (_Cache.TryGetValue(id, out TradingCalendar entity))
-                return entity;
-
-            try
+            return _Cache.GetOrCreateAsync<TradingCalendar>(id, (cacheEntry) =>
             {
-                _Semphore.Wait();
-                if (_Cache.TryGetValue(id, out entity))
-                    return entity;
-
-                entity = await _Repository.GetAsync(id);
-                if (entity != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            .SetAbsoluteExpiration(TimeSpan.FromDays(1));
-
-                    _Cache.Set(id, entity, cacheEntryOptions);
-                }
-            }
-            finally
-            {
-                _Semphore.Release();
-            }
-
-            return entity;
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromDays(1);
+                return _Repository.GetAsync(id);
+            });
         }
 
         public void Update(TradingCalendar entity)

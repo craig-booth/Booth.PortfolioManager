@@ -13,7 +13,6 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
     {
         private readonly IPortfolioRepository _Repository;
         private readonly IMemoryCache _Cache;
-        private readonly SemaphoreSlim _Semphore = new SemaphoreSlim(1, 1);
 
         public CachedPortfolioRepository(IPortfolioRepository repository, IMemoryCache cache) 
         { 
@@ -76,58 +75,16 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
 
         public Portfolio Get(Guid id)
         {
-            if (_Cache.TryGetValue(id, out Portfolio entity))
-                return entity;
-
-            try
-            {
-                _Semphore.Wait();
-                if (_Cache.TryGetValue(id, out entity))
-                    return entity;
-
-                entity = _Repository.Get(id);
-                if (entity != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-
-                    _Cache.Set(id, entity, cacheEntryOptions);
-                }
-            }
-            finally
-            {
-                _Semphore.Release();
-            }
-
-            return entity;
+            throw new NotImplementedException();
         }
 
-        public async Task<Portfolio> GetAsync(Guid id)
+        public Task<Portfolio> GetAsync(Guid id)
         {
-            if (_Cache.TryGetValue(id, out Portfolio entity))
-                return entity;
-
-            try
+            return _Cache.GetOrCreateAsync<Portfolio>(id, (cacheEntry) =>
             {
-                _Semphore.Wait();
-                if (_Cache.TryGetValue(id, out entity))
-                    return entity;
-
-                entity = await _Repository.GetAsync(id);
-                if (entity != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-
-                    _Cache.Set(id, entity, cacheEntryOptions);
-                }
-            }
-            finally
-            {
-                _Semphore.Release();
-            }
-
-            return entity;
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                return _Repository.GetAsync(id);
+            });
         }
 
         public void Update(Portfolio entity)
