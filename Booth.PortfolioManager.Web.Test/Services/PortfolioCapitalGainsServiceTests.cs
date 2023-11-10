@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioCapitalGainsService(null);
+            var service = new PortfolioCapitalGainsService(null, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetCapitalGains(new Date(2000, 01, 01));
 
@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetCapitalGains(new Date(2010, 01, 01));
 
@@ -103,7 +103,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetCapitalGains(Guid.NewGuid(), new Date(2010, 01, 01));
 
@@ -115,7 +115,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetCapitalGains(_Fixture.Stock_ARG.Id, new Date(1999, 01, 01));
 
@@ -127,7 +127,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetCapitalGains(_Fixture.Stock_ARG.Id, new Date(2010, 01, 01));
 
@@ -178,7 +178,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture    .CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetDetailedCapitalGains(new Date(2010, 01, 01));
 
@@ -315,7 +315,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetDetailedCapitalGains(Guid.NewGuid(), new Date(2010, 01, 01));
 
@@ -327,7 +327,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetDetailedCapitalGains(_Fixture.Stock_ARG.Id, new Date(1999, 01, 01));
 
@@ -339,7 +339,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCapitalGainsService(portfolio);
+            var service = new PortfolioCapitalGainsService(portfolio, _Fixture.StockPriceRetriever, _Fixture.StockMapper);
 
             var result = service.GetDetailedCapitalGains(_Fixture.Stock_ARG.Id, new Date(2010, 01, 01));
 

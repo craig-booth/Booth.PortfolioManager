@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Linq;
+
 
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -15,7 +16,7 @@ namespace Booth.PortfolioManager.Repository
 
     public interface ITradingCalendarRepository : IRepository<TradingCalendar>
     {
-        void UpdateYear(TradingCalendar calendar, int year);
+        Task UpdateYearAsync(TradingCalendar calendar, int year);
     }
 
     public class TradingCalendarRepository : Repository<TradingCalendar>, ITradingCalendarRepository
@@ -24,12 +25,13 @@ namespace Booth.PortfolioManager.Repository
             :base(database, "TradingCalendar")
         {
         }
-        public override void Update(TradingCalendar entity)
+
+        public override Task UpdateAsync(TradingCalendar entity)
         {
             throw new NotSupportedException();
         }
 
-        public void UpdateYear(TradingCalendar calendar, int year)
+        public async Task UpdateYearAsync(TradingCalendar calendar, int year)
         {
             var existsFilter = Builders<BsonDocument>.Filter
                 .And(new[]
@@ -57,11 +59,12 @@ namespace Booth.PortfolioManager.Repository
                         { "days", new BsonArray(calendar.NonTradingDays(year).Select(x => x.ToBsonDocument()))},
                 }); 
 
-            _Collection.BulkWrite(new[]
+            await _Collection.BulkWriteAsync(new[]
             {
                 new UpdateOneModel<BsonDocument>(existsFilter, updateYear),
                 new UpdateOneModel<BsonDocument>(notExistsFilter, addYear)
             });  
         }
+
     }
 }

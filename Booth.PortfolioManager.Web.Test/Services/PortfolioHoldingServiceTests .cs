@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioHoldingService(null);
+            var service = new PortfolioHoldingService(null, _Fixture.HoldingMapper);
 
             var result = service.GetHoldings(new Date(2000, 01, 01));
 
@@ -35,7 +35,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioHoldingService(portfolio);
+            var service = new PortfolioHoldingService(portfolio, _Fixture.HoldingMapper);
 
             var result = service.GetHoldings(new Date(2000, 01, 01));
 
@@ -66,7 +66,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioHoldingService(portfolio);
+            var service = new PortfolioHoldingService(portfolio, _Fixture.HoldingMapper);
 
             var result = service.GetHoldings(new DateRange(new Date(2000, 01, 01), new Date(2003, 01, 01)));
 
@@ -96,7 +96,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioHoldingService(portfolio);
+            var service = new PortfolioHoldingService(portfolio, _Fixture.HoldingMapper);
 
             var result = service.GetHolding(Guid.NewGuid(), new Date(2000, 01, 01));
 
@@ -108,7 +108,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioHoldingService(portfolio);
+            var service = new PortfolioHoldingService(portfolio, _Fixture.HoldingMapper);
 
             var result = service.GetHolding(_Fixture.Stock_ARG.Id, new Date(2000, 01, 01));
 

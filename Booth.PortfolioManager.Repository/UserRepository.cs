@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -14,7 +13,7 @@ namespace Booth.PortfolioManager.Repository
 
     public interface IUserRepository : IRepository<User>
     {
-        User GetUserByUserName(string userName);
+        Task<User> GetUserByUserNameAsync(string userName);
     }
 
     public class UserRepository : Repository<User>, IUserRepository
@@ -25,10 +24,9 @@ namespace Booth.PortfolioManager.Repository
 
         }
 
-        public User GetUserByUserName(string userName)
+        public async Task<User> GetUserByUserNameAsync(string userName)
         {
-            return FindFirst("userName", userName);
+            return await FindFirstAsync("userName", userName);
         }
-
     }
 }

@@ -14,8 +14,8 @@ namespace Booth.PortfolioManager.Web.Services
 
     public interface IPortfolioService
     {
-        ServiceResult CreatePortfolio(Guid id, string name, Guid owner);
-        ServiceResult ChangeDrpParticipation(IPortfolio portfolio, Guid stockId, bool participation);
+        Task<ServiceResult> CreatePortfolioAsync(Guid id, string name, Guid owner);
+        Task<ServiceResult> ChangeDrpParticipationAsync(IPortfolio portfolio, Guid stockId, bool participation);
     }
     
     public class PortfolioService : IPortfolioService
@@ -29,17 +29,17 @@ namespace Booth.PortfolioManager.Web.Services
             _Repository = repository;
         }
 
-        public ServiceResult CreatePortfolio(Guid id, string name, Guid owner)
+        public async Task<ServiceResult> CreatePortfolioAsync(Guid id, string name, Guid owner)
         {
             var portfolio = _Factory.CreatePortfolio(id);
             portfolio.Create(name, owner);
 
-            _Repository.Add(portfolio);
+            await _Repository.AddAsync(portfolio);
 
             return ServiceResult.Ok();
         }
 
-        public ServiceResult ChangeDrpParticipation(IPortfolio portfolio, Guid stockId, bool participation)
+        public async Task<ServiceResult> ChangeDrpParticipationAsync(IPortfolio portfolio, Guid stockId, bool participation)
         {
             if (portfolio == null)
                 return ServiceResult<List<Holding>>.NotFound();
@@ -50,7 +50,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             portfolio.ChangeDrpParticipation(stockId, participation);
 
-            _Repository.Update((Portfolio)portfolio);
+            await _Repository.UpdateAsync((Portfolio)portfolio);
 
             return ServiceResult.Ok();
         }

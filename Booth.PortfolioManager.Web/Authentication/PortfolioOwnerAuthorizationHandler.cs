@@ -7,6 +7,10 @@ using System.Security.Claims;
 
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Web.Utilities;
+using AngleSharp.Html;
+using Microsoft.AspNetCore.Http;
+using Booth.PortfolioManager.Repository;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Booth.PortfolioManager.Web.Authentication
 {
@@ -14,31 +18,34 @@ namespace Booth.PortfolioManager.Web.Authentication
 
     class PortfolioOwnerAuthorizationHandler : AuthorizationHandler<PortfolioOwnerRequirement>
     {
-        private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IHttpContextPortfolioAccessor _PortfolioAccessor;
 
         public PortfolioOwnerAuthorizationHandler(IHttpContextPortfolioAccessor portfolioAccessor)
         {
-            _Portfolio = portfolioAccessor.ReadOnlyPortfolio;
+            _PortfolioAccessor = portfolioAccessor;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, PortfolioOwnerRequirement requirement)
         {
             if (context.User.Identity.IsAuthenticated)
             {
-                if (_Portfolio == null)
-                    context.Succeed(requirement);
-                else
-                {
-                    var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
+                var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
+                var userId = new Guid(userIdClaim.Value);
 
-                    var userId = new Guid(userIdClaim.Value);
-                    if (_Portfolio.Owner == userId)
-                        context.Succeed(requirement);
-                }                   
+
+                var portfolio = _PortfolioAccessor.GetReadOnlyPortfolio();
+                return portfolio.ContinueWith(x => { if (IsPortfolioOwner(x.Result, userId)) context.Succeed(requirement); });
             }
 
-
             return Task.CompletedTask;
+        }
+
+        private bool IsPortfolioOwner(IReadOnlyPortfolio portfolio, Guid userId)
+        {
+            if (portfolio == null)
+                return false;
+
+            return (portfolio.Owner == userId);
         }
     }
 }

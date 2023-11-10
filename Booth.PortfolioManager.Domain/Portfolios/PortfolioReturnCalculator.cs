@@ -9,19 +9,31 @@ using Booth.PortfolioManager.Domain.Transactions;
 
 namespace Booth.PortfolioManager.Domain.Portfolios
 {
-    public static class PortfolioReturnCalculation
+
+    public interface IPortfolioReturnCalculator
     {
-        public static decimal CalculateIRR(this IReadOnlyPortfolio portfolio, DateRange dateRange)
+        decimal Calculate(IReadOnlyPortfolio portfolio, DateRange dateRange);
+    }
+
+    public class IrrReturnCalculator : IPortfolioReturnCalculator
+    {
+        private readonly IStockPriceRetriever _PriceRetreiver;
+        public IrrReturnCalculator(IStockPriceRetriever priceRetriever)
+        {
+            _PriceRetreiver = priceRetriever;
+        }
+
+        public decimal Calculate(IReadOnlyPortfolio portfolio, DateRange dateRange)
         {
             // Get the initial portfolio value         
             var initialHoldings = portfolio.Holdings.All(dateRange.FromDate);
-            var initialHoldingsValue = initialHoldings.Sum(x => x.Value(dateRange.FromDate));
+            var initialHoldingsValue = initialHoldings.Sum(x => x.Properties[dateRange.FromDate].Units * _PriceRetreiver.GetPrice(x.Stock.Id, dateRange.FromDate));
             var initialCashBalance = portfolio.CashAccount.Balance(dateRange.FromDate);
             var initialValue = initialHoldingsValue + initialCashBalance;
 
             // Get the final portfolio value
             var finalHoldings = portfolio.Holdings.All(dateRange.ToDate);
-            var finalHoldingsValue = finalHoldings.Sum(x => x.Value(dateRange.ToDate));
+            var finalHoldingsValue = finalHoldings.Sum(x => x.Properties[dateRange.ToDate].Units * _PriceRetreiver.GetPrice(x.Stock.Id, dateRange.ToDate));
             var finalCashBalance = portfolio.CashAccount.Balance(dateRange.ToDate);
             var finalValue = finalHoldingsValue + finalCashBalance;
 

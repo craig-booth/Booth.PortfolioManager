@@ -32,7 +32,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
 
             for (var year = 2015; year <= DateTime.Today.Year; year++)
             {
-                var tradingCalendar = _TradingCalendarService.Get(TradingCalendarIds.ASX, year);
+                var tradingCalendar = await _TradingCalendarService.GetAsync(TradingCalendarIds.ASX, year);
                 if (tradingCalendar.Status == ServiceStatus.Ok)
                 {
                     if (tradingCalendar.Result.NonTradingDays.Count == 0)
@@ -44,7 +44,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
                         if (nonTradingDays.Any())
                         {
                             _Logger?.LogInformation("Adding {0} non-trading days for {1}", nonTradingDays.Count(), year);
-                            _TradingCalendarService.SetNonTradingDays(TradingCalendarIds.ASX, year, nonTradingDays);
+                            await _TradingCalendarService.SetNonTradingDaysAsync(TradingCalendarIds.ASX, year, nonTradingDays);
                         }
                         else
                             _Logger?.LogInformation("No data found for {0}", year);

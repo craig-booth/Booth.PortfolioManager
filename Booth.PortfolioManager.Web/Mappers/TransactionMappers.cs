@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.RestApi.Portfolios;
 using Booth.PortfolioManager.RestApi.Transactions;

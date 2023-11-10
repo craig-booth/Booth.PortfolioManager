@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+
 
 using Xunit;
 using FluentAssertions;
@@ -11,7 +12,7 @@ using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web.Mappers;
 using Booth.PortfolioManager.RestApi.Stocks;
-using System.Linq;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Mappers
 {
@@ -23,16 +24,16 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var priceHistory = mockRepository.Create<IStockPriceHistory>();
-            priceHistory.Setup(x => x.GetPrice(Date.Today)).Returns(1.20m);
-
             var stock = new Stock(Guid.NewGuid());
-            stock.SetPriceHistory(priceHistory.Object);
             stock.List("ABC", "ABC Pty Ltd", new Date(2000, 01, 01), true, Domain.Stocks.AssetCategory.InternationalProperty);
             stock.ChangeDividendRules(new Date(2000, 01, 01), 0.30m, RoundingRule.Truncate, true, Domain.Stocks.DrpMethod.RoundDown);
             stock.DeList(new Date(2010, 01, 01));
-           
-            var reponse = stock.ToResponse(new Common.Date(2010, 01, 01));
+
+            var priceRetriever = mockRepository.Create<IStockPriceRetriever>();
+            priceRetriever.Setup(x => x.GetPrice(stock.Id, Date.Today)).Returns(1.20m);
+            var mapper = new StockMapper(priceRetriever.Object);
+
+            var reponse = mapper.ToResponse(stock, new Common.Date(2010, 01, 01));
 
             reponse.Should().BeEquivalentTo(new
             { 
@@ -64,7 +65,10 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             stock.ChangeDividendRules(new Date(2008, 01, 01), 0.40m, RoundingRule.Truncate, true, Domain.Stocks.DrpMethod.RoundDown);
             stock.DeList(new Date(2020, 01, 01));
 
-            var reponse = stock.ToHistoryResponse();
+            var priceRetriever = mockRepository.Create<IStockPriceRetriever>();
+            var mapper = new StockMapper(priceRetriever.Object);
+
+            var reponse = mapper.ToHistoryResponse(stock);
 
             using (new AssertionScope())
             {
@@ -131,19 +135,17 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 new StockPrice(new Date(2010, 01, 03), 0.30m)
             };
 
-            var priceHistory = mockRepository.Create<IStockPriceHistory>();
-            priceHistory.Setup(x => x.GetPrices(dateRange)).Returns(prices);
-
-
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", new Date(2000, 01, 01), true, Domain.Stocks.AssetCategory.InternationalProperty);
             stock.ChangeProperties(new Date(2010, 01, 01), "XYZ", "XYZ Pty Ltd", Domain.Stocks.AssetCategory.InternationalStocks);
             stock.ChangeDividendRules(new Date(2008, 01, 01), 0.40m, RoundingRule.Truncate, true, Domain.Stocks.DrpMethod.RoundDown);
             stock.DeList(new Date(2020, 01, 01));
 
-            stock.SetPriceHistory(priceHistory.Object);
+            var priceRetriever = mockRepository.Create<IStockPriceRetriever>();
+            priceRetriever.Setup(x => x.GetPrices(stock.Id, dateRange)).Returns(prices);
+            var mapper = new StockMapper(priceRetriever.Object);
 
-            var reponse = stock.ToPriceResponse(dateRange);
+            var reponse = mapper.ToPriceResponse(stock, dateRange);
 
             using (new AssertionScope())
             {

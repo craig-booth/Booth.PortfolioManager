@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
         {
             var bsonReader = context.Reader;
 
-            Guid id;
+            Guid id = Guid.Empty;
             Date listingDate = Date.MinValue;
             Date delistingDate = Date.MinValue;
             bool trust = false;

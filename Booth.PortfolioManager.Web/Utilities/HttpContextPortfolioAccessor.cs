@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -10,29 +11,38 @@ namespace Booth.PortfolioManager.Web.Utilities
 {
     public interface IHttpContextPortfolioAccessor
     {
-        IReadOnlyPortfolio ReadOnlyPortfolio { get; }
-        IPortfolio Portfolio { get; }
+        Task<IReadOnlyPortfolio> GetReadOnlyPortfolio();
+        Task<IPortfolio> GetPortfolio();
     }
 
     class HttpContextPortfolioAccessor : IHttpContextPortfolioAccessor
     {
-        private readonly Portfolio _Portfolio;
-
-        public IReadOnlyPortfolio ReadOnlyPortfolio => _Portfolio;
-        public IPortfolio Portfolio => _Portfolio;
+        private readonly IPortfolioRepository _Repository;
+        private Guid _PortfolioId = Guid.Empty;
 
         public HttpContextPortfolioAccessor(IHttpContextAccessor httpContextAccessor, IPortfolioRepository repository)
         {
-            _Portfolio = null;
+            _Repository = repository;
 
             if (httpContextAccessor.HttpContext.Request.RouteValues.TryGetValue("portfolioId", out var portfolioParameter))
             {
-                if (Guid.TryParse((string)portfolioParameter, out var portfolioId))
-                {       
-                    _Portfolio = repository.Get(portfolioId);
-                }
+                Guid.TryParse((string)portfolioParameter, out _PortfolioId);
             }
         }
 
+        public async Task<IReadOnlyPortfolio> GetReadOnlyPortfolio()
+        {
+            return await GetPortfolioInternal();
+        }
+
+        public async Task<IPortfolio> GetPortfolio()
+        {
+            return await GetPortfolioInternal();
+        }
+
+        private async Task<Portfolio> GetPortfolioInternal()
+        {
+            return await _Repository.GetAsync(_PortfolioId);
+        }
     }
 }

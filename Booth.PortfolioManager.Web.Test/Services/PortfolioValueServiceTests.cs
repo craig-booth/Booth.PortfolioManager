@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using Xunit;
 using FluentAssertions;
@@ -25,27 +24,27 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
 
         [Fact]
-        public void PortfolioNotFound()
+        public async Task PortfolioNotFound()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var service = new PortfolioValueService(null, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(null, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(dateRange, ValueFrequency.Day);
+            var result = await service.GetValueAsync(dateRange, ValueFrequency.Day);
 
             result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
-        public void GetValueDaily()
+        public async Task GetValueDaily()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(dateRange, ValueFrequency.Day);
+            var result = await service.GetValueAsync(dateRange, ValueFrequency.Day);
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -63,15 +62,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void GetValueWeekly()
+        public async Task GetValueWeekly()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 17));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(dateRange, ValueFrequency.Week);
+            var result = await service.GetValueAsync(dateRange, ValueFrequency.Week);
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -86,15 +85,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void GetValueMonthly()
+        public async Task GetValueMonthly()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 05, 25));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(dateRange, ValueFrequency.Month);
+            var result = await service.GetValueAsync(dateRange, ValueFrequency.Month);
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -111,44 +110,44 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void GetValueForStockNotFound()
+        public async Task GetValueForStockNotFound()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(Guid.Empty, dateRange, ValueFrequency.Day);
+            var result = await service.GetValueAsync(Guid.Empty, dateRange, ValueFrequency.Day);
 
             result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
-        public void GetValueForStockNotOwned()
+        public async Task GetValueForStockNotOwned()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(Guid.NewGuid(), dateRange, ValueFrequency.Day);
+            var result = await service.GetValueAsync(Guid.NewGuid(), dateRange, ValueFrequency.Day);
 
             result.Should().HaveNotFoundStatus();
         }
 
 
         [Fact]
-        public void GetValueForStockDaily()
+        public async Task GetValueForStockDaily()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 10));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Day);
+            var result = await service.GetValueAsync(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Day);
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -165,15 +164,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void GetValueForStockWeekly()
+        public async Task GetValueForStockWeekly()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 01, 17));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever);
 
-            var result = service.GetValue(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Week);
+            var result = await service.GetValueAsync(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Week);
 
             result.Result.Should().BeEquivalentTo(new
             {
@@ -188,15 +187,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void GetValueForStockMonthly()
+        public async Task GetValueForStockMonthly()
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 05, 25));
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository);
+            var service = new PortfolioValueService(portfolio, _Fixture.TradingCalendarRepository, _Fixture.StockPriceRetriever );
 
-            var result = service.GetValue(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Month);
+            var result = await service.GetValueAsync(_Fixture.Stock_ARG.Id, dateRange, ValueFrequency.Month);
 
             result.Result.Should().BeEquivalentTo(new
             {

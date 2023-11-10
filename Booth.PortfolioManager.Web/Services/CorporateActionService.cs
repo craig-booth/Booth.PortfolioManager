@@ -16,9 +16,9 @@ namespace Booth.PortfolioManager.Web.Services
     {
         ServiceResult<CorporateAction> GetCorporateAction(Guid stockId, Guid id);
         ServiceResult<List<CorporateAction>> GetCorporateActions(Guid stockId, DateRange dateRange);
-        ServiceResult AddCorporateAction(Guid stockId, CorporateAction corporateAction);
-        ServiceResult UpdateCorporateAction(Guid stockId, CorporateAction corporateAction);
-        ServiceResult DeleteCorporateAction(Guid stockId, Guid corporateActionId);
+        Task<ServiceResult> AddCorporateActionAsync(Guid stockId, CorporateAction corporateAction);
+        Task<ServiceResult> UpdateCorporateActionAsync(Guid stockId, CorporateAction corporateAction);
+        Task<ServiceResult> DeleteCorporateActionAsync(Guid stockId, Guid corporateActionId);
     }
 
     public class CorporateActionService : ICorporateActionService
@@ -60,7 +60,7 @@ namespace Booth.PortfolioManager.Web.Services
             var stock = _StockQuery.Get(stockId);
             if (stock == null)
                 return ServiceResult<List<CorporateAction>>.NotFound();
-
+            
             var corporateActions = stock.CorporateActions.InDateRange(dateRange);
 
             var result = corporateActions.Select(x => _Mapper.ToApi(x)).ToList();
@@ -68,19 +68,19 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<List<CorporateAction>>.Ok(result);
         }
 
-        public ServiceResult AddCorporateAction(Guid stockId, CorporateAction corporateAction)
+        public async Task<ServiceResult> AddCorporateActionAsync(Guid stockId, CorporateAction corporateAction)
         {
             var stock = _StockQuery.Get(stockId);
             if (stock == null)
                 return ServiceResult.NotFound();
 
             stock.CorporateActions.Add(_Mapper.FromApi(corporateAction));
-            _Repository.AddCorporateAction(stock, corporateAction.Id);
+            await _Repository.AddCorporateActionAsync(stock, corporateAction.Id);
 
             return ServiceResult.Ok();
         }
 
-        public ServiceResult UpdateCorporateAction(Guid stockId, CorporateAction corporateAction)
+        public async Task<ServiceResult> UpdateCorporateActionAsync(Guid stockId, CorporateAction corporateAction)
         {
             var stock = _StockQuery.Get(stockId);
             if (stock == null)
@@ -91,12 +91,12 @@ namespace Booth.PortfolioManager.Web.Services
 
             stock.CorporateActions.Update(_Mapper.FromApi(corporateAction));
 
-            _Repository.UpdateCorporateAction(stock, corporateAction.Id);
+            await _Repository.UpdateCorporateActionAsync(stock, corporateAction.Id);
 
             return ServiceResult.Ok();
         }
 
-        public ServiceResult DeleteCorporateAction(Guid stockId, Guid corporateActionId)
+        public async Task<ServiceResult> DeleteCorporateActionAsync(Guid stockId, Guid corporateActionId)
         {
             var stock = _StockQuery.Get(stockId);
             if (stock == null)
@@ -106,7 +106,7 @@ namespace Booth.PortfolioManager.Web.Services
                 return ServiceResult.NotFound();
            
             stock.CorporateActions.Remove(corporateActionId);
-            _Repository.DeleteCorporateAction(stock, corporateActionId);
+            await _Repository.DeleteCorporateActionAsync(stock, corporateActionId);
 
             return ServiceResult.Ok();
         }

@@ -21,10 +21,12 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioHoldingService : IPortfolioHoldingService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IHoldingMapper _Mapper;
 
-        public PortfolioHoldingService(IReadOnlyPortfolio portfolio)
+        public PortfolioHoldingService(IReadOnlyPortfolio portfolio, IHoldingMapper mapper)
         {
             _Portfolio = portfolio;
+            _Mapper = mapper;
         }
 
         public ServiceResult<List<Holding>> GetHoldings(Date date)
@@ -34,7 +36,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             var holdings = _Portfolio.Holdings.All(date);
 
-            var result = holdings.Select(x => x.ToResponse(date)).ToList();
+            var result = holdings.Select(x => _Mapper.ToApi(x, date)).ToList();
 
             return ServiceResult<List<Holding>>.Ok(result);
         }
@@ -46,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             var holdings = _Portfolio.Holdings.All(dateRange);
 
-            var result = holdings.Select(x => x.ToResponse(dateRange.ToDate)).ToList();
+            var result = holdings.Select(x => _Mapper.ToApi(x, dateRange.ToDate)).ToList();
 
             return ServiceResult<List<Holding>>.Ok(result);
         }
@@ -60,7 +62,7 @@ namespace Booth.PortfolioManager.Web.Services
             if (holding == null)
                 return ServiceResult<Holding>.NotFound();
 
-            var result = holding.ToResponse(date);
+            var result = _Mapper.ToApi(holding, date);
 
             return ServiceResult<Holding>.Ok(result);
         }

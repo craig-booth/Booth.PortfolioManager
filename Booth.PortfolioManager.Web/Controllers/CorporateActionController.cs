@@ -48,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Controllers
         [Authorize(Policy.CanMantainStocks)]
         [Route("")]
         [HttpPost]
-        public ActionResult AddCorporateAction([FromRoute]Guid stockId, [FromBody] CorporateAction corporateAction)
+        public async Task<ActionResult> AddCorporateAction([FromRoute]Guid stockId, [FromBody] CorporateAction corporateAction)
         {
             if (corporateAction == null)
                 return NotFound();
@@ -56,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             if (corporateAction.Stock != stockId)
                 return BadRequest();
 
-            var result = _Service.AddCorporateAction(stockId, corporateAction);
+            var result = await _Service.AddCorporateActionAsync(stockId, corporateAction);
 
             return result.ToActionResult();
         }
@@ -65,7 +65,7 @@ namespace Booth.PortfolioManager.Web.Controllers
         [Authorize(Policy.CanMantainStocks)]
         [Route("{id:guid}")]
         [HttpPost]
-        public ActionResult UpdateCorporateAction([FromRoute] Guid stockId, [FromRoute] Guid id, [FromBody] CorporateAction corporateAction)
+        public async Task<ActionResult> UpdateCorporateAction([FromRoute] Guid stockId, [FromRoute] Guid id, [FromBody] CorporateAction corporateAction)
         {
             if (corporateAction == null)
                 return NotFound();
@@ -76,7 +76,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             if (corporateAction.Id != id)
                 return BadRequest();
 
-            var result = _Service.UpdateCorporateAction(stockId, corporateAction);
+            var result = await _Service.UpdateCorporateActionAsync(stockId, corporateAction);
 
             return result.ToActionResult();
         }
@@ -85,9 +85,9 @@ namespace Booth.PortfolioManager.Web.Controllers
         [Authorize(Policy.CanMantainStocks)]
         [Route("{id:guid}")]
         [HttpDelete]
-        public ActionResult DeleteCorporateAction([FromRoute] Guid stockId, [FromRoute] Guid id)
+        public async Task<ActionResult> DeleteCorporateAction([FromRoute] Guid stockId, [FromRoute] Guid id)
         {
-            var result = _Service.DeleteCorporateAction(stockId, id);
+            var result = await _Service.DeleteCorporateActionAsync(stockId, id);
 
             return result.ToActionResult();
         }

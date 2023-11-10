@@ -17,29 +17,32 @@ namespace Booth.PortfolioManager.Web.Services
 
     public interface IPortfolioValueService
     {
-        ServiceResult<PortfolioValueResponse> GetValue(DateRange dateRange, ValueFrequency frequency);
-        ServiceResult<PortfolioValueResponse> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency);
+        Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(DateRange dateRange, ValueFrequency frequency);
+        Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(Guid stockId, DateRange dateRange, ValueFrequency frequency);
     }
 
     public class PortfolioValueService : IPortfolioValueService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
         private readonly ITradingCalendarRepository _TradingCalendarRepository;
+        private readonly IStockPriceRetriever _PriceRetriever;
 
-        public PortfolioValueService(IReadOnlyPortfolio portfolio, ITradingCalendarRepository tradingCalendarRepository)
+        public PortfolioValueService(IReadOnlyPortfolio portfolio, ITradingCalendarRepository tradingCalendarRepository, IStockPriceRetriever priceRetriever)
         {
             _Portfolio = portfolio;
             _TradingCalendarRepository = tradingCalendarRepository;
+            _PriceRetriever = priceRetriever;
         }
  
-        public ServiceResult<PortfolioValueResponse> GetValue(DateRange dateRange, ValueFrequency frequency)
+        public async Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(DateRange dateRange, ValueFrequency frequency)
         {
             if (_Portfolio == null)
                 return ServiceResult<PortfolioValueResponse>.NotFound();
 
             var response = new PortfolioValueResponse();
 
-            var dates = GetDates(dateRange, frequency);
+            var tradingCalendar = await _TradingCalendarRepository.GetAsync(TradingCalendarIds.ASX);
+            var dates = GetDates(tradingCalendar, dateRange, frequency);
 
             var holdings = _Portfolio.Holdings.All(dateRange);
 
@@ -53,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Services
 
                 // Add holding values
                 foreach (var holding in holdings)
-                    amount += holding.Value(date);
+                    amount += GetValue(holding, date);
 
                 // Add cash account balances
                 if (date > closingBalanceEnumerator.Current.EffectivePeriod.ToDate)
@@ -72,7 +75,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<PortfolioValueResponse>.Ok(response);
         }
 
-        public ServiceResult<PortfolioValueResponse> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency)
+        public async Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(Guid stockId, DateRange dateRange, ValueFrequency frequency)
         {
             if (_Portfolio == null)
                 return ServiceResult<PortfolioValueResponse>.NotFound();
@@ -83,14 +86,15 @@ namespace Booth.PortfolioManager.Web.Services
 
             var response = new PortfolioValueResponse();
 
-            var dates = GetDates(dateRange, frequency);
+            var tradingCalendar = await _TradingCalendarRepository.GetAsync(TradingCalendarIds.ASX);
+            var dates = GetDates(tradingCalendar, dateRange, frequency);
 
             foreach (var date in dates)
             {
                 var value = new ClosingPrice()
                 {
                     Date = date,
-                    Price = holding.Value(date)
+                    Price = GetValue(holding, date)
                 };
 
                 response.Values.Add(value);
@@ -99,10 +103,8 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<PortfolioValueResponse>.Ok(response);
         } 
 
-        private IEnumerable<Date> GetDates(DateRange dateRange, ValueFrequency frequency)
+        private IEnumerable<Date> GetDates(ITradingCalendar tradingCalendar, DateRange dateRange, ValueFrequency frequency)
         {
-            var tradingCalendar = _TradingCalendarRepository.Get(TradingCalendarIds.ASX);
-
             var firstRequestedDate = tradingCalendar.NextTradingDay(dateRange.FromDate);
             var lastRequestedDate = tradingCalendar.PreviousTradingDay(dateRange.ToDate);
 
@@ -129,6 +131,11 @@ namespace Booth.PortfolioManager.Web.Services
 
             if (lastDate < lastRequestedDate)
                 yield return lastRequestedDate;
+        }
+
+        private decimal GetValue(IReadOnlyHolding holding, Date date)
+        {
+            return _PriceRetriever.GetPrice(holding.Stock.Id, date) * holding.Properties[date].Units;
         }
 
     } 

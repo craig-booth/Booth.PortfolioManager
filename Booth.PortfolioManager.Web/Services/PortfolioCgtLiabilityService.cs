@@ -19,10 +19,12 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioCgtLiabilityService : IPortfolioCgtLiabilityService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IStockMapper _Mapper;
 
-        public PortfolioCgtLiabilityService(IReadOnlyPortfolio portfolio)
+        public PortfolioCgtLiabilityService(IReadOnlyPortfolio portfolio, IStockMapper mapper)
         {
             _Portfolio = portfolio;
+            _Mapper = mapper;
         }
 
         public ServiceResult<CgtLiabilityResponse> GetCGTLiability(DateRange dateRange)

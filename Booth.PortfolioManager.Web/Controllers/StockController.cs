@@ -21,13 +21,15 @@ namespace Booth.PortfolioManager.Web.Controllers
     [Route("api/stocks")]
     public class StockController : ControllerBase
     {
-        private readonly  IStockService _StockService;
+        private readonly IStockService _StockService;
         private readonly IStockQuery _StockQuery;
+        private readonly IStockMapper _Mapper;
 
-        public StockController(IStockService stockService, IStockQuery stockQuery)
+        public StockController(IStockService stockService, IStockQuery stockQuery, IStockMapper mapper)
         {
             _StockService = stockService;
             _StockQuery = stockQuery;
+            _Mapper = mapper;
         }
 
         // GET: api/stocks
@@ -81,7 +83,7 @@ namespace Booth.PortfolioManager.Web.Controllers
                 }
             } 
 
-            return Ok(stocks.Select(x => x.ToResponse(resultDate)).ToList()); 
+            return Ok(stocks.Select(x => _Mapper.ToResponse(x, resultDate)).ToList()); 
         }
 
         // GET: api/stocks/{id}
@@ -99,7 +101,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             else
                 requestedDate = Date.Today;
 
-            return Ok(stock.ToResponse(requestedDate));
+            return Ok(_Mapper.ToResponse(stock, requestedDate));
         }
 
         // GET : /api/stocks/{id}/history
@@ -111,7 +113,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             if (stock == null)
                 return NotFound();
 
-           return Ok(stock.ToHistoryResponse()); 
+           return Ok(_Mapper.ToHistoryResponse(stock)); 
         }
 
         // GET : /api/stocks/{id}/closingprices
@@ -133,15 +135,15 @@ namespace Booth.PortfolioManager.Web.Controllers
             else
                 dateRange = new DateRange(new Date(fromDate!.Value), new Date(toDate!.Value));
 
-            return Ok(stock.ToPriceResponse(dateRange)); 
+            return Ok(_Mapper.ToPriceResponse(stock, dateRange)); 
         }
 
         // POST : /api/stocks
         [Authorize(Policy.CanMantainStocks)]
         [HttpPost]
-        public ActionResult CreateStock([FromBody] CreateStockCommand command)
+        public async Task<ActionResult> CreateStock([FromBody] CreateStockCommand command)
         {
-            var result = _StockService.ListStock(command.Id, command.AsxCode, command.Name, command.ListingDate, command.Trust, command.Category.ToDomain());
+            var result = await _StockService.ListStockAsync(command.Id, command.AsxCode, command.Name, command.ListingDate, command.Trust, command.Category.ToDomain());
 
             return result.ToActionResult();
         }
@@ -150,13 +152,13 @@ namespace Booth.PortfolioManager.Web.Controllers
         [Authorize(Policy.CanMantainStocks)]
         [Route("{id:guid}/change")]
         [HttpPost]
-        public ActionResult ChangeStock([FromRoute] Guid id, [FromBody] ChangeStockCommand command)
+        public async Task<ActionResult> ChangeStock([FromRoute] Guid id, [FromBody] ChangeStockCommand command)
         {
             // Check id in URL and id in command match
             if (id != command.Id)
                 return BadRequest("Id in command doesn't match id on URL");
 
-            var result = _StockService.ChangeStock(id, command.ChangeDate, command.AsxCode, command.Name, command.Category.ToDomain());
+            var result = await _StockService.ChangeStockAsync(id, command.ChangeDate, command.AsxCode, command.Name, command.Category.ToDomain());
 
             return result.ToActionResult();
         }
@@ -165,13 +167,13 @@ namespace Booth.PortfolioManager.Web.Controllers
         [Authorize(Policy.CanMantainStocks)]
         [Route("{id:guid}/delist")]
         [HttpPost]
-        public ActionResult DelistStock([FromRoute] Guid id, [FromBody] DelistStockCommand command)
+        public async Task<ActionResult> DelistStock([FromRoute] Guid id, [FromBody] DelistStockCommand command)
         {
             // Check id in URL and id in command match
             if (id != command.Id)
                 return BadRequest("Id in command doesn't match id on URL");
 
-            var result = _StockService.DelistStock(id, command.DelistingDate);
+            var result = await _StockService.DelistStockAsync(id, command.DelistingDate);
 
             return result.ToActionResult();
 
@@ -181,7 +183,7 @@ namespace Booth.PortfolioManager.Web.Controllers
         [Authorize(Policy.CanMantainStocks)]
         [Route("{id:guid}/closingprices")]
         [HttpPost]
-        public ActionResult UpdateClosingPrices([FromRoute] Guid id, [FromBody] UpdateClosingPricesCommand command)
+        public async Task<ActionResult> UpdateClosingPrices([FromRoute] Guid id, [FromBody] UpdateClosingPricesCommand command)
         {
             // Check id in URL and id in command match
             if (id != command.Id)
@@ -189,7 +191,7 @@ namespace Booth.PortfolioManager.Web.Controllers
 
             var closingPrices = command.ClosingPrices.Select(x => new StockPrice(x.Date, x.Price));
 
-            var result = _StockService.UpdateClosingPrices(id, closingPrices);
+            var result = await _StockService.UpdateClosingPricesAsync(id, closingPrices);
 
             return result.ToActionResult();
         }
@@ -198,13 +200,13 @@ namespace Booth.PortfolioManager.Web.Controllers
         [Authorize(Policy.CanMantainStocks)]
         [Route("{id}/changedividendrules")]
         [HttpPost]
-        public ActionResult ChangeDividendRules([FromRoute] Guid id, [FromBody] ChangeDividendRulesCommand command)
+        public async Task<ActionResult> ChangeDividendRules([FromRoute] Guid id, [FromBody] ChangeDividendRulesCommand command)
         {
             // Check id in URL and id in command match
             if (id != command.Id)
                 return BadRequest("Id in command doesn't match id on URL");
          
-            var result = _StockService.ChangeDividendRules(id, command.ChangeDate, command.CompanyTaxRate, command.DividendRoundingRule, command.DrpActive, command.DrpMethod.ToDomain());
+            var result = await _StockService.ChangeDividendRulesAsync(id, command.ChangeDate, command.CompanyTaxRate, command.DividendRoundingRule, command.DrpActive, command.DrpMethod.ToDomain());
 
             return result.ToActionResult();
         }

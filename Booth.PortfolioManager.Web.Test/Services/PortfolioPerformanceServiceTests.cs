@@ -26,7 +26,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var service = new PortfolioPerformanceService(null);
+            var service = new PortfolioPerformanceService(null, _Fixture.StockPriceRetriever);
 
             var result = service.GetPerformance(dateRange);
 
@@ -38,7 +38,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioPerformanceService(portfolio);
+            var service = new PortfolioPerformanceService(portfolio, _Fixture.StockPriceRetriever);
 
             var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
 
@@ -95,7 +95,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             portfolio.AquireShares(_Fixture.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
 
-            var service = new PortfolioPerformanceService(portfolio);
+            var service = new PortfolioPerformanceService(portfolio, _Fixture.StockPriceRetriever);
             var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
 
             result.Result.Should().BeEquivalentTo(new
@@ -139,7 +139,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             portfolio.AquireShares(_Fixture.Stock_ARG.Id, new Date(2000, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
             portfolio.DisposeOfShares(_Fixture.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
 
-            var service = new PortfolioPerformanceService(portfolio);
+            var service = new PortfolioPerformanceService(portfolio, _Fixture.StockPriceRetriever);
             var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
 
             result.Result.Should().BeEquivalentTo(new
@@ -183,7 +183,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             portfolio.AquireShares(_Fixture.Stock_ARG.Id, new Date(2002, 01, 01), 100, 1.00m, 19.95m, false, "", Guid.NewGuid());
             portfolio.DisposeOfShares(_Fixture.Stock_ARG.Id, new Date(2009, 01, 01), 100, 1.20m, 19.95m, Domain.Utils.CgtCalculationMethod.FirstInFirstOut, false, "", Guid.NewGuid());
 
-            var service = new PortfolioPerformanceService(portfolio);
+            var service = new PortfolioPerformanceService(portfolio, _Fixture.StockPriceRetriever);
             var result = service.GetPerformance(new DateRange(new Date(2001, 01, 01), new Date(2010, 01, 01)));
 
             result.Result.Should().BeEquivalentTo(new

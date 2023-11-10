@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.Repository.Serialization
         {
             var bsonReader = context.Reader;
 
-            Guid id;
+            Guid id = Guid.Empty;
             List<StockPrice> closingPrices = null;
 
             bsonReader.ReadStartDocument();

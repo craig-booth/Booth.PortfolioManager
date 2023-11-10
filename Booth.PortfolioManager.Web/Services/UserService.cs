@@ -10,7 +10,7 @@ namespace Booth.PortfolioManager.Web.Services
 {
     public interface IUserService
     {
-        ServiceResult<User> Authenticate(string userName, string password);
+        Task<ServiceResult<User>> AuthenticateAsync(string userName, string password);
     }
 
     class UserService : IUserService
@@ -22,13 +22,13 @@ namespace Booth.PortfolioManager.Web.Services
             _UserRepository = userRepository;
         }
 
-        public ServiceResult<User> Authenticate(string userName, string password)
+        public async Task<ServiceResult<User>> AuthenticateAsync(string userName, string password)
         {
-            var user = _UserRepository.GetUserByUserName(userName);
+            var user = await _UserRepository.GetUserByUserNameAsync(userName);
             if (user == null)
                 return ServiceResult<User>.Error("User not found");
 
-            if (! user.PasswordCorrect(password))
+            if (!user.PasswordCorrect(password))
                 return ServiceResult<User>.Error("Incorrect Password");
 
             return ServiceResult<User>.Ok(user);

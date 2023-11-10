@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
@@ -23,18 +23,18 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
     {
 
         [Fact]
-        public void AuthenticateFailsReturnsForbidden()
+        public async Task AuthenticateFailsReturnsForbidden()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var userService = mockRepository.Create<IUserService>();
-            userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Error(""));
+            userService.Setup(x => x.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(ServiceResult<User>.Error("")));
             var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
 
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
             var request = new AuthenticationRequest() { UserName = "user", Password = "password" };
-            var response = controller.Authenticate(request);
+            var response = await controller.Authenticate(request);
 
             response.Result.Should().BeForbidResult();
 
@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void AuthenticateSuccessfulReturnsToken()
+        public async Task AuthenticateSuccessfulReturnsToken()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -50,7 +50,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             user.Create("user", "password");
 
             var userService = mockRepository.Create<IUserService>();
-            userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
+            userService.Setup(x => x.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(ServiceResult<User>.Ok(user)));
             var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
             jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
             jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
@@ -60,7 +60,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
             var request = new AuthenticationRequest() { UserName = "user", Password = "password" };
-            var response = controller.Authenticate(request);
+            var response = await controller.Authenticate(request);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var validationParameters = new TokenValidationParameters()
@@ -77,7 +77,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void AuthenticateTokenContainsNameClaims()
+        public async Task AuthenticateTokenContainsNameClaims()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -85,7 +85,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             user.Create("user", "password");
 
             var userService = mockRepository.Create<IUserService>();
-            userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
+            userService.Setup(x => x.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(ServiceResult<User>.Ok(user)));
             var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
             jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
             jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
@@ -95,7 +95,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
             var request = new AuthenticationRequest() { UserName = "user", Password = "password" };
-            var response = controller.Authenticate(request);
+            var response = await controller.Authenticate(request);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.ReadJwtToken(response.Value.Token);
@@ -107,7 +107,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void AuthenticateTokenDoesNotAdministratorClaim()
+        public async Task AuthenticateTokenDoesNotAdministratorClaim()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -115,7 +115,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             user.Create("user", "password");
 
             var userService = mockRepository.Create<IUserService>();
-            userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
+            userService.Setup(x => x.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(ServiceResult<User>.Ok(user)));
             var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
             jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
             jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
@@ -125,7 +125,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
             var request = new AuthenticationRequest() { UserName = "user", Password = "password" };
-            var response = controller.Authenticate(request);
+            var response = await controller.Authenticate(request);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.ReadJwtToken(response.Value.Token);
@@ -136,7 +136,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void AuthenticateTokenContainsAdministratorClaimForAdministrator()
+        public async Task AuthenticateTokenContainsAdministratorClaimForAdministrator()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -145,7 +145,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             user.AddAdministratorPrivilage();
 
             var userService = mockRepository.Create<IUserService>();
-            userService.Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>())).Returns(ServiceResult<User>.Ok(user));
+            userService.Setup(x => x.AuthenticateAsync(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult(ServiceResult<User>.Ok(user)));
             var jwtConfig = mockRepository.Create<IJwtTokenConfigurationProvider>();
             jwtConfig.SetupGet(x => x.Issuer).Returns("TestIssuer");
             jwtConfig.SetupGet(x => x.Audience).Returns("TestAudience");
@@ -155,7 +155,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new AuthenticationController(userService.Object, jwtConfig.Object);
 
             var request = new AuthenticationRequest() { UserName = "user", Password = "password" };
-            var response = controller.Authenticate(request);
+            var response = await controller.Authenticate(request);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.ReadJwtToken(response.Value.Token);

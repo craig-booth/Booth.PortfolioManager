@@ -50,9 +50,9 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET: properties
         [Route("{id:guid}/changedrpparticipation")]
         [HttpPost]
-        public ActionResult ChangeDrpParticipation([FromServices] IPortfolio portfolio, [FromServices] IPortfolioService service, [FromRoute] Guid id, [FromBody] ChangeDrpParticipationCommand command)
+        public async Task<ActionResult> ChangeDrpParticipation([FromServices] IPortfolio portfolio, [FromServices] IPortfolioService service, [FromRoute] Guid id, [FromBody] ChangeDrpParticipationCommand command)
         {
-            var result = service.ChangeDrpParticipation(portfolio, id, command.Participate);
+            var result = await service.ChangeDrpParticipationAsync(portfolio, id, command.Participate);
 
             return result.ToActionResult();
         }
@@ -60,11 +60,11 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET: id/value?fromDate&toDate
         [Route("{id:guid}/value")]
         [HttpGet]
-        public ActionResult<PortfolioValueResponse> GetValue([FromServices] IPortfolioValueService service, [FromRoute]Guid id, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] ValueFrequency? frequency)
+        public async Task<ActionResult<PortfolioValueResponse>> GetValue([FromServices] IPortfolioValueService service, [FromRoute]Guid id, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] ValueFrequency? frequency)
         {
             var requestedFrequency = frequency == null ? ValueFrequency.Day : frequency!.Value;
 
-            var result = service.GetValue(id, DateRangeFromParameter(fromDate, toDate), requestedFrequency);
+            var result = await service.GetValueAsync(id, DateRangeFromParameter(fromDate, toDate), requestedFrequency);
 
             return result.ToActionResult<PortfolioValueResponse>();
         } 

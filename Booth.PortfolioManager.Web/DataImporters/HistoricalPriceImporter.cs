@@ -13,6 +13,7 @@ using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Repository;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.DataImporters
 {
@@ -22,14 +23,16 @@ namespace Booth.PortfolioManager.Web.DataImporters
         private readonly IStockQuery _StockQuery;
         private readonly IStockService _StockService;
         private readonly ITradingCalendarRepository _TradingCalendarRepository;
+        private readonly IStockPriceRetriever _PriceRetriever;
         private readonly ILogger _Logger;
 
-        public HistoricalPriceImporter(IStockQuery stockQuery, IStockService stockService, ITradingCalendarRepository tradingCalendarRepository, IHistoricalStockPriceService dataService, ILogger<HistoricalPriceImporter> logger)
+        public HistoricalPriceImporter(IStockQuery stockQuery, IStockService stockService, ITradingCalendarRepository tradingCalendarRepository, IHistoricalStockPriceService dataService, IStockPriceRetriever priceRetriever, ILogger<HistoricalPriceImporter> logger)
         {
             _StockQuery = stockQuery;
             _StockService = stockService;
             _TradingCalendarRepository = tradingCalendarRepository;
             _DataService = dataService;
+            _PriceRetriever = priceRetriever;
             _Logger = logger;
         }
 
@@ -38,7 +41,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
         {
             _Logger?.LogInformation("Starting import of historical price data");
 
-            var tradingCalendar = _TradingCalendarRepository.Get(TradingCalendarIds.ASX);
+            var tradingCalendar = await _TradingCalendarRepository.GetAsync(TradingCalendarIds.ASX);
 
             var lastExpectedDate = tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1));
 
@@ -47,11 +50,11 @@ namespace Booth.PortfolioManager.Web.DataImporters
                 if (cancellationToken.IsCancellationRequested)
                     return;
 
-                var latestDate = stock.DateOfLastestPrice(); 
+                var latestPrice = _PriceRetriever.GetLatestPrice(stock.Id); 
 
-                if (latestDate < lastExpectedDate)
+                if (latestPrice.Date < lastExpectedDate)
                 {                 
-                    var dateRange = new DateRange(latestDate.AddDays(1), lastExpectedDate);
+                    var dateRange = new DateRange(latestPrice.Date.AddDays(1), lastExpectedDate);
                     var asxCode = stock.Properties.ClosestTo(dateRange.ToDate).AsxCode;
 
                     _Logger?.LogInformation("Importing closing prices for {0} between {1:d} and {2:d}", asxCode, dateRange.FromDate, dateRange.ToDate);
@@ -62,7 +65,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
                     _Logger?.LogInformation("{0} closing prices found", closingPrices.Count);
                     if (closingPrices.Count > 0)
                     {
-                        _StockService.UpdateClosingPrices(stock.Id, closingPrices);
+                        await _StockService.UpdateClosingPricesAsync(stock.Id, closingPrices);
                     }
                      
                 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using Xunit;
 using Moq;
@@ -56,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void AddTransactionValidationError()
+        public async Task AddTransactionValidationError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -64,10 +64,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var transaction = new Aquisition() { Id = transactionId };
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.AddTransaction(transaction)).Returns(ServiceResult.Error("Error message")).Verifiable();
+            service.Setup(x => x.AddTransactionAsync(transaction)).Returns(Task.FromResult(ServiceResult.Error("Error message"))).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.AddTransaction(service.Object, transaction);
+            var result = await controller.AddTransaction(service.Object, transaction);
 
             result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
 
@@ -75,7 +75,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void AddTransaction()
+        public async Task AddTransaction()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -83,10 +83,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var transaction = new Aquisition() { Id = transactionId };
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.AddTransaction(transaction)).Returns(ServiceResult.Ok()).Verifiable();
+            service.Setup(x => x.AddTransactionAsync(transaction)).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.AddTransaction(service.Object, transaction);
+            var result = await controller.AddTransaction(service.Object, transaction);
 
             result.Should().BeOkResult();
 
@@ -94,7 +94,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void UpdateTransactionNotFound()
+        public async Task UpdateTransactionNotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -102,10 +102,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var transaction = new Aquisition() { Id = transactionId };
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.UpdateTransaction(transactionId, transaction)).Returns(ServiceResult.NotFound()).Verifiable();
+            service.Setup(x => x.UpdateTransactionAsync(transactionId, transaction)).Returns(Task.FromResult(ServiceResult.NotFound())).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.UpdateTransaction(service.Object, transactionId, transaction);
+            var result = await controller.UpdateTransaction(service.Object, transactionId, transaction);
 
             result.Should().BeNotFoundResult();
 
@@ -113,7 +113,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void UpdateTransactionValidationError()
+        public async Task UpdateTransactionValidationError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -121,10 +121,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var transaction = new Aquisition() { Id = transactionId };
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.UpdateTransaction(transactionId, transaction)).Returns(ServiceResult.Error("Error message")).Verifiable();
+            service.Setup(x => x.UpdateTransactionAsync(transactionId, transaction)).Returns(Task.FromResult(ServiceResult.Error("Error message"))).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.UpdateTransaction(service.Object, transactionId, transaction);
+            var result = await controller.UpdateTransaction(service.Object, transactionId, transaction);
 
             result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
 
@@ -132,7 +132,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void UpdateTransaction()
+        public async Task UpdateTransaction()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -140,10 +140,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var transaction = new Aquisition() { Id = transactionId };
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.UpdateTransaction(transactionId, transaction)).Returns(ServiceResult.Ok()).Verifiable();
+            service.Setup(x => x.UpdateTransactionAsync(transactionId, transaction)).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.UpdateTransaction(service.Object, transactionId, transaction);
+            var result = await controller.UpdateTransaction(service.Object, transactionId, transaction);
 
             result.Should().BeOkResult();
 
@@ -151,17 +151,17 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void DeleteTransactionNotFound()
+        public async Task DeleteTransactionNotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var transactionId = Guid.NewGuid();
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.DeleteTransaction(transactionId)).Returns(ServiceResult.NotFound()).Verifiable();
+            service.Setup(x => x.DeleteTransactionAsync(transactionId)).Returns(Task.FromResult(ServiceResult.NotFound())).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.DeleteTransaction(service.Object, transactionId);
+            var result = await controller.DeleteTransaction(service.Object, transactionId);
 
             result.Should().BeNotFoundResult();
 
@@ -169,17 +169,17 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void DeleteTransactionValidationError()
+        public async Task DeleteTransactionValidationError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var transactionId = Guid.NewGuid();
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.DeleteTransaction(transactionId)).Returns(ServiceResult.Error("Error message")).Verifiable();
+            service.Setup(x => x.DeleteTransactionAsync(transactionId)).Returns(Task.FromResult(ServiceResult.Error("Error message"))).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.DeleteTransaction(service.Object, transactionId);
+            var result = await controller.DeleteTransaction(service.Object, transactionId);
 
             result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
 
@@ -187,17 +187,17 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void DeleteTransaction()
+        public async Task DeleteTransaction()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var transactionId = Guid.NewGuid();
 
             var service = mockRepository.Create<IPortfolioTransactionService>();
-            service.Setup(x => x.DeleteTransaction(transactionId)).Returns(ServiceResult.Ok()).Verifiable();
+            service.Setup(x => x.DeleteTransactionAsync(transactionId)).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new TransactionController();
-            var result = controller.DeleteTransaction(service.Object, transactionId);
+            var result = await controller.DeleteTransaction(service.Object, transactionId);
 
             result.Should().BeOkResult();
 

@@ -27,9 +27,9 @@ namespace Booth.PortfolioManager.Repository.Serialization
         {
             var bsonReader = context.Reader;
 
-            Guid id;
+            Guid id = Guid.Empty;
             string portfolioName = "";
-            Guid owner;
+            Guid owner = Guid.Empty;
             List<PortfolioTransaction> transactions = null;
             List<Guid> participateInDrp = null;
 

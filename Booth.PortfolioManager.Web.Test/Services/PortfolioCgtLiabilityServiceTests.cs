@@ -26,7 +26,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var service = new PortfolioCgtLiabilityService(null);
+            var service = new PortfolioCgtLiabilityService(null, _Fixture.StockMapper);
 
             var result = service.GetCGTLiability(dateRange);
 
@@ -40,7 +40,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCgtLiabilityService(portfolio);
+            var service = new PortfolioCgtLiabilityService(portfolio, _Fixture.StockMapper);
 
             var result = service.GetCGTLiability(dateRange);
 

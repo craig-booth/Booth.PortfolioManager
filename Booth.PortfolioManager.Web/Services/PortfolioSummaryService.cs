@@ -18,10 +18,14 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioSummaryService : IPortfolioSummaryService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IPortfolioReturnCalculator _ReturnCalculator;
+        private readonly IHoldingMapper _Mapper;
 
-        public PortfolioSummaryService(IReadOnlyPortfolio portfolio)
+        public PortfolioSummaryService(IReadOnlyPortfolio portfolio, IPortfolioReturnCalculator returnCalculator, IHoldingMapper mapper)
         {
             _Portfolio = portfolio;
+            _ReturnCalculator = returnCalculator;
+            _Mapper = mapper;
         }
 
         public ServiceResult<PortfolioSummaryResponse> GetSummary(Date date)
@@ -30,7 +34,7 @@ namespace Booth.PortfolioManager.Web.Services
                 return ServiceResult<PortfolioSummaryResponse>.NotFound();
 
             var response = new PortfolioSummaryResponse();
-            response.Holdings.AddRange(_Portfolio.Holdings.All(date).Select(x => x.ToResponse(date)));
+            response.Holdings.AddRange(_Portfolio.Holdings.All(date).Select(x => _Mapper.ToApi(x, date)));
             response.CashBalance = _Portfolio.CashAccount.Balance(date);
             response.PortfolioValue = response.Holdings.Sum(x => x.Value) + response.CashBalance;
             response.PortfolioCost = response.Holdings.Sum(x => x.Cost) + response.CashBalance; 
@@ -43,18 +47,18 @@ namespace Booth.PortfolioManager.Web.Services
             {
                 var fromDate = date.AddYears(-1).AddDays(1);
                 if (fromDate >= _Portfolio.StartDate)
-                    response.Return1Year = _Portfolio.CalculateIRR(new DateRange(fromDate, date));
+                    response.Return1Year = _ReturnCalculator.Calculate(_Portfolio, new DateRange(fromDate, date));
 
                 fromDate = date.AddYears(-3).AddDays(1);
                 if (fromDate >= _Portfolio.StartDate)
-                    response.Return3Year = _Portfolio.CalculateIRR(new DateRange(fromDate, date));
+                    response.Return3Year = _ReturnCalculator.Calculate(_Portfolio, new DateRange(fromDate, date));
 
                 fromDate = date.AddYears(-5).AddDays(1);
                 if (fromDate >= _Portfolio.StartDate)
-                    response.Return5Year = _Portfolio.CalculateIRR(new DateRange(fromDate, date));
+                    response.Return5Year = _ReturnCalculator.Calculate(_Portfolio, new DateRange(fromDate, date));
 
                 if (date >= _Portfolio.StartDate)
-                    response.ReturnAll = _Portfolio.CalculateIRR(new DateRange(_Portfolio.StartDate, date));
+                    response.ReturnAll = _ReturnCalculator.Calculate(_Portfolio, new DateRange(_Portfolio.StartDate, date));
             } 
 
             return ServiceResult<PortfolioSummaryResponse>.Ok(response); 

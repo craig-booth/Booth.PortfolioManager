@@ -8,6 +8,7 @@ using Booth.PortfolioManager.Web.Utilities;
 using System.Threading;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Microsoft.Extensions.Caching.Memory;
+using System.Threading.Tasks;
 
 namespace Booth.PortfolioManager.Web.CachedRepositories
 {
@@ -23,18 +24,18 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Cache = cache;
         }
 
-        public void Add(Stock entity)
+        public async Task AddAsync(Stock entity)
         {
-            _Repository.Add(entity);
+            await _Repository.AddAsync(entity);
             _Cache.Add(entity);
         }
 
-        public void AddCorporateAction(Stock stock, Guid id)
+        public async Task AddCorporateActionAsync(Stock stock, Guid id)
         {
-            _Repository.AddCorporateAction(stock, id);
+            await _Repository.AddCorporateActionAsync(stock, id);
         }
 
-        public IEnumerable<Stock> All()
+        public async IAsyncEnumerable<Stock> AllAsync()
         {
             // If cache is empty then load it first
             if (_Cache.Count == 0)
@@ -44,8 +45,8 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
                     _Semphore.Wait();
                     if (_Cache.Count == 0)
                     {
-                        var entities = _Repository.All();
-                        foreach (var entity in entities)
+                        var entities = _Repository.AllAsync();
+                        await foreach (var entity in entities)
                             _Cache.Add(entity);
                     }
                 }
@@ -53,51 +54,51 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
                 {
                     _Semphore.Release();
                 }
-
             }
 
-            return _Cache.All();
+            foreach (var entity in _Cache.All())
+                yield return entity;
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            _Repository.Delete(id);
+            await _Repository.DeleteAsync(id);
             _Cache.Remove(id);
         }
 
-        public void DeleteCorporateAction(Stock stock, Guid id)
+        public async Task DeleteCorporateActionAsync(Stock stock, Guid id)
         {
-            _Repository.DeleteCorporateAction(stock, id);
+            await _Repository.DeleteCorporateActionAsync(stock, id);
         }
 
-        public Stock Get(Guid id)
+        public Task<Stock> GetAsync(Guid id)
         {
-            return _Cache.Get(id);
+            return Task.FromResult<Stock>(_Cache.Get(id));
         }
 
-        public void Update(Stock entity)
+        public async Task UpdateAsync(Stock entity)
         {
-            _Repository.Update(entity);
+            await _Repository.UpdateAsync(entity);
         }
 
-        public void UpdateCorporateAction(Stock stock, Guid id)
+        public async Task UpdateCorporateActionAsync(Stock stock, Guid id)
         {
-            _Repository.UpdateCorporateAction(stock, id);
+            await _Repository.UpdateCorporateActionAsync(stock, id);
         }
 
-        public void UpdateDividendRules(Stock stock, Date date)
+        public async Task UpdateDividendRulesAsync(Stock stock, Date date)
         {
-            _Repository.UpdateDividendRules(stock, date);
+            await _Repository.UpdateDividendRulesAsync(stock, date);
         }
 
-        public void UpdateProperties(Stock stock, Date date)
+        public async Task UpdatePropertiesAsync(Stock stock, Date date)
         {
-            _Repository.UpdateProperties(stock, date);
+            await _Repository.UpdatePropertiesAsync(stock, date);
         }
 
-        public void UpdateRelativeNTAs(Stock stock, Date date)
+        public async Task UpdateRelativeNTAsAsync(Stock stock, Date date)
         {
-            _Repository.UpdateRelativeNTAs(stock, date);
+            await _Repository.UpdateRelativeNTAsAsync(stock, date);
         }
     }
 }

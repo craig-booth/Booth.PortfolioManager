@@ -23,10 +23,14 @@ namespace Booth.PortfolioManager.Web.Services
     {
 
         private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IStockPriceRetriever _PriceRetriever;
+        private readonly IStockMapper _Mapper;
 
-        public PortfolioCapitalGainsService(IReadOnlyPortfolio portfolio)
+        public PortfolioCapitalGainsService(IReadOnlyPortfolio portfolio, IStockPriceRetriever priceRetriever, IStockMapper mapper)
         {
             _Portfolio = portfolio;
+            _PriceRetriever = priceRetriever;
+            _Mapper = mapper;
         }
 
         public ServiceResult<SimpleUnrealisedGainsResponse> GetCapitalGains(Date date)
@@ -89,7 +93,7 @@ namespace Booth.PortfolioManager.Web.Services
                 {
                     var properties = parcel.Properties[date];
 
-                    var value = properties.Units * holding.Stock.GetPrice(date);
+                    var value = properties.Units * _PriceRetriever.GetPrice(holding.Stock.Id , date);
                     var capitalGain = value - properties.CostBase;
                     var discountMethod = CgtUtils.CgtMethodForParcel(parcel.AquisitionDate, date);
                     var discoutedGain = (discountMethod == Domain.Portfolios.CgtMethod.Discount) ? CgtUtils.DiscountedCgt(capitalGain, Domain.Portfolios.CgtMethod.Discount) : capitalGain;
@@ -123,7 +127,7 @@ namespace Booth.PortfolioManager.Web.Services
                 {
                     var properties = parcel.Properties[date];
 
-                    var value = properties.Units * holding.Stock.GetPrice(date);
+                    var value = properties.Units * _PriceRetriever.GetPrice(holding.Stock.Id, date);
                     var capitalGain = value - properties.CostBase;
                     var discountMethod = CgtUtils.CgtMethodForParcel(parcel.AquisitionDate, date);
                     var discoutedGain = (discountMethod == Domain.Portfolios.CgtMethod.Discount) ? CgtUtils.DiscountedCgt(capitalGain, Domain.Portfolios.CgtMethod.Discount) : capitalGain;

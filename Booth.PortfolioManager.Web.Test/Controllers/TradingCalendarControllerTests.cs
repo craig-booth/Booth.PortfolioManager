@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 using Xunit;
 using Moq;
@@ -18,17 +19,17 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
     {
 
         [Fact]
-        public void GetYear()
+        public async Task GetYear()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var response = new RestApi.TradingCalendars.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
-            service.Setup(x => x.Get(TradingCalendarIds.ASX, 2010)).Returns(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(response)).Verifiable();
+            service.Setup(x => x.GetAsync(TradingCalendarIds.ASX, 2010)).Returns(Task.FromResult(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(response))).Verifiable();
 
             var controller = new TradingCalendarController(service.Object);
-            var result = controller.Get(2010);
+            var result = await controller.Get(2010);
 
             result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
 
@@ -36,17 +37,17 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void UpdateValidationError()
+        public async Task UpdateValidationError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
-            service.Setup(x => x.Update(TradingCalendarIds.ASX, tradingCalendar)).Returns(ServiceResult.Error("Error message")).Verifiable();
+            service.Setup(x => x.UpdateAsync(TradingCalendarIds.ASX, tradingCalendar)).Returns(Task.FromResult(ServiceResult.Error("Error message"))).Verifiable();
 
             var controller = new TradingCalendarController(service.Object);
-            var result = controller.Update(2010, tradingCalendar);
+            var result = await controller.Update(2010, tradingCalendar);
 
             result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new [] { "Error message" });
 
@@ -54,17 +55,17 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void Update()
+        public async Task Update()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
-            service.Setup(x => x.Update(TradingCalendarIds.ASX, tradingCalendar)).Returns(ServiceResult.Ok()).Verifiable();
+            service.Setup(x => x.UpdateAsync(TradingCalendarIds.ASX, tradingCalendar)).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new TradingCalendarController(service.Object);
-            var result = controller.Update(2010, tradingCalendar);
+            var result = await controller.Update(2010, tradingCalendar);
 
             result.Should().BeOkResult();
 

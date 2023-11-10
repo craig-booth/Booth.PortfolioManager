@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 using Moq;
 using Xunit;
@@ -27,7 +28,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void PortfolioNotFound()
+        public async Task PortfolioNotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -35,7 +36,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
-            var result = service.ChangeDrpParticipation(null, Guid.NewGuid(), true);
+            var result = await service.ChangeDrpParticipationAsync(null, Guid.NewGuid(), true);
 
             result.Should().HaveNotFoundStatus();
 
@@ -45,7 +46,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
 
         [Fact]
-        public void ChangeDrpParticipationStockNotFound()
+        public async Task ChangeDrpParticipationStockNotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -55,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
            
             var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
-            var result = service.ChangeDrpParticipation(portfolio, Guid.NewGuid(), true);
+            var result = await service.ChangeDrpParticipationAsync(portfolio, Guid.NewGuid(), true);
 
             result.Should().HaveNotFoundStatus();
 
@@ -64,18 +65,18 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
 
         [Fact]
-        public void ChangeDrpParticipation()
+        public async Task ChangeDrpParticipation()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
             var repository = mockRepository.Create<IPortfolioRepository>();
-            repository.Setup(x => x.Update(It.Is<Portfolio>(x => x.Id == portfolio.Id))).Verifiable();     
+            repository.Setup(x => x.UpdateAsync(It.Is<Portfolio>(x => x.Id == portfolio.Id))).Returns(Task.CompletedTask).Verifiable();     
 
             var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
-            var result = service.ChangeDrpParticipation(portfolio, _Fixture.Stock_ARG.Id, true);
+            var result = await service.ChangeDrpParticipationAsync(portfolio, _Fixture.Stock_ARG.Id, true);
 
             result.Should().HaveOkStatus();
 
@@ -83,18 +84,18 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void CreatePortfolio()
+        public async Task CreatePortfolio()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var portfolioId = Guid.NewGuid();
 
             var repository = mockRepository.Create<IPortfolioRepository>();
-            repository.Setup(x => x.Add(It.Is<Portfolio>(x => x.Id == portfolioId))).Verifiable();
+            repository.Setup(x => x.AddAsync(It.Is<Portfolio>(x => x.Id == portfolioId))).Returns(Task.CompletedTask).Verifiable();
 
             var service = new PortfolioService(_Fixture.PortfolioFactory, repository.Object);
 
-            var result = service.CreatePortfolio(portfolioId, "My Portfolio", Guid.NewGuid());
+            var result = await service.CreatePortfolioAsync(portfolioId, "My Portfolio", Guid.NewGuid());
 
             result.Should().HaveOkStatus();
 

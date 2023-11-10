@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Repository;
+using System.Threading.Tasks;
 
 namespace Booth.PortfolioManager.Web.CachedRepositories
 {
@@ -12,7 +13,6 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
     {
         private readonly IPortfolioRepository _Repository;
         private readonly IMemoryCache _Cache;
-        private readonly SemaphoreSlim _Semphore = new SemaphoreSlim(1, 1);
 
         public CachedPortfolioRepository(IPortfolioRepository repository, IMemoryCache cache) 
         { 
@@ -20,71 +20,52 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Cache = cache;
         }
 
-        public void Add(Portfolio entity)
+        public async Task AddAsync(Portfolio entity)
         {
-            _Repository.Add(entity);
+            await _Repository.AddAsync(entity);
         }
 
-        public void AddTransaction(Portfolio portfolio, Guid id)
+        public async Task AddTransactionAsync(Portfolio portfolio, Guid id)
         {
-            _Repository.AddTransaction(portfolio, id);
-            _Cache.Remove(portfolio.Id);  
-        }
-
-        public IEnumerable<Portfolio> All()
-        {
-            return _Repository.All();
-        }
-
-        public void Delete(Guid id)
-        {
-            _Repository.Delete(id);
-            _Cache.Remove(id);
-        }
-
-        public void DeleteTransaction(Portfolio portfolio, Guid id)
-        {
-            _Repository.DeleteTransaction(portfolio, id);
+            await _Repository.AddTransactionAsync(portfolio, id);
             _Cache.Remove(portfolio.Id);
         }
 
-        public Portfolio Get(Guid id)
+        public IAsyncEnumerable<Portfolio> AllAsync()
         {
-            if (_Cache.TryGetValue(id, out Portfolio entity))
-                return entity;
-
-            try
-            {
-                _Semphore.Wait();
-                if (_Cache.TryGetValue(id, out entity))
-                    return entity;
-
-                entity = _Repository.Get(id);
-                if (entity != null)
-                {
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                            .SetSlidingExpiration(TimeSpan.FromMinutes(5));
-
-                    _Cache.Set(id, entity, cacheEntryOptions);
-                }
-            }
-            finally
-            {
-                _Semphore.Release();
-            }
-
-            return entity;
+            return _Repository.AllAsync();
         }
 
-        public void Update(Portfolio entity)
+        public async Task DeleteAsync(Guid id)
         {
-            _Repository.Update(entity);
+            await _Repository.DeleteAsync(id);
+            _Cache.Remove(id);
+        }
+
+        public async Task DeleteTransactionAsync(Portfolio portfolio, Guid id)
+        {
+            await _Repository.DeleteTransactionAsync(portfolio, id);
+            _Cache.Remove(portfolio.Id);
+        }
+
+        public Task<Portfolio> GetAsync(Guid id)
+        {
+            return _Cache.GetOrCreateAsync<Portfolio>(id, (cacheEntry) =>
+            {
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                return _Repository.GetAsync(id);
+            });
+        }
+
+        public async Task UpdateAsync(Portfolio entity)
+        {
+            await _Repository.UpdateAsync(entity);
             _Cache.Remove(entity.Id);
         }
 
-        public void UpdateTransaction(Portfolio portfolio, Guid id)
+        public async Task UpdateTransactionAsync(Portfolio portfolio, Guid id)
         {
-            _Repository.UpdateTransaction(portfolio, id);
+            await _Repository.UpdateTransactionAsync(portfolio, id);
             _Cache.Remove(portfolio.Id);
         }
     }

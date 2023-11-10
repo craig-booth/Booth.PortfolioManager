@@ -19,7 +19,6 @@ namespace Booth.PortfolioManager.Domain.Portfolios
         IEnumerable<IParcel> Parcels();
         IEnumerable<IParcel> Parcels(Date date);
         IEnumerable<IParcel> Parcels(DateRange dateRange);
-        decimal Value(Date date);
     }
 
     public interface IHolding : IEffectiveEntity, IReadOnlyHolding
@@ -202,14 +201,6 @@ namespace Booth.PortfolioManager.Domain.Portfolios
 
             if (capitalGain > 0)
                 OnCgtEventOccured(date, Stock, holdingProperties.Units, capitalGain, amount, capitalGain, CgtMethod.Discount, transaction);
-        }
-
-        public decimal Value(Date date)
-        {
-            if (EffectivePeriod.Contains(date))
-                return Properties[date].Units * Stock.GetPrice(date);
-            else
-                return 0.00m;
         }
 
         public void AddDrpAccountAmount(Date date, decimal amount)

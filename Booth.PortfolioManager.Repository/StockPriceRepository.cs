@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using MongoDB.Driver;
 using MongoDB.Bson;
@@ -14,10 +13,9 @@ namespace Booth.PortfolioManager.Repository
 {
 
     public interface IStockPriceRepository : IRepository<StockPriceHistory>
-    {
-        void UpdatePrice(StockPriceHistory stockPriceHistory, Date date);
-
-        void UpdatePrices(StockPriceHistory stockPriceHistory, DateRange dateRange);
+    { 
+        Task UpdatePriceAsync(StockPriceHistory stockPriceHistory, Date date);
+        Task UpdatePricesAsync(StockPriceHistory stockPriceHistory, DateRange dateRange);
     }
 
     public class StockPriceRepository : Repository<StockPriceHistory>, IStockPriceRepository
@@ -27,12 +25,12 @@ namespace Booth.PortfolioManager.Repository
         {
         }
 
-        public override void Update(StockPriceHistory entity)
+        public override Task UpdateAsync(StockPriceHistory entity)
         {
             throw new NotSupportedException();
         }
 
-        public void UpdatePrice(StockPriceHistory stockPriceHistory, Date date)
+        public async Task UpdatePriceAsync(StockPriceHistory stockPriceHistory, Date date)
         {
             var removePrice = Builders<BsonDocument>.Update
                 .PullFilter("closingPrices", Builders<BsonDocument>.Filter.Eq("date", date));
@@ -40,14 +38,14 @@ namespace Booth.PortfolioManager.Repository
             var addPrice = Builders<BsonDocument>.Update
                 .Push("closingPrices", new StockPrice(date, stockPriceHistory.GetPrice(date)));
 
-            _Collection.BulkWrite(new[]
+            await _Collection.BulkWriteAsync(new[]
             {
                 new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", stockPriceHistory.Id), removePrice),
                 new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", stockPriceHistory.Id), addPrice),
             }); 
         }
 
-        public void UpdatePrices(StockPriceHistory stockPriceHistory, DateRange dateRange)
+        public async Task UpdatePricesAsync(StockPriceHistory stockPriceHistory, DateRange dateRange)
         {
             var removePrices = Builders<BsonDocument>.Update
                 .PullFilter("closingPrices", Builders<BsonDocument>.Filter.And(new[]
@@ -59,7 +57,7 @@ namespace Booth.PortfolioManager.Repository
             var addPrices = Builders<BsonDocument>.Update
                 .PushEach("closingPrices", stockPriceHistory.GetPrices(dateRange));
 
-            _Collection.BulkWrite(new[]
+            await _Collection.BulkWriteAsync(new[]
             {
                 new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", stockPriceHistory.Id), removePrices),
                 new UpdateOneModel<BsonDocument>(Builders<BsonDocument>.Filter.Eq("_id", stockPriceHistory.Id), addPrices),
