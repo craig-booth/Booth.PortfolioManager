@@ -25,11 +25,11 @@ namespace Booth.PortfolioManager.IntegrationTest
             _DBRunner = MongoDbRunner.Start();
             _ConnectionString = _DBRunner.ConnectionString;
 
-            _DBRunner.Import(_Database, "TradingCalendar", Path.Combine("data", "TradingCalendar.json"), true);
-            _DBRunner.Import(_Database, "Stocks", Path.Combine("data", "Stocks.json"), true);
-            _DBRunner.Import(_Database, "StockPriceHistory", Path.Combine("data", "StockPriceHistory.json"), true);
-            _DBRunner.Import(_Database, "Users", Path.Combine("data", "Users.json"), true);
-            _DBRunner.Import(_Database, "Portfolios", Path.Combine("data", "Portfolios.json"), true);
+            _DBRunner.Import(_Database, "TradingCalendar", Path.Combine("Data", "TradingCalendar.json"), true);
+            _DBRunner.Import(_Database, "Stocks", Path.Combine("Data", "Stocks.json"), true);
+            _DBRunner.Import(_Database, "StockPriceHistory", Path.Combine("Data", "StockPriceHistory.json"), true);
+            _DBRunner.Import(_Database, "Users", Path.Combine("Data", "Users.json"), true);
+            _DBRunner.Import(_Database, "Portfolios", Path.Combine("Data", "Portfolios.json"), true);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
