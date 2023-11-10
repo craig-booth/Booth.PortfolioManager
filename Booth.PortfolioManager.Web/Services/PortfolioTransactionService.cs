@@ -21,9 +21,9 @@ namespace Booth.PortfolioManager.Web.Services
         ServiceResult<TransactionsResponse> GetTransactions(DateRange dateRange);
         ServiceResult<TransactionsResponse> GetTransactions(Guid stockId, DateRange dateRange);
 
-        ServiceResult AddTransaction(Transaction transaction);
-        ServiceResult UpdateTransaction(Guid id, Transaction transaction);
-        ServiceResult DeleteTransaction(Guid id);
+        Task<ServiceResult> AddTransactionAsync(Transaction transaction);
+        Task<ServiceResult> UpdateTransactionAsync(Guid id, Transaction transaction);
+        Task<ServiceResult> DeleteTransactionAsync(Guid id);
     }
     
     public class PortfolioTransactionService : IPortfolioTransactionService
@@ -88,7 +88,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<TransactionsResponse>.Ok(response);
         }
 
-        public ServiceResult AddTransaction(Transaction transaction)
+        public async Task<ServiceResult> AddTransactionAsync(Transaction transaction)
         {
             if (_Portfolio == null)
                 return ServiceResult<TransactionsResponse>.NotFound();
@@ -96,12 +96,12 @@ namespace Booth.PortfolioManager.Web.Services
             var newTransaction = _Mapper.FromApi(transaction);
             _Portfolio.AddTransaction(newTransaction);
 
-            _Repository.AddTransaction((Portfolio)_Portfolio, transaction.Id);
+            await _Repository.AddTransactionAsync((Portfolio)_Portfolio, transaction.Id);
 
             return ServiceResult.Ok();
         }
 
-        public ServiceResult UpdateTransaction(Guid id, Transaction transaction)
+        public async Task<ServiceResult> UpdateTransactionAsync(Guid id, Transaction transaction)
         {
             if (_Portfolio == null)
                 return ServiceResult<TransactionsResponse>.NotFound();
@@ -112,12 +112,12 @@ namespace Booth.PortfolioManager.Web.Services
             var updatedTransaction = _Mapper.FromApi(transaction);
             _Portfolio.UpdateTransaction(updatedTransaction);
 
-            _Repository.UpdateTransaction((Portfolio)_Portfolio, transaction.Id);
+            await _Repository.UpdateTransactionAsync((Portfolio)_Portfolio, transaction.Id);
 
             return ServiceResult.Ok();
         }
 
-        public ServiceResult DeleteTransaction(Guid id)
+        public async Task<ServiceResult> DeleteTransactionAsync(Guid id)
         {
             if (_Portfolio == null)
                 return ServiceResult<TransactionsResponse>.NotFound();
@@ -127,7 +127,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             _Portfolio.DeleteTransaction(id);
 
-            _Repository.DeleteTransaction((Portfolio)_Portfolio, id);
+            await _Repository.DeleteTransactionAsync((Portfolio)_Portfolio, id);
 
             return ServiceResult.Ok();
         }

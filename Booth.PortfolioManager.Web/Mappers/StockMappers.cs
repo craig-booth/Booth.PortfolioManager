@@ -6,54 +6,27 @@ using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.RestApi.Stocks;
 
 namespace Booth.PortfolioManager.Web.Mappers
 {
-    static class StockMappers
+    public interface IStockMapper
     {
+        StockResponse ToResponse(Stock stock, Date date);
+        StockHistoryResponse ToHistoryResponse(Stock stock);
+        StockPriceResponse ToPriceResponse(Stock stock, DateRange dateRange);
+    }
 
-        public static StockResponse ToResponse(this Stock stock, Date date)
+
+    public class StockMapper : IStockMapper
+    {
+        private readonly IStockPriceRetriever _PriceRetreiver;
+        public StockMapper(IStockPriceRetriever priceRetriever)
         {
-            var stockProperties = stock.Properties.ClosestTo(date);
-            var dividendRules = stock.DividendRules.ClosestTo(date);
-
-            var result = new StockResponse()
-            {
-                Id = stock.Id,
-                AsxCode = stockProperties.AsxCode,
-                Name = stockProperties.Name,
-                ListingDate = stock.EffectivePeriod.FromDate,
-                Category = stockProperties.Category.ToResponse(),
-                Trust = stock.Trust,
-                StapledSecurity = false,
-                DelistedDate = stock.EffectivePeriod.ToDate,
-                LastPrice = stock.GetPrice(Date.Today),
-                CompanyTaxRate = dividendRules.CompanyTaxRate,
-                DividendRoundingRule = dividendRules.DividendRoundingRule,
-                DrpActive = dividendRules.DrpActive,
-                DrpMethod = dividendRules.DrpMethod.ToResponse()
-            };
-
-            return result;
+            _PriceRetreiver = priceRetriever;
         }
-
-        public static RestApi.Portfolios.Stock ToSummaryResponse(this IReadOnlyStock stock, Date date)
-        {
-            var stockProperties = stock.Properties.ClosestTo(date);    
-
-            var result = new RestApi.Portfolios.Stock()
-            {
-                Id = stock.Id,
-                AsxCode = stockProperties.AsxCode,
-                Name = stockProperties.Name,
-                Category = stockProperties.Category.ToResponse()
-            };
-
-            return result;
-        }
-
-        public static StockHistoryResponse ToHistoryResponse(this Stock stock)
+        public StockHistoryResponse ToHistoryResponse(Stock stock)
         {
             var stockProperties = stock.Properties.ClosestTo(Date.Today);
 
@@ -75,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return result;
         }
 
-        public static StockPriceResponse ToPriceResponse(this Stock stock, DateRange dateRange)
+        public StockPriceResponse ToPriceResponse(Stock stock, DateRange dateRange)
         {
             var stockProperties = stock.Properties.ClosestTo(dateRange.ToDate);
 
@@ -86,10 +59,54 @@ namespace Booth.PortfolioManager.Web.Mappers
                 Name = stockProperties.Name
             };
 
-            foreach (var price in stock.GetPrices(dateRange))
+            foreach (var price in _PriceRetreiver.GetPrices(stock.Id, dateRange))
                 result.AddClosingPrice(price.Date, price.Price);
 
             return result;
         }
+
+        public StockResponse ToResponse(Stock stock, Date date)
+        {
+            var stockProperties = stock.Properties.ClosestTo(date);
+            var dividendRules = stock.DividendRules.ClosestTo(date);
+
+            var result = new StockResponse()
+            {
+                Id = stock.Id,
+                AsxCode = stockProperties.AsxCode,
+                Name = stockProperties.Name,
+                ListingDate = stock.EffectivePeriod.FromDate,
+                Category = stockProperties.Category.ToResponse(),
+                Trust = stock.Trust,
+                StapledSecurity = false,
+                DelistedDate = stock.EffectivePeriod.ToDate,
+                LastPrice = _PriceRetreiver.GetPrice(stock.Id, Date.Today),
+                CompanyTaxRate = dividendRules.CompanyTaxRate,
+                DividendRoundingRule = dividendRules.DividendRoundingRule,
+                DrpActive = dividendRules.DrpActive,
+                DrpMethod = dividendRules.DrpMethod.ToResponse()
+            };
+
+            return result;
+        }
     }
+
+    public static class StockMapperExtension
+    {
+        public static RestApi.Portfolios.Stock ToSummaryResponse(this IReadOnlyStock stock, Date date)
+        {
+            var stockProperties = stock.Properties.ClosestTo(date);
+
+            var result = new RestApi.Portfolios.Stock()
+            {
+                Id = stock.Id,
+                AsxCode = stockProperties.AsxCode,
+                Name = stockProperties.Name,
+                Category = stockProperties.Category.ToResponse()
+            };
+
+            return result;
+        }
+    }
+
 }

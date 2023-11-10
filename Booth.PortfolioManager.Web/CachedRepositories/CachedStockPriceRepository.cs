@@ -22,18 +22,13 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Cache = cache;
         }
 
-        public void Add(StockPriceHistory entity)
+        public async Task AddAsync(StockPriceHistory entity)
         {
-            _Repository.Add(entity);
+            await _Repository.AddAsync(entity);
             _Cache.Add(entity);
         }
 
-        public Task AddAsync(StockPriceHistory entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<StockPriceHistory> All()
+        public async IAsyncEnumerable<StockPriceHistory> AllAsync()
         {
             // If cache is empty then load it first
             if (_Cache.Count == 0)
@@ -43,8 +38,8 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
                     _Semphore.Wait();
                     if (_Cache.Count == 0)
                     {
-                        var entities = _Repository.All();
-                        foreach (var entity in entities)
+                        var entities = _Repository.AllAsync();
+                        await foreach (var entity in entities)
                             _Cache.Add(entity);
                     }
                 }
@@ -52,41 +47,43 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
                 {
                     _Semphore.Release();
                 }
-
             }
 
-            return _Cache.All();
+            foreach (var entity in _Cache.All())
+                yield return entity;
         }
 
-        public IAsyncEnumerable<StockPriceHistory> AllAsync()
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Delete(Guid id)
-        {
-            _Repository.Delete(id);
+            await _Repository.DeleteAsync(id);
             _Cache.Remove(id);
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task<StockPriceHistory> GetAsync(Guid id)
         {
-            throw new NotImplementedException();
-        }
+            var stockPriceHistory = _Cache.Get(id);
+            if (stockPriceHistory != null)
+                return stockPriceHistory;
 
-        public StockPriceHistory Get(Guid id)
-        {
-            return _Cache.Get(id);
-        }
+            try
+            {
+                _Semphore.Wait();
 
-        public Task<StockPriceHistory> GetAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
+                stockPriceHistory = _Cache.Get(id);
+                if (stockPriceHistory == null)
+                {
 
-        public void Update(StockPriceHistory entity)
-        {
-            throw new NotImplementedException();
+                    stockPriceHistory = await _Repository.GetAsync(id);
+                    if (stockPriceHistory != null)
+                        _Cache.Add(stockPriceHistory);
+                }
+            }
+            finally
+            {
+                _Semphore.Release();
+            }
+
+            return stockPriceHistory;
         }
 
         public Task UpdateAsync(StockPriceHistory entity)
@@ -94,24 +91,14 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             throw new NotImplementedException();
         }
 
-        public void UpdatePrice(StockPriceHistory stockPriceHistory, Date date)
+        public async Task UpdatePriceAsync(StockPriceHistory stockPriceHistory, Date date)
         {
-            _Repository.UpdatePrice(stockPriceHistory, date);
+            await _Repository.UpdatePriceAsync(stockPriceHistory, date);
         }
 
-        public Task UpdatePriceAsync(StockPriceHistory stockPriceHistory, Date date)
+        public async Task UpdatePricesAsync(StockPriceHistory stockPriceHistory, DateRange dateRange)
         {
-            throw new NotImplementedException();
-        }
-
-        public void UpdatePrices(StockPriceHistory stockPriceHistory, DateRange dateRange)
-        {
-            _Repository.UpdatePrices(stockPriceHistory, dateRange);
-        }
-
-        public Task UpdatePricesAsync(StockPriceHistory stockPriceHistory, DateRange dateRange)
-        {
-            throw new NotImplementedException();
+            await _Repository.UpdatePricesAsync(stockPriceHistory, dateRange);
         }
     }
 }

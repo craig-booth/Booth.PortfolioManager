@@ -11,9 +11,9 @@ namespace Booth.PortfolioManager.Web.Services
 {
     public interface ITradingCalendarService
     {
-        ServiceResult<RestApi.TradingCalendars.TradingCalendar> Get(Guid calendarId, int year);
-        ServiceResult Update(Guid calendarId, RestApi.TradingCalendars.TradingCalendar tradingCalendar);
-        ServiceResult SetNonTradingDays(Guid calendarId, int year, IEnumerable<NonTradingDay> nonTradingDays);
+        Task<ServiceResult<RestApi.TradingCalendars.TradingCalendar>> GetAsync(Guid calendarId, int year);
+        Task<ServiceResult> UpdateAsync(Guid calendarId, RestApi.TradingCalendars.TradingCalendar tradingCalendar);
+        Task<ServiceResult> SetNonTradingDaysAsync(Guid calendarId, int year, IEnumerable<NonTradingDay> nonTradingDays);
     }
 
     class TradingCalendarService : ITradingCalendarService
@@ -25,9 +25,9 @@ namespace Booth.PortfolioManager.Web.Services
             _Repository = repository;        
         }
 
-        public ServiceResult<RestApi.TradingCalendars.TradingCalendar> Get(Guid calendarId, int year)
+        public async Task<ServiceResult<RestApi.TradingCalendars.TradingCalendar>> GetAsync(Guid calendarId, int year)
         {
-            var tradingCalendar = _Repository.Get(calendarId);
+            var tradingCalendar = await _Repository.GetAsync(calendarId);
             if (tradingCalendar == null)
                 return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound();
 
@@ -40,22 +40,22 @@ namespace Booth.PortfolioManager.Web.Services
             
             return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(result);
         }
-
-        public ServiceResult Update(Guid calendarId, RestApi.TradingCalendars.TradingCalendar tradingCalendar)
+        
+        public async Task<ServiceResult> UpdateAsync(Guid calendarId, RestApi.TradingCalendars.TradingCalendar tradingCalendar)
         {
             var nonTradingDays = tradingCalendar.NonTradingDays.Select(x => new NonTradingDay(x.Date, x.Description));
 
-            return SetNonTradingDays(calendarId, tradingCalendar.Year, nonTradingDays);
+            return await SetNonTradingDaysAsync(calendarId, tradingCalendar.Year, nonTradingDays);
         }
 
-        public ServiceResult SetNonTradingDays(Guid calendarId, int year, IEnumerable<NonTradingDay> nonTradingDays)
+        public async Task<ServiceResult> SetNonTradingDaysAsync(Guid calendarId, int year, IEnumerable<NonTradingDay> nonTradingDays)
         {
-            var tradingCalendar = _Repository.Get(calendarId);
+            var tradingCalendar = await _Repository.GetAsync(calendarId);
             if (tradingCalendar == null)
                 return ServiceResult.NotFound();
 
             tradingCalendar.SetNonTradingDays(year, nonTradingDays);
-            _Repository.UpdateYear(tradingCalendar, year);
+            await _Repository.UpdateYearAsync(tradingCalendar, year);
 
             return ServiceResult.Ok();
         }

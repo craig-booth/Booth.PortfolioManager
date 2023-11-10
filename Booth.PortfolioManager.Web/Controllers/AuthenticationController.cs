@@ -33,9 +33,9 @@ namespace Booth.PortfolioManager.Web.Controllers
         [AllowAnonymous]
         [Route("authenticate")]
         [HttpPost]
-        public ActionResult<AuthenticationResponse> Authenticate([FromBody] AuthenticationRequest request)
+        public async Task<ActionResult<AuthenticationResponse>> Authenticate([FromBody] AuthenticationRequest request)
         {
-            var result = _UserService.Authenticate(request.UserName, request.Password);
+            var result = await _UserService.AuthenticateAsync(request.UserName, request.Password);
             if (! result.Successful)
                 return Forbid();
 

@@ -16,7 +16,6 @@ namespace Booth.PortfolioManager.Repository
 
     public interface ITradingCalendarRepository : IRepository<TradingCalendar>
     {
-        void UpdateYear(TradingCalendar calendar, int year);
         Task UpdateYearAsync(TradingCalendar calendar, int year);
     }
 
@@ -26,17 +25,13 @@ namespace Booth.PortfolioManager.Repository
             :base(database, "TradingCalendar")
         {
         }
-        public override void Update(TradingCalendar entity)
-        {
-            throw new NotSupportedException();
-        }
 
         public override Task UpdateAsync(TradingCalendar entity)
         {
             throw new NotSupportedException();
         }
 
-        public void UpdateYear(TradingCalendar calendar, int year)
+        public async Task UpdateYearAsync(TradingCalendar calendar, int year)
         {
             var existsFilter = Builders<BsonDocument>.Filter
                 .And(new[]
@@ -64,16 +59,12 @@ namespace Booth.PortfolioManager.Repository
                         { "days", new BsonArray(calendar.NonTradingDays(year).Select(x => x.ToBsonDocument()))},
                 }); 
 
-            _Collection.BulkWrite(new[]
+            await _Collection.BulkWriteAsync(new[]
             {
                 new UpdateOneModel<BsonDocument>(existsFilter, updateYear),
                 new UpdateOneModel<BsonDocument>(notExistsFilter, addYear)
             });  
         }
 
-        public Task UpdateYearAsync(TradingCalendar calendar, int year)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

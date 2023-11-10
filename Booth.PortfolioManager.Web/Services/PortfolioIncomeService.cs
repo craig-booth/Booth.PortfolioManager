@@ -20,10 +20,12 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioIncomeService : IPortfolioIncomeService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IStockMapper _Mapper;
 
-        public PortfolioIncomeService(IReadOnlyPortfolio portfolio)
+        public PortfolioIncomeService(IReadOnlyPortfolio portfolio, IStockMapper mapper)
         {
             _Portfolio = portfolio;
+            _Mapper = mapper;
         }
 
         public ServiceResult<IncomeResponse> GetIncome(DateRange dateRange)

@@ -183,7 +183,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void ChangeDrpParticipationNotFound()
+        public async Task ChangeDrpParticipationNotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -192,7 +192,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var portfolio = mockRepository.Create<Domain.Portfolios.IPortfolio>();
 
             var service = mockRepository.Create<IPortfolioService>();
-            service.Setup(x => x.ChangeDrpParticipation(portfolio.Object, stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.NotFound()).Verifiable();
+            service.Setup(x => x.ChangeDrpParticipationAsync(portfolio.Object, stockId, true)).Returns(Task.FromResult(ServiceResult.NotFound())).Verifiable();
 
             var controller = new HoldingController();
             var command = new ChangeDrpParticipationCommand()
@@ -200,7 +200,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 Holding = stockId,
                 Participate = true
             };
-            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
+            var result = await controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
 
             result.Should().BeNotFoundResult();
 
@@ -208,7 +208,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         }
 
         [Fact]
-        public void ChangeDrpParticipation()
+        public async Task ChangeDrpParticipation()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -217,7 +217,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var portfolio = mockRepository.Create<Domain.Portfolios.IPortfolio>();
 
             var service = mockRepository.Create<IPortfolioService>();
-            service.Setup(x => x.ChangeDrpParticipation(portfolio.Object, stockId, true)).Returns(ServiceResult<PortfolioSummaryResponse>.Ok()).Verifiable();
+            service.Setup(x => x.ChangeDrpParticipationAsync(portfolio.Object, stockId, true)).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new HoldingController();
             var command = new ChangeDrpParticipationCommand()
@@ -225,7 +225,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 Holding = stockId,
                 Participate = true
             };
-            var result = controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
+            var result = await controller.ChangeDrpParticipation(portfolio.Object, service.Object, stockId, command);
 
             result.Should().BeOkResult();
 
@@ -241,7 +241,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, null, null, null);
@@ -260,7 +260,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, null, null, null);
@@ -279,7 +279,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, new DateTime(2000, 01, 01), null, null);
@@ -298,7 +298,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, null, new DateTime(2000, 12, 31), null);
@@ -317,7 +317,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31)), It.IsAny<ValueFrequency>())).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31), null);
@@ -336,7 +336,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Day)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, It.IsAny<DateRange>(), ValueFrequency.Day)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Day);
@@ -355,7 +355,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Week)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, It.IsAny<DateRange>(), ValueFrequency.Week)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Week);
@@ -374,7 +374,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = new PortfolioValueResponse();
 
             var service = mockRepository.Create<IPortfolioValueService>();
-            service.Setup(x => x.GetValue(stockId, It.IsAny<DateRange>(), ValueFrequency.Month)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetValueAsync(stockId, It.IsAny<DateRange>(), ValueFrequency.Month)).Returns(Task.FromResult(ServiceResult<PortfolioValueResponse>.Ok(response))).Verifiable();
 
             var controller = new HoldingController();
             var result = await controller.GetValue(service.Object, stockId, null, null, ValueFrequency.Month);

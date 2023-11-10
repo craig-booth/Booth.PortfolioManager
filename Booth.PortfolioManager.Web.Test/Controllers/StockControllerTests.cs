@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+
 
 using Xunit;
 using Moq;
@@ -14,7 +16,7 @@ using Booth.PortfolioManager.Web.Mappers;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.RestApi.Stocks;
-using System.Linq;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {
@@ -24,7 +26,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         private Guid _ValidationErrorId;
         private Stock _Stock;
 
-        private Mock<IStockPriceHistory> _StockPriceHistory;
+        private Mock<IStockPriceRetriever> _StockPriceRetriever;
         private Mock<IStockQuery> _StockQueryMock;
         private Mock<IStockService> _StockServiceMock;
 
@@ -42,11 +44,11 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _Stock.List("ABC", "ABC Pty Ltd", new Date(2000, 01, 01), false, Domain.Stocks.AssetCategory.AustralianStocks);
             _Stock.ChangeProperties(new Date(2010, 01, 01), "XYZ", "XYZ Pty Ltd", Domain.Stocks.AssetCategory.AustralianStocks);
 
-            _StockPriceHistory = mockRepository.Create<IStockPriceHistory>();
-            _StockPriceHistory.Setup(x => x.GetPrice(Date.Today)).Returns(12.25m);
-            _StockPriceHistory.Setup(x => x.GetPrices(It.IsAny<DateRange>())).Returns<DateRange>(x => DateUtils.Days(x.FromDate, x.ToDate).Select(x => new StockPrice(x, 0.10m)));
+            _StockPriceRetriever = mockRepository.Create<IStockPriceRetriever>();
+            _StockPriceRetriever.Setup(x => x.GetPrice(_Stock.Id, Date.Today)).Returns(12.25m);
+            _StockPriceRetriever.Setup(x => x.GetPrices(_Stock.Id, It.IsAny<DateRange>())).Returns<Guid, DateRange>((id, dateRange) => DateUtils.Days(dateRange.FromDate, dateRange.ToDate).Select(x => new StockPrice(x, 0.10m)));
 
-            _Stock.SetPriceHistory(_StockPriceHistory.Object);
+            var stockMapper = new StockMapper(_StockPriceRetriever.Object);
 
             _StockQueryMock = mockRepository.Create<IStockQuery>();
             _StockQueryMock.Setup(x => x.Get(_MissingStockId)).Returns(default(Stock));
@@ -84,11 +86,11 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockServiceMock.Setup(x => x.UpdateClosingPricesAsync(_ValidationErrorId, It.IsAny<IEnumerable<StockPrice>>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
             _StockServiceMock.Setup(x => x.UpdateClosingPricesAsync(_Stock.Id, It.IsAny<IEnumerable<StockPrice>>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
 
-            _StockServiceMock.Setup(x => x.UpdateCurrentPriceAsync(_MissingStockId, It.IsAny<decimal>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.NotFound()));
-            _StockServiceMock.Setup(x => x.UpdateCurrentPriceAsync(_ValidationErrorId, It.IsAny<decimal>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Error("Dummy Error")));
-            _StockServiceMock.Setup(x => x.UpdateCurrentPriceAsync(_Stock.Id, It.IsAny<decimal>())).Returns(Task.FromResult<ServiceResult>(ServiceResult.Ok()));
+            _StockServiceMock.Setup(x => x.UpdateCurrentPrice(_MissingStockId, It.IsAny<decimal>())).Returns(ServiceResult.NotFound());
+            _StockServiceMock.Setup(x => x.UpdateCurrentPrice(_ValidationErrorId, It.IsAny<decimal>())).Returns(ServiceResult.Error("Dummy Error"));
+            _StockServiceMock.Setup(x => x.UpdateCurrentPrice(_Stock.Id, It.IsAny<decimal>())).Returns(ServiceResult.Ok());
 
-            _Controller = new StockController(_StockServiceMock.Object, _StockQueryMock.Object);
+            _Controller = new StockController(_StockServiceMock.Object, _StockQueryMock.Object, stockMapper);
         }
 
 
@@ -105,7 +107,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(_Stock.Id, null);
 
-            response.Result.Should().BeOkObjectResult().Value.Should().BeEquivalentTo(_Stock.ToResponse(Date.Today));
+            response.Result.Should().BeOkObjectResult().Value.Should().BeEquivalentTo(new
+            {
+                Id = _Stock.Id,
+                AsxCode = "XYZ",
+                Name = "XYZ Pty Ltd",
+                ListingDate = new Date(2000, 01, 01),
+                Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                Trust = false,
+                StapledSecurity = false,
+                DelistedDate = Date.MaxValue,
+                LastPrice = 12.25m,
+                CompanyTaxRate = 0.30m,
+                DividendRoundingRule = RoundingRule.Round,
+                DrpActive = false,
+                DrpMethod = RestApi.Stocks.DrpMethod.Round
+            });
         }
 
         [Fact]
@@ -113,7 +130,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(_Stock.Id, new DateTime(2005, 01, 01));
 
-            response.Result.Should().BeOkObjectResult().Value.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2005, 01, 01)));
+            response.Result.Should().BeOkObjectResult().Value.Should().BeEquivalentTo(new
+            {
+                Id = _Stock.Id,
+                AsxCode = "ABC",
+                Name = "ABC Pty Ltd",
+                ListingDate = new Date(2000, 01, 01),
+                Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                Trust = false,
+                StapledSecurity = false,
+                DelistedDate = Date.MaxValue,
+                LastPrice = 12.25m,
+                CompanyTaxRate = 0.30m,
+                DividendRoundingRule = RoundingRule.Round,
+                DrpActive = false,
+                DrpMethod = RestApi.Stocks.DrpMethod.Round
+            });
         }
 
 
@@ -127,7 +159,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.Today));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -140,7 +187,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2011, 01, 01)));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -153,7 +215,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.MaxValue));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -166,7 +243,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2055, 01, 01)));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -179,7 +271,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2012, 01, 01)));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -200,7 +307,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.Today));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -213,7 +335,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2011, 01, 01)));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -226,7 +363,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(Date.MaxValue));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
         }
 
         [Fact]
@@ -239,7 +391,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2055, 01, 01)));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
 
         }
 
@@ -253,7 +420,22 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
-                .Which.Should().BeEquivalentTo(_Stock.ToResponse(new Date(2012, 01, 01)));
+                .Which.Should().BeEquivalentTo(new
+                {
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Trust = false,
+                    StapledSecurity = false,
+                    DelistedDate = Date.MaxValue,
+                    LastPrice = 12.25m,
+                    CompanyTaxRate = 0.30m,
+                    DividendRoundingRule = RoundingRule.Round,
+                    DrpActive = false,
+                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                });
 
         }
 
@@ -280,8 +462,47 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockHistoryResponse>()
-                .Which.Should().BeEquivalentTo(_Stock.ToHistoryResponse());
+                .Which.Should().BeEquivalentTo(new {
+                
+                    Id = _Stock.Id,
+                    AsxCode = "XYZ",
+                    Name = "XYZ Pty Ltd",
+                    ListingDate = new Date(2000, 01, 01),
+                    DelistedDate = Date.MaxValue,
 
+                    History = new []
+                        {
+                            new StockHistoryResponse.HistoricProperties()
+                            {
+                                FromDate = new Date(2000, 01, 01),
+                                ToDate = new Date(2009, 12, 31),
+                                AsxCode = "ABC",
+                                Name = "ABC Pty Ltd",
+                                Category = RestApi.Stocks.AssetCategory.AustralianStocks
+                            },
+                            new StockHistoryResponse.HistoricProperties()
+                            {
+                                FromDate = new Date(2010, 01, 01),
+                                ToDate = Date.MaxValue,
+                                AsxCode = "XYZ",
+                                Name = "XYZ Pty Ltd",
+                                Category = RestApi.Stocks.AssetCategory.AustralianStocks
+                            }
+                        },
+
+                    DividendRules = new []
+                    {
+                        new StockHistoryResponse.HistoricDividendRules
+                        {
+                            FromDate = new Date(2000, 01, 01),
+                            ToDate = Date.MaxValue,
+                            CompanyTaxRate = 0.30m,
+                            DrpActive = false,
+                            DrpMethod = RestApi.Stocks.DrpMethod.Round,
+                            RoundingRule = RoundingRule.Round
+                        }
+                    }
+                });
         }
 
         [Fact]
@@ -298,11 +519,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, null, null);
 
             var expectedDateRange = new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today);
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
+            _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
-                .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
+                .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2022, 11, 11), Price = 0.10m })
+                .And.EndWith(new ClosingPrice() { Date = Date.Today, Price = 0.10m })
+                .And.HaveCount(365);
         }
 
         [Fact]
@@ -311,11 +534,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, new DateTime(2010, 01, 01), null);
 
             var expectedDateRange = new DateRange(new Date(2010, 01, 01), new Date(2010, 12, 31));
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
+            _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
-                .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
+                .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2010, 01, 01), Price = 0.10m })
+                .And.EndWith(new ClosingPrice() { Date = new Date(2010, 12, 31), Price = 0.10m })
+                .And.HaveCount(365);
         }
 
         [Fact]
@@ -324,11 +549,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, null, new DateTime(2015, 01, 01));
 
             var expectedDateRange = new DateRange(new Date(2014, 01, 02), new Date(2015, 01, 01));
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
+            _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
-                .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
+                .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2014, 01, 02), Price = 0.10m })
+                .And.EndWith(new ClosingPrice() { Date = new Date(2015, 01, 01), Price = 0.10m })
+                .And.HaveCount(365);
         }
 
         [Fact]
@@ -337,11 +564,13 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, new DateTime(2010, 01, 01), new DateTime(2010, 01, 20));
 
             var expectedDateRange = new DateRange(new Date(2010, 01, 01), new Date(2010, 01, 20));
-            _StockPriceHistory.Verify(x => x.GetPrices(expectedDateRange));
+            _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
-                .Which.Should().BeEquivalentTo(_Stock.ToPriceResponse(expectedDateRange));
+                .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2010, 01, 01), Price = 0.10m })
+                .And.EndWith(new ClosingPrice() { Date = new Date(2010, 01, 20), Price = 0.10m })
+                .And.HaveCount(20);
 
         }
 

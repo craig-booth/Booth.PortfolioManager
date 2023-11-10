@@ -24,28 +24,18 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Cache = cache;
         }
 
-        public void Add(Stock entity)
+        public async Task AddAsync(Stock entity)
         {
-            _Repository.Add(entity);
+            await _Repository.AddAsync(entity);
             _Cache.Add(entity);
         }
 
-        public Task AddAsync(Stock entity)
+        public async Task AddCorporateActionAsync(Stock stock, Guid id)
         {
-            throw new NotImplementedException();
+            await _Repository.AddCorporateActionAsync(stock, id);
         }
 
-        public void AddCorporateAction(Stock stock, Guid id)
-        {
-            _Repository.AddCorporateAction(stock, id);
-        }
-
-        public Task AddCorporateActionAsync(Stock stock, Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Stock> All()
+        public async IAsyncEnumerable<Stock> AllAsync()
         {
             // If cache is empty then load it first
             if (_Cache.Count == 0)
@@ -55,8 +45,8 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
                     _Semphore.Wait();
                     if (_Cache.Count == 0)
                     {
-                        var entities = _Repository.All();
-                        foreach (var entity in entities)
+                        var entities = _Repository.AllAsync();
+                        await foreach (var entity in entities)
                             _Cache.Add(entity);
                     }
                 }
@@ -64,41 +54,21 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
                 {
                     _Semphore.Release();
                 }
-
             }
 
-            return _Cache.All();
+            foreach (var entity in _Cache.All())
+                yield return entity;
         }
 
-        public IAsyncEnumerable<Stock> AllAsync()
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public void Delete(Guid id)
-        {
-            _Repository.Delete(id);
+            await _Repository.DeleteAsync(id);
             _Cache.Remove(id);
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteCorporateActionAsync(Stock stock, Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteCorporateAction(Stock stock, Guid id)
-        {
-            _Repository.DeleteCorporateAction(stock, id);
-        }
-
-        public Task DeleteCorporateActionAsync(Stock stock, Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Stock Get(Guid id)
-        {
-            return _Cache.Get(id);
+            await _Repository.DeleteCorporateActionAsync(stock, id);
         }
 
         public Task<Stock> GetAsync(Guid id)
@@ -106,54 +76,29 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             return Task.FromResult<Stock>(_Cache.Get(id));
         }
 
-        public void Update(Stock entity)
+        public async Task UpdateAsync(Stock entity)
         {
-            _Repository.Update(entity);
+            await _Repository.UpdateAsync(entity);
         }
 
-        public Task UpdateAsync(Stock entity)
+        public async Task UpdateCorporateActionAsync(Stock stock, Guid id)
         {
-            throw new NotImplementedException();
+            await _Repository.UpdateCorporateActionAsync(stock, id);
         }
 
-        public void UpdateCorporateAction(Stock stock, Guid id)
+        public async Task UpdateDividendRulesAsync(Stock stock, Date date)
         {
-            _Repository.UpdateCorporateAction(stock, id);
+            await _Repository.UpdateDividendRulesAsync(stock, date);
         }
 
-        public Task UpdateCorporateActionAsync(Stock stock, Guid id)
+        public async Task UpdatePropertiesAsync(Stock stock, Date date)
         {
-            throw new NotImplementedException();
+            await _Repository.UpdatePropertiesAsync(stock, date);
         }
 
-        public void UpdateDividendRules(Stock stock, Date date)
+        public async Task UpdateRelativeNTAsAsync(Stock stock, Date date)
         {
-            _Repository.UpdateDividendRules(stock, date);
-        }
-
-        public Task UpdateDividendRulesAsync(Stock stock, Date date)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateProperties(Stock stock, Date date)
-        {
-            _Repository.UpdateProperties(stock, date);
-        }
-
-        public Task UpdatePropertiesAsync(Stock stock, Date date)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateRelativeNTAs(Stock stock, Date date)
-        {
-            _Repository.UpdateRelativeNTAs(stock, date);
-        }
-
-        public Task UpdateRelativeNTAsAsync(Stock stock, Date date)
-        {
-            throw new NotImplementedException();
+            await _Repository.UpdateRelativeNTAsAsync(stock, date);
         }
     }
 }

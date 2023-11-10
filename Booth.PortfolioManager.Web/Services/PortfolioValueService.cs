@@ -17,22 +17,24 @@ namespace Booth.PortfolioManager.Web.Services
 
     public interface IPortfolioValueService
     {
-        Task<ServiceResult<PortfolioValueResponse>> GetValue(DateRange dateRange, ValueFrequency frequency);
-        Task<ServiceResult<PortfolioValueResponse>> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency);
+        Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(DateRange dateRange, ValueFrequency frequency);
+        Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(Guid stockId, DateRange dateRange, ValueFrequency frequency);
     }
 
     public class PortfolioValueService : IPortfolioValueService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
         private readonly ITradingCalendarRepository _TradingCalendarRepository;
+        private readonly IStockPriceRetriever _PriceRetriever;
 
-        public PortfolioValueService(IReadOnlyPortfolio portfolio, ITradingCalendarRepository tradingCalendarRepository)
+        public PortfolioValueService(IReadOnlyPortfolio portfolio, ITradingCalendarRepository tradingCalendarRepository, IStockPriceRetriever priceRetriever)
         {
             _Portfolio = portfolio;
             _TradingCalendarRepository = tradingCalendarRepository;
+            _PriceRetriever = priceRetriever;
         }
  
-        public async Task<ServiceResult<PortfolioValueResponse>> GetValue(DateRange dateRange, ValueFrequency frequency)
+        public async Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(DateRange dateRange, ValueFrequency frequency)
         {
             if (_Portfolio == null)
                 return ServiceResult<PortfolioValueResponse>.NotFound();
@@ -54,7 +56,7 @@ namespace Booth.PortfolioManager.Web.Services
 
                 // Add holding values
                 foreach (var holding in holdings)
-                    amount += holding.Value(date);
+                    amount += GetValue(holding, date);
 
                 // Add cash account balances
                 if (date > closingBalanceEnumerator.Current.EffectivePeriod.ToDate)
@@ -73,7 +75,7 @@ namespace Booth.PortfolioManager.Web.Services
             return ServiceResult<PortfolioValueResponse>.Ok(response);
         }
 
-        public async Task<ServiceResult<PortfolioValueResponse>> GetValue(Guid stockId, DateRange dateRange, ValueFrequency frequency)
+        public async Task<ServiceResult<PortfolioValueResponse>> GetValueAsync(Guid stockId, DateRange dateRange, ValueFrequency frequency)
         {
             if (_Portfolio == null)
                 return ServiceResult<PortfolioValueResponse>.NotFound();
@@ -92,7 +94,7 @@ namespace Booth.PortfolioManager.Web.Services
                 var value = new ClosingPrice()
                 {
                     Date = date,
-                    Price = holding.Value(date)
+                    Price = GetValue(holding, date)
                 };
 
                 response.Values.Add(value);
@@ -129,6 +131,11 @@ namespace Booth.PortfolioManager.Web.Services
 
             if (lastDate < lastRequestedDate)
                 yield return lastRequestedDate;
+        }
+
+        private decimal GetValue(IReadOnlyHolding holding, Date date)
+        {
+            return _PriceRetriever.GetPrice(holding.Stock.Id, date) * holding.Properties[date].Units;
         }
 
     } 

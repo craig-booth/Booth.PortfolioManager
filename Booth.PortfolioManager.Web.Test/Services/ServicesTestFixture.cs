@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 using Xunit;
 using Moq;
@@ -11,7 +12,7 @@ using Booth.PortfolioManager.Domain.CorporateActions;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Repository;
-
+using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -20,6 +21,13 @@ namespace Booth.PortfolioManager.Web.Test.Services
         public IStockResolver StockResolver;
         public IPortfolioFactory PortfolioFactory;
         public ITradingCalendarRepository TradingCalendarRepository;
+
+        private StockPriceRetriever_ _StockPriceRetriever;
+        public IStockPriceRetriever StockPriceRetriever => _StockPriceRetriever;
+
+        public IStockMapper StockMapper;
+        public ITransactionMapper TransactionMapper;
+        public IHoldingMapper HoldingMapper;
 
         public RestApi.Portfolios.Stock Stock_ARG;
         public RestApi.Portfolios.Stock Stock_WAM; 
@@ -40,9 +48,14 @@ namespace Booth.PortfolioManager.Web.Test.Services
             tradingCalendarRepository.Setup(x => x.GetAsync(TradingCalendarIds.ASX)).Returns(Task.FromResult<TradingCalendar>(new TradingCalendar(TradingCalendarIds.ASX)));
             TradingCalendarRepository = tradingCalendarRepository.Object;
 
+            _StockPriceRetriever = new StockPriceRetriever_();
+
+            StockMapper = new StockMapper(StockPriceRetriever);
+            TransactionMapper = new TransactionMapper(StockResolver);
+            HoldingMapper = new HoldingMapper(StockPriceRetriever);
+
             Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
             Stock_WAM = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
-
 
             var arg = new Stock(Stock_ARG.Id);
             arg.List(Stock_ARG.AsxCode, Stock_ARG.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
@@ -51,7 +64,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             arg.CorporateActions.Add(new CapitalReturn(ARG_CapitalReturn, arg, new Date(2001, 01, 01), "ARG Capital Return", new Date(2001, 01, 02), 10.00m));
 
             var argStockPrice = new StockPriceHistory(arg.Id);
-            arg.SetPriceHistory(argStockPrice);
             argStockPrice.UpdateClosingPrice(new Date(2000, 01, 01), 1.00m);
             argStockPrice.UpdateClosingPrice(new Date(2000, 01, 03), 1.01m);
             argStockPrice.UpdateClosingPrice(new Date(2000, 01, 04), 1.00m);
@@ -75,6 +87,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             argStockPrice.UpdateClosingPrice(new Date(2007, 01, 02), 0.90m);
             argStockPrice.UpdateClosingPrice(new Date(2009, 01, 02), 1.70m);
             argStockPrice.UpdateClosingPrice(new Date(2010, 01, 01), 2.00m);
+            _StockPriceRetriever.StockPrices.Add(Stock_ARG.Id, argStockPrice);
 
             var wam = new Stock(Stock_WAM.Id);
             wam.List(Stock_WAM.AsxCode, Stock_WAM.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);
@@ -83,7 +96,6 @@ namespace Booth.PortfolioManager.Web.Test.Services
             wam.CorporateActions.Add(new SplitConsolidation(WAM_Split, wam, new Date(2002, 01, 01), "WAM Split", 1, 2));
 
             var wamStockPrice = new StockPriceHistory(wam.Id);
-            wam.SetPriceHistory(wamStockPrice);
             wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 01), 1.20m);
             wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 03), 1.21m);
             wamStockPrice.UpdateClosingPrice(new Date(2000, 01, 04), 1.20m);
@@ -108,6 +120,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             wamStockPrice.UpdateClosingPrice(new Date(2007, 01, 02), 0.90m);
             wamStockPrice.UpdateClosingPrice(new Date(2009, 01, 02), 1.30m);
             wamStockPrice.UpdateClosingPrice(new Date(2010, 01, 01), 1.50m);
+            _StockPriceRetriever.StockPrices.Add(Stock_WAM.Id, wamStockPrice);
         }
 
         public Portfolio CreateEmptyPortfolio()
@@ -140,6 +153,28 @@ namespace Booth.PortfolioManager.Web.Test.Services
             portfolio.MakeCashTransaction(new Date(2009, 01, 01), Domain.Transactions.BankAccountTransactionType.Deposit, 500m, "", Guid.NewGuid());
 
             return portfolio;
+        }
+
+        private class StockPriceRetriever_ : IStockPriceRetriever
+        {
+            public Dictionary<Guid, IStockPriceHistory> StockPrices { get; } = new Dictionary<Guid, IStockPriceHistory>();
+            public StockPrice GetLatestPrice(Guid stock)
+            {
+                var prices = StockPrices[stock];
+                return new StockPrice(prices.LatestDate, prices.GetPrice(prices.LatestDate));
+            }
+
+            public decimal GetPrice(Guid stock, Date date)
+            {
+                var prices = StockPrices[stock];
+                return prices.GetPrice(date);
+            }
+
+            public IEnumerable<StockPrice> GetPrices(Guid stock, DateRange dateRange)
+            {
+                var prices = StockPrices[stock];
+                return prices.GetPrices(dateRange);
+            }
         }
     }
 

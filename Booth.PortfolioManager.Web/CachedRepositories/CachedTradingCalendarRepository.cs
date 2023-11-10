@@ -22,19 +22,9 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Cache = cache;
         }
 
-        public void Add(TradingCalendar entity)
+        public async Task AddAsync(TradingCalendar entity)
         {
-            _Repository.Add(entity);          
-        }
-
-        public Task AddAsync(TradingCalendar entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<TradingCalendar> All()
-        {
-            throw new NotImplementedException();
+            await _Repository.AddAsync(entity);
         }
 
         public IAsyncEnumerable<TradingCalendar> AllAsync()
@@ -42,20 +32,10 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             throw new NotImplementedException();
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            _Repository.Delete(id);
+            await _Repository.DeleteAsync(id);
             _Cache.Remove(id);
-        }
-
-        public Task DeleteAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TradingCalendar Get(Guid id)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<TradingCalendar> GetAsync(Guid id)
@@ -67,27 +47,16 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             });
         }
 
-        public void Update(TradingCalendar entity)
+        public async Task UpdateAsync(TradingCalendar entity)
         {
-            _Repository.Update(entity);
+            await _Repository.UpdateAsync(entity);
             _Cache.Remove(entity.Id);
-
         }
 
-        public Task UpdateAsync(TradingCalendar entity)
+        public async Task UpdateYearAsync(TradingCalendar calendar, int year)
         {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateYear(TradingCalendar calendar, int year)
-        {
-            _Repository.UpdateYear(calendar, year);
+            await _Repository.UpdateYearAsync(calendar, year);
             _Cache.Remove(calendar.Id);
-        }
-
-        public Task UpdateYearAsync(TradingCalendar calendar, int year)
-        {
-            throw new NotImplementedException();
         }
     }
 }

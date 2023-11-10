@@ -88,6 +88,8 @@ namespace Booth.PortfolioManager.Web
 
 
             //Mappers
+            services.AddScoped<IHoldingMapper, HoldingMapper>();
+            services.AddScoped<IStockMapper, StockMapper>();
             services.AddScoped<ICorporateActionMapper, CorporateActionMapper>();
             services.AddScoped<ITransactionMapper, TransactionMapper>();
 
@@ -99,6 +101,8 @@ namespace Booth.PortfolioManager.Web
             services.AddScoped<IPortfolioFactory, PortfolioFactory>();
             services.AddScoped<IStockResolver, StockResolver>();
             services.AddScoped<IStockQuery, StockQuery>();
+            services.AddScoped<IStockPriceRetriever, StockPriceRetriever>();
+            services.AddScoped<IPortfolioReturnCalculator, IrrReturnCalculator>();
 
             return services;
         }
@@ -107,7 +111,8 @@ namespace Booth.PortfolioManager.Web
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                InitializeStockCache(scope.ServiceProvider);
+                var task = InitializeStockCache(scope.ServiceProvider);
+                task.Wait();
             }
 
             return app;
@@ -127,26 +132,18 @@ namespace Booth.PortfolioManager.Web
             return services;
         }
 
-        private static void InitializeStockCache(IServiceProvider serviceProvider)
+        private static async Task InitializeStockCache(IServiceProvider serviceProvider)
         {
             // Load all entities from the repositories
             var stockRepository = serviceProvider.GetRequiredService<IStockRepository>();
             var stockCache = serviceProvider.GetRequiredService<IEntityCache<Stock>>();
             stockCache.Clear();
-            stockRepository.All();
+            var allStocks = await stockRepository.AllAsync().ToListAsync();
 
             var stockPriceRepository = serviceProvider.GetRequiredService<IStockPriceRepository>();
             var stockPriceHistoryCache = serviceProvider.GetRequiredService<IEntityCache<StockPriceHistory>>();
             stockPriceHistoryCache.Clear();
-            stockPriceRepository.All();
-
-            // Hook up stock prices to stocks
-            foreach (var stock in stockCache.All())
-            {
-                var stockPriceHistory = stockPriceHistoryCache.Get(stock.Id);
-                if (stockPriceHistory != null)
-                    stock.SetPriceHistory(stockPriceHistory);
-            }
+            var allPrices = await stockPriceRepository.AllAsync().ToListAsync();
         }
 
         private static void AddJwtAuthetication(this IServiceCollection services, IJwtTokenConfigurationProvider jwtTokenConfigProvider)

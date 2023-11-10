@@ -13,7 +13,6 @@ namespace Booth.PortfolioManager.Repository
 
     public interface IUserRepository : IRepository<User>
     {
-        User GetUserByUserName(string userName);
         Task<User> GetUserByUserNameAsync(string userName);
     }
 
@@ -25,14 +24,9 @@ namespace Booth.PortfolioManager.Repository
 
         }
 
-        public User GetUserByUserName(string userName)
+        public async Task<User> GetUserByUserNameAsync(string userName)
         {
-            return FindFirst("userName", userName);
-        }
-
-        public Task<User> GetUserByUserNameAsync(string userName)
-        {
-            throw new NotImplementedException();
+            return await FindFirstAsync("userName", userName);
         }
     }
 }

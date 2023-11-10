@@ -22,13 +22,13 @@ namespace Booth.PortfolioManager.Web.Controllers
         // POST :
         [Authorize(Policy.CanCreatePortfolio)]
         [HttpPost]
-        public ActionResult CreatePortfolio([FromServices] IPortfolioService service, [FromBody] CreatePortfolioCommand command)
+        public async Task<ActionResult> CreatePortfolio([FromServices] IPortfolioService service, [FromBody] CreatePortfolioCommand command)
         {
             // Retreive the authenticated user
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             var userId = new Guid(userIdClaim.Value);
 
-            var result = service.CreatePortfolio(command.Id, command.Name, userId);
+            var result = await service.CreatePortfolioAsync(command.Id, command.Name, userId);
 
             return result.ToActionResult();
         }

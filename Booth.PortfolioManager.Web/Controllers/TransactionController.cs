@@ -27,27 +27,27 @@ namespace Booth.PortfolioManager.Web.Controllers
 
         // POST: transactions
         [HttpPost]
-        public ActionResult AddTransaction([FromServices] IPortfolioTransactionService service, [FromBody]Transaction transaction)
+        public async Task<ActionResult> AddTransaction([FromServices] IPortfolioTransactionService service, [FromBody]Transaction transaction)
         {
-            var result = service.AddTransaction(transaction);
+            var result = await service.AddTransactionAsync(transaction);
 
             return result.ToActionResult();
         }
 
         // POST: transactions/id
         [HttpPost("{id:guid}")]
-        public ActionResult UpdateTransaction([FromServices] IPortfolioTransactionService service, Guid id, [FromBody] Transaction transaction)
+        public async Task<ActionResult> UpdateTransaction([FromServices] IPortfolioTransactionService service, Guid id, [FromBody] Transaction transaction)
         {
-            var result = service.UpdateTransaction(id, transaction);
+            var result = await service.UpdateTransactionAsync(id, transaction);
 
             return result.ToActionResult();
         }
 
         // DELETE: transactions/id
         [HttpDelete("{id:guid}")]
-        public ActionResult DeleteTransaction([FromServices] IPortfolioTransactionService service, Guid id)
+        public async Task<ActionResult> DeleteTransaction([FromServices] IPortfolioTransactionService service, Guid id)
         {
-            var result = service.DeleteTransaction(id);
+            var result = await service.DeleteTransactionAsync(id);
 
             return result.ToActionResult();
         }

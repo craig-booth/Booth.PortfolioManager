@@ -660,60 +660,6 @@ namespace Booth.PortfolioManager.Domain.Test.Portfolios
         }
 
         [Fact]
-        public void GetValueNoParcels()
-        {
-            var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
-
-            var holding = new Holding(stock, new Date(2000, 01, 01));
-
-            var value = holding.Value(new Date(2001, 01, 01));
-
-            value.Should().Be(0.00m);
-        }
-
-        [Fact]
-        public void GetValueSingleParcel()
-        {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var priceHistory = mockRepository.Create<IStockPriceHistory>();
-            priceHistory.Setup(x => x.GetPrice(new Date(2001, 01, 01))).Returns(10.00m).Verifiable();
-
-            var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
-            stock.SetPriceHistory(priceHistory.Object);
-
-            var holding = new Holding(stock, new Date(2000, 01, 01));
-            holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
-
-            var value = holding.Value(new Date(2001, 01, 01));
-
-            value.Should().Be(1000.00m);
-        }
-
-        [Fact]
-        public void GetValueMultipleParcels()
-        {
-            var mockRepository = new MockRepository(MockBehavior.Strict);
-
-            var priceHistory = mockRepository.Create<IStockPriceHistory>();
-            priceHistory.Setup(x => x.GetPrice(new Date(2001, 01, 01))).Returns(10.00m).Verifiable();
-
-            var stock = new Stock(Guid.NewGuid());
-            stock.List("ABC", "ABC Pty Ltd", new Date(1974, 01, 01), false, AssetCategory.AustralianStocks);
-            stock.SetPriceHistory(priceHistory.Object);
-
-            var holding = new Holding(stock, new Date(2000, 01, 01));
-            holding.AddParcel(new Date(2000, 01, 01), new Date(2000, 01, 01), 100, 1000.00m, 1200.00m, null);
-            holding.AddParcel(new Date(2001, 01, 01), new Date(2001, 01, 01), 200, 2000.00m, 2200.00m, null);
-
-            var value = holding.Value(new Date(2001, 01, 01));
-
-            value.Should().Be(3000.00m);
-        }
-
-        [Fact]
         public void ChangeDrpParticipation()
         {
             var stock = new Stock(Guid.NewGuid());

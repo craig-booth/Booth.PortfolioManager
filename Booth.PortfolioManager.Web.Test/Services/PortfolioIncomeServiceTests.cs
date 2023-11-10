@@ -26,7 +26,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var dateRange = new DateRange(new Date(2000, 01, 01), new Date(2000, 12, 31));
 
-            var service = new PortfolioIncomeService(null);
+            var service = new PortfolioIncomeService(null, _Fixture.StockMapper);
 
             var result = service.GetIncome(dateRange);
 
@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioIncomeService(portfolio);
+            var service = new PortfolioIncomeService(portfolio, _Fixture.StockMapper);
 
             var result = service.GetIncome(dateRange);
 

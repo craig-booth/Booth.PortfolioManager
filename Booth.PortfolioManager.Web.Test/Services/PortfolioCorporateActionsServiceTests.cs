@@ -31,7 +31,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioCorporateActionsService(null, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
+            var service = new PortfolioCorporateActionsService(null, _Fixture.StockResolver, _Fixture.TransactionMapper, _Fixture.StockMapper);
 
             var result = service.GetCorporateActions();
 
@@ -43,7 +43,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, _Fixture.TransactionMapper, _Fixture.StockMapper);
 
             var result = service.GetCorporateActions();
 
@@ -64,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, _Fixture.TransactionMapper, _Fixture.StockMapper);
 
             var result = service.GetCorporateActions(Guid.NewGuid());
 
@@ -76,7 +76,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, _Fixture.TransactionMapper, _Fixture.StockMapper);
 
             var result = service.GetCorporateActions(_Fixture.Stock_WAM.Id);
 
@@ -96,7 +96,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, _Fixture.TransactionMapper, _Fixture.StockMapper);
 
             var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
 
@@ -108,7 +108,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, _Fixture.TransactionMapper, _Fixture.StockMapper);
 
             var result = service.GetTransactionsForCorporateAction(Guid.NewGuid(), Guid.NewGuid());
 
@@ -120,7 +120,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, new TransactionMapper(_Fixture.StockResolver));
+            var service = new PortfolioCorporateActionsService(portfolio, _Fixture.StockResolver, _Fixture.TransactionMapper, _Fixture.StockMapper);
 
             var result = service.GetTransactionsForCorporateAction(_Fixture.Stock_WAM.Id, _Fixture.WAM_Split);
 

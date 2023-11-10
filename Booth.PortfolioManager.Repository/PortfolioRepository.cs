@@ -20,9 +20,6 @@ namespace Booth.PortfolioManager.Repository
 {
     public interface IPortfolioRepository : IRepository<Portfolio>
     {
-        void AddTransaction(Portfolio portfolio, Guid id);
-        void DeleteTransaction(Portfolio portfolio, Guid id);
-        void UpdateTransaction(Portfolio portfolio, Guid id);
         Task AddTransactionAsync(Portfolio portfolio, Guid id);
         Task DeleteTransactionAsync(Portfolio portfolio, Guid id);
         Task UpdateTransactionAsync(Portfolio portfolio, Guid id);
@@ -36,7 +33,7 @@ namespace Booth.PortfolioManager.Repository
         {
         }
 
-        public override void Update(Portfolio entity)
+        public override async Task UpdateAsync(Portfolio entity)
         {
             var drpHoldings = entity.Holdings.All().Where(x => x.Settings.ParticipateInDrp).Select(x => x.Id).ToArray();
 
@@ -45,43 +42,29 @@ namespace Booth.PortfolioManager.Repository
             .Set("owner", entity.Owner)
             .Set("participateInDrp", drpHoldings);
 
-            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
+            await _Collection.UpdateOneAsync(Builders<BsonDocument>.Filter.Eq("_id", entity.Id), bson);
         }
 
-        public override Task UpdateAsync(Portfolio entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddTransaction(Portfolio portfolio, Guid id)
+        public async Task AddTransactionAsync(Portfolio portfolio, Guid id)
         {
             var transaction = portfolio.Transactions[id];
 
             var addValue = Builders<BsonDocument>.Update
                 .Push("transactions", transaction);
 
-            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), addValue); 
+            await _Collection.UpdateOneAsync(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), addValue);
         }
 
-        public Task AddTransactionAsync(Portfolio portfolio, Guid id)
-        { 
-            throw new NotImplementedException();
-        }
 
-        public void DeleteTransaction(Portfolio portfolio, Guid id)
+        public async Task DeleteTransactionAsync(Portfolio portfolio, Guid id)
         {
             var updateValue = Builders<BsonDocument>.Update
                 .PullFilter("transactions", Builders<BsonDocument>.Filter.Eq("_id", id));
 
-            _Collection.UpdateOne(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), updateValue);
+            await _Collection.UpdateOneAsync(Builders<BsonDocument>.Filter.Eq("_id", portfolio.Id), updateValue);
         }
 
-        public Task DeleteTransactionAsync(Portfolio portfolio, Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateTransaction(Portfolio portfolio, Guid id)
+        public async Task UpdateTransactionAsync(Portfolio portfolio, Guid id)
         {
             var transaction = portfolio.Transactions[id];
 
@@ -91,12 +74,7 @@ namespace Booth.PortfolioManager.Repository
             var updateValue = Builders<BsonDocument>.Update
                 .Set("transactions.$", transaction);
 
-            _Collection.UpdateOne(filter, updateValue); 
-        }
-
-        public Task UpdateTransactionAsync(Portfolio portfolio, Guid id)
-        {
-            throw new NotImplementedException();
+            await _Collection.UpdateOneAsync(filter, updateValue);
         }
     }
 }

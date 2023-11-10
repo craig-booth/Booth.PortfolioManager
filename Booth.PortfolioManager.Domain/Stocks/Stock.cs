@@ -19,9 +19,6 @@ namespace Booth.PortfolioManager.Domain.Stocks
         IEffectiveProperties<DividendRules> DividendRules { get; }
         IEffectiveProperties<StockProperties> Properties { get; }
         bool Trust { get; }
-        Date DateOfLastestPrice();
-        decimal GetPrice(Date date);
-        IEnumerable<StockPrice> GetPrices(DateRange dateRange);
         string ToString();
     }
 
@@ -32,13 +29,10 @@ namespace Booth.PortfolioManager.Domain.Stocks
         void ChangeProperties(Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory);
         void DeList(Date date);
         void List(string asxCode, string name, Date date, bool trust, AssetCategory category);
-        void SetPriceHistory(IStockPriceHistory stockPriceHistory);
     }
 
     public class Stock : EffectiveEntity, IEntity, IStock, IReadOnlyStock
     {
-        private IStockPriceHistory _StockPriceHistory;
-
         public bool Trust { get; private set; }
 
         protected EffectiveProperties<StockProperties> _Properties = new EffectiveProperties<StockProperties>();
@@ -64,11 +58,6 @@ namespace Booth.PortfolioManager.Domain.Stocks
             return String.Format("{0} - {1}", properties.AsxCode, properties.Name);
         }
 
-        public void SetPriceHistory(IStockPriceHistory stockPriceHistory)
-        {
-            _StockPriceHistory = stockPriceHistory;
-        }
-
         public virtual void List(string asxCode, string name, Date date, bool trust, AssetCategory category)
         {
             if ((date <= Date.MinValue) || (date >= Date.MaxValue))
@@ -91,30 +80,6 @@ namespace Booth.PortfolioManager.Domain.Stocks
             _DividendRules.End(date);
 
             End(date);
-        }
-
-        public decimal GetPrice(Date date)
-        {
-            if (_StockPriceHistory != null)
-                return _StockPriceHistory.GetPrice(date);
-            else
-                return 0.00m;
-        }
-
-        public IEnumerable<StockPrice> GetPrices(DateRange dateRange)
-        {
-            if (_StockPriceHistory != null)
-                return _StockPriceHistory.GetPrices(dateRange);
-            else
-                return new StockPrice[0];
-        }
-
-        public Date DateOfLastestPrice()
-        {
-            if (_StockPriceHistory != null)
-                return _StockPriceHistory.LatestDate;
-            else
-                return Date.MinValue;
         }
 
         public void ChangeProperties(Date changeDate, string newAsxCode, string newName, AssetCategory newAssetCategory)

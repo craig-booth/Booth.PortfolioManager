@@ -21,13 +21,15 @@ namespace Booth.PortfolioManager.Web.Controllers
     [Route("api/stocks")]
     public class StockController : ControllerBase
     {
-        private readonly  IStockService _StockService;
+        private readonly IStockService _StockService;
         private readonly IStockQuery _StockQuery;
+        private readonly IStockMapper _Mapper;
 
-        public StockController(IStockService stockService, IStockQuery stockQuery)
+        public StockController(IStockService stockService, IStockQuery stockQuery, IStockMapper mapper)
         {
             _StockService = stockService;
             _StockQuery = stockQuery;
+            _Mapper = mapper;
         }
 
         // GET: api/stocks
@@ -81,7 +83,7 @@ namespace Booth.PortfolioManager.Web.Controllers
                 }
             } 
 
-            return Ok(stocks.Select(x => x.ToResponse(resultDate)).ToList()); 
+            return Ok(stocks.Select(x => _Mapper.ToResponse(x, resultDate)).ToList()); 
         }
 
         // GET: api/stocks/{id}
@@ -99,7 +101,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             else
                 requestedDate = Date.Today;
 
-            return Ok(stock.ToResponse(requestedDate));
+            return Ok(_Mapper.ToResponse(stock, requestedDate));
         }
 
         // GET : /api/stocks/{id}/history
@@ -111,7 +113,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             if (stock == null)
                 return NotFound();
 
-           return Ok(stock.ToHistoryResponse()); 
+           return Ok(_Mapper.ToHistoryResponse(stock)); 
         }
 
         // GET : /api/stocks/{id}/closingprices
@@ -133,7 +135,7 @@ namespace Booth.PortfolioManager.Web.Controllers
             else
                 dateRange = new DateRange(new Date(fromDate!.Value), new Date(toDate!.Value));
 
-            return Ok(stock.ToPriceResponse(dateRange)); 
+            return Ok(_Mapper.ToPriceResponse(stock, dateRange)); 
         }
 
         // POST : /api/stocks

@@ -20,62 +20,32 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             _Cache = cache;
         }
 
-        public void Add(Portfolio entity)
+        public async Task AddAsync(Portfolio entity)
         {
-            _Repository.Add(entity);
+            await _Repository.AddAsync(entity);
         }
 
-        public Task AddAsync(Portfolio entity)
+        public async Task AddTransactionAsync(Portfolio portfolio, Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public void AddTransaction(Portfolio portfolio, Guid id)
-        {
-            _Repository.AddTransaction(portfolio, id);
-            _Cache.Remove(portfolio.Id);  
-        }
-
-        public Task AddTransactionAsync(Portfolio portfolio, Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Portfolio> All()
-        {
-            return _Repository.All();
+            await _Repository.AddTransactionAsync(portfolio, id);
+            _Cache.Remove(portfolio.Id);
         }
 
         public IAsyncEnumerable<Portfolio> AllAsync()
         {
-            throw new NotImplementedException();
+            return _Repository.AllAsync();
         }
 
-        public void Delete(Guid id)
+        public async Task DeleteAsync(Guid id)
         {
-            _Repository.Delete(id);
+            await _Repository.DeleteAsync(id);
             _Cache.Remove(id);
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task DeleteTransactionAsync(Portfolio portfolio, Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public void DeleteTransaction(Portfolio portfolio, Guid id)
-        {
-            _Repository.DeleteTransaction(portfolio, id);
+            await _Repository.DeleteTransactionAsync(portfolio, id);
             _Cache.Remove(portfolio.Id);
-        }
-
-        public Task DeleteTransactionAsync(Portfolio portfolio, Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Portfolio Get(Guid id)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<Portfolio> GetAsync(Guid id)
@@ -87,26 +57,16 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             });
         }
 
-        public void Update(Portfolio entity)
+        public async Task UpdateAsync(Portfolio entity)
         {
-            _Repository.Update(entity);
+            await _Repository.UpdateAsync(entity);
             _Cache.Remove(entity.Id);
         }
 
-        public Task UpdateAsync(Portfolio entity)
+        public async Task UpdateTransactionAsync(Portfolio portfolio, Guid id)
         {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateTransaction(Portfolio portfolio, Guid id)
-        {
-            _Repository.UpdateTransaction(portfolio, id);
+            await _Repository.UpdateTransactionAsync(portfolio, id);
             _Cache.Remove(portfolio.Id);
-        }
-
-        public Task UpdateTransactionAsync(Portfolio portfolio, Guid id)
-        {
-            throw new NotImplementedException();
         }
     }
 }

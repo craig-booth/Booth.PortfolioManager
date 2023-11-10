@@ -27,7 +27,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public void PortfolioNotFound()
         {
-            var service = new PortfolioSummaryService(null);
+            var service = new PortfolioSummaryService(null, new IrrReturnCalculator(_Fixture.StockPriceRetriever), _Fixture.HoldingMapper);
 
             var result = service.GetSummary(new Date(2000, 01, 01));
 
@@ -39,7 +39,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         {
             var portfolio = _Fixture.CreateDefaultPortfolio();
 
-            var service = new PortfolioSummaryService(portfolio);
+            var service = new PortfolioSummaryService(portfolio, new IrrReturnCalculator(_Fixture.StockPriceRetriever), _Fixture.HoldingMapper);
 
             var result = service.GetSummary(new Date(2010, 01, 01));
 

@@ -21,10 +21,12 @@ namespace Booth.PortfolioManager.Web.Services
     public class PortfolioPerformanceService : IPortfolioPerformanceService
     {
         private readonly IReadOnlyPortfolio _Portfolio;
+        private readonly IStockPriceRetriever _PriceRetriever;
 
-        public PortfolioPerformanceService(IReadOnlyPortfolio portfolio)
+        public PortfolioPerformanceService(IReadOnlyPortfolio portfolio, IStockPriceRetriever priceRetriever)
         {
             _Portfolio = portfolio;
+            _PriceRetriever = priceRetriever;   
         }
 
         public ServiceResult<PortfolioPerformanceResponse> GetPerformance(DateRange dateRange)
@@ -49,7 +51,7 @@ namespace Booth.PortfolioManager.Web.Services
             {
                 workItem = new HoldingPerformanceWorkItem(holding.Stock.ToSummaryResponse(dateRange.FromDate));
 
-                var value = holding.Value(dateRange.FromDate);
+                var value = GetValue(holding, dateRange.FromDate);
 
                 workItem.HoldingPerformance.OpeningBalance = value;
                 workItem.StartDate = dateRange.FromDate;
@@ -136,7 +138,7 @@ namespace Booth.PortfolioManager.Web.Services
                 else
                 {
                     // Holding still held at period end
-                    var value = holding.Value(dateRange.ToDate);
+                    var value = GetValue(holding, dateRange.ToDate);
                     item.HoldingPerformance.ClosingBalance = value;
 
                     item.EndDate = dateRange.ToDate;
@@ -165,14 +167,19 @@ namespace Booth.PortfolioManager.Web.Services
             response.Fees = cashTransactions.Where(x => x.Type == BankAccountTransactionType.Fee).Sum(x => x.Amount);
             response.ClosingCashBalance = _Portfolio.CashAccount.Balance(dateRange.ToDate);
 
-            response.OpeningBalance = openingHoldings.Sum(x => x.Value(dateRange.FromDate));
+            response.OpeningBalance = openingHoldings.Sum(x => GetValue(x, dateRange.FromDate));
             response.Dividends = response.HoldingPerformance.Sum(x => x.Dividends);
             response.ChangeInMarketValue = response.HoldingPerformance.Sum(x => x.CapitalGain);
             response.OutstandingDRPAmount = -response.HoldingPerformance.Sum(x => x.DrpCashBalance);
-            response.ClosingBalance = closingHoldings.Sum(x => x.Value(dateRange.ToDate));
+            response.ClosingBalance = closingHoldings.Sum(x => GetValue(x, dateRange.ToDate));
 
           
             return ServiceResult<PortfolioPerformanceResponse>.Ok(response);
+        }
+
+        private decimal GetValue(IReadOnlyHolding holding, Date date)
+        {
+            return _PriceRetriever.GetPrice(holding.Stock.Id, date) * holding.Properties[date].Units;
         }
 
         private class HoldingPerformanceWorkItem

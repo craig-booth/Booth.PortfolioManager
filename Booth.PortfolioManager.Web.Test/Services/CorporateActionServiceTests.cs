@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using Xunit;
 using FluentAssertions;
@@ -97,17 +97,17 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void AddCorporateActionStockNotFound()
+        public async Task AddCorporateActionStockNotFound()
         {
             var dividend = new RestApi.CorporateActions.Dividend();
 
-            var result = _Service.AddCorporateAction(Guid.NewGuid(), dividend);
+            var result = await _Service.AddCorporateActionAsync(Guid.NewGuid(), dividend);
 
             result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
-        public void AddCapitalReturn()
+        public async Task AddCapitalReturn()
         {
             var action = new RestApi.CorporateActions.CapitalReturn()
             {
@@ -119,18 +119,18 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Amount = 10.00m
             };
 
-            var result = _Service.AddCorporateAction(_StockWithoutCorporateActions.Id, action);
+            var result = await _Service.AddCorporateActionAsync(_StockWithoutCorporateActions.Id, action);
 
             result.Should().HaveOkStatus();
             _StockWithoutCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.CapitalReturn>(
                 new Domain.CorporateActions.CapitalReturn(action.Id, _StockWithoutCorporateActions, action.ActionDate, action.Description, action.PaymentDate, action.Amount)
                 );
 
-            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
+            _RepositoryMock.Verify(x => x.AddCorporateActionAsync(_StockWithoutCorporateActions, _NewAction));
         }
 
         [Fact]
-        public void AddCompositeAction()
+        public async Task AddCompositeAction()
         {
             var action = new RestApi.CorporateActions.CompositeAction()
             {
@@ -160,7 +160,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 NewUnits = 2
             });
 
-            var result = _Service.AddCorporateAction(_StockWithoutCorporateActions.Id, action);
+            var result = await _Service.AddCorporateActionAsync(_StockWithoutCorporateActions.Id, action);
 
             result.Should().HaveOkStatus();
 
@@ -172,11 +172,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 })
             , opts => opts.Excluding(x => x.Path.EndsWith(".Id")));
 
-            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
+            _RepositoryMock.Verify(x => x.AddCorporateActionAsync(_StockWithoutCorporateActions, _NewAction));
         }
 
         [Fact]
-        public void AddDividend()
+        public async Task AddDividend()
         {
             var action = new RestApi.CorporateActions.Dividend()
             {
@@ -190,18 +190,18 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 DrpPrice = 1.00m
             };
 
-            var result = _Service.AddCorporateAction(_StockWithoutCorporateActions.Id, action);
+            var result = await _Service.AddCorporateActionAsync(_StockWithoutCorporateActions.Id, action);
 
             result.Should().HaveOkStatus();
             _StockWithoutCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.Dividend>(
                 new Domain.CorporateActions.Dividend(action.Id, _StockWithoutCorporateActions, action.ActionDate, action.Description, action.PaymentDate, action.Amount, action.PercentFranked, action.DrpPrice)
             );
 
-            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
+            _RepositoryMock.Verify(x => x.AddCorporateActionAsync(_StockWithoutCorporateActions, _NewAction));
         }
 
         [Fact]
-        public void AddSplitConsolidation()
+        public async Task AddSplitConsolidation()
         {
             var action = new RestApi.CorporateActions.SplitConsolidation()
             {
@@ -213,7 +213,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 NewUnits = 2
             };
 
-            var result = _Service.AddCorporateAction(_StockWithoutCorporateActions.Id, action);
+            var result = await _Service.AddCorporateActionAsync(_StockWithoutCorporateActions.Id, action);
 
             result.Should().HaveOkStatus();
 
@@ -221,12 +221,12 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 new Domain.CorporateActions.SplitConsolidation(action.Id, _StockWithoutCorporateActions, action.ActionDate, action.Description, action.OriginalUnits, action.NewUnits)
             );
 
-            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
+            _RepositoryMock.Verify(x => x.AddCorporateActionAsync(_StockWithoutCorporateActions, _NewAction));
         }
 
 
         [Fact]
-        public void AddTransformation()
+        public async Task AddTransformation()
         {
             var action = new RestApi.CorporateActions.Transformation()
             {
@@ -247,7 +247,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 NewUnits = 2
             });
 
-            var result = _Service.AddCorporateAction(_StockWithoutCorporateActions.Id, action);
+            var result = await _Service.AddCorporateActionAsync(_StockWithoutCorporateActions.Id, action);
 
             result.Should().HaveOkStatus();
             _StockWithoutCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.Transformation>(
@@ -256,31 +256,31 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     new Domain.CorporateActions.Transformation.ResultingStock(_StockWithCorporateActions.Id, 1, 2, 0.5m, new Date(2001, 04, 01))
                 }));
 
-            _RepositoryMock.Verify(x => x.AddCorporateAction(_StockWithoutCorporateActions, _NewAction));
+            _RepositoryMock.Verify(x => x.AddCorporateActionAsync(_StockWithoutCorporateActions, _NewAction));
         }
 
         [Fact]
-        public void UpdateCorporateActionStockNotFound()
+        public async Task UpdateCorporateActionStockNotFound()
         {
             var dividend = new RestApi.CorporateActions.Dividend() { Id = _Action1 };
 
-            var result = _Service.UpdateCorporateAction(Guid.NewGuid(), dividend);
+            var result = await _Service.UpdateCorporateActionAsync(Guid.NewGuid(), dividend);
 
             result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
-        public void UpdateCorporateActionNotFound()
+        public async Task UpdateCorporateActionNotFound()
         {
             var dividend = new RestApi.CorporateActions.Dividend() { Id = Guid.NewGuid() };
 
-            var result = _Service.UpdateCorporateAction(_StockWithCorporateActions.Id, dividend);
+            var result = await _Service.UpdateCorporateActionAsync(_StockWithCorporateActions.Id, dividend);
 
             result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
-        public void UpdateCorporateAction()
+        public async Task UpdateCorporateAction()
         {
             var capitalReturn = new RestApi.CorporateActions.CapitalReturn()
             {
@@ -292,41 +292,41 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Amount = 13.00m
             };
 
-            var result = _Service.UpdateCorporateAction(_StockWithCorporateActions.Id, capitalReturn);
+            var result = await _Service.UpdateCorporateActionAsync(_StockWithCorporateActions.Id, capitalReturn);
 
             result.Should().HaveOkStatus();
             _StockWithCorporateActions.CorporateActions.Should().ContainEquivalentOf<Domain.CorporateActions.CapitalReturn>(
                 new Domain.CorporateActions.CapitalReturn(_Action1, _StockWithCorporateActions, new Date(2001, 01, 01), "Updated", new Date(2001, 01, 02), 13.00m)
                 );
 
-            _RepositoryMock.Verify(x => x.UpdateCorporateAction(_StockWithCorporateActions, _Action1));
+            _RepositoryMock.Verify(x => x.UpdateCorporateActionAsync(_StockWithCorporateActions, _Action1));
         }
 
         [Fact]
-        public void DeleteCorporateActionStockNotFound()
+        public async Task DeleteCorporateActionStockNotFound()
         {
-            var result = _Service.DeleteCorporateAction(Guid.NewGuid(), _Action1);
+            var result = await _Service.DeleteCorporateActionAsync(Guid.NewGuid(), _Action1);
 
             result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
-        public void DeleteCorporateActionNotFound()
+        public async Task DeleteCorporateActionNotFound()
         {
-            var result = _Service.DeleteCorporateAction(_StockWithCorporateActions.Id, Guid.NewGuid());
+            var result = await _Service.DeleteCorporateActionAsync(_StockWithCorporateActions.Id, Guid.NewGuid());
 
             result.Should().HaveNotFoundStatus();
         }
 
         [Fact]
-        public void DeleteCorporateAction()
+        public async Task DeleteCorporateAction()
         {
-            var result = _Service.DeleteCorporateAction(_StockWithCorporateActions.Id, _Action1);
+            var result = await _Service.DeleteCorporateActionAsync(_StockWithCorporateActions.Id, _Action1);
 
             result.Should().HaveOkStatus();
             _StockWithCorporateActions.CorporateActions.Should().NotContain(x => x.Id == _Action1);
 
-            _RepositoryMock.Verify(x => x.DeleteCorporateAction(_StockWithCorporateActions, _Action1));
+            _RepositoryMock.Verify(x => x.DeleteCorporateActionAsync(_StockWithCorporateActions, _Action1));
         }
     }
 }

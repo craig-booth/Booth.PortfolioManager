@@ -18,6 +18,7 @@ using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Repository;
+using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.DataImporters
 {
@@ -28,12 +29,11 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var priceHistory = mockRepository.Create<IStockPriceHistory>();
-            priceHistory.SetupGet(x => x.LatestDate).Returns(new Date(2015, 01, 01));
-
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", new Date(2010, 01, 01), false, AssetCategory.InternationalStocks);
-            stock.SetPriceHistory(priceHistory.Object);
+
+            var priceRetriever = mockRepository.Create<IStockPriceRetriever>();
+            priceRetriever.Setup(x => x.GetLatestPrice(stock.Id)).Returns(new Domain.Stocks.StockPrice(new Date(2015, 01, 01), 0.10m));
 
             var stockQuery = mockRepository.Create<IStockQuery>();
             stockQuery.Setup(x => x.All()).Returns(new[] { stock });
@@ -51,7 +51,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
 
             var logger = mockRepository.Create<ILogger<HistoricalPriceImporter>>(MockBehavior.Loose);
 
-            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarRepository.Object, dataService.Object, logger.Object);
+            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarRepository.Object, dataService.Object, priceRetriever.Object, logger.Object);
 
             await importer.Import(cancellationToken);
 
@@ -63,12 +63,11 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var priceHistory = mockRepository.Create<IStockPriceHistory>();
-            priceHistory.SetupGet(x => x.LatestDate).Returns(new Date(2015, 01, 01));
-
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", new Date(2010, 01, 01), false, AssetCategory.InternationalStocks);
-            stock.SetPriceHistory(priceHistory.Object);
+
+            var priceRetriever = mockRepository.Create<IStockPriceRetriever>();
+            priceRetriever.Setup(x => x.GetLatestPrice(stock.Id)).Returns(new Domain.Stocks.StockPrice(new Date(2015, 01, 01), 0.10m));
 
             var stockQuery = mockRepository.Create<IStockQuery>();
             stockQuery.Setup(x => x.All()).Returns(new[] { stock });
@@ -88,9 +87,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             var dataService = mockRepository.Create<IHistoricalStockPriceService>();
             dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1))), cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
 
-
-
-            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarRepository.Object, dataService.Object, logger.Object);
+            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarRepository.Object, dataService.Object, priceRetriever.Object, logger.Object);
 
             await importer.Import(cancellationToken);
 
@@ -108,12 +105,11 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var priceHistory = mockRepository.Create<IStockPriceHistory>();
-            priceHistory.SetupGet(x => x.LatestDate).Returns(new Date(2015, 01, 01));
-
             var stock = new Stock(Guid.NewGuid());
             stock.List("ABC", "ABC Pty Ltd", new Date(2010, 01, 01), false, AssetCategory.InternationalStocks);
-            stock.SetPriceHistory(priceHistory.Object);
+
+            var priceRetriever = mockRepository.Create<IStockPriceRetriever>();
+            priceRetriever.Setup(x => x.GetLatestPrice(stock.Id)).Returns(new Domain.Stocks.StockPrice(new Date(2015, 01, 01), 0.10m));
 
             var stockQuery = mockRepository.Create<IStockQuery>();
             stockQuery.Setup(x => x.All()).Returns(new[] { stock });
@@ -131,7 +127,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             var dataService = mockRepository.Create<IHistoricalStockPriceService>();
             dataService.Setup(x => x.GetHistoricalPriceData("ABC", new DateRange(new Date(2015, 01, 02), tradingCalendar.PreviousTradingDay(Date.Today.AddDays(-1))), cancellationToken)).Returns(Task<IEnumerable<DataServices.StockPrice>>.FromResult(prices.AsEnumerable()));
 
-            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarRepository.Object, dataService.Object, null);
+            var importer = new HistoricalPriceImporter(stockQuery.Object, stockService.Object, tradingCalendarRepository.Object, dataService.Object, priceRetriever.Object, null);
 
             await importer.Import(cancellationToken);
 

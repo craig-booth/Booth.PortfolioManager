@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using Xunit;
 using Moq;
@@ -19,16 +19,16 @@ namespace Booth.PortfolioManager.Web.Test.Services
     {
 
         [Fact]
-        public void GetYearCalanderNotExist()
+        public async Task GetYearCalanderNotExist()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var repository = mockRepository.Create<ITradingCalendarRepository>();
-            repository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(default(TradingCalendar));
+            repository.Setup(x => x.GetAsync(It.IsAny<Guid>())).Returns(Task.FromResult(default(TradingCalendar)));
 
             var service = new TradingCalendarService(repository.Object);
 
-            var result = service.Get(Guid.NewGuid(), 2010);
+            var result = await service.GetAsync(Guid.NewGuid(), 2010);
 
             result.Should().HaveNotFoundStatus();
 
@@ -36,18 +36,18 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void GetYearNotExists()
+        public async Task GetYearNotExists()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
+            repository.Setup(x => x.GetAsync(tradingCalendar.Id)).Returns(Task.FromResult(tradingCalendar));
 
             var service = new TradingCalendarService(repository.Object);
 
-            var result = service.Get(tradingCalendar.Id, 2010);
+            var result = await service.GetAsync(tradingCalendar.Id, 2010);
             var response = result.Result;
 
             response.Should().BeEquivalentTo(new
@@ -58,18 +58,18 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void GetYearExists()
+        public async Task GetYearExists()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2000, new[] { new NonTradingDay(new Date(2000, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
+            repository.Setup(x => x.GetAsync(tradingCalendar.Id)).Returns(Task.FromResult(tradingCalendar));
 
             var service = new TradingCalendarService(repository.Object);
 
-            var result = service.Get(tradingCalendar.Id, 2000);
+            var result = await service.GetAsync(tradingCalendar.Id, 2000);
             var response = result.Result;
 
             response.Should().BeEquivalentTo(new
@@ -83,15 +83,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void Update()
+        public async Task Update()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
-            repository.Setup(x => x.UpdateYear(tradingCalendar, 2001));
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
+            repository.Setup(x => x.UpdateYearAsync(tradingCalendar, 2001)).Returns(Task.CompletedTask);
+            repository.Setup(x => x.GetAsync(tradingCalendar.Id)).Returns(Task.FromResult(tradingCalendar));
 
             var service = new TradingCalendarService(repository.Object);
 
@@ -107,7 +107,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             updatedTradingCalendar.Year = 2001;
             updatedTradingCalendar.NonTradingDays.Add(new RestApi.TradingCalendars.TradingCalendar.NonTradingDay() { Date = new Date(2001, 12, 25), Description = "Christmas Day" });
 
-            var result = service.Update(tradingCalendar.Id, updatedTradingCalendar);
+            var result = await service.UpdateAsync(tradingCalendar.Id, updatedTradingCalendar);
 
             using (new AssertionScope())
             {
@@ -121,15 +121,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void SetNonTradingDays()
+        public async Task SetNonTradingDays()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var tradingCalendar = new TradingCalendar(TradingCalendarIds.ASX);
             tradingCalendar.SetNonTradingDays(2001, new[] { new NonTradingDay(new Date(2001, 01, 01), "New Year's Day") });
             var repository = mockRepository.Create<ITradingCalendarRepository>();
-            repository.Setup(x => x.UpdateYear(tradingCalendar, 2001));
-            repository.Setup(x => x.Get(tradingCalendar.Id)).Returns(tradingCalendar);
+            repository.Setup(x => x.UpdateYearAsync(tradingCalendar, 2001)).Returns(Task.CompletedTask);
+            repository.Setup(x => x.GetAsync(tradingCalendar.Id)).Returns(Task.FromResult(tradingCalendar));
 
             var service = new TradingCalendarService(repository.Object);
 
@@ -141,7 +141,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 calendarReference.IsTradingDay(new Date(2001, 12, 25)).Should().BeTrue();
             }
 
-            service.SetNonTradingDays(tradingCalendar.Id, 2001, new[] { new NonTradingDay(new Date(2001, 12, 25), "Christmas Day") });
+            await service.SetNonTradingDaysAsync(tradingCalendar.Id, 2001, new[] { new NonTradingDay(new Date(2001, 12, 25), "Christmas Day") });
 
             using (new AssertionScope())
             {

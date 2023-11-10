@@ -61,7 +61,7 @@ namespace Booth.PortfolioManager.Web.Controllers
 
             var requestedFrequency = frequency == null ? ValueFrequency.Day : frequency!.Value;
 
-            var result = await service.GetValue(dateRange, requestedFrequency);
+            var result = await service.GetValueAsync(dateRange, requestedFrequency);
 
             return result.ToActionResult();
         }

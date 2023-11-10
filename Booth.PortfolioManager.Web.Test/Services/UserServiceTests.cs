@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 
 using Xunit;
 using FluentAssertions;
@@ -17,16 +17,16 @@ namespace Booth.PortfolioManager.Web.Test.Services
     {
 
         [Fact]
-        public void AuthenticateUserNotFound()
+        public async Task AuthenticateUserNotFound()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
             var repository = mockRepository.Create<IUserRepository>();
-            repository.Setup(x => x.GetUserByUserName("user")).Returns(default(User));
+            repository.Setup(x => x.GetUserByUserNameAsync("user")).Returns(Task.FromResult(default(User)));
 
             var service = new UserService(repository.Object);
 
-            var result = service.Authenticate("user", "password");
+            var result = await service.AuthenticateAsync("user", "password");
 
             result.Should().HaveErrorStatus().WithError("User not found");
 
@@ -34,7 +34,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void AuthenticatePasswordWrong()
+        public async Task AuthenticatePasswordWrong()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -42,11 +42,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             user.Create("user", "password");
 
             var repository = mockRepository.Create<IUserRepository>();
-            repository.Setup(x => x.GetUserByUserName("user")).Returns(user);
+            repository.Setup(x => x.GetUserByUserNameAsync("user")).Returns(Task.FromResult(user));
 
             var service = new UserService(repository.Object);
 
-            var result = service.Authenticate("user", "wrong");
+            var result = await service.AuthenticateAsync("user", "wrong");
 
             result.Should().HaveErrorStatus().WithError("Incorrect Password");
 
@@ -54,7 +54,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         }
 
         [Fact]
-        public void AuthenticateSuccessful()
+        public async Task AuthenticateSuccessful()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -62,11 +62,11 @@ namespace Booth.PortfolioManager.Web.Test.Services
             user.Create("user", "password");
 
             var repository = mockRepository.Create<IUserRepository>();
-            repository.Setup(x => x.GetUserByUserName("user")).Returns(user);
+            repository.Setup(x => x.GetUserByUserNameAsync("user")).Returns(Task.FromResult(user));
 
             var service = new UserService(repository.Object);
 
-            var result = service.Authenticate("user", "password");
+            var result = await service.AuthenticateAsync("user", "password");
 
             result.Result.Should().Be(user);
 
