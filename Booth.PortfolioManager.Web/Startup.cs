@@ -42,6 +42,9 @@ namespace Booth.PortfolioManager.Web
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UsePortfolioManager();
 
             app.UseRouting();
@@ -52,7 +55,9 @@ namespace Booth.PortfolioManager.Web
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapFallbackToFile("/index.html");
             });
+
         }
     }
 }

@@ -14,11 +14,11 @@ using Booth.PortfolioManager.Domain.TradingCalendars;
 
 namespace Booth.PortfolioManager.DataServices
 {
-    internal class AsxTradingCalendarParserPost2020 : IAsxTradingCalendarParser
+    internal class AsxTradingCalendarParser2021to2023 : IAsxTradingCalendarParser
     {
         public bool CanParse(int year)
         {
-            return (year >= 2021);            
+            return ((year >= 2021) && (year <= 2023));            
         }
 
         public string ResourceUrl(int year)

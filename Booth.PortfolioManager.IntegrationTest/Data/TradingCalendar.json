@@ -523,6 +523,43 @@
           "description": "Boxing Day"
         }
       ]
+    },
+    {
+      "year": 2024,
+      "days": [
+        {
+          "date": "2024-01-01",
+          "description": "New Year's Day"
+        },
+        {
+          "date": "2024-01-26",
+          "description": "Australia Day"
+        },
+        {
+          "date": "2024-03-29",
+          "description": "Good Friday"
+        },
+        {
+          "date": "2024-04-01",
+          "description": "Easter Monday"
+        },
+        {
+          "date": "2024-04-25",
+          "description": "ANZAC Day"
+        },
+        {
+          "date": "2024-06-10",
+          "description": "King's Birthday"
+        },
+        {
+          "date": "2024-12-25",
+          "description": "Christmas Day"
+        },
+        {
+          "date": "2024-12-26",
+          "description": "Boxing Day"
+        }
+      ]
     }
   ]
 }

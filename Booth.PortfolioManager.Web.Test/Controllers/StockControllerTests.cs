@@ -519,13 +519,15 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetClosingPrices(_Stock.Id, null, null);
 
             var expectedDateRange = new DateRange(Date.Today.AddYears(-1).AddDays(1), Date.Today);
+            var expectedCount = (int)(expectedDateRange.ToDate - expectedDateRange.FromDate).TotalDays + 1;
+
             _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
                 .Value.Should().BeOfType<StockPriceResponse>()
-                .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2022, 11, 11), Price = 0.10m })
-                .And.EndWith(new ClosingPrice() { Date = Date.Today, Price = 0.10m })
-                .And.HaveCount(365);
+                .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = expectedDateRange.FromDate, Price = 0.10m })
+                .And.EndWith(new ClosingPrice() { Date = expectedDateRange.ToDate, Price = 0.10m })
+                .And.HaveCount(expectedCount);
         }
 
         [Fact]

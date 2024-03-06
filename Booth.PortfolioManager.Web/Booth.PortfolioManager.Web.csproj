@@ -1,12 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Version>2.0.0</Version>
     <Authors>Craig Booth</Authors>
     <Description>Portfolio Manager Server</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>Booth.png</PackageIcon>
+	<SpaRoot>..\booth.portfoliomanager.ui</SpaRoot>
+    <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>https://localhost:5173</SpaProxyServerUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -17,10 +20,11 @@
     <PackageReference Include="Booth.Common" Version="1.0.8" />
     <PackageReference Include="Booth.PortfolioManager.RestApi" Version="1.2.1" />
     <PackageReference Include="Booth.Scheduler" Version="1.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.12" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.4.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
   </ItemGroup>
 
@@ -36,6 +40,9 @@
     <ProjectReference Include="..\Booth.PortfolioManager.DataServices\Booth.PortfolioManager.DataServices.csproj" />
     <ProjectReference Include="..\Booth.PortfolioManager.Domain\Booth.PortfolioManager.Domain.csproj" />
     <ProjectReference Include="..\Booth.PortfolioManager.Repository\Booth.PortfolioManager.Repository.csproj" />
+    <ProjectReference Include="..\Booth.PortfolioManager.UI\booth.portfoliomanager.ui.esproj">
+		<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
 
