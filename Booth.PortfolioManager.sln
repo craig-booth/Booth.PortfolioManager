@@ -28,7 +28,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Repo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Booth.PortfolioManager.Repository.Test", "Booth.PortfolioManager.Repository.Test\Booth.PortfolioManager.Repository.Test.csproj", "{F0CA7E32-3947-4E5F-83BA-5369DCC02498}"
 EndProject
-Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "booth.portfoliomanager.ui", "Booth.PortfolioManager.UI\booth.portfoliomanager.ui.esproj", "{A967376D-20FE-48A1-8C83-12191371E4E0}"
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "booth.portfoliomanager.ui", "booth.portfoliomanager.ui\booth.portfoliomanager.ui.esproj", "{A967376D-20FE-48A1-8C83-12191371E4E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
