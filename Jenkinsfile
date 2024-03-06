@@ -16,8 +16,8 @@ pipeline {
     stages {
 		stage('Build') {
 			agent { 
-				docker { 
-					image 'mcr.microsoft.com/dotnet/sdk:8.0' 
+				dockerfile { 
+					filename 'JenkinsBuildAgentDockerFile' 
 					reuseNode true
 				}
 			}
