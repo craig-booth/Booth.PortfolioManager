@@ -40,7 +40,7 @@
     <ProjectReference Include="..\Booth.PortfolioManager.DataServices\Booth.PortfolioManager.DataServices.csproj" />
     <ProjectReference Include="..\Booth.PortfolioManager.Domain\Booth.PortfolioManager.Domain.csproj" />
     <ProjectReference Include="..\Booth.PortfolioManager.Repository\Booth.PortfolioManager.Repository.csproj" />
-    <ProjectReference Include="..\Booth.PortfolioManager.UI\booth.portfoliomanager.ui.esproj">
+    <ProjectReference Include="..\booth.portfoliomanager.ui\booth.portfoliomanager.ui.esproj">
 		<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
