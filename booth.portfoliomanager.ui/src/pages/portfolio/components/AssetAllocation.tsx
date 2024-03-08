@@ -13,9 +13,11 @@ import { Label } from "@/components/ui/label"
 import { Chart as ChartJS, ArcElement, PieController ,Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 
-import { PortfolioSummary, AssetCategory, isGrowthCategory, isIncomeCategory, Holding } from "@/model/Portfolio";
+import { PortfolioSummary, AssetCategory, isGrowthCategory, isIncomeCategory, Holding, Stock } from "@/model/Portfolio";
 import { AlloctionCalcParam, allocationCalc } from "../hooks/AllocationCalc.ts";
-import { generateColors, ColorRangeInfo} from "@/lib/GenerateColors.ts";
+import { generateColors, ColorRangeInfo } from "@/lib/GenerateColors.ts";
+import { formatPercentage, formatCurrency } from "@/lib/formatting.ts";
+
 import * as d3 from 'd3';
 
 ChartJS.register(ArcElement, PieController, Tooltip, Legend);
@@ -24,7 +26,21 @@ ChartJS.register(ArcElement, PieController, Tooltip, Legend);
 interface AssetAllocationProps {
 	portfolio: PortfolioSummary
 }
+ 
+function stockTarget(stock: Stock): number {
 
+	if (stock.asxCode == "ARG") return 0.30;
+	else if (stock.asxCode == "COH") return 0.025;
+	else if (stock.asxCode == "CSL") return 0.025;
+	else if (stock.asxCode == "VAP") return 0.05;
+	else if (stock.asxCode == "VGE") return 0.05;
+	else if (stock.asxCode == "VGS") return 0.40;
+	else if (stock.asxCode == "VISM") return 0.05;
+	else if (stock.asxCode == "VCF") return 0.05;
+	else if (stock.asxCode == "VAF") return 0.05;
+	else return 0;
+
+}
 
 function AssetAllocation({portfolio} : AssetAllocationProps) {
 	const [chartType, setChartType] = useState("holding");
@@ -51,7 +67,7 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 		case "holding": 	
 			calcParams = portfolio.holdings.map((holding) =>({
 				name: holding.stock.name,
-				target: 0.10,
+				target: stockTarget(holding.stock),
 				value: holding.value
 			}));
 			calcParams.push({ name: "Cash", target: 0.00, value: portfolio.cashBalance });
@@ -82,7 +98,15 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 			legend: {
 				display: false,
 			},
-		}
+			tooltip: {
+				callbacks: {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					label: function (context) {
+						return formatPercentage(context.raw);
+					}
+				}
+			}
+		},
 	}; 
 
 	let colorIndex = 0;
@@ -129,10 +153,10 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 											<div className="text-nowrap">{asset.name}</div>
 										</div>
 									</TableCell>
-									<TableCell className="py-1 text-right">{asset.percentage.toLocaleString(undefined, {style: "percent", minimumFractionDigits: 2})}</TableCell>
-									<TableCell className="py-1 text-right">{asset.targetPercentage.toLocaleString(undefined, {style: "percent", minimumFractionDigits: 2})}</TableCell>
-									<TableCell className="py-1 text-right">{asset.differenceAmount.toLocaleString(undefined, {style: "currency", currency: "AUD"})}</TableCell>
-									<TableCell className="py-1 text-right">{asset.differencePercentage.toLocaleString(undefined, {style: "percent", minimumFractionDigits: 2})}</TableCell>
+									<TableCell className="py-1 text-right">{formatPercentage(asset.percentage)}</TableCell>
+									<TableCell className="py-1 text-right">{formatPercentage(asset.targetPercentage)}</TableCell>
+									<TableCell className="py-1 text-right">{formatCurrency(asset.differenceAmount)}</TableCell>
+									<TableCell className="py-1 text-right">{formatPercentage(asset.differencePercentage)}</TableCell>
 								</TableRow>
 							))}
 						</TableBody>

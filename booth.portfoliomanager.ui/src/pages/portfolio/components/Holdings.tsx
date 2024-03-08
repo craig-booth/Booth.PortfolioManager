@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 
+import { formatNumber, formatCurrency } from "@/lib/formatting";
 import {PortfolioProperties, PortfolioSummary} from "@/model/Portfolio";
 
 
@@ -34,8 +35,8 @@ function Holdings({ portfolioProperties, portfolioSummary }: HoldingsProps) {
 	const holdings: HoldingItem[] = portfolioSummary.holdings.map<HoldingItem>((holding) => ({
 		id: holding.stock.id,
 		name: holding.stock.name,
-		units: holding.units.toLocaleString(undefined),
-		amount: holding.value.toLocaleString(undefined, { style: "currency", currency: "AUD" }),
+		units: formatNumber(holding.units),
+		amount: formatCurrency(holding.value),
 		inActive: false
 	}));
 
@@ -83,7 +84,7 @@ function Holdings({ portfolioProperties, portfolioSummary }: HoldingsProps) {
 							<Link to="cashaccount">Cash</Link>
 						</TableCell>
 						<TableCell className="text-right py-1"></TableCell>
-						<TableCell className="text-right py-1">{portfolioSummary.cashBalance.toLocaleString(undefined, {style: "currency", currency: "AUD"})}</TableCell>
+						<TableCell className="text-right py-1">{formatCurrency(portfolioSummary.cashBalance)}</TableCell>
 					</TableRow>
 				</TableBody>
 			</Table>

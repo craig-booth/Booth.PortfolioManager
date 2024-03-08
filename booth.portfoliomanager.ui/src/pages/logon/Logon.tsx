@@ -25,7 +25,7 @@ function Logon() {
     }
 
     return (
-		<div id="logon-background" className="container min-h-screen min-w-full flex flex-row items-center justify-center">
+        <div id="logon-background" className="container min-h-screen min-w-full flex flex-row items-center justify-center">
 			<div className="rounded-lg backdrop-blur-sm bg-white/30 p-8">
 				<div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
 					<div className="text-2xl font-bold text-center">Sign in</div>

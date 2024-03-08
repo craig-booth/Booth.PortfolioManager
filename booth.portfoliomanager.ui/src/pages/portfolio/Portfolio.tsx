@@ -40,7 +40,7 @@ function Portfolio() {
 		<Card className="bg-muted rounded-lg col-span-1 p-2">
 			<CardHeader className="text-sm">Corporate Actions</CardHeader>
 		</Card>			
-		<Card className="bg-muted rounded-lg col-span-2 p-2">
+		<Card className="bg-muted rounded-lg col-span-3 p-2">
 			<CardHeader className="text-sm">Asset Allocation</CardHeader>
 			<AssetAllocation portfolio={portfolioSummary}/>
 		</Card>
