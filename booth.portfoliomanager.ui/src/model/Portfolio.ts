@@ -45,6 +45,13 @@ export interface CorporateAction {
     description: string
 }
 
+export interface Transaction {
+	id: string,
+	stock: Stock,
+	transactionDate: Date,
+	description: string,
+	comment: string
+}
 export enum AssetCategory {
 	AustralianStocks = "australianStocks",
 	InternationalStocks = "internationalStocks",

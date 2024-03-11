@@ -1,6 +1,6 @@
 import { useSession } from "@/lib/Session";
 import { AuthenticationRequest, AuthenticationResponse } from "@/model/Authentication";
-import { PortfolioSummary, PortfolioProperties, CorporateAction } from "@/model/Portfolio";
+import { PortfolioSummary, PortfolioProperties, CorporateAction, Holding, Transaction } from "@/model/Portfolio";
 
 
 export interface UseApiClientResult {
@@ -9,6 +9,8 @@ export interface UseApiClientResult {
     getPortfolioProperties(): Promise<PortfolioProperties>;
     getPortfolioSummary(): Promise<PortfolioSummary>;
     getCorporateActions(): Promise<CorporateAction[]>;
+    getHolding(stockId: string): Promise<Holding>;
+    getTransactions(stockId: string): Promise<Transaction[]>;
 }
 
 export const useApiClient = (): UseApiClientResult => {
@@ -118,10 +120,55 @@ export const useApiClient = (): UseApiClientResult => {
         return actions;
     }
 
+    const getHolding = async (stockId: string): Promise<Holding> => {
+
+        const holding = fetch("/api/portfolio/" + session?.portfolioId + "/holdings/" + stockId,
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + session?.token,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            })
+            .then(response => {
+                if (!response.ok)
+                    throw new Error(response.statusText)
+
+                return response.text();
+            })
+            .then(response => JSON.parse(response, customReviver))
+
+        return holding;
+    }
+
+    const getTransactions = async (stockId: string): Promise<Transaction[]> => {
+
+        const actions = fetch("/api/portfolio/" + session?.portfolioId + "/holdings/" + stockId + "/transactions?fromdate=2000-01-01&toDate=2100-01-01",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + session?.token,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            })
+            .then(response => {
+                if (!response.ok)
+                    throw new Error(response.statusText)
+
+                return response.text();
+            })
+            .then(response => JSON.parse(response, customReviver))
+            .then(response => response.transactions)
+
+        return actions;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function customReviver(key: string, value: any): any {
 
-        if ((key == "startDate") || (key == "endDate") || (key == "actionDate")) {
+        if ((key == "startDate") || (key == "endDate") || (key == "actionDate") || (key == "transactionDate")) {
             if ((value != undefined) && (value != null)) {
 
                 if (value == "9999-12-31")
@@ -137,5 +184,13 @@ export const useApiClient = (): UseApiClientResult => {
         return value;
     }
 
-    return { signIn, signOut, getPortfolioProperties, getPortfolioSummary, getCorporateActions };
+    return {
+        signIn,
+        signOut,
+        getPortfolioProperties,
+        getPortfolioSummary,
+        getCorporateActions,
+        getHolding,
+        getTransactions
+    };
 }
