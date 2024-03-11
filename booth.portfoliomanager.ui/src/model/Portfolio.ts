@@ -38,6 +38,13 @@ export interface Stock {
 	category: AssetCategory;
 }
 
+export interface CorporateAction {
+	id: string,
+    actionDate: Date,
+    stock: Stock,
+    description: string
+}
+
 export enum AssetCategory {
 	AustralianStocks = "australianStocks",
 	InternationalStocks = "internationalStocks",

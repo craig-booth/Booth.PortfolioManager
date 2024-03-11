@@ -101,13 +101,15 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 			tooltip: {
 				callbacks: {
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					label: function (context) {
+					label: function (context: any) {
 						return formatPercentage(context.raw);
 					}
 				}
 			}
 		},
 	}; 
+
+	
 
 	let colorIndex = 0;
 	

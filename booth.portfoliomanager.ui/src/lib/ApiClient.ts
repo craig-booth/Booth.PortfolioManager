@@ -1,6 +1,6 @@
 import { useSession } from "@/lib/Session";
 import { AuthenticationRequest, AuthenticationResponse } from "@/model/Authentication";
-import { PortfolioSummary, PortfolioProperties } from "@/model/Portfolio";
+import { PortfolioSummary, PortfolioProperties, CorporateAction } from "@/model/Portfolio";
 
 
 export interface UseApiClientResult {
@@ -8,6 +8,7 @@ export interface UseApiClientResult {
     signOut(): Promise<void>;
     getPortfolioProperties(): Promise<PortfolioProperties>;
     getPortfolioSummary(): Promise<PortfolioSummary>;
+    getCorporateActions(): Promise<CorporateAction[]>;
 }
 
 export const useApiClient = (): UseApiClientResult => {
@@ -94,10 +95,33 @@ export const useApiClient = (): UseApiClientResult => {
         return summary;
     }
 
+    const getCorporateActions = async (): Promise<CorporateAction[]> => {
+
+        const actions = fetch("/api/portfolio/" + session?.portfolioId + "/corporateactions",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + session?.token,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            })
+            .then(response => {
+                if (!response.ok)
+                    throw new Error(response.statusText)
+
+                return response.text();
+            })
+            .then(response => JSON.parse(response, customReviver))
+            .then(response => response.corporateActions)
+
+        return actions;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function customReviver(key: string, value: any): any {
 
-        if ((key == "startDate") || (key == "endDate")) {
+        if ((key == "startDate") || (key == "endDate") || (key == "actionDate")) {
             if ((value != undefined) && (value != null)) {
 
                 if (value == "9999-12-31")
@@ -113,5 +137,5 @@ export const useApiClient = (): UseApiClientResult => {
         return value;
     }
 
-    return { signIn, signOut, getPortfolioProperties, getPortfolioSummary };
+    return { signIn, signOut, getPortfolioProperties, getPortfolioSummary, getCorporateActions };
 }

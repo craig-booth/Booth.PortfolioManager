@@ -13,3 +13,7 @@ export function formatCurrency(value: number, digits?: number): string {
 export function formatPercentage(value: number, digits: number = 2): string {
 	return value.toLocaleString(undefined, { style: "percent", minimumFractionDigits: digits });
 }
+
+export function formatDate(value: Date): string {
+	return value.toLocaleDateString(undefined);
+}

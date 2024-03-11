@@ -9,6 +9,7 @@ import PortfolioValue from "./components/PortfolioValue.tsx";
 import PortfolioReturn from "./components/PortfolioReturn.tsx";
 import Holdings from "./components/Holdings.tsx";
 import AssetAllocation from "./components/AssetAllocation.tsx";
+import CorporateActions from "./components/CorporateActions.tsx";
 
 function Portfolio() {
 
@@ -39,6 +40,7 @@ function Portfolio() {
 		</Card>
 		<Card className="bg-muted rounded-lg col-span-1 p-2">
 			<CardHeader className="text-sm">Corporate Actions</CardHeader>
+			<CorporateActions />
 		</Card>			
 		<Card className="bg-muted rounded-lg col-span-3 p-2">
 			<CardHeader className="text-sm">Asset Allocation</CardHeader>
