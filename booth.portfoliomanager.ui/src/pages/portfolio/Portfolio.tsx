@@ -1,5 +1,6 @@
 import {
   Card,
+  CardContent,
   CardHeader,
 } from "@/components/ui/card"
 
@@ -24,32 +25,50 @@ function Portfolio() {
 		return <div>Error</div>;
 	}
 
-    return (
-	<div className="grid grid-flow-row-dense grid-cols-3 gap-8">
-		<Card className="bg-muted rounded-lg col-span-2 p-2">
-			<CardHeader className="text-sm">Value</CardHeader>
-			<PortfolioValue portfolio={portfolioSummary}/>
-		</Card>
-		<Card className="bg-muted rounded-lg col-span-1 p-2">
-			<CardHeader className="text-sm">Return</CardHeader>
-			<PortfolioReturn portfolio={portfolioSummary}/>
-		</Card>		
-		<Card className="bg-muted rounded-lg col-span-2">
-			<CardHeader className="text-sm">Holdings</CardHeader>
-			<Holdings portfolioProperties={portfolioProperties} portfolioSummary={portfolioSummary} />
-		</Card>
-		<Card className="bg-muted rounded-lg col-span-1 p-2">
-			<CardHeader className="text-sm">Corporate Actions</CardHeader>
-			<CorporateActions />
-		</Card>			
-		<Card className="bg-muted rounded-lg col-span-3 p-2">
-			<CardHeader className="text-sm">Asset Allocation</CardHeader>
-			<AssetAllocation portfolio={portfolioSummary}/>
-		</Card>
-		<Card className="bg-muted rounded-lg col-span-1 p-2">
-			<CardHeader className="text-sm">Suggested Trades</CardHeader>
-		</Card>		
-	</div>
+	return (
+		<div className="space-y-8">
+			<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+				<Card className="bg-muted rounded-lg p-2">
+					<CardHeader className="text-sm">Value</CardHeader>
+					<CardContent>
+						<PortfolioValue portfolio={portfolioSummary} />
+					</CardContent>
+				</Card>
+				<Card className="bg-muted rounded-lg p-2">
+					<CardHeader className="text-sm">Return</CardHeader>
+					<CardContent>
+						<PortfolioReturn portfolio={portfolioSummary} />
+					</CardContent>
+				</Card>	
+			</div>
+			<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+				<Card className="bg-muted rounded-lg col-span-1 md:col-span-2">
+					<CardHeader className="text-sm">Holdings</CardHeader>
+					<CardContent>
+						<Holdings portfolioProperties={portfolioProperties} portfolioSummary={portfolioSummary} />
+					</CardContent>	
+				</Card>
+				<Card className="bg-muted rounded-lg col-span-1 p-2">
+					<CardHeader className="text-sm">Corporate Actions</CardHeader>
+					<CardContent>
+						<CorporateActions />
+					</CardContent>	
+				</Card>	
+				<Card className="bg-muted rounded-lg col-span-1 p-2">
+					<CardHeader className="text-sm">Suggested Trades</CardHeader>
+					<CardContent>
+					</CardContent>
+				</Card>
+			</div>
+			<div className="grid grid-cols-4 gap-8">
+				<Card className="bg-muted rounded-lg col-span-4 p-2">
+					<CardHeader className="text-sm">Asset Allocation</CardHeader>
+					<CardContent>
+						<AssetAllocation portfolio={portfolioSummary} />
+					</CardContent>	
+				</Card>
+			</div>
+		</div>
     );
 }
 

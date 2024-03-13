@@ -10,18 +10,15 @@ import {
   } from "@/components/ui/table"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Chart as ChartJS, ArcElement, PieController ,Tooltip, Legend } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, TooltipProps } from 'recharts';
+import { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent';
 
 import { PortfolioSummary, AssetCategory, isGrowthCategory, isIncomeCategory, Holding, Stock } from "@/model/Portfolio";
-import { AlloctionCalcParam, allocationCalc } from "../hooks/AllocationCalc.ts";
+import { AlloctionCalcParam, allocationCalc, Allocation } from "../hooks/AllocationCalc.ts";
 import { generateColors, ColorRangeInfo } from "@/lib/GenerateColors.ts";
 import { formatPercentage, formatCurrency } from "@/lib/formatting.ts";
 
 import * as d3 from 'd3';
-
-ChartJS.register(ArcElement, PieController, Tooltip, Legend);
-
 
 interface AssetAllocationProps {
 	portfolio: PortfolioSummary
@@ -40,6 +37,21 @@ function stockTarget(stock: Stock): number {
 	else if (stock.asxCode == "VAF") return 0.05;
 	else return 0;
 
+}
+
+const CustomTooltip = ({active, payload }: TooltipProps<ValueType, NameType>)  => {
+	if (active && payload?.length) {
+
+		const allocation: Allocation = payload[0].payload;
+
+		return (
+			<div className="bg-muted z-50 rounded-lg p-2">
+				<span className="text-sm">{allocation.name + "  " + formatPercentage(allocation.percentage, 2)}</span>
+			</div>
+		);
+	}
+	else
+		return null;
 }
 
 function AssetAllocation({portfolio} : AssetAllocationProps) {
@@ -79,39 +91,10 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 	const colorScale = d3.interpolateBlues;
 	const colorRangeInfo: ColorRangeInfo = {
 		colorStart: 0.4,
-		colorEnd: 1,
+		colorEnd: 0.95,
 		useEndAsStart: false,
 	};
-	const colors = generateColors(allocation.length, colorScale, colorRangeInfo);
-
-	const chartData = {
-		labels: allocation.map((allocation) => allocation.name),
-		datasets: [ {
-			data: allocation.map((allocation) => allocation.percentage),
-			backgroundColor: colors,
-			borderWidth: 0
-		}],
-	};
-
-	const chartOptions = {
-		plugins: {
-			legend: {
-				display: false,
-			},
-			tooltip: {
-				callbacks: {
-					// eslint-disable-next-line @typescript-eslint/no-explicit-any
-					label: function (context: any) {
-						return formatPercentage(context.raw);
-					}
-				}
-			}
-		},
-	}; 
-
-	
-
-	let colorIndex = 0;
+	const colors = generateColors(allocation.length, colorScale, colorRangeInfo).reverse();
 	
 	return(
 		<div className="flex flex-col">
@@ -131,27 +114,38 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 					</div>
 				</RadioGroup>
 			</div>			
-			<div className="flex flex-row">
-				<div>
-					<Pie data={chartData} options={chartOptions} />
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+				<div className="col-span-1 p-2">
+					<ResponsiveContainer>
+						<PieChart>
+							<Pie data={allocation} stroke="none" dataKey="percentage" nameKey="name" startAngle={90} endAngle={450} outerRadius="100%">
+								{
+									colors.map((color) => (
+										<Cell fill={color} />
+									))
+								}		
+							</Pie>
+							<Tooltip content={<CustomTooltip active={false} payload={[]} /> }></Tooltip>
+						</PieChart> 
+					</ResponsiveContainer>
 				</div>
-				<div className="grow place-self-center">
+				<div className="col-span-2 p-2">
 					<Table className="w-full text-sm">
 						<TableHeader>
 							<TableRow>
-								<TableHead >Asset</TableHead>
-								<TableHead className="text-right">%</TableHead>
-								<TableHead className="text-right">Target</TableHead>
-								<TableHead className="text-right">Diff $</TableHead>
-								<TableHead className="text-right">Diff %</TableHead>
+								<TableHead className="min-w-36">Asset</TableHead>
+								<TableHead className="min-w-20 text-right">%</TableHead>
+								<TableHead className="min-w-20 text-right">Target</TableHead>
+								<TableHead className="min-w-20 text-right">Diff $</TableHead>
+								<TableHead className="min-w-20 text-right">Diff %</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{allocation.map((asset) => (
+							{allocation.map((asset, index) => (
 								<TableRow key={asset.name} className="h-2">
 									<TableCell className="py-1">
 										<div className="inline-flex">
-											<div className="w-8 h-6 rounded-xl mr-3" style={{backgroundColor: colors[colorIndex++]}}>&nbsp;</div>
+											<div className="w-8 h-6 rounded-xl mr-3" style={{backgroundColor: colors[index]}}>&nbsp;</div>
 											<div className="text-nowrap">{asset.name}</div>
 										</div>
 									</TableCell>
