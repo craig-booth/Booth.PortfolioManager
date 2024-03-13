@@ -45,11 +45,6 @@ namespace Booth.PortfolioManager.Repository.Serialization
 
         public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Date value)
         {
-            if (value == null)
-            {
-                context.Writer.WriteNull();
-                return;
-            }
             context.Writer.WriteString(value.ToString("yyyy-MM-dd"));
         }
     }

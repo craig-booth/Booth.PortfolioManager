@@ -39,7 +39,7 @@ namespace Booth.PortfolioManager.Web.DataImporters
             var logger = _ServiceProvider.GetRequiredService<ILogger<DataImportBackgroundService>>();
 
             // Run the data imports initially (wait 30 seconds to allow for application setup)
-            Task.Delay(TimeSpan.FromSeconds(30), stoppingToken).ContinueWith(t => InitialImport());
+            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken).ContinueWith(t => InitialImport());
 
             // and start Scheduler to run data imports on schedule
              _Scheduler.Start();
