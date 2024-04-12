@@ -52,6 +52,22 @@ export interface Transaction {
 	description: string,
 	comment: string
 }
+
+export interface CashAccount {
+	openingBalance: number,
+	closingBalance: number,
+	transactions: CashTransaction[]
+}
+
+export interface CashTransaction {
+	date: Date,
+	type: CashTransactionType,
+	description: string,
+	amount: number,
+	balance: number
+}
+
+
 export enum AssetCategory {
 	AustralianStocks = "australianStocks",
 	InternationalStocks = "internationalStocks",
@@ -74,3 +90,10 @@ export function isIncomeCategory(category: AssetCategory) {
 		(category == AssetCategory.InternationlFixedInterest));
 }
 
+export enum CashTransactionType {
+	Deposit = "deposit",
+	Withdrawl = "withdrawl",
+	Transfer = "transfer",
+	Fee = "fee",
+	Interest = "interest"
+}

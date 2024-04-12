@@ -1,6 +1,6 @@
 import { useSession } from "@/lib/Session";
 import { AuthenticationRequest, AuthenticationResponse } from "@/model/Authentication";
-import { PortfolioSummary, PortfolioProperties, CorporateAction, Holding, Transaction } from "@/model/Portfolio";
+import { PortfolioSummary, PortfolioProperties, CorporateAction, Holding, Transaction, CashAccount } from "@/model/Portfolio";
 
 
 export interface UseApiClientResult {
@@ -11,6 +11,7 @@ export interface UseApiClientResult {
     getCorporateActions(): Promise<CorporateAction[]>;
     getHolding(stockId: string): Promise<Holding>;
     getTransactions(stockId: string): Promise<Transaction[]>;
+    getCashAccount(): Promise<CashAccount>
 }
 
 export const useApiClient = (): UseApiClientResult => {
@@ -144,7 +145,7 @@ export const useApiClient = (): UseApiClientResult => {
 
     const getTransactions = async (stockId: string): Promise<Transaction[]> => {
 
-        const actions = fetch("/api/portfolio/" + session?.portfolioId + "/holdings/" + stockId + "/transactions?fromdate=2000-01-01&toDate=2100-01-01",
+        const transactions = fetch("/api/portfolio/" + session?.portfolioId + "/holdings/" + stockId + "/transactions?fromdate=2000-01-01&toDate=2100-01-01",
             {
                 method: "GET",
                 headers: {
@@ -162,13 +163,40 @@ export const useApiClient = (): UseApiClientResult => {
             .then(response => JSON.parse(response, customReviver))
             .then(response => response.transactions)
 
-        return actions;
+        return transactions;
+    }
+
+    const getCashAccount = async (): Promise<CashAccount> => {
+
+        const cashAccount = fetch("/api/portfolio/" + session?.portfolioId + "/cashaccount?fromdate=2000-01-01&toDate=2100-01-01",
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + session?.token,
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                }
+            })
+            .then(response => {
+                if (!response.ok)
+                    throw new Error(response.statusText)
+
+                return response.text();
+            })
+            .then(response => JSON.parse(response, customReviver))
+            .then(response => {
+                response.transactions.reverse();
+                return response;
+                }
+            )
+
+        return cashAccount;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function customReviver(key: string, value: any): any {
 
-        if ((key == "startDate") || (key == "endDate") || (key == "actionDate") || (key == "transactionDate")) {
+        if ((key == "startDate") || (key == "endDate") || (key == "actionDate") || (key == "transactionDate") || (key == "date")) {
             if ((value != undefined) && (value != null)) {
 
                 if (value == "9999-12-31")
@@ -191,6 +219,7 @@ export const useApiClient = (): UseApiClientResult => {
         getPortfolioSummary,
         getCorporateActions,
         getHolding,
-        getTransactions
+        getTransactions,
+        getCashAccount
     };
 }

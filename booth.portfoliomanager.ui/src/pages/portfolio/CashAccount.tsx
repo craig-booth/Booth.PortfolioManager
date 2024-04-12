@@ -1,31 +1,36 @@
 import {
   Card,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 
+import { useCashAccountQuery } from "./hooks/PortfolioQueries";
+
+import CashTransactions from "./components/CashTransactions";
+import CashBalance from "./components/CashBalance";
 function CashAccount() {
 
-    return (
-	<div className="grid grid-flow-row-dense grid-cols-3 grid-rows-3 gap-8">
-        <div className="col-span-3">
-			<Card>
-				<CardHeader>
-					<CardTitle>Balance</CardTitle>
-					<CardDescription>Shows Cash Account Balance</CardDescription>
-				</CardHeader>
+	const { isPending: isPending, isError: isError, data: cashAccount } = useCashAccountQuery();
+
+	if (isPending) {
+		return <div>Loading...</div>;
+	}
+
+	if (isError) {
+		return <div>Error</div>;
+	} 
+
+	return (
+
+		<div className="grid grid-flow-row-dense grid-cols-3 gap-8">
+			<Card className="bg-muted rounded-lg col-span-3 p-2">
+				<CardHeader className="text-sm">Balance</CardHeader>
+				<CashBalance cashAccount={cashAccount} />
 			</Card>
+			<Card className="bg-muted rounded-lg col-span-3 p-2">
+				<CardHeader className="text-sm">Transactions</CardHeader>
+				<CashTransactions cashAccount={cashAccount} />
+			</Card>		
 		</div>
-		<div className="col-span-3">
-			<Card>
-				<CardHeader>
-					<CardTitle>Transactions</CardTitle>
-					<CardDescription>Shows transactions</CardDescription>
-				</CardHeader>
-			</Card>
-		</div>
-	</div>
     );
 }
 

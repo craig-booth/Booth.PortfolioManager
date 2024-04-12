@@ -64,7 +64,7 @@ function Holdings({ portfolioProperties, portfolioSummary }: HoldingsProps) {
 			<Table className="w-full text-sm">
 				<TableHeader>
 					<TableRow>
-						<TableHead className="min-w-36">Holding</TableHead>
+						<TableHead className="">Holding</TableHead>
 						<TableHead className="min-w-20 text-right">Units</TableHead>
 						<TableHead className="min-w-20 text-right">Amount</TableHead>
 					</TableRow>

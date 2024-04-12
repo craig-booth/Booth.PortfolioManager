@@ -98,7 +98,7 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 	
 	return(
 		<div className="flex flex-col">
-			<div className="px-10">
+			<div className="px-10 pb-4">
 				<RadioGroup value={chartType} onValueChange={(value) => setChartType(value)} className="flex flex-row-reverse">
 					<div>
 						<RadioGroupItem value="type" id="type" className="peer sr-only" />
@@ -114,9 +114,9 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 					</div>
 				</RadioGroup>
 			</div>			
-			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-				<div className="col-span-1 p-2">
-					<ResponsiveContainer>
+			<div className="grid grid-cols-1 xl:grid-cols-3">
+				<div className="col-span-1 content-center min-h-72" >
+					<ResponsiveContainer >
 						<PieChart>
 							<Pie data={allocation} stroke="none" dataKey="percentage" nameKey="name" startAngle={90} endAngle={450} outerRadius="100%">
 								{
@@ -133,7 +133,7 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 					<Table className="w-full text-sm">
 						<TableHeader>
 							<TableRow>
-								<TableHead className="min-w-36">Asset</TableHead>
+								<TableHead className="">Asset</TableHead>
 								<TableHead className="min-w-20 text-right">%</TableHead>
 								<TableHead className="min-w-20 text-right">Target</TableHead>
 								<TableHead className="min-w-20 text-right">Diff $</TableHead>

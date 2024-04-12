@@ -33,8 +33,8 @@ function Transactions({ stockId }: TransactionsProps) {
 		<Table className="w-full text-sm">
 			<TableHeader>
 				<TableRow>
-					<TableHead>Date</TableHead>
-					<TableHead>Description</TableHead>
+					<TableHead className="min-w-20">Date</TableHead>
+					<TableHead className="min-w-72">Description</TableHead>
 					<TableHead>Comment</TableHead>
 				</TableRow>
 			</TableHeader>

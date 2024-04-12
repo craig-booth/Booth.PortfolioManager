@@ -1,6 +1,6 @@
 import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
-import { PortfolioSummary, PortfolioProperties, CorporateAction, Holding, Transaction } from "@/model/Portfolio";
+import { PortfolioSummary, PortfolioProperties, CorporateAction, Holding, Transaction, CashAccount } from "@/model/Portfolio";
 import { useApiClient } from "@/lib/ApiClient";
 
 export const usePortfolioSummaryQuery = (): UseQueryResult<PortfolioSummary> => {
@@ -50,5 +50,15 @@ export const useHoldingTransactionQuery = (stockId: string): UseQueryResult<Tran
 	return useQuery({
 		queryKey: ["holdingTransactions", stockId],
 		queryFn: () => getTransactions(stockId)
+	});
+};
+
+export const useCashAccountQuery = (): UseQueryResult<CashAccount> => {
+
+	const { getCashAccount } = useApiClient();
+
+	return useQuery({
+		queryKey: ["cashAccount"],
+		queryFn: () => getCashAccount()
 	});
 };
