@@ -26,13 +26,13 @@ interface AssetAllocationProps {
  
 function stockTarget(stock: Stock): number {
 
-	if (stock.asxCode == "ARG") return 0.30;
+	if (stock.asxCode == "ARG") return 0.25;
 	else if (stock.asxCode == "COH") return 0.025;
 	else if (stock.asxCode == "CSL") return 0.025;
 	else if (stock.asxCode == "VAP") return 0.05;
 	else if (stock.asxCode == "VGE") return 0.05;
-	else if (stock.asxCode == "VGS") return 0.40;
-	else if (stock.asxCode == "VISM") return 0.05;
+	else if (stock.asxCode == "VGS") return 0.43;
+	else if (stock.asxCode == "VISM") return 0.07;
 	else if (stock.asxCode == "VCF") return 0.05;
 	else if (stock.asxCode == "VAF") return 0.05;
 	else return 0;
@@ -68,11 +68,11 @@ function AssetAllocation({portfolio} : AssetAllocationProps) {
 			break;
 		case "category": 			
 			calcParams = [
-				{ name: "Australian Stocks", target: 0.35, selector: (holding: Holding) => holding.stock.category == AssetCategory.AustralianStocks },
-				{ name: "International Stocks", target: 0.50, selector: (holding: Holding) => holding.stock.category == AssetCategory.InternationalStocks },
+				{ name: "Australian Stocks", target: 0.30, selector: (holding: Holding) => holding.stock.category == AssetCategory.AustralianStocks },
+				{ name: "International Stocks", target: 0.55, selector: (holding: Holding) => holding.stock.category == AssetCategory.InternationalStocks },
 				{ name: "Australian Property", target: 0.05, selector: (holding: Holding) => holding.stock.category == AssetCategory.AustralianProperty },
 				{ name: "Australian Fixed Interest", target: 0.05, selector: (holding: Holding) => holding.stock.category == AssetCategory.AustralianFixedInterest },
-				{ name: "Internationl Fixed Interest", target: 0.05, selector: (holding: Holding) => holding.stock.category == AssetCategory.InternationlFixedInterest },
+				{ name: "International Fixed Interest", target: 0.05, selector: (holding: Holding) => holding.stock.category == AssetCategory.InternationalFixedInterest },
 				{ name: "Cash", target: 0.00, value: portfolio.cashBalance }
 			];
 			break;

@@ -74,7 +74,7 @@ export enum AssetCategory {
 	AustralianProperty = "australianProperty",
 	InternationalProperty = "internationalProperty",
 	AustralianFixedInterest = "australianFixedInterest",
-	InternationlFixedInterest = "internationlFixedInterest",
+	InternationalFixedInterest = "internationlFixedInterest",
 	Cash = "cash"
 }
 
@@ -87,7 +87,7 @@ export function isGrowthCategory(category: AssetCategory) {
 
 export function isIncomeCategory(category: AssetCategory) {
 	return ((category == AssetCategory.AustralianFixedInterest) ||
-		(category == AssetCategory.InternationlFixedInterest));
+		(category == AssetCategory.InternationalFixedInterest));
 }
 
 export enum CashTransactionType {
