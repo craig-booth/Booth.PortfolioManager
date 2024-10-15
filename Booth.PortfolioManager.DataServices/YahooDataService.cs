@@ -41,12 +41,13 @@ namespace Booth.PortfolioManager.DataServices
                     var json = await JsonNode.ParseAsync(responseStream);
 
                     var results = json["chart"]["result"].AsArray().First();
+                    var gmtOffset = (int)results["meta"]["gmtoffset"];
                     var timeStamps = results["timestamp"].AsArray();
                     var closingPrices = results["indicators"]["quote"].AsArray().First()["close"].AsArray();
 
                     for (var i = 0; i < timeStamps.Count; i++) 
                     {
-                        var date = new Date(DateTimeOffset.FromUnixTimeSeconds((int)timeStamps.ElementAt(i)).ToLocalTime().Date);
+                        var date = new Date(DateTimeOffset.FromUnixTimeSeconds((int)timeStamps.ElementAt(i) + gmtOffset).Date);
                         var price = Math.Round((decimal)closingPrices.ElementAt(i), 5);
 
                         if (date.InRange(dateRange))
