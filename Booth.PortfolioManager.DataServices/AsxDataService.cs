@@ -79,7 +79,7 @@ namespace Booth.PortfolioManager.DataServices
         {
             try
             {
-                string url = "https://www.asx.com.au/asx/1/share/" + asxCode;
+                string url = $"https://asx.api.markitdigital.com/asx-research/1.0/companies/{asxCode}/header";
                 var response = await _HttpClient.GetAsync(url, cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
                     return null;
@@ -88,10 +88,10 @@ namespace Booth.PortfolioManager.DataServices
 
                 using (var json = await JsonDocument.ParseAsync(responseStream))
                 {
-                    var price = json.RootElement.GetProperty("last_price").GetDecimal();
-                    var date = Date.Parse(json.RootElement.GetProperty("last_trade_date").GetString().Substring(0, 10));
+                    var price = json.RootElement.GetProperty("data").GetProperty("priceLast").GetDecimal();
+                    var date = Date.Today;
 
-                    return new StockPrice(asxCode, date, price);
+                    return new StockPrice(asxCode, date, Math.Round(price, 5));
                 }
             }
             catch

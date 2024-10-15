@@ -26,6 +26,7 @@ using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.DataImporters;
 using Booth.PortfolioManager.Web.Mappers;
 using Booth.PortfolioManager.Web.CachedRepositories;
+using System.Net.Security;
 
 namespace Booth.PortfolioManager.Web
 {
@@ -119,7 +120,7 @@ namespace Booth.PortfolioManager.Web
         }
         public static IServiceCollection AddDataImportService(this IServiceCollection services)
         {
-            services.AddHttpClient<IHistoricalStockPriceService, AsxDataService>();
+            services.AddHttpClient<IHistoricalStockPriceService, YahooDataService>();
             services.AddHttpClient<ILiveStockPriceService, AsxDataService>();
             services.AddHttpClient<ITradingDayService, AsxDataService>();
 

@@ -8,7 +8,7 @@ using System.Linq;
 using Xunit;
 using FluentAssertions;
 using Moq;
-using Moq.Protected;
+using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.TradingCalendars;
@@ -19,11 +19,11 @@ namespace Booth.PortfolioManager.DataServices.Test
     {
 
         [Fact]
-        public async void GetSinglePrice()
+        public async Task GetSinglePrice()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var json = "{\"code\":\"BHP\",\"isin_code\":\"AU000000BHP4\",\"desc_full\":\"Ordinary Fully Paid\",\"last_price\":34.72,\"open_price\":34.38,\"day_high_price\":34.88,\"day_low_price\":34.25,\"change_price\":-0.33,\"change_in_percent\":\" - 0.942 % \",\"volume\":6214544,\"bid_price\":34.72,\"offer_price\":34.74,\"previous_close_price\":35.05,\"previous_day_percentage_change\":\"5.891 % \",\"year_high_price\":42.33,\"last_trade_date\":\"2020-05-20T00:00:00+1000\",\"year_high_date\":\"2019-07-03T00:00:00+1000\",\"year_low_price\":24.05,\"year_low_date\":\"2020-03-13T00:00:00+1100\",\"year_open_price\":39.1,\"year_open_date\":\"2014-02-25T11:00:00+1100\",\"year_change_price\":-4.38,\"year_change_in_percentage\":\"-11.202 % \",\"pe\":13.2,\"eps\":2.6547,\"average_daily_volume\":11644628,\"annual_dividend_yield\":6.08,\"market_cap\":103252091430,\"number_of_shares\":2945851396,\"deprecated_market_cap\":102279960000,\"deprecated_number_of_shares\":2945851394,\"suspended\":false}";
+            var json = "{\"data\": { \"dateListed\": \"1885-08-13\", \"displayName\": \"BHP GROUP LIMITED\", \"priceAsk\": 43.800000000000004, \"priceBid\": 43.79, \"priceChange\": 0.37000000000000455, \"priceChangePercent\": 0.8519456596822578, \"priceLast\": 43.800000000000004, \"sector\": \"Materials\", \"industryGroup\": \"Materials\", \"securityType\": 1, \"symbol\": \"BHP\", \"volume\": 6157139, \"xid\": \"60947\", \"marketCap\": 220359528595, \"statusCode\": \"\" }}";
 
             HttpRequestMessage requestMessage = null;
             var messageHandler = mockRepository.CreateJsonMessageHandler(json, x => requestMessage = x);
@@ -34,17 +34,17 @@ namespace Booth.PortfolioManager.DataServices.Test
             var result = await dataService.GetSinglePrice("BHP", CancellationToken.None);
 
             requestMessage.Method.Should().Be(HttpMethod.Get);
-            requestMessage.RequestUri.AbsoluteUri.Should().Be("https://www.asx.com.au/asx/1/share/BHP");
-            result.Should().BeEquivalentTo(new StockPrice("BHP", new Date(2020, 05, 20), 34.72m));
+            requestMessage.RequestUri.AbsoluteUri.Should().Be("https://asx.api.markitdigital.com/asx-research/1.0/companies/BHP/header");
+            result.Should().BeEquivalentTo(new StockPrice("BHP", Date.Today, 43.80m));
             
         }
 
         [Fact]
-        public async void GetSinglePriceUnexpectedJson()
+        public async Task GetSinglePriceUnexpectedJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var json = "{\"field\": \"value\" }";
+            var json = "{ \"error\": { \"code\": 400, \"message\": \"Bad Request: Symbol not found\", \"errors\": [ { \"message\": \"Bad Request: Symbol not found\"} ] } }";
 
             var messageHandler = mockRepository.CreateJsonMessageHandler(json);
 
@@ -57,7 +57,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetSinglePriceInvalidJson()
+        public async Task GetSinglePriceInvalidJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -74,7 +74,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetSinglePriceHttpError()
+        public async Task GetSinglePriceHttpError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -89,11 +89,11 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetMultiplePrices()
+        public async Task GetMultiplePrices()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var json = "{\"code\":\"BHP\",\"isin_code\":\"AU000000BHP4\",\"desc_full\":\"Ordinary Fully Paid\",\"last_price\":34.72,\"open_price\":34.38,\"day_high_price\":34.88,\"day_low_price\":34.25,\"change_price\":-0.33,\"change_in_percent\":\" - 0.942 % \",\"volume\":6214544,\"bid_price\":34.72,\"offer_price\":34.74,\"previous_close_price\":35.05,\"previous_day_percentage_change\":\"5.891 % \",\"year_high_price\":42.33,\"last_trade_date\":\"2020-05-20T00:00:00+1000\",\"year_high_date\":\"2019-07-03T00:00:00+1000\",\"year_low_price\":24.05,\"year_low_date\":\"2020-03-13T00:00:00+1100\",\"year_open_price\":39.1,\"year_open_date\":\"2014-02-25T11:00:00+1100\",\"year_change_price\":-4.38,\"year_change_in_percentage\":\"-11.202 % \",\"pe\":13.2,\"eps\":2.6547,\"average_daily_volume\":11644628,\"annual_dividend_yield\":6.08,\"market_cap\":103252091430,\"number_of_shares\":2945851396,\"deprecated_market_cap\":102279960000,\"deprecated_number_of_shares\":2945851394,\"suspended\":false}";
+            var json = "{\"data\": { \"dateListed\": \"1885-08-13\", \"displayName\": \"BHP GROUP LIMITED\", \"priceAsk\": 43.800000000000004, \"priceBid\": 43.79, \"priceChange\": 0.37000000000000455, \"priceChangePercent\": 0.8519456596822578, \"priceLast\": 43.800000000000004, \"sector\": \"Materials\", \"industryGroup\": \"Materials\", \"securityType\": 1, \"symbol\": \"BHP\", \"volume\": 6157139, \"xid\": \"60947\", \"marketCap\": 220359528595, \"statusCode\": \"\" }}";
 
             var requestMessage = new List<HttpRequestMessage>(); ;
             var messageHandler = mockRepository.CreateJsonMessageHandler(json, x => requestMessage.Add(x));
@@ -104,14 +104,14 @@ namespace Booth.PortfolioManager.DataServices.Test
             var result = await dataService.GetMultiplePrices(new string[] { "BHP", "COH" }, CancellationToken.None);
 
             requestMessage[0].Method.Should().Be(HttpMethod.Get);
-            requestMessage[0].RequestUri.AbsoluteUri.Should().StartWith("https://www.asx.com.au/asx/1/share/BHP");
+            requestMessage[0].RequestUri.AbsoluteUri.Should().StartWith("https://asx.api.markitdigital.com/asx-research/1.0/companies/BHP/header");
 
             requestMessage[1].Method.Should().Be(HttpMethod.Get);
-            requestMessage[1].RequestUri.AbsoluteUri.Should().StartWith("https://www.asx.com.au/asx/1/share/COH");
+            requestMessage[1].RequestUri.AbsoluteUri.Should().StartWith("https://asx.api.markitdigital.com/asx-research/1.0/companies/COH/header");
         }
 
         [Fact]
-        public async void GetHistoricalPriceData()
+        public async Task GetHistoricalPriceData()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -136,7 +136,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetHistoricalPriceDataUnexpectedJson()
+        public async Task GetHistoricalPriceDataUnexpectedJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -153,7 +153,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetHistoricalPriceDataInvalidJson()
+        public async Task GetHistoricalPriceDataInvalidJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -170,7 +170,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetHistoricalPriceDataHttpError()
+        public async Task GetHistoricalPriceDataHttpError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -195,7 +195,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         [InlineData(new object[] { 2022, 8 })]
         [InlineData(new object[] { 2023, 8 })]
         [InlineData(new object[] { 2024, 8 })]
-        public async void GetNonTradingDays(int year, int expectedCount)
+        public async Task GetNonTradingDays(int year, int expectedCount)
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -226,7 +226,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetNonTradingDaysUnexpectedResponse()
+        public async Task GetNonTradingDaysUnexpectedResponse()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -251,7 +251,7 @@ namespace Booth.PortfolioManager.DataServices.Test
 
 
         [Fact]
-        public async void GetNonTradingDaysHttpError()
+        public async Task GetNonTradingDaysHttpError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 

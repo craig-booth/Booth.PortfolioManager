@@ -21,7 +21,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public async void AnonymousUserShouldNotHaveAccess()
+        public async Task AnonymousUserShouldNotHaveAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
 
@@ -31,7 +31,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public async void StandardUserHasReadAccess()
+        public async Task StandardUserHasReadAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
             await client.Authenticate(Integration.User, Integration.Password);
@@ -42,7 +42,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public async void StandardUserShouldNotHaveUpdateAccess()
+        public async Task StandardUserShouldNotHaveUpdateAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
             await client.Authenticate(Integration.User, Integration.Password);
@@ -62,7 +62,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public async void AdminUserHasUpdateAccess()
+        public async Task AdminUserHasUpdateAccess()
         {
             var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
             await client.Authenticate(Integration.AdminUser, Integration.Password);
