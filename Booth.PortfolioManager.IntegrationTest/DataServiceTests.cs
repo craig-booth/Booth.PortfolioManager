@@ -27,7 +27,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public async void GetTradingDaysForThisYear()
+        public async Task GetTradingDaysForThisYear()
         {
             var dataService = _Fixture.Services.GetService<ITradingDayService>();
 
@@ -37,7 +37,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public async void GetLiveStockPrice()
+        public async Task GetLiveStockPrice()
         {
             var dataService = _Fixture.Services.GetService<ILiveStockPriceService>();
 
@@ -48,7 +48,7 @@ namespace Booth.PortfolioManager.IntegrationTest
         }
 
         [Fact]
-        public async void GetLastWeeksClosingPrices()
+        public async Task GetLastWeeksClosingPrices()
         {
             var dataService = _Fixture.Services.GetService<IHistoricalStockPriceService>();
 

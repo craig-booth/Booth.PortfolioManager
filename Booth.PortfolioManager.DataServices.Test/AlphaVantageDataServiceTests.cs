@@ -7,7 +7,7 @@ using System.Net.Http;
 using Xunit;
 using FluentAssertions;
 using Moq;
-using Moq.Protected;
+using System.Threading.Tasks;
 
 using Booth.Common;
 
@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.DataServices.Test
     {
 
         [Fact]
-        public async void GetSinglePrice()
+        public async Task GetSinglePrice()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -62,7 +62,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetSinglePriceUnexpectedJson()
+        public async Task GetSinglePriceUnexpectedJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -86,7 +86,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetSinglePriceInvalidJson()
+        public async Task GetSinglePriceInvalidJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -103,7 +103,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetSinglePriceHttpError()
+        public async Task GetSinglePriceHttpError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -118,7 +118,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetMultiplePrices()
+        public async Task GetMultiplePrices()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -163,7 +163,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetHistoricalPriceData()
+        public async Task GetHistoricalPriceData()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -207,7 +207,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetHistoricalPriceDataUnexpectedJson()
+        public async Task GetHistoricalPriceDataUnexpectedJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -231,7 +231,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetHistoricalPriceDataInvalidJson()
+        public async Task GetHistoricalPriceDataInvalidJson()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
@@ -248,7 +248,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         }
 
         [Fact]
-        public async void GetHistoricalPriceDataHttpError()
+        public async Task GetHistoricalPriceDataHttpError()
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
