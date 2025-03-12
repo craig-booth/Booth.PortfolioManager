@@ -195,6 +195,7 @@ namespace Booth.PortfolioManager.DataServices.Test
         [InlineData(new object[] { 2022, 8 })]
         [InlineData(new object[] { 2023, 8 })]
         [InlineData(new object[] { 2024, 8 })]
+        [InlineData(new object[] { 2025, 8 })]
         public async Task GetNonTradingDays(int year, int expectedCount)
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);

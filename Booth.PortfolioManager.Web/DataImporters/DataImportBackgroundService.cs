@@ -53,9 +53,32 @@ namespace Booth.PortfolioManager.Web.DataImporters
         {
             var logger = _ServiceProvider.GetRequiredService<ILogger<DataImportBackgroundService>>();
 
-            ImportTradingDays();
-            ImportHistoricalPrices();
-            ImportLivePrices();
+            try
+            {
+                ImportTradingDays();
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error occured importing trading days: {error}", e.Message);
+            }
+
+            try
+            {
+                ImportHistoricalPrices();
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error occured importing historical prices: {error}", e.Message);
+            }
+
+            try
+            {
+                ImportLivePrices();
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error occured importing live prices: {error}", e.Message);
+            }
         }
 
         private void ImportHistoricalPrices()

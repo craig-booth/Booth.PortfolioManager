@@ -18,7 +18,7 @@ namespace Booth.PortfolioManager.DataServices
     {
         public bool CanParse(int year)
         {
-            return (year == 2024);            
+            return (year >= 2024);            
         }
 
         public string ResourceUrl(int year)

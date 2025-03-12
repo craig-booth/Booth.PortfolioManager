@@ -20,7 +20,7 @@ namespace Booth.PortfolioManager.DataServices
         public YahooDataService(HttpClient httpClient)
         {
             _HttpClient = httpClient;
-            _HttpClient.DefaultRequestHeaders.Add("User-Agent", "curl/7.68.0");
+            _HttpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)");
         }
 
         public async Task<IEnumerable<StockPrice>> GetHistoricalPriceData(string asxCode, DateRange dateRange, CancellationToken cancellationToken)
