@@ -49,7 +49,7 @@ pipeline {
 
 				stage('Publish') {
 					steps {
-					    sh "RUN mkdir -p /.aspnet/https"
+				    sh "RUN mkdir -p /.aspnet/https"
 						sh "dotnet publish ${PROJECT} --configuration Release --output ./deploy"
 					}
 				}
