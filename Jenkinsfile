@@ -44,7 +44,7 @@ pipeline {
 								tools: [ MSTest(pattern: 'testresults/*.trx') ]
 								)
 
-							recordCoverage(tools: [[parser: 'COBERTURA', pattern: 'testresults/**/*.xml']])
+							recordCoverage(ignoreParsingErrors: true, tools: [[parser: 'COBERTURA', pattern: 'testresults/**/*.xml']])
 						}
 					}
 				}
@@ -70,7 +70,7 @@ pipeline {
     }
 	
 	post {
-		always {
+		success {
 			cleanWs()
 		}
 	}
