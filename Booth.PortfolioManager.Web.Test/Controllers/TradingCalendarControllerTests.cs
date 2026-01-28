@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using FluentAssertions;
-using FluentAssertions.AspNetCore.Mvc;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
@@ -31,7 +30,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new TradingCalendarController(service.Object);
             var result = await controller.Get(2010);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -49,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new TradingCalendarController(service.Object);
             var result = await controller.Update(2010, tradingCalendar);
 
-            result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new [] { "Error message" });
+            result.Should().BeBadRequestObjectResult().Which.Value.Should().BeEquivalentTo(new [] { "Error message" });
 
             mockRepository.VerifyAll();
         }

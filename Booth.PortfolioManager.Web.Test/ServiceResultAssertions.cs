@@ -15,14 +15,14 @@ namespace Booth.PortfolioManager.Web.Test
     {
         public static ServiceResultAssertions Should(this ServiceResult result)
         {
-            return new ServiceResultAssertions(result);
+            return new ServiceResultAssertions(result, AssertionChain.GetOrCreate());
         }
     }
 
     class ServiceResultAssertions : ReferenceTypeAssertions<ServiceResult, ServiceResultAssertions>
     {
-        public ServiceResultAssertions(ServiceResult result) 
-             : base(result)
+        public ServiceResultAssertions(ServiceResult result, AssertionChain chain) 
+             : base(result, chain)
         {
         }
 
@@ -30,7 +30,7 @@ namespace Booth.PortfolioManager.Web.Test
 
         public AndConstraint<ServiceResultAssertions> HaveOkStatus(string because = "", params object[] becauseArgs)
         {
-            Execute.Assertion
+            CurrentAssertionChain
                 .BecauseOf(because, becauseArgs)
                 .Given(() => Subject)
                 .ForCondition(x => x.Status == ServiceStatus.Ok)
@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.Web.Test
 
         public AndConstraint<ServiceResultAssertions> HaveNotFoundStatus(string because = "", params object[] becauseArgs)
         {
-            Execute.Assertion
+            CurrentAssertionChain
                 .BecauseOf(because, becauseArgs)
                 .Given(() => Subject)
                 .ForCondition(x => x.Status == ServiceStatus.NotFound)
@@ -52,20 +52,20 @@ namespace Booth.PortfolioManager.Web.Test
 
         public ServiceErrorAssertions HaveErrorStatus(string because = "", params object[] becauseArgs)
         {
-            Execute.Assertion
+            CurrentAssertionChain
                 .BecauseOf(because, becauseArgs)
                 .Given(() => Subject)
                 .ForCondition(x => x.Status == ServiceStatus.Error)
                 .FailWith("Expected {context:service result} to be Error{reason}, but found {0}.", Subject.Status);
 
-            return new ServiceErrorAssertions(Subject);
+            return new ServiceErrorAssertions(Subject, CurrentAssertionChain);
         }
     }
 
     class ServiceErrorAssertions : ReferenceTypeAssertions<ServiceResult, ServiceErrorAssertions>
     {
-        public ServiceErrorAssertions(ServiceResult result)
-             : base(result)
+        public ServiceErrorAssertions(ServiceResult result, AssertionChain chain)
+             : base(result, chain)
         {
 
         }
@@ -74,7 +74,7 @@ namespace Booth.PortfolioManager.Web.Test
 
         public AndConstraint<ServiceErrorAssertions> WithError(string error, string because = "", params object[] becauseArgs)
         {
-            Execute.Assertion
+            CurrentAssertionChain
                 .BecauseOf(because, becauseArgs)
                 .ForCondition(!string.IsNullOrEmpty(error))
                 .FailWith("Error message cannot be null or empty")

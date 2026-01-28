@@ -1,21 +1,20 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Booth.Common;
+using Booth.PortfolioManager.Domain;
+using Booth.PortfolioManager.Domain.CorporateActions;
+using Booth.PortfolioManager.Domain.Portfolios;
+using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Domain.TradingCalendars;
+using Booth.PortfolioManager.Domain.Transactions;
+using Booth.PortfolioManager.Domain.Utils;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Bson.Serialization.Serializers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
-
-using Booth.Common;
-using Booth.PortfolioManager.Domain;
-using Booth.PortfolioManager.Domain.Portfolios;
-using Booth.PortfolioManager.Domain.Utils;
-using Booth.PortfolioManager.Domain.Stocks;
-using Booth.PortfolioManager.Domain.CorporateActions;
-using Booth.PortfolioManager.Domain.TradingCalendars;
-using Booth.PortfolioManager.Domain.Transactions;
-using MongoDB.Bson.Serialization.Serializers;
+using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Booth.PortfolioManager.Repository.Test")]
 
@@ -41,6 +40,8 @@ namespace Booth.PortfolioManager.Repository.Serialization
 
             var objectSerializer = new ObjectSerializer(type => ObjectSerializer.DefaultAllowedTypes(type) || type.Namespace.StartsWith("Booth.PortfolioManager.Domain"));
             BsonSerializer.RegisterSerializer(objectSerializer);
+
+            BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.CSharpLegacy));
 
             // Corporate Actions
             BsonClassMap.RegisterClassMap<CorporateAction>(cm =>

@@ -8,7 +8,6 @@ using System.Security.Cryptography;
 using Xunit;
 using Moq;
 using FluentAssertions;
-using FluentAssertions.AspNetCore.Mvc;
 
 using Booth.PortfolioManager.RestApi.Users;
 using Booth.PortfolioManager.Web.Controllers;
