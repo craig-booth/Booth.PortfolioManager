@@ -5,7 +5,6 @@ using System.Text;
 using Xunit;
 using Moq;
 using FluentAssertions;
-using FluentAssertions.AspNetCore.Mvc;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
@@ -65,7 +64,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetProperties(service.Object);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -83,7 +82,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetSummary(service.Object, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -101,7 +100,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetSummary(service.Object, new DateTime(2000, 01, 01));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -119,7 +118,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetPerformance(service.Object, null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -137,7 +136,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetPerformance(service.Object, new DateTime(2000, 01, 01), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -155,7 +154,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetPerformance(service.Object, null, new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -173,7 +172,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetPerformance(service.Object, new DateTime(2000, 06, 01), new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -191,7 +190,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = await controller.GetValue(service.Object, null, null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -209,7 +208,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = await controller.GetValue(service.Object, new DateTime(2000, 01, 01), null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -227,7 +226,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = await controller.GetValue(service.Object, null, new DateTime(2000, 12, 31), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -245,7 +244,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = await controller.GetValue(service.Object, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -263,7 +262,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = await controller.GetValue(service.Object, null, null, ValueFrequency.Day);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -281,7 +280,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = await controller.GetValue(service.Object, null, null, ValueFrequency.Week);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -299,7 +298,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = await controller.GetValue(service.Object, null, null, ValueFrequency.Month);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -318,7 +317,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetTransactions(service.Object, null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -336,7 +335,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetTransactions(service.Object, new DateTime(2000, 01, 01), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -354,7 +353,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetTransactions(service.Object, null, new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -372,7 +371,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetTransactions(service.Object, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -390,7 +389,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCapitalGains(service.Object, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -408,7 +407,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCapitalGains(service.Object, new DateTime(2000, 01, 01));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -426,7 +425,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetDetailedCapitalGains(service.Object, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -444,7 +443,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetDetailedCapitalGains(service.Object, new DateTime(2000, 01, 01));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -462,7 +461,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCGTLiability(service.Object, null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -480,7 +479,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCGTLiability(service.Object, new DateTime(2000, 01, 01), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -498,7 +497,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCGTLiability(service.Object, null, new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -516,7 +515,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCGTLiability(service.Object, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -534,7 +533,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCashAccount(service.Object, null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -552,7 +551,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCashAccount(service.Object, new DateTime(2000, 01, 01), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -570,7 +569,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCashAccount(service.Object, null, new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -588,7 +587,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCashAccount(service.Object, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -606,7 +605,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetIncome(service.Object, null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -624,7 +623,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetIncome(service.Object, new DateTime(2000, 01, 01), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -642,7 +641,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetIncome(service.Object, null, new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -660,7 +659,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetIncome(service.Object, new DateTime(2000, 01, 01), new DateTime(2000, 12, 31));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }
@@ -678,7 +677,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new PortfolioController();
             var result = controller.GetCorporateActions(service.Object);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(response);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(response);
 
             mockRepository.VerifyAll();
         }

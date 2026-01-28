@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using FluentAssertions;
-using FluentAssertions.AspNetCore.Mvc;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
@@ -49,7 +48,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, null, null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(actions);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(actions);
 
             mockRepository.VerifyAll();
         }
@@ -69,7 +68,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, new DateTime(2000, 01, 01), null);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(actions);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(actions);
 
             mockRepository.VerifyAll();
         }
@@ -89,7 +88,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, null, new DateTime(2000, 01, 01));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(actions);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(actions);
 
             mockRepository.VerifyAll();
         }
@@ -109,7 +108,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, new DateTime(2000, 01, 01), new DateTime(2001, 01, 01));
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(actions);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(actions);
 
             mockRepository.VerifyAll();
         }
@@ -167,7 +166,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateAction(stockId, actionId);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(action);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(action);
 
             mockRepository.VerifyAll();
         }

@@ -53,7 +53,7 @@ namespace Booth.PortfolioManager.Repository.Test.Serialization
 
             var json = BsonExtensionMethods.ToJson(portfolio);
 
-            json.Should().Be("{ " +
+            var expected = "{ " +
                 "\"_id\" : CSUUID(\"" + portfolioId.ToString() + "\")," +
                 " \"name\" : \"Test\"," +
                 " \"owner\" : CSUUID(\"" + ownerId.ToString() + "\")," +
@@ -67,8 +67,8 @@ namespace Booth.PortfolioManager.Repository.Test.Serialization
                         " \"stock\" : CSUUID(\"" + stockId.ToString() + "\")," +
                         " \"comment\" : \"A comment\"," +
                         " \"units\" : 100," +
-                        " \"averagePrice\" : \"1.30\"," +
-                        " \"transactionCosts\" : \"19.95\"," +
+                        " \"averagePrice\" : { \"$numberDecimal\" : \"1.30\" }," +
+                        " \"transactionCosts\" : { \"$numberDecimal\" : \"19.95\" }," +
                         " \"createCashTransaction\" : false }, " +
                     "{ \"_t\" : \"IncomeReceived\"," +
                         " \"_id\" : CSUUID(\"" + transaction2Id.ToString() + "\")," +
@@ -76,15 +76,17 @@ namespace Booth.PortfolioManager.Repository.Test.Serialization
                         " \"stock\" : CSUUID(\"" + stockId.ToString() + "\")," +
                         " \"comment\" : \"Another comment\"," +
                         " \"recordDate\" : \"2000-06-07\"," +
-                        " \"frankedAmount\" : \"145.00\"," +
-                        " \"unfrankedAmount\" : \"8.00\"," +
-                        " \"frankingCredits\" : \"9.00\"," +
-                        " \"interest\" : \"10.00\"," +
-                        " \"taxDeferred\" : \"3.45\"," +
+                        " \"frankedAmount\" : { \"$numberDecimal\" : \"145.00\" }," +
+                        " \"unfrankedAmount\" : { \"$numberDecimal\" : \"8.00\" }," +
+                        " \"frankingCredits\" : { \"$numberDecimal\" : \"9.00\" }," +
+                        " \"interest\" : { \"$numberDecimal\" : \"10.00\" }," +
+                        " \"taxDeferred\" : { \"$numberDecimal\" : \"3.45\" }," +
                         " \"createCashTransaction\" : false," +
-                        " \"drpCashBalance\" : \"1.89\" }" +
+                        " \"drpCashBalance\" : { \"$numberDecimal\" : \"1.89\" } }" +
                      "] " +
-                "}");
+                "}";
+
+            json.Should().Be(expected);
         }
 
         [Fact]
@@ -100,7 +102,7 @@ namespace Booth.PortfolioManager.Repository.Test.Serialization
             stock.List("ABC", "Test Stock", new Date(1990, 01, 01), false, AssetCategory.AustralianStocks);
             _Fixture.SetStockCache(new[] { stock });
 
-            var portfolio = BsonSerializer.Deserialize<Portfolio>("{ " +
+            var json = "{ " +
                 "\"_id\" : CSUUID(\"" + portfolioId.ToString() + "\")," +
                 " \"name\" : \"Test\"," +
                 " \"owner\" : CSUUID(\"" + ownerId.ToString() + "\")," +
@@ -114,8 +116,8 @@ namespace Booth.PortfolioManager.Repository.Test.Serialization
                         " \"stock\" : CSUUID(\"" + stockId.ToString() + "\")," +
                         " \"comment\" : \"A comment\"," +
                         " \"units\" : 100," +
-                        " \"averagePrice\" : \"1.30\"," +
-                        " \"transactionCosts\" : \"19.95\"," +
+                        " \"averagePrice\" : { \"$numberDecimal\" : \"1.30\" }," +
+                        " \"transactionCosts\" : { \"$numberDecimal\" : \"19.95\" }," +
                         " \"createCashTransaction\" : false }, " +
                     "{ \"_t\" : \"IncomeReceived\"," +
                         " \"_id\" : CSUUID(\"" + transaction2Id.ToString() + "\")," +
@@ -123,15 +125,17 @@ namespace Booth.PortfolioManager.Repository.Test.Serialization
                         " \"stock\" : CSUUID(\"" + stockId.ToString() + "\")," +
                         " \"comment\" : \"Another comment\"," +
                         " \"recordDate\" : \"2000-06-07\"," +
-                        " \"frankedAmount\" : \"145.00\"," +
-                        " \"unfrankedAmount\" : \"8.00\"," +
-                        " \"frankingCredits\" : \"9.00\"," +
-                        " \"interest\" : \"10.00\"," +
-                        " \"taxDeferred\" : \"3.45\"," +
+                        " \"frankedAmount\" : { \"$numberDecimal\" : \"145.00\" }," +
+                        " \"unfrankedAmount\" : { \"$numberDecimal\" : \"8.00\" }," +
+                        " \"frankingCredits\" : { \"$numberDecimal\" : \"9.00\" }," +
+                        " \"interest\" : { \"$numberDecimal\" : \"10.00\" }," +
+                        " \"taxDeferred\" : { \"$numberDecimal\" : \"3.45\" }," +
                         " \"createCashTransaction\" : false," +
-                        " \"drpCashBalance\" : \"1.89\" }" +
+                        " \"drpCashBalance\" : { \"$numberDecimal\" : \"1.89\" } }" +
                      "] " +
-                "}");
+                "}";
+
+            var portfolio = BsonSerializer.Deserialize<Portfolio>(json);
 
             using (new AssertionScope())
             {

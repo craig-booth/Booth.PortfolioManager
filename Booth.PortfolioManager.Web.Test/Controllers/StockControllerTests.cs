@@ -7,7 +7,6 @@ using System.Linq;
 using Xunit;
 using Moq;
 using FluentAssertions;
-using FluentAssertions.AspNetCore.Mvc;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
@@ -107,7 +106,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(_Stock.Id, null);
 
-            response.Result.Should().BeOkObjectResult().Value.Should().BeEquivalentTo(new
+            response.Result.Should().BeOkObjectResult().Which.Value.Should().BeEquivalentTo(new
             {
                 Id = _Stock.Id,
                 AsxCode = "XYZ",
@@ -130,7 +129,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var response = _Controller.Get(_Stock.Id, new DateTime(2005, 01, 01));
 
-            response.Result.Should().BeOkObjectResult().Value.Should().BeEquivalentTo(new
+            response.Result.Should().BeOkObjectResult().Which.Value.Should().BeEquivalentTo(new
             {
                 Id = _Stock.Id,
                 AsxCode = "ABC",
@@ -157,7 +156,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.Find(It.IsAny<Func<StockProperties, bool>>()));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -185,7 +184,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.Find(new Date(2011, 01, 01), It.IsAny<Func<StockProperties, bool>>()));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -213,7 +212,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.Find(new DateRange(new Date(2009, 01, 01), Date.MaxValue), It.IsAny<Func<StockProperties, bool>>()));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -241,7 +240,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.Find(new DateRange(Date.MinValue, new Date(2055, 01, 01)), It.IsAny<Func<StockProperties, bool>>()));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -269,7 +268,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.Find(new DateRange(new Date(2009, 01, 01), new Date(2012, 01, 01)), It.IsAny<Func<StockProperties, bool>>()));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -305,7 +304,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.All());
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -333,7 +332,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.All(new Date(2011, 01, 01)));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -361,7 +360,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.All(new DateRange(new Date(2009, 01, 01), Date.MaxValue)));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -389,7 +388,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.All(new DateRange(Date.MinValue, new Date(2055, 01, 01))));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -418,7 +417,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockQueryMock.Verify(x => x.All(new DateRange(new Date(2009, 01, 01), new Date(2012, 01, 01))));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<List<StockResponse>>()
+                .Which.Value.Should().BeOfType<List<StockResponse>>()
                 .Which.Should().ContainSingle()
                 .Which.Should().BeEquivalentTo(new
                 {
@@ -461,7 +460,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var response = _Controller.GetHistory(_Stock.Id);
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<StockHistoryResponse>()
+                .Which.Value.Should().BeOfType<StockHistoryResponse>()
                 .Which.Should().BeEquivalentTo(new {
                 
                     Id = _Stock.Id,
@@ -524,7 +523,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<StockPriceResponse>()
+                .Which.Value.Should().BeOfType<StockPriceResponse>()
                 .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = expectedDateRange.FromDate, Price = 0.10m })
                 .And.EndWith(new ClosingPrice() { Date = expectedDateRange.ToDate, Price = 0.10m })
                 .And.HaveCount(expectedCount);
@@ -539,7 +538,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<StockPriceResponse>()
+                .Which.Value.Should().BeOfType<StockPriceResponse>()
                 .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2010, 01, 01), Price = 0.10m })
                 .And.EndWith(new ClosingPrice() { Date = new Date(2010, 12, 31), Price = 0.10m })
                 .And.HaveCount(365);
@@ -554,7 +553,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<StockPriceResponse>()
+                .Which.Value.Should().BeOfType<StockPriceResponse>()
                 .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2014, 01, 02), Price = 0.10m })
                 .And.EndWith(new ClosingPrice() { Date = new Date(2015, 01, 01), Price = 0.10m })
                 .And.HaveCount(365);
@@ -569,7 +568,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             _StockPriceRetriever.Verify(x => x.GetPrices(_Stock.Id, expectedDateRange));
 
             response.Result.Should().BeOkObjectResult()
-                .Value.Should().BeOfType<StockPriceResponse>()
+                .Which.Value.Should().BeOfType<StockPriceResponse>()
                 .Which.ClosingPrices.Should().StartWith(new ClosingPrice() { Date = new Date(2010, 01, 01), Price = 0.10m })
                 .And.EndWith(new ClosingPrice() { Date = new Date(2010, 01, 20), Price = 0.10m })
                 .And.HaveCount(20);

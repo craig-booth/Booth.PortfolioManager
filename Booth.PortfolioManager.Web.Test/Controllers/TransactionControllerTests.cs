@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Xunit;
 using Moq;
 using FluentAssertions;
-using FluentAssertions.AspNetCore.Mvc;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
@@ -50,7 +49,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new TransactionController();
             var result = controller.Get(service.Object, transactionId);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(transaction);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(transaction);
 
             mockRepository.VerifyAll();
         }
@@ -69,7 +68,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new TransactionController();
             var result = await controller.AddTransaction(service.Object, transaction);
 
-            result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
+            result.Should().BeBadRequestObjectResult().Which.Value.Should().BeEquivalentTo(new[] { "Error message" });
 
             mockRepository.VerifyAll();
         }
@@ -126,7 +125,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new TransactionController();
             var result = await controller.UpdateTransaction(service.Object, transactionId, transaction);
 
-            result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
+            result.Should().BeBadRequestObjectResult().Which.Value.Should().BeEquivalentTo(new[] { "Error message" });
 
             mockRepository.VerifyAll(); 
         }
@@ -181,7 +180,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new TransactionController();
             var result = await controller.DeleteTransaction(service.Object, transactionId);
 
-            result.Should().BeBadRequestObjectResult().Error.Should().BeEquivalentTo(new[] { "Error message" });
+            result.Should().BeBadRequestObjectResult().Which.Value.Should().BeEquivalentTo(new[] { "Error message" });
 
             mockRepository.VerifyAll(); 
         }
@@ -259,7 +258,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var controller = new TransactionController();
             var result = controller.GetTransactionsForCorporateAction(service.Object, stockId, actionId);
 
-            result.Result.Should().BeOkObjectResult().Value.Should().Be(transactions);
+            result.Result.Should().BeOkObjectResult().Which.Value.Should().Be(transactions);
 
             mockRepository.VerifyAll();
         }
