@@ -44,7 +44,7 @@ pipeline {
 								tools: [ MSTest(pattern: 'testresults/*.trx') ]
 								)
 
-							recordCoverage(tools: [[parser: 'COBERTURA', pattern: '**/*.xml']], sourceDirectories: [[path: './testresults']])
+							recordCoverage(tools: [[parser: 'COBERTURA', pattern: 'testresults/*.xml']])
 						}
 					}
 				}
