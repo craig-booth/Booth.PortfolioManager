@@ -35,7 +35,7 @@ pipeline {
 						sh "dotnet test ${TEST_PROJECT2} --configuration Release --logger trx --collect \"XPlat Code Coverage\" --settings ./.runsettings --results-directory ./testresults"
 						sh "dotnet test ${TEST_PROJECT3} --configuration Release --logger trx --collect \"XPlat Code Coverage\" --settings ./.runsettings --results-directory ./testresults"
 
-						sh "dotnet test ${INTTEST_PROJECT} --configuration Release --logger trx --results-directory ./testresults"
+						sh "dotnet test ${INTTEST_PROJECT} --configuration Release --logger trx --collect \"XPlat Code Coverage\" --settings ./.runsettings --results-directory ./testresults"
 					}
 					post {
 						always {
