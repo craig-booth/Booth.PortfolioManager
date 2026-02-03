@@ -28,11 +28,10 @@ function stockTarget(stock: Stock): number {
 
 	if (stock.asxCode == "ARG") return 0.25;
 	else if (stock.asxCode == "COH") return 0.025;
-	else if (stock.asxCode == "CSL") return 0.025;
 	else if (stock.asxCode == "VAP") return 0.05;
 	else if (stock.asxCode == "VGE") return 0.05;
-	else if (stock.asxCode == "VGS") return 0.43;
-	else if (stock.asxCode == "VISM") return 0.07;
+	else if (stock.asxCode == "VGS") return 0.46;
+	else if (stock.asxCode == "VISM") return 0.065;
 	else if (stock.asxCode == "VCF") return 0.05;
 	else if (stock.asxCode == "VAF") return 0.05;
 	else return 0;
