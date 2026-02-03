@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.IO;
 
-using Mongo2Go;
+using EphemeralMongo;
 using Xunit;
 
 using Booth.PortfolioManager.Web;
@@ -18,18 +18,22 @@ namespace Booth.PortfolioManager.IntegrationTest
     {
         private readonly string _ConnectionString;
         private readonly string _Database = "IntegrationTest";
-        private readonly MongoDbRunner _DBRunner;
+        private readonly IMongoRunner _MongoRunner;
 
         public IntegrationTestFixture()
         {
-            _DBRunner = MongoDbRunner.Start();
-            _ConnectionString = _DBRunner.ConnectionString;
+            var options = new MongoRunnerOptions
+            {
+                Version = MongoVersion.V8
+            };
+            _MongoRunner = MongoRunner.Run(options);
+            _ConnectionString = _MongoRunner.ConnectionString;
 
-            _DBRunner.Import(_Database, "TradingCalendar", Path.Combine("Data", "TradingCalendar.json"), true);
-            _DBRunner.Import(_Database, "Stocks", Path.Combine("Data", "Stocks.json"), true);
-            _DBRunner.Import(_Database, "StockPriceHistory", Path.Combine("Data", "StockPriceHistory.json"), true);
-            _DBRunner.Import(_Database, "Users", Path.Combine("Data", "Users.json"), true);
-            _DBRunner.Import(_Database, "Portfolios", Path.Combine("Data", "Portfolios.json"), true);
+            _MongoRunner.Import(_Database, "TradingCalendar", Path.Combine("Data", "TradingCalendar.json"), [], true);
+            _MongoRunner.Import(_Database, "Stocks", Path.Combine("Data", "Stocks.json"), [], true);
+            _MongoRunner.Import(_Database, "StockPriceHistory", Path.Combine("Data", "StockPriceHistory.json"), [], true);
+            _MongoRunner.Import(_Database, "Users", Path.Combine("Data", "Users.json"), [], true);
+            _MongoRunner.Import(_Database, "Portfolios", Path.Combine("Data", "Portfolios.json"), [], true);
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -73,7 +77,7 @@ namespace Booth.PortfolioManager.IntegrationTest
 
         protected override void Dispose(bool disposing)
         {
-            _DBRunner.Dispose();
+            _MongoRunner.Dispose();
             base.Dispose(disposing);
         }
     }
