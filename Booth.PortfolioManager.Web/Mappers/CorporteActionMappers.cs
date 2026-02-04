@@ -12,18 +12,18 @@ namespace Booth.PortfolioManager.Web.Mappers
 
     public interface ICorporateActionMapper
     {
-        RestApi.CorporateActions.CorporateAction ToApi(ICorporateAction action);
-        Domain.CorporateActions.CorporateAction FromApi(RestApi.CorporateActions.CorporateAction action);
-        RestApi.CorporateActions.CapitalReturn ToApi(Domain.CorporateActions.CapitalReturn action);
-        Domain.CorporateActions.CapitalReturn FromApi(RestApi.CorporateActions.CapitalReturn action);
-        RestApi.CorporateActions.CompositeAction ToApi(Domain.CorporateActions.CompositeAction action);
-        Domain.CorporateActions.CompositeAction FromApi(RestApi.CorporateActions.CompositeAction action);
-        RestApi.CorporateActions.Dividend ToApi(Domain.CorporateActions.Dividend action);
-        Domain.CorporateActions.Dividend FromApi(RestApi.CorporateActions.Dividend action);
-        RestApi.CorporateActions.SplitConsolidation ToApi(Domain.CorporateActions.SplitConsolidation action);
-        Domain.CorporateActions.SplitConsolidation FromApi(RestApi.CorporateActions.SplitConsolidation action);
-        RestApi.CorporateActions.Transformation ToApi(Domain.CorporateActions.Transformation action);
-        Domain.CorporateActions.Transformation FromApi(RestApi.CorporateActions.Transformation action);
+        Models.CorporateAction.CorporateAction ToApi(ICorporateAction action);
+        Domain.CorporateActions.CorporateAction FromApi(Models.CorporateAction.CorporateAction action);
+        Models.CorporateAction.CapitalReturn ToApi(Domain.CorporateActions.CapitalReturn action);
+        Domain.CorporateActions.CapitalReturn FromApi(Models.CorporateAction.CapitalReturn action);
+        Models.CorporateAction.CompositeAction ToApi(Domain.CorporateActions.CompositeAction action);
+        Domain.CorporateActions.CompositeAction FromApi(Models.CorporateAction.CompositeAction action);
+        Models.CorporateAction.Dividend ToApi(Domain.CorporateActions.Dividend action);
+        Domain.CorporateActions.Dividend FromApi(Models.CorporateAction.Dividend action);
+        Models.CorporateAction.SplitConsolidation ToApi(Domain.CorporateActions.SplitConsolidation action);
+        Domain.CorporateActions.SplitConsolidation FromApi(Models.CorporateAction.SplitConsolidation action);
+        Models.CorporateAction.Transformation ToApi(Domain.CorporateActions.Transformation action);
+        Domain.CorporateActions.Transformation FromApi(Models.CorporateAction.Transformation action);
     }
 
     class CorporateActionMapper : ICorporateActionMapper
@@ -35,7 +35,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             _StockResolver = stockResover;  
         }
 
-        public RestApi.CorporateActions.CorporateAction ToApi(ICorporateAction action)
+        public Models.CorporateAction.CorporateAction ToApi(ICorporateAction action)
         {
             if (action is Domain.CorporateActions.CapitalReturn capitalReturn)
                 return ToApi(capitalReturn);
@@ -51,26 +51,26 @@ namespace Booth.PortfolioManager.Web.Mappers
                 throw new NotSupportedException();
         }
 
-        public Domain.CorporateActions.CorporateAction FromApi(RestApi.CorporateActions.CorporateAction action)
+        public Domain.CorporateActions.CorporateAction FromApi(Models.CorporateAction.CorporateAction action)
         {
-            if (action is RestApi.CorporateActions.CapitalReturn capitalReturn)
+            if (action is Models.CorporateAction.CapitalReturn capitalReturn)
                 return FromApi(capitalReturn);
-            else if (action is RestApi.CorporateActions.CompositeAction compositeAction)
+            else if (action is Models.CorporateAction.CompositeAction compositeAction)
                 return FromApi(compositeAction);
-            else if (action is RestApi.CorporateActions.Dividend dividend)
+            else if (action is Models.CorporateAction.Dividend dividend)
                 return FromApi(dividend);
-            else if (action is RestApi.CorporateActions.SplitConsolidation splitConsolidation)
+            else if (action is Models.CorporateAction.SplitConsolidation splitConsolidation)
                 return FromApi(splitConsolidation);
-            else if (action is RestApi.CorporateActions.Transformation transformation)
+            else if (action is Models.CorporateAction.Transformation transformation)
                 return FromApi(transformation);
             else
                 throw new NotSupportedException();
         }
 
 
-        public  RestApi.CorporateActions.CapitalReturn ToApi(Domain.CorporateActions.CapitalReturn action)
+        public Models.CorporateAction.CapitalReturn ToApi(Domain.CorporateActions.CapitalReturn action)
         {
-            var response = new RestApi.CorporateActions.CapitalReturn()
+            var response = new Models.CorporateAction.CapitalReturn()
             {
                 Id = action.Id,
                 Stock = action.Stock.Id,
@@ -83,15 +83,15 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.CorporateActions.CapitalReturn FromApi(RestApi.CorporateActions.CapitalReturn action)
+        public Domain.CorporateActions.CapitalReturn FromApi(Models.CorporateAction.CapitalReturn action)
         {
             var stock = _StockResolver.GetStock(action.Stock);
             return new Domain.CorporateActions.CapitalReturn(action.Id, stock, action.ActionDate, action.Description, action.PaymentDate, action.Amount);
         }
 
-        public RestApi.CorporateActions.CompositeAction ToApi(Domain.CorporateActions.CompositeAction action)
+        public Models.CorporateAction.CompositeAction ToApi(Domain.CorporateActions.CompositeAction action)
         {
-            var response = new RestApi.CorporateActions.CompositeAction()
+            var response = new Models.CorporateAction.CompositeAction()
             {
                 Id = action.Id,
                 Stock = action.Stock.Id,
@@ -105,15 +105,15 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.CorporateActions.CompositeAction FromApi(RestApi.CorporateActions.CompositeAction action)
+        public Domain.CorporateActions.CompositeAction FromApi(Models.CorporateAction.CompositeAction action)
         {
             var stock = _StockResolver.GetStock(action.Stock);
             return new Domain.CorporateActions.CompositeAction(action.Id, stock, action.ActionDate, action.Description, action.ChildActions.Select(x => FromApi(x)));
         }
 
-        public RestApi.CorporateActions.Dividend ToApi(Domain.CorporateActions.Dividend action)
+        public Models.CorporateAction.Dividend ToApi(Domain.CorporateActions.Dividend action)
         {
-            var response = new RestApi.CorporateActions.Dividend()
+            var response = new Models.CorporateAction.Dividend()
             {
                 Id = action.Id,
                 Stock = action.Stock.Id,
@@ -129,15 +129,15 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.CorporateActions.Dividend FromApi(RestApi.CorporateActions.Dividend action)
+        public Domain.CorporateActions.Dividend FromApi(Models.CorporateAction.Dividend action)
         {
             var stock = _StockResolver.GetStock(action.Stock);
             return new Domain.CorporateActions.Dividend(action.Id, stock, action.ActionDate, action.Description, action.PaymentDate, action.Amount, action.PercentFranked, action.DrpPrice);
         }
 
-        public RestApi.CorporateActions.SplitConsolidation ToApi(Domain.CorporateActions.SplitConsolidation action)
+        public Models.CorporateAction.SplitConsolidation ToApi(Domain.CorporateActions.SplitConsolidation action)
         {
-            var response = new RestApi.CorporateActions.SplitConsolidation()
+            var response = new Models.CorporateAction.SplitConsolidation()
             {
 
                 Id = action.Id,
@@ -151,15 +151,15 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.CorporateActions.SplitConsolidation FromApi(RestApi.CorporateActions.SplitConsolidation action)
+        public Domain.CorporateActions.SplitConsolidation FromApi(Models.CorporateAction.SplitConsolidation action)
         {
             var stock = _StockResolver.GetStock(action.Stock);
             return new Domain.CorporateActions.SplitConsolidation(action.Id, stock, action.ActionDate, action.Description, action.OriginalUnits, action.NewUnits);
         }
 
-        public RestApi.CorporateActions.Transformation ToApi(Domain.CorporateActions.Transformation action)
+        public Models.CorporateAction.Transformation ToApi(Domain.CorporateActions.Transformation action)
         {
-            var response = new RestApi.CorporateActions.Transformation()
+            var response = new Models.CorporateAction.Transformation()
             {
                 Id = action.Id,
                 Stock = action.Stock.Id,
@@ -169,7 +169,7 @@ namespace Booth.PortfolioManager.Web.Mappers
                 RolloverRefliefApplies = action.RolloverRefliefApplies
             };
 
-            var resultStocks = action.ResultingStocks.Select(x => new RestApi.CorporateActions.Transformation.ResultingStock()
+            var resultStocks = action.ResultingStocks.Select(x => new Models.CorporateAction.Transformation.ResultingStock()
             {
                 Stock = x.Stock,
                 OriginalUnits = x.OriginalUnits,
@@ -183,7 +183,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.CorporateActions.Transformation FromApi(RestApi.CorporateActions.Transformation action)
+        public Domain.CorporateActions.Transformation FromApi(Models.CorporateAction.Transformation action)
         {
             var stock = _StockResolver.GetStock(action.Stock);
 

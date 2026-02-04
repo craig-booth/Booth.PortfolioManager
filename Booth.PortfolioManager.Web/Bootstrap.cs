@@ -17,7 +17,7 @@ using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.TradingCalendars;
-using Booth.PortfolioManager.RestApi.Serialization;
+using Booth.PortfolioManager.Web.Serialization;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
@@ -190,7 +190,7 @@ namespace Booth.PortfolioManager.Web
     {
         public void Configure(MvcNewtonsoftJsonOptions options)
         {
-            RestSerializerSettings.Configure(options.SerializerSettings);
+            SerializerSettings.Configure(options.SerializerSettings);
         }
     }
 

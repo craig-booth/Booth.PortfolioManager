@@ -1,13 +1,15 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
-
-using Xunit;
+﻿using Booth.Common;
+using Booth.PortfolioManager.Web.Models.Stock;
+using Booth.PortfolioManager.Web.Models.User;
+using Booth.PortfolioManager.Web.Serialization;
 using FluentAssertions;
-
-using Booth.Common;
-using Booth.PortfolioManager.RestApi.Client;
-using Booth.PortfolioManager.RestApi.Stocks;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -23,29 +25,32 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task AnonymousUserShouldNotHaveAccess()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
+            var httpClient = _Fixture.CreateClient();
 
-            Func<Task> a = () => client.Stocks.Get(Integration.StockId);
+            Func<Task> a = () => httpClient.GetAsync<StockResponse>($"https://integrationtest.com/api/stocks/{Integration.StockId}", TestContext.Current.CancellationToken);
 
-            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            (await a.Should().ThrowAsync<RestApiException>()).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized); 
         }
 
         [Fact]
         public async Task StandardUserHasReadAccess()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
 
-            var response = await client.Stocks.Get(Integration.StockId);
+            var authenticated = await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
+            authenticated.Should().Be(true);
 
+            var response = await httpClient.GetAsync<StockResponse>($"https://integrationtest.com/api/stocks/{Integration.StockId}", TestContext.Current.CancellationToken);
             response.Should().NotBeNull();
         }
 
         [Fact]
         public async Task StandardUserShouldNotHaveUpdateAccess()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+
+            var authenticated = await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
+            authenticated.Should().Be(true);
 
             var command = new CreateStockCommand()
             {
@@ -56,17 +61,18 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Category = AssetCategory.AustralianStocks,
             };
 
-            Func<Task> a = () => client.Stocks.CreateStock(command);
+            Func<Task> a = () => httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", command, TestContext.Current.CancellationToken);
 
-            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            (await a.Should().ThrowAsync<RestApiException>()).Which.StatusCode.Should().Be(HttpStatusCode.Forbidden); 
         }
 
         [Fact]
         public async Task AdminUserHasUpdateAccess()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
 
+            var authenticated = await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
+            authenticated.Should().Be(true);
 
             var command = new CreateStockCommand()
             {
@@ -77,7 +83,7 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Category = AssetCategory.AustralianStocks,
             };
 
-            await client.Stocks.CreateStock(command);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", command, TestContext.Current.CancellationToken); 
         }
 
     }

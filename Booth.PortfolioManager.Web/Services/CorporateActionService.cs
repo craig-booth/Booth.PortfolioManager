@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Booth.Common;
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Domain.Stocks;
-using Booth.PortfolioManager.RestApi.CorporateActions;
+using Booth.PortfolioManager.Web.Models.CorporateAction;
 using Booth.PortfolioManager.Web.Mappers;
 using Booth.PortfolioManager.Web.Utilities;
 

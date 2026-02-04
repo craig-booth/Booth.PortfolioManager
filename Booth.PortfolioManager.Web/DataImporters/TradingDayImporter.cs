@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.DataServices;
 using Booth.PortfolioManager.Web.Services;
-using static Booth.PortfolioManager.RestApi.TradingCalendars.TradingCalendar;
 
 namespace Booth.PortfolioManager.Web.DataImporters
 {

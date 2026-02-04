@@ -8,8 +8,8 @@ using Xunit;
 using FluentAssertions;
 
 using Booth.Common;
-using Booth.PortfolioManager.RestApi.Client;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
+using Booth.PortfolioManager.Web.Models.Transaction;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -26,8 +26,8 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task AddSingleTransaction()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
             var portfolioId = Guid.NewGuid();
             var command = new CreatePortfolioCommand()
@@ -35,10 +35,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Id = portfolioId,
                 Name = "Test Portfolio"
             };
-            await client.Portfolio.CreatePortfolio(command);
-            client.SetPortfolio(portfolioId);
+            await httpClient.PostAsync<CreatePortfolioCommand>("https://integrationtest.com/api/portfolio", command, TestContext.Current.CancellationToken);
 
-            var transaction = new RestApi.Transactions.OpeningBalance()
+            var transaction = new OpeningBalance()
             {
                 Id = Guid.NewGuid(),
                 Stock = Integration.StockId,
@@ -47,18 +46,18 @@ namespace Booth.PortfolioManager.IntegrationTest
                 CostBase = 14.00m,
                 AquisitionDate = new Date(2020, 01, 02)
             };
-            await client.Transactions.Add(transaction);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction, TestContext.Current.CancellationToken);
 
-            var response = await client.Portfolio.GetTransactions(new DateRange(Date.MinValue, Date.MaxValue));
+            var response = await httpClient.GetAsync<TransactionsResponse>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions?fromdate={Date.MinValue.ToIsoDateString()}&todate={Date.MaxValue.ToIsoDateString()}", TestContext.Current.CancellationToken);
 
-            response.Transactions.Should().HaveCount(1);
+            response.Transactions.Should().HaveCount(1); 
         }
 
         [Fact]
         public async Task AddMultipleTransactions()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
             var portfolioId = Guid.NewGuid();
             var command = new CreatePortfolioCommand()
@@ -66,10 +65,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Id = portfolioId,
                 Name = "Test Portfolio"
             };
-            await client.Portfolio.CreatePortfolio(command);
-            client.SetPortfolio(portfolioId);
+            await httpClient.PostAsync<CreatePortfolioCommand>("https://integrationtest.com/api/portfolio", command, TestContext.Current.CancellationToken);
 
-            var transaction1 = new RestApi.Transactions.OpeningBalance()
+            var transaction1 = new OpeningBalance()
             {
                 Id = Guid.NewGuid(),
                 Stock = Integration.StockId,
@@ -78,9 +76,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 CostBase = 14.00m,
                 AquisitionDate = new Date(2020, 01, 02)
             };
-            await client.Transactions.Add(transaction1);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction1, TestContext.Current.CancellationToken);
 
-            var transaction2 = new RestApi.Transactions.Disposal()
+            var transaction2 = new Disposal()
             {
                 Id = Guid.NewGuid(),
                 Stock = Integration.StockId,
@@ -88,21 +86,21 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Units = 10,
                 AveragePrice = 1.00m,
                 TransactionCosts = 19.95m,
-                CgtMethod = RestApi.Transactions.CgtCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = false
             };
-            await client.Transactions.Add(transaction2);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction2, TestContext.Current.CancellationToken);
 
-            var response = await client.Portfolio.GetTransactions(new DateRange(Date.MinValue, Date.MaxValue));
+            var response = await httpClient.GetAsync<TransactionsResponse>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions?fromdate={Date.MinValue.ToIsoDateString()}&todate={Date.MaxValue.ToIsoDateString()}", TestContext.Current.CancellationToken);
 
-            response.Transactions.Should().HaveCount(2);
+            response.Transactions.Should().HaveCount(2); 
         }
 
         [Fact]
         public async Task UpdateTransaction()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
             var portfolioId = Guid.NewGuid();
             var command = new CreatePortfolioCommand()
@@ -110,10 +108,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Id = portfolioId,
                 Name = "Test Portfolio"
             };
-            await client.Portfolio.CreatePortfolio(command);
-            client.SetPortfolio(portfolioId);
+            await httpClient.PostAsync<CreatePortfolioCommand>("https://integrationtest.com/api/portfolio", command, TestContext.Current.CancellationToken);
 
-            var transaction1 = new RestApi.Transactions.OpeningBalance()
+            var transaction1 = new OpeningBalance()
             {
                 Id = Guid.NewGuid(),
                 Stock = Integration.StockId,
@@ -122,9 +119,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 CostBase = 14.00m,
                 AquisitionDate = new Date(2020, 01, 02)
             };
-            await client.Transactions.Add(transaction1);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction1, TestContext.Current.CancellationToken);
 
-            var transaction2 = new RestApi.Transactions.Disposal()
+            var transaction2 = new Disposal()
             {
                 Id = Guid.NewGuid(),
                 Stock = Integration.StockId,
@@ -132,37 +129,38 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Units = 10,
                 AveragePrice = 1.00m,
                 TransactionCosts = 19.95m,
-                CgtMethod = RestApi.Transactions.CgtCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = false
             };
-            await client.Transactions.Add(transaction2);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction2, TestContext.Current.CancellationToken);
 
-            var transaction3 = new RestApi.Transactions.CashTransaction()
+            var transaction3 = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
                 TransactionDate = new Date(2020, 01, 12),
-                CashTransactionType = RestApi.Transactions.CashTransactionType.Deposit,
+                CashTransactionType = CashTransactionType.Deposit,
                 Amount = 1200.00m
             };
-            await client.Transactions.Add(transaction3);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction3, TestContext.Current.CancellationToken);
 
 
             transaction2.AveragePrice = 1.20m;
-            await client.Transactions.Update(transaction2);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions/{transaction2.Id}", transaction2, TestContext.Current.CancellationToken);
 
-            var response = await client.Portfolio.GetTransactions(new DateRange(Date.MinValue, Date.MaxValue));
+
+            var response = await httpClient.GetAsync<TransactionsResponse>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions?fromdate={Date.MinValue.ToIsoDateString()}&todate={Date.MaxValue.ToIsoDateString()}", TestContext.Current.CancellationToken);
             response.Transactions.Should().HaveCount(3);
 
-            var transaction = await client.Transactions.Get(transaction2.Id);
-            ((RestApi.Transactions.Disposal)transaction).AveragePrice.Should().Be(1.20m);
+            var transaction = await httpClient.GetAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions/{transaction2.Id}", TestContext.Current.CancellationToken);
+            ((Disposal)transaction).AveragePrice.Should().Be(1.20m); 
 
         }
 
         [Fact]
         public async Task DeleteTransaction()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
             var portfolioId = Guid.NewGuid();
             var command = new CreatePortfolioCommand()
@@ -170,10 +168,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Id = portfolioId,
                 Name = "Test Portfolio"
             };
-            await client.Portfolio.CreatePortfolio(command);
-            client.SetPortfolio(portfolioId);
+            await httpClient.PostAsync<CreatePortfolioCommand>("https://integrationtest.com/api/portfolio", command, TestContext.Current.CancellationToken);
 
-            var transaction1 = new RestApi.Transactions.OpeningBalance()
+            var transaction1 = new OpeningBalance()
             {
                 Id = Guid.NewGuid(),
                 Stock = Integration.StockId,
@@ -182,9 +179,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 CostBase = 14.00m,
                 AquisitionDate = new Date(2020, 01, 02)
             };
-            await client.Transactions.Add(transaction1);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction1, TestContext.Current.CancellationToken);
 
-            var transaction2 = new RestApi.Transactions.Disposal()
+            var transaction2 = new Disposal()
             {
                 Id = Guid.NewGuid(),
                 Stock = Integration.StockId,
@@ -192,24 +189,23 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Units = 10,
                 AveragePrice = 1.00m,
                 TransactionCosts = 19.95m,
-                CgtMethod = RestApi.Transactions.CgtCalculationMethod.FirstInFirstOut,
+                CgtMethod = CgtCalculationMethod.FirstInFirstOut,
                 CreateCashTransaction = false
             };
-            await client.Transactions.Add(transaction2);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction2, TestContext.Current.CancellationToken);
 
-            var transaction3 = new RestApi.Transactions.CashTransaction()
+            var transaction3 = new CashTransaction()
             {
                 Id = Guid.NewGuid(),
                 TransactionDate = new Date(2020, 01, 12),
-                CashTransactionType = RestApi.Transactions.CashTransactionType.Deposit,
+                CashTransactionType = CashTransactionType.Deposit,
                 Amount = 1200.00m
             };
-            await client.Transactions.Add(transaction3);
+            await httpClient.PostAsync<Transaction>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions", transaction3, TestContext.Current.CancellationToken);
 
+            await httpClient.DeleteAsync($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions/{transaction2.Id}", TestContext.Current.CancellationToken);
 
-            await client.Transactions.Delete(transaction2.Id);
-
-            var response = await client.Portfolio.GetTransactions(new DateRange(Date.MinValue, Date.MaxValue));
+            var response = await httpClient.GetAsync<TransactionsResponse>($"https://integrationtest.com/api/portfolio/{portfolioId}/transactions?fromdate={Date.MinValue.ToIsoDateString()}&todate={Date.MaxValue.ToIsoDateString()}", TestContext.Current.CancellationToken);
             response.Transactions.Select(x => x.Id).Should().BeEquivalentTo(new[] { transaction1.Id, transaction3.Id });
         }
 

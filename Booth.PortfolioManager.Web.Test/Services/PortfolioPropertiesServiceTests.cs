@@ -50,14 +50,14 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 EndDate = Date.MaxValue,
                 Holdings = new[]
                 {
-                    new RestApi.Portfolios.HoldingProperties()
+                    new Models.Portfolio.HoldingProperties()
                     {
                         Stock = _Fixture.Stock_ARG,
                         StartDate = new Date(2000, 01, 01),
                         EndDate = Date.MaxValue,
                         ParticipatingInDrp = false
                     },
-                    new RestApi.Portfolios.HoldingProperties()
+                    new Models.Portfolio.HoldingProperties()
                     {
                         Stock = _Fixture.Stock_WAM,
                         StartDate = new Date(2000, 01, 01),

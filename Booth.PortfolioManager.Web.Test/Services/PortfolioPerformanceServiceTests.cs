@@ -57,7 +57,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 ClosingCashBalance = 5151.25m,
                 HoldingPerformance = new[]
                 {
-                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    new Models.Portfolio.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 105.00m,
@@ -70,7 +70,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         TotalReturn = 386.00m,
                         Irr = 0.15518m
                     },
-                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    new Models.Portfolio.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
                         Stock = _Fixture.Stock_WAM,
                         OpeningBalance = 230.00m,
@@ -113,7 +113,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 ClosingCashBalance = 0.00m,
                 HoldingPerformance = new[]
                 {
-                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    new Models.Portfolio.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 0.00m,
@@ -157,7 +157,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 ClosingCashBalance = 0.00m,
                 HoldingPerformance = new[]
                 {
-                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    new Models.Portfolio.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 105.00m,
@@ -201,7 +201,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 ClosingCashBalance = 0.00m,
                 HoldingPerformance = new[]
                  {
-                    new RestApi.Portfolios.PortfolioPerformanceResponse.HoldingPerformanceItem()
+                    new Models.Portfolio.PortfolioPerformanceResponse.HoldingPerformanceItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         OpeningBalance = 0.00m,

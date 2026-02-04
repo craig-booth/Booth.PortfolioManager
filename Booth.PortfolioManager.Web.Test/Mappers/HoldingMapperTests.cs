@@ -36,12 +36,12 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
 
             reponse.Should().BeEquivalentTo(new 
             {
-                Stock = new RestApi.Portfolios.Stock()
+                Stock = new Models.Portfolio.Stock()
                 {
                     Id = stock.Id,
                     AsxCode = "ABC",
                     Name = "ABC Pty Ltd",
-                    Category = RestApi.Stocks.AssetCategory.InternationalProperty
+                    Category = Models.Stock.AssetCategory.InternationalProperty
                 },
                 Units = 30,
                 Value = 36.00m,

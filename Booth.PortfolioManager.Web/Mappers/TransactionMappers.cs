@@ -8,34 +8,34 @@ using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Transactions;
-using Booth.PortfolioManager.RestApi.Portfolios;
-using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Web.Models.Portfolio;
+using Booth.PortfolioManager.Web.Models.Transaction;
 
 namespace Booth.PortfolioManager.Web.Mappers
 {
     public interface ITransactionMapper
     {
-        RestApi.Transactions.Transaction ToApi(Domain.Transactions.IPortfolioTransaction transaction);
-        Domain.Transactions.PortfolioTransaction FromApi(RestApi.Transactions.Transaction transaction);
+        Models.Transaction.Transaction ToApi(Domain.Transactions.IPortfolioTransaction transaction);
+        Domain.Transactions.PortfolioTransaction FromApi(Models.Transaction.Transaction transaction);
         TransactionsResponse.TransactionItem ToTransactionItem(Domain.Transactions.IPortfolioTransaction transaction, Date date);
 
 
-        RestApi.Transactions.Aquisition ToApi(Domain.Transactions.Aquisition transaction);
-        Domain.Transactions.Aquisition FromApi(RestApi.Transactions.Aquisition transaction);
-        RestApi.Transactions.CashTransaction ToApi(Domain.Transactions.CashTransaction transaction);
-        Domain.Transactions.CashTransaction FromApi(RestApi.Transactions.CashTransaction transaction);
-        RestApi.Transactions.CostBaseAdjustment ToApi(Domain.Transactions.CostBaseAdjustment transaction);
-        Domain.Transactions.CostBaseAdjustment FromApi(RestApi.Transactions.CostBaseAdjustment transaction);
-        RestApi.Transactions.Disposal ToApi(Domain.Transactions.Disposal transaction);
-        Domain.Transactions.Disposal FromApi(RestApi.Transactions.Disposal transaction);
-        RestApi.Transactions.IncomeReceived ToApi(Domain.Transactions.IncomeReceived transaction);
-        Domain.Transactions.IncomeReceived FromApi(RestApi.Transactions.IncomeReceived transaction);
-        RestApi.Transactions.OpeningBalance ToApi(Domain.Transactions.OpeningBalance transaction);
-        Domain.Transactions.OpeningBalance FromApi(RestApi.Transactions.OpeningBalance transaction);
-        RestApi.Transactions.ReturnOfCapital ToApi(Domain.Transactions.ReturnOfCapital transaction);
-        Domain.Transactions.ReturnOfCapital FromApi(RestApi.Transactions.ReturnOfCapital transaction);
-        RestApi.Transactions.UnitCountAdjustment ToApi(Domain.Transactions.UnitCountAdjustment transaction);
-        Domain.Transactions.UnitCountAdjustment FromApi(RestApi.Transactions.UnitCountAdjustment transaction);
+        Models.Transaction.Aquisition ToApi(Domain.Transactions.Aquisition transaction);
+        Domain.Transactions.Aquisition FromApi(Models.Transaction.Aquisition transaction);
+        Models.Transaction.CashTransaction ToApi(Domain.Transactions.CashTransaction transaction);
+        Domain.Transactions.CashTransaction FromApi(Models.Transaction.CashTransaction transaction);
+        Models.Transaction.CostBaseAdjustment ToApi(Domain.Transactions.CostBaseAdjustment transaction);
+        Domain.Transactions.CostBaseAdjustment FromApi(Models.Transaction.CostBaseAdjustment transaction);
+        Models.Transaction.Disposal ToApi(Domain.Transactions.Disposal transaction);
+        Domain.Transactions.Disposal FromApi(Models.Transaction.Disposal transaction);
+        Models.Transaction.IncomeReceived ToApi(Domain.Transactions.IncomeReceived transaction);
+        Domain.Transactions.IncomeReceived FromApi(Models.Transaction.IncomeReceived transaction);
+        Models.Transaction.OpeningBalance ToApi(Domain.Transactions.OpeningBalance transaction);
+        Domain.Transactions.OpeningBalance FromApi(Models.Transaction.OpeningBalance transaction);
+        Models.Transaction.ReturnOfCapital ToApi(Domain.Transactions.ReturnOfCapital transaction);
+        Domain.Transactions.ReturnOfCapital FromApi(Models.Transaction.ReturnOfCapital transaction);
+        Models.Transaction.UnitCountAdjustment ToApi(Domain.Transactions.UnitCountAdjustment transaction);
+        Domain.Transactions.UnitCountAdjustment FromApi(Models.Transaction.UnitCountAdjustment transaction);
     }
 
     public class TransactionMapper : ITransactionMapper
@@ -49,21 +49,21 @@ namespace Booth.PortfolioManager.Web.Mappers
 
         public PortfolioTransaction FromApi(Transaction transaction)
         {
-            if (transaction is RestApi.Transactions.Aquisition aquisition)
+            if (transaction is Models.Transaction.Aquisition aquisition)
                 return FromApi(aquisition);
-            else if (transaction is RestApi.Transactions.CashTransaction cashTransaction)
+            else if (transaction is Models.Transaction.CashTransaction cashTransaction)
                 return FromApi(cashTransaction);
-            else if (transaction is RestApi.Transactions.CostBaseAdjustment costBaseAdjustment)
+            else if (transaction is Models.Transaction.CostBaseAdjustment costBaseAdjustment)
                 return FromApi(costBaseAdjustment);
-            else if (transaction is RestApi.Transactions.Disposal disposal)
+            else if (transaction is Models.Transaction.Disposal disposal)
                 return FromApi(disposal);
-            else if (transaction is RestApi.Transactions.IncomeReceived incomeReceived)
+            else if (transaction is Models.Transaction.IncomeReceived incomeReceived)
                 return FromApi(incomeReceived);
-            else if (transaction is RestApi.Transactions.OpeningBalance openingBalance)
+            else if (transaction is Models.Transaction.OpeningBalance openingBalance)
                 return FromApi(openingBalance);
-            else if (transaction is RestApi.Transactions.ReturnOfCapital returnOfCapital)
+            else if (transaction is Models.Transaction.ReturnOfCapital returnOfCapital)
                 return FromApi(returnOfCapital);
-            else if (transaction is RestApi.Transactions.UnitCountAdjustment unitCountAdjustment)
+            else if (transaction is Models.Transaction.UnitCountAdjustment unitCountAdjustment)
                 return FromApi(unitCountAdjustment);
             else
                 throw new NotSupportedException();
@@ -91,7 +91,7 @@ namespace Booth.PortfolioManager.Web.Mappers
                 throw new NotSupportedException();
         }
 
-        public Domain.Transactions.Aquisition FromApi(RestApi.Transactions.Aquisition transaction)
+        public Domain.Transactions.Aquisition FromApi(Models.Transaction.Aquisition transaction)
         {
             var response = new Domain.Transactions.Aquisition()
             {
@@ -108,9 +108,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public RestApi.Transactions.Aquisition ToApi(Domain.Transactions.Aquisition transaction)
+        public Models.Transaction.Aquisition ToApi(Domain.Transactions.Aquisition transaction)
         {
-            var response = new RestApi.Transactions.Aquisition()
+            var response = new Models.Transaction.Aquisition()
             {
                 Id = transaction.Id,
                 Stock = transaction.Stock.Id,
@@ -126,9 +126,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
 
         }
-        public RestApi.Transactions.CashTransaction ToApi(Domain.Transactions.CashTransaction transaction)
+        public Models.Transaction.CashTransaction ToApi(Domain.Transactions.CashTransaction transaction)
         {
-            var response = new RestApi.Transactions.CashTransaction()
+            var response = new Models.Transaction.CashTransaction()
             {
                 Id = transaction.Id,
                 Stock = Guid.Empty,
@@ -142,7 +142,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.Transactions.CashTransaction FromApi(RestApi.Transactions.CashTransaction transaction)
+        public Domain.Transactions.CashTransaction FromApi(Models.Transaction.CashTransaction transaction)
         {
             var response = new Domain.Transactions.CashTransaction()
             {
@@ -157,9 +157,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }        
 
-        public RestApi.Transactions.CostBaseAdjustment ToApi(Domain.Transactions.CostBaseAdjustment transaction)
+        public Models.Transaction.CostBaseAdjustment ToApi(Domain.Transactions.CostBaseAdjustment transaction)
         {
-            var response = new RestApi.Transactions.CostBaseAdjustment()
+            var response = new Models.Transaction.CostBaseAdjustment()
             {
                 Id = transaction.Id,
                 Stock = transaction.Stock.Id,
@@ -172,7 +172,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.Transactions.CostBaseAdjustment FromApi(RestApi.Transactions.CostBaseAdjustment transaction)
+        public Domain.Transactions.CostBaseAdjustment FromApi(Models.Transaction.CostBaseAdjustment transaction)
         {
             var response = new Domain.Transactions.CostBaseAdjustment()
             {
@@ -186,7 +186,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.Transactions.Disposal FromApi(RestApi.Transactions.Disposal transaction)
+        public Domain.Transactions.Disposal FromApi(Models.Transaction.Disposal transaction)
         {
             var response = new Domain.Transactions.Disposal()
             {
@@ -204,9 +204,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public RestApi.Transactions.Disposal ToApi(Domain.Transactions.Disposal transaction)
+        public Models.Transaction.Disposal ToApi(Domain.Transactions.Disposal transaction)
         {
-            var response = new RestApi.Transactions.Disposal()
+            var response = new Models.Transaction.Disposal()
             {
                 Id = transaction.Id,
                 Stock = transaction.Stock.Id,
@@ -223,7 +223,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.Transactions.IncomeReceived FromApi(RestApi.Transactions.IncomeReceived transaction)
+        public Domain.Transactions.IncomeReceived FromApi(Models.Transaction.IncomeReceived transaction)
         {
             var response = new Domain.Transactions.IncomeReceived()
             {
@@ -244,9 +244,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public RestApi.Transactions.IncomeReceived ToApi(Domain.Transactions.IncomeReceived transaction)
+        public Models.Transaction.IncomeReceived ToApi(Domain.Transactions.IncomeReceived transaction)
         {
-            var response = new RestApi.Transactions.IncomeReceived()
+            var response = new Models.Transaction.IncomeReceived()
             {
                 Id = transaction.Id,
                 Stock = transaction.Stock.Id,
@@ -266,7 +266,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.Transactions.OpeningBalance FromApi(RestApi.Transactions.OpeningBalance transaction)
+        public Domain.Transactions.OpeningBalance FromApi(Models.Transaction.OpeningBalance transaction)
         {
             var response = new Domain.Transactions.OpeningBalance()
             {
@@ -282,9 +282,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public RestApi.Transactions.OpeningBalance ToApi(Domain.Transactions.OpeningBalance transaction)
+        public Models.Transaction.OpeningBalance ToApi(Domain.Transactions.OpeningBalance transaction)
         {
-            var response = new RestApi.Transactions.OpeningBalance()
+            var response = new Models.Transaction.OpeningBalance()
             {
                 Id = transaction.Id,
                 Stock = transaction.Stock.Id,
@@ -299,7 +299,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.Transactions.ReturnOfCapital FromApi(RestApi.Transactions.ReturnOfCapital transaction)
+        public Domain.Transactions.ReturnOfCapital FromApi(Models.Transaction.ReturnOfCapital transaction)
         {
             var response = new Domain.Transactions.ReturnOfCapital()
             {
@@ -315,9 +315,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public RestApi.Transactions.ReturnOfCapital ToApi(Domain.Transactions.ReturnOfCapital transaction)
+        public Models.Transaction.ReturnOfCapital ToApi(Domain.Transactions.ReturnOfCapital transaction)
         {
-            var response = new RestApi.Transactions.ReturnOfCapital()
+            var response = new Models.Transaction.ReturnOfCapital()
             {
                 Id = transaction.Id,
                 Stock = transaction.Stock.Id,
@@ -332,7 +332,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public Domain.Transactions.UnitCountAdjustment FromApi(RestApi.Transactions.UnitCountAdjustment transaction)
+        public Domain.Transactions.UnitCountAdjustment FromApi(Models.Transaction.UnitCountAdjustment transaction)
         {
             var response = new Domain.Transactions.UnitCountAdjustment()
             {
@@ -347,9 +347,9 @@ namespace Booth.PortfolioManager.Web.Mappers
             return response;
         }
 
-        public RestApi.Transactions.UnitCountAdjustment ToApi(Domain.Transactions.UnitCountAdjustment transaction)
+        public Models.Transaction.UnitCountAdjustment ToApi(Domain.Transactions.UnitCountAdjustment transaction)
         {
-            var response = new RestApi.Transactions.UnitCountAdjustment()
+            var response = new Models.Transaction.UnitCountAdjustment()
             {
                 Id = transaction.Id,
                 Stock = transaction.Stock.Id,

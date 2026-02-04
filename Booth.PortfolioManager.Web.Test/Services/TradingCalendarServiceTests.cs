@@ -77,7 +77,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Year = 2000,
                 NonTradingDays = new [] 
                 { 
-                    new RestApi.TradingCalendars.TradingCalendar.NonTradingDay() { Date = new Date(2000, 01, 01), Description = "New Year's Day"} 
+                    new Models.TradingCalendar.TradingCalendar.NonTradingDay() { Date = new Date(2000, 01, 01), Description = "New Year's Day"} 
                 },
             });
         }
@@ -103,9 +103,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 calendarReference.IsTradingDay(new Date(2001, 12, 25)).Should().BeTrue();
             }
 
-            var updatedTradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
+            var updatedTradingCalendar = new Models.TradingCalendar.TradingCalendar();
             updatedTradingCalendar.Year = 2001;
-            updatedTradingCalendar.NonTradingDays.Add(new RestApi.TradingCalendars.TradingCalendar.NonTradingDay() { Date = new Date(2001, 12, 25), Description = "Christmas Day" });
+            updatedTradingCalendar.NonTradingDays.Add(new Models.TradingCalendar.TradingCalendar.NonTradingDay() { Date = new Date(2001, 12, 25), Description = "Christmas Day" });
 
             var result = await service.UpdateAsync(tradingCalendar.Id, updatedTradingCalendar);
 

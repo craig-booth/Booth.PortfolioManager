@@ -54,7 +54,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 CashBalance = 5151.25m,
                 Holdings = new[]
                 {
-                    new RestApi.Portfolios.Holding()
+                    new Models.Portfolio.Holding()
                     {
                         Stock = _Fixture.Stock_ARG,
                         Units = 250,
@@ -62,7 +62,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         Cost = 299.87m,
                         CostBase = 299.87m
                     },
-                    new RestApi.Portfolios.Holding()
+                    new Models.Portfolio.Holding()
                     {
                         Stock = _Fixture.Stock_WAM,
                         Units = 205,

@@ -101,9 +101,9 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
             mockRepository.Verify();
         }
 
-        private ServiceResult<RestApi.TradingCalendars.TradingCalendar> GetTradingCalendar(Guid id, int requestedYear)
+        private ServiceResult<Models.TradingCalendar.TradingCalendar> GetTradingCalendar(Guid id, int requestedYear)
         {
-            var calendar = new RestApi.TradingCalendars.TradingCalendar()
+            var calendar = new Models.TradingCalendar.TradingCalendar()
             {
                 Year = requestedYear
             };
@@ -112,7 +112,7 @@ namespace Booth.PortfolioManager.Web.Test.DataImporters
                 calendar.AddNonTradingDay(new Date(requestedYear, 05, 06), "Birthday");
             }
 
-            return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(calendar);
+            return ServiceResult<Models.TradingCalendar.TradingCalendar>.Ok(calendar);
         }
 
     }

@@ -7,7 +7,7 @@ using FluentAssertions;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Services;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {

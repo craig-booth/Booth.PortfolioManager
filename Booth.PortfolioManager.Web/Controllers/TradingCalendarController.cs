@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-using Booth.PortfolioManager.RestApi.TradingCalendars;
+using Booth.PortfolioManager.Web.Models.TradingCalendar;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.Services;
@@ -30,18 +30,18 @@ namespace Booth.PortfolioManager.Web.Controllers
         // GET: api/tradingcalendar/{year}
         [HttpGet]
         [Route("{year:int}")]
-        public async Task<ActionResult<RestApi.TradingCalendars.TradingCalendar>> Get([FromRoute]int year)
+        public async Task<ActionResult<Models.TradingCalendar.TradingCalendar>> Get([FromRoute]int year)
         {
             var result = await _Service.GetAsync(TradingCalendarIds.ASX, year);
 
-            return result.ToActionResult<RestApi.TradingCalendars.TradingCalendar>();
+            return result.ToActionResult<Models.TradingCalendar.TradingCalendar>();
         }
 
         // POST: api/tradingcalendar/{year}
         [Authorize(Policy.CanMantainStocks)]
         [HttpPost]
         [Route("{year:int}")]
-        public async Task<ActionResult> Update([FromRoute]int year, [FromBody] RestApi.TradingCalendars.TradingCalendar tradingCalendar)
+        public async Task<ActionResult> Update([FromRoute]int year, [FromBody] Models.TradingCalendar.TradingCalendar tradingCalendar)
         {
             var result = await _Service.UpdateAsync(TradingCalendarIds.ASX, tradingCalendar);
 

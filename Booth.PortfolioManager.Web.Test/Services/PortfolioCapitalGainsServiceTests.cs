@@ -38,7 +38,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 UnrealisedGains = new[]
                 {
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
@@ -47,9 +47,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 100m,
                         CapitalGain = 40.03m,
                         DiscoutedGain = 20.02m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     },
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
@@ -58,9 +58,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     },
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
@@ -69,9 +69,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     },
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
@@ -80,9 +80,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 300m,
                         CapitalGain = 40.05m,
                         DiscoutedGain = 20.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     },
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2005, 01, 03),
@@ -91,7 +91,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 7.50m,
                         CapitalGain = -25.00m,
                         DiscoutedGain = -25.00m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     }
                 }
 
@@ -135,7 +135,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 UnrealisedGains = new[]
                 {
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
@@ -144,9 +144,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 100m,
                         CapitalGain = 40.03m,
                         DiscoutedGain = 20.02m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     },
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
@@ -155,9 +155,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     },
-                    new RestApi.Portfolios.SimpleUnrealisedGainsItem()
+                    new Models.Portfolio.SimpleUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
@@ -166,7 +166,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount
                     }
                 }
 
@@ -186,7 +186,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 UnrealisedGains = new[]
                 {
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
@@ -195,9 +195,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 100m,
                         CapitalGain = 40.03m,
                         DiscoutedGain = 20.02m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2000, 01, 01),
                                 Description = "Aquired 100 shares @ $1.00",
@@ -206,7 +206,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                                 CostBaseChange = 119.95m,
                                 CostBase = 119.95m
                             },
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2004, 01, 01),
                                 Description = "Disposed of 50 shares @ $1.02",
@@ -217,7 +217,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                             }
                         }
                     },
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
@@ -226,9 +226,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2003, 01, 01),
                                 Description = "Aquired 100 shares @ $1.00",
@@ -239,7 +239,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                             }
                         }
                     },
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
@@ -248,9 +248,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2005, 01, 01),
                                 Description = "Aquired 100 shares @ $1.00",
@@ -261,7 +261,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                             }
                         }
                     },
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2000, 01, 01),
@@ -270,9 +270,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 300m,
                         CapitalGain = 40.05m,
                         DiscoutedGain = 20.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2000, 01, 01),
                                 Description = "Aquired 200 shares @ $1.20",
@@ -283,7 +283,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                             }
                         }
                     },
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_WAM,
                         AquisitionDate = new Date(2005, 01, 03),
@@ -292,9 +292,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 7.50m,
                         CapitalGain = -25.00m,
                         DiscoutedGain = -25.00m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2005, 01, 03),
                                 Description = "Opening balance of 5 shares",
@@ -347,7 +347,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
             {
                 UnrealisedGains = new[]
                 {
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2000, 01, 01),
@@ -356,9 +356,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 100m,
                         CapitalGain = 40.03m,
                         DiscoutedGain = 20.02m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2000, 01, 01),
                                 Description = "Aquired 100 shares @ $1.00",
@@ -367,7 +367,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                                 CostBaseChange = 119.95m,
                                 CostBase = 119.95m
                             },
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2004, 01, 01),
                                 Description = "Disposed of 50 shares @ $1.02",
@@ -378,7 +378,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                             }
                         }
                     },
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2003, 01, 01),
@@ -387,9 +387,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2003, 01, 01),
                                 Description = "Aquired 100 shares @ $1.00",
@@ -400,7 +400,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                             }
                         }
                     },
-                    new RestApi.Portfolios.DetailedUnrealisedGainsItem()
+                    new Models.Portfolio.DetailedUnrealisedGainsItem()
                     {
                         Stock = _Fixture.Stock_ARG,
                         AquisitionDate = new Date(2005, 01, 01),
@@ -409,9 +409,9 @@ namespace Booth.PortfolioManager.Web.Test.Services
                         MarketValue = 200m,
                         CapitalGain = 80.05m,
                         DiscoutedGain = 40.03m,
-                        DiscountMethod = RestApi.Portfolios.CgtMethod.Discount,
+                        DiscountMethod = Models.Portfolio.CgtMethod.Discount,
                         CGTEvents = {
-                            new RestApi.Portfolios.DetailedUnrealisedGainsItem.CGTEventItem()
+                            new Models.Portfolio.DetailedUnrealisedGainsItem.CGTEventItem()
                             {
                                 Date = new Date(2005, 01, 01),
                                 Description = "Aquired 100 shares @ $1.00",

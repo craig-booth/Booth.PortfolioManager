@@ -8,7 +8,7 @@ using Xunit;
 using FluentAssertions;
 
 using Booth.Common;
-using Booth.PortfolioManager.RestApi.Client;
+using Booth.PortfolioManager.Web.Models.TradingCalendar;
 
 
 namespace Booth.PortfolioManager.IntegrationTest
@@ -26,17 +26,17 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task Update()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
-            var calendar = await client.TradingCalander.Get(2019);
+            var calendar = await httpClient.GetAsync<TradingCalendar>("https://integrationtest.com/api/tradingcalendars/2019", TestContext.Current.CancellationToken);
 
             calendar.AddNonTradingDay(new Date(2019, 04, 01), "April Fools Day");
-            await client.TradingCalander.Update(calendar);
+            await httpClient.PostAsync<TradingCalendar>("https://integrationtest.com/api/tradingcalendars/2019", calendar, TestContext.Current.CancellationToken);
 
-            var response = await client.TradingCalander.Get(2019);
+            var response = await httpClient.GetAsync<TradingCalendar>("https://integrationtest.com/api/tradingcalendars/2019", TestContext.Current.CancellationToken);
 
-            response.NonTradingDays.Should().Contain(x => x.Date == new Date(2019, 04, 01) && x.Description == "April Fools Day");
+            response.NonTradingDays.Should().Contain(x => x.Date == new Date(2019, 04, 01) && x.Description == "April Fools Day"); 
         }
 
     }

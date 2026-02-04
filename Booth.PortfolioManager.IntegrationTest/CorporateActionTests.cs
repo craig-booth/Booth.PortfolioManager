@@ -1,15 +1,14 @@
-﻿using System;
+﻿using Booth.Common;
+using Booth.PortfolioManager.Web.Models.CorporateAction;
+using Booth.PortfolioManager.Web.Models.Stock;
+using FluentAssertions;
+using MongoDB.Driver.Core.Bindings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 using Xunit;
-using FluentAssertions;
-
-using Booth.Common;
-using Booth.PortfolioManager.RestApi.Client;
-using Booth.PortfolioManager.RestApi.Stocks;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -25,8 +24,8 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task AddSingleCorporateAction()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var command = new CreateStockCommand()
@@ -37,9 +36,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(command);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", command, TestContext.Current.CancellationToken);
 
-            var corporateAction = new RestApi.CorporateActions.CapitalReturn()
+            var corporateAction = new CapitalReturn()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -48,18 +47,18 @@ namespace Booth.PortfolioManager.IntegrationTest
                 PaymentDate = new Date(2012, 01, 30),
                 Amount = 10.00m              
             };
-            await client.CorporateActions.Add(stockId, corporateAction);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction, TestContext.Current.CancellationToken);
 
-            var response = await client.CorporateActions.GetAll(stockId, new DateRange(Date.MinValue, Date.MaxValue));
+            var response = await httpClient.GetAsync<List<CorporateAction>>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions?startDate={Date.MinValue}&endDate={Date.MaxValue}", TestContext.Current.CancellationToken);
 
-            response.Should().HaveCount(1);
+            response.Should().HaveCount(1); 
         }
 
         [Fact]
         public async Task AddMultipleCorporateActions()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var command = new CreateStockCommand()
@@ -70,9 +69,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(command);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", command, TestContext.Current.CancellationToken);
 
-            var corporateAction1 = new RestApi.CorporateActions.CapitalReturn()
+            var corporateAction1 = new CapitalReturn()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -81,9 +80,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 PaymentDate = new Date(2012, 01, 30),
                 Amount = 10.00m
             };
-            await client.CorporateActions.Add(stockId, corporateAction1);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction1, TestContext.Current.CancellationToken);
 
-            var corporateAction2 = new RestApi.CorporateActions.SplitConsolidation()
+            var corporateAction2 = new SplitConsolidation()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -92,18 +91,18 @@ namespace Booth.PortfolioManager.IntegrationTest
                 NewUnits = 2,
                 OriginalUnits = 1
             };
-            await client.CorporateActions.Add(stockId, corporateAction2);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction2, TestContext.Current.CancellationToken);
 
-            var response = await client.CorporateActions.GetAll(stockId, new DateRange(Date.MinValue, Date.MaxValue));
+            var response = await httpClient.GetAsync<List<CorporateAction>>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions?startDate={Date.MinValue}&endDate={Date.MaxValue}", TestContext.Current.CancellationToken);
 
-            response.Should().HaveCount(2);
+            response.Should().HaveCount(2); 
         }
 
         [Fact]
         public async Task UpdateCorporateAction()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var command = new CreateStockCommand()
@@ -114,9 +113,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(command);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", command, TestContext.Current.CancellationToken);
 
-            var corporateAction1 = new RestApi.CorporateActions.CapitalReturn()
+            var corporateAction1 = new CapitalReturn()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -125,9 +124,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 PaymentDate = new Date(2012, 01, 30),
                 Amount = 10.00m
             };
-            await client.CorporateActions.Add(stockId, corporateAction1);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction1, TestContext.Current.CancellationToken);
 
-            var corporateAction2 = new RestApi.CorporateActions.SplitConsolidation()
+            var corporateAction2 = new SplitConsolidation()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -136,9 +135,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 NewUnits = 2,
                 OriginalUnits = 1
             };
-            await client.CorporateActions.Add(stockId, corporateAction2);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction2, TestContext.Current.CancellationToken);
 
-            var corporateAction3 = new RestApi.CorporateActions.CapitalReturn()
+            var corporateAction3 = new CapitalReturn()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -147,26 +146,26 @@ namespace Booth.PortfolioManager.IntegrationTest
                 PaymentDate = new Date(2013, 02, 28),
                 Amount = 20.00m
             };
-            await client.CorporateActions.Add(stockId, corporateAction3);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction3, TestContext.Current.CancellationToken);
 
 
             corporateAction2.NewUnits = 3;
-            await client.CorporateActions.Update(stockId, corporateAction2);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions/{corporateAction2.Id}", corporateAction2, TestContext.Current.CancellationToken);
 
-            var response = await client.CorporateActions.GetAll(stockId, new DateRange(Date.MinValue, Date.MaxValue));
+            var response = await httpClient.GetAsync<List<CorporateAction>>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions?startDate={Date.MinValue}&endDate={Date.MaxValue}", TestContext.Current.CancellationToken);
             response.Should().HaveCount(3);
 
 
-            var action = await client.CorporateActions.Get(stockId, corporateAction2.Id);
+            var action = await httpClient.GetAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions/{corporateAction2.Id}", TestContext.Current.CancellationToken);
 
-            ((RestApi.CorporateActions.SplitConsolidation)action).NewUnits.Should().Be(3);
+            ((SplitConsolidation)action).NewUnits.Should().Be(3); 
         }
 
         [Fact]
         public async Task DeleteCorporateAction()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var command = new CreateStockCommand()
@@ -177,9 +176,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Name = "Test",
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(command);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", command, TestContext.Current.CancellationToken);
 
-            var corporateAction1 = new RestApi.CorporateActions.CapitalReturn()
+            var corporateAction1 = new CapitalReturn()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -188,9 +187,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 PaymentDate = new Date(2012, 01, 30),
                 Amount = 10.00m
             };
-            await client.CorporateActions.Add(stockId, corporateAction1);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction1, TestContext.Current.CancellationToken);
 
-            var corporateAction2 = new RestApi.CorporateActions.SplitConsolidation()
+            var corporateAction2 = new SplitConsolidation()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -199,9 +198,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 NewUnits = 2,
                 OriginalUnits = 1
             };
-            await client.CorporateActions.Add(stockId, corporateAction2);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction2, TestContext.Current.CancellationToken);
 
-            var corporateAction3 = new RestApi.CorporateActions.CapitalReturn()
+            var corporateAction3 = new CapitalReturn()
             {
                 Id = Guid.NewGuid(),
                 Stock = stockId,
@@ -210,13 +209,12 @@ namespace Booth.PortfolioManager.IntegrationTest
                 PaymentDate = new Date(2013, 02, 28),
                 Amount = 20.00m
             };
-            await client.CorporateActions.Add(stockId, corporateAction3);
+            await httpClient.PostAsync<CorporateAction>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions", corporateAction3, TestContext.Current.CancellationToken);
 
+            await httpClient.DeleteAsync($"https://integrationtest.com/api/stocks/{stockId}/corporateactions/{corporateAction2.Id}", TestContext.Current.CancellationToken);
 
-            await client.CorporateActions.Delete(stockId, corporateAction2.Id);
-
-            var response = await client.CorporateActions.GetAll(stockId, new DateRange(Date.MinValue, Date.MaxValue));
-            response.Select(x => x.Id).Should().BeEquivalentTo(new[] { corporateAction1.Id, corporateAction3.Id });
+            var response = await httpClient.GetAsync<List<CorporateAction>>($"https://integrationtest.com/api/stocks/{stockId}/corporateactions?startDate={Date.MinValue}&endDate={Date.MaxValue}", TestContext.Current.CancellationToken);
+            response.Select(x => x.Id).Should().BeEquivalentTo(new[] { corporateAction1.Id, corporateAction3.Id }); 
         }
     }
 }

@@ -29,8 +29,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
         public ITransactionMapper TransactionMapper;
         public IHoldingMapper HoldingMapper;
 
-        public RestApi.Portfolios.Stock Stock_ARG;
-        public RestApi.Portfolios.Stock Stock_WAM; 
+        public Models.Portfolio.Stock Stock_ARG;
+        public Models.Portfolio.Stock Stock_WAM; 
 
         public Guid ARG_CapitalReturn = Guid.NewGuid();
         public Guid WAM_Split = Guid.NewGuid();
@@ -54,8 +54,8 @@ namespace Booth.PortfolioManager.Web.Test.Services
             TransactionMapper = new TransactionMapper(StockResolver);
             HoldingMapper = new HoldingMapper(StockPriceRetriever);
 
-            Stock_ARG = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
-            Stock_WAM = new RestApi.Portfolios.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = RestApi.Stocks.AssetCategory.AustralianStocks };
+            Stock_ARG = new Models.Portfolio.Stock() { Id = Guid.NewGuid(), AsxCode = "ARG", Name = "Argo", Category = Models.Stock.AssetCategory.AustralianStocks };
+            Stock_WAM = new Models.Portfolio.Stock() { Id = Guid.NewGuid(), AsxCode = "WAM", Name = "Wilson Asset Management", Category = Models.Stock.AssetCategory.AustralianStocks };
 
             var arg = new Stock(Stock_ARG.Id);
             arg.List(Stock_ARG.AsxCode, Stock_ARG.Name, new Date(2000, 01, 01), false, AssetCategory.AustralianStocks);

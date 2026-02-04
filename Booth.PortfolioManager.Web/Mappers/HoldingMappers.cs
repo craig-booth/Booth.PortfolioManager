@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Stocks;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 
 namespace Booth.PortfolioManager.Web.Mappers
 {
 
     public interface IHoldingMapper
     {
-        RestApi.Portfolios.Holding ToApi(Domain.Portfolios.IReadOnlyHolding holding, Date date);
+        Models.Portfolio.Holding ToApi(Domain.Portfolios.IReadOnlyHolding holding, Date date);
     }
 
     public class HoldingMapper : IHoldingMapper
@@ -25,7 +25,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             _PriceRetreiver = priceRetriever;
         }
 
-        public RestApi.Portfolios.Holding ToApi(Domain.Portfolios.IReadOnlyHolding holding, Date date)
+        public Models.Portfolio.Holding ToApi(Domain.Portfolios.IReadOnlyHolding holding, Date date)
         {
             var properties = holding.Properties.ClosestTo(date);
 
