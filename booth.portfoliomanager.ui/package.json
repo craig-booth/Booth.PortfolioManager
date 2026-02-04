@@ -31,7 +31,7 @@
     "match-sorter": "^6.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.3",
+    "react-router-dom": "^6.30.3",
     "recharts": "^2.12.2",
     "sort-by": "^0.0.2",
     "tailwind-merge": "^2.2.1",
