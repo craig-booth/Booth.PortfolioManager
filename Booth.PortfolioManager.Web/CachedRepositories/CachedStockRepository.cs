@@ -96,9 +96,5 @@ namespace Booth.PortfolioManager.Web.CachedRepositories
             await _Repository.UpdatePropertiesAsync(stock, date);
         }
 
-        public async Task UpdateRelativeNTAsAsync(Stock stock, Date date)
-        {
-            await _Repository.UpdateRelativeNTAsAsync(stock, date);
-        }
     }
 }

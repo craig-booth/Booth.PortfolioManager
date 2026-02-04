@@ -47,6 +47,9 @@ namespace Booth.PortfolioManager.DataServices
 
                     for (var i = 0; i < timeStamps.Count; i++) 
                     {
+                        if (timeStamps.ElementAt(i) == null || closingPrices.ElementAt(i) == null)
+                            continue;
+
                         var date = new Date(DateTimeOffset.FromUnixTimeSeconds((int)timeStamps.ElementAt(i) + gmtOffset).Date);
                         var price = Math.Round((decimal)closingPrices.ElementAt(i), 5);
 

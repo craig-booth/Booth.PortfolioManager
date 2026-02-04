@@ -31,33 +31,8 @@ namespace Booth.PortfolioManager.Domain.Transactions
             var parcelsSold = cgtCalculator.Calculate(holding.Parcels(disposal.Date), disposal.Date, disposal.Units, amountReceived, CgtCalculator.GetCgtComparer(disposal.Date, disposal.CgtMethod));
 
             // Dispose of select parcels 
-            if (disposal.Stock is StapledSecurity)
-            {
-                /*     foreach (ParcelSold parcelSold in cgtCalculation.ParcelsSold)
-                     {
-                         var childStocks = _StockQuery.GetChildStocks(stock.Id, disposal.TransactionDate);
-
-                         // Apportion amount based on NTA of child stocks
-                         var amountsReceived = PortfolioUtils.ApportionAmountOverChildStocks(childStocks, disposal.TransactionDate, parcelSold.AmountReceived, _StockQuery);
-
-                         int i = 0;
-                         foreach (var childStock in childStocks)
-                         {
-                             var childParcels = _PortfolioQuery.GetParcelsForStock(childStock.Id, disposal.TransactionDate, disposal.TransactionDate);
-
-                             var childParcel = childParcels.First(x => x.PurchaseId == parcelSold.Parcel.PurchaseId);
-                             DisposeOfParcel(unitOfWork, childParcel, disposal.TransactionDate, parcelSold.UnitsSold, amountsReceived[i].Amount, transaction.Id);
-
-                             i++;
-                         }
-
-                     };  */
-            }
-            else
-            {
-                foreach (var parcelSold in parcelsSold)
-                    holding.DisposeOfParcel(parcelSold.Parcel.Id, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, parcelSold.CapitalGain, parcelSold.CgtMethod, transaction);
-            }
+            foreach (var parcelSold in parcelsSold)
+                holding.DisposeOfParcel(parcelSold.Parcel.Id, disposal.Date, parcelSold.UnitsSold, parcelSold.AmountReceived, parcelSold.CapitalGain, parcelSold.CgtMethod, transaction);
 
             if (disposal.CreateCashTransaction)
             {
