@@ -29,9 +29,6 @@ namespace Booth.PortfolioManager.Repository.Serialization
             IEffectiveProperties<DividendRules> dividendRules = null;
             List<CorporateAction> corporateActions = null;
 
-            List<StapledSecurityChild> childSecurities = null;
-            IEffectiveProperties<RelativeNTA> relativeNTAs = null;
-
             bsonReader.ReadStartDocument();
             while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
             {
@@ -60,40 +57,16 @@ namespace Booth.PortfolioManager.Repository.Serialization
                     case "corporateActions":
                         corporateActions = BsonSerializer.Deserialize<List<CorporateAction>>(bsonReader);
                         break;
-                    case "childSecurities":
-                        childSecurities = BsonSerializer.Deserialize<List<StapledSecurityChild>>(bsonReader);
-                        break;
-                    case "relativeNTAs":
-                        relativeNTAs = BsonSerializer.Deserialize<IEffectiveProperties<RelativeNTA>>(bsonReader);
-                        break;
+
                 }
             }
 
-            Stock stock = null;
-            if (childSecurities == null)
+            var stock = new Stock(id);
+
+            if (listingDate != Date.MinValue)
             {
-                stock = new Stock(id);
-
-                if (listingDate != Date.MinValue)
-                {
-                    var listingProperties = effectiveProperties[listingDate];
-                    stock.List(listingProperties.AsxCode, listingProperties.Name, listingDate, trust, listingProperties.Category);
-                }
-            }
-            else
-            {
-                var stapledSecurity = new StapledSecurity(id);
-
-                if (listingDate != Date.MinValue)
-                {
-                    var listingProperties = effectiveProperties[listingDate];
-                    stapledSecurity.List(listingProperties.AsxCode, listingProperties.Name, listingDate, listingProperties.Category, childSecurities);
-                }
-
-                foreach (var relativeNTA in relativeNTAs.Values.Reverse())
-                    stapledSecurity.SetRelativeNTAs(relativeNTA.EffectivePeriod.FromDate, relativeNTA.Properties.Percentages);
-
-                stock = stapledSecurity;
+                var listingProperties = effectiveProperties[listingDate];
+                stock.List(listingProperties.AsxCode, listingProperties.Name, listingDate, trust, listingProperties.Category);
             }
 
             if (effectiveProperties != null)
@@ -152,20 +125,8 @@ namespace Booth.PortfolioManager.Repository.Serialization
                 BsonSerializer.Serialize<Date>(bsonWriter, value.EffectivePeriod.ToDate);
             }
 
-            if (value is StapledSecurity stapledSecurity)
-            {
-                bsonWriter.WriteName("childSecurities");
-                BsonSerializer.Serialize<IEnumerable<StapledSecurityChild>>(bsonWriter, stapledSecurity.ChildSecurities);
-
-                bsonWriter.WriteName("relativeNTAs");
-                BsonSerializer.Serialize<IEffectiveProperties<RelativeNTA>>(bsonWriter, stapledSecurity.RelativeNTAs);
-            }
-            else
-            {
-
-                bsonWriter.WriteName("trust");
-                bsonWriter.WriteBoolean(value.Trust);
-            }
+            bsonWriter.WriteName("trust");
+            bsonWriter.WriteBoolean(value.Trust);
 
             bsonWriter.WriteName("properties");
             BsonSerializer.Serialize<IEffectiveProperties<StockProperties>>(bsonWriter, value.Properties);

@@ -23,7 +23,6 @@ namespace Booth.PortfolioManager.Repository
         Task AddCorporateActionAsync(Stock stock, Guid id);
         Task DeleteCorporateActionAsync(Stock stock, Guid id);
         Task UpdateCorporateActionAsync(Stock stock, Guid id);
-        Task UpdateRelativeNTAsAsync(Stock stock, Date date);
     }
 
     public class StockRepository : Repository<Stock>, IStockRepository
@@ -89,15 +88,6 @@ namespace Booth.PortfolioManager.Repository
                 .Set("corporateActions.$", action);
 
             await _Collection.UpdateOneAsync(filter, updateValue);
-        }
-
-        public async Task UpdateRelativeNTAsAsync(Stock stock, Date date)
-        {
-            var stapledSecurity = stock as StapledSecurity;
-            if (stapledSecurity == null)
-                throw new Exception("Can only update Relative NTAs on stapled securities");
-
-            await base.UpdateEffectivePropertiesAsync<RelativeNTA>(stock, date, stapledSecurity.RelativeNTAs[date], "relativeNTAs");
         }
 
     }
