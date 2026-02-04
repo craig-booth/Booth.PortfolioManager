@@ -6,7 +6,7 @@ using Xunit;
 using FluentAssertions;
 
 using Booth.Common;
-using Booth.PortfolioManager.RestApi.Client;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -22,41 +22,38 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task AnonymousUserShouldNotHaveAccess()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
 
-            Func<Task> a = () => client.Portfolio.GetProperties();
+            Func<Task> a = () => httpClient.GetAsync<PortfolioPropertiesResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/properties", TestContext.Current.CancellationToken);
 
-            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            (await a.Should().ThrowAsync<RestApiException>()).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized); 
         }
 
         [Fact]
         public async Task UserThatIsNotPortfolioOwnerShouldNotHaveAccess()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User2, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User2, Integration.Password, TestContext.Current.CancellationToken);
 
-            Func<Task> a = () => client.Portfolio.GetProperties();
+            Func<Task> a = () => httpClient.GetAsync<PortfolioPropertiesResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/properties", TestContext.Current.CancellationToken);
 
-            (await a.Should().ThrowAsync<RestException>()).Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
+            (await a.Should().ThrowAsync<RestApiException>()).Which.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
 
         [Fact]
         public async Task PortfolioOwnerShouldHaveAccess()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            var response = await client.Portfolio.GetProperties();
+            var response = await httpClient.GetAsync<PortfolioPropertiesResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/properties", TestContext.Current.CancellationToken);
 
             response.Should().BeEquivalentTo(new
             {
                 Id = Integration.PortfolioId,
                 StartDate = new Date(2020, 01, 01),
                 EndDate = Date.MaxValue
-            });
+            }); 
         }
     }
 }

@@ -14,7 +14,7 @@ using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Mappers;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Stocks;
-using Booth.PortfolioManager.RestApi.Stocks;
+using Booth.PortfolioManager.Web.Models.Stock;
 using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
@@ -112,15 +112,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 AsxCode = "XYZ",
                 Name = "XYZ Pty Ltd",
                 ListingDate = new Date(2000, 01, 01),
-                Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                Category = Models.Stock.AssetCategory.AustralianStocks,
                 Trust = false,
-                StapledSecurity = false,
                 DelistedDate = Date.MaxValue,
                 LastPrice = 12.25m,
                 CompanyTaxRate = 0.30m,
                 DividendRoundingRule = RoundingRule.Round,
                 DrpActive = false,
-                DrpMethod = RestApi.Stocks.DrpMethod.Round
+                DrpMethod = Models.Stock.DrpMethod.Round
             });
         }
 
@@ -135,15 +134,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 AsxCode = "ABC",
                 Name = "ABC Pty Ltd",
                 ListingDate = new Date(2000, 01, 01),
-                Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                Category = Models.Stock.AssetCategory.AustralianStocks,
                 Trust = false,
-                StapledSecurity = false,
                 DelistedDate = Date.MaxValue,
                 LastPrice = 12.25m,
                 CompanyTaxRate = 0.30m,
                 DividendRoundingRule = RoundingRule.Round,
                 DrpActive = false,
-                DrpMethod = RestApi.Stocks.DrpMethod.Round
+                DrpMethod = Models.Stock.DrpMethod.Round
             });
         }
 
@@ -164,15 +162,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -192,15 +189,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -220,15 +216,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -248,15 +243,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -276,15 +270,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -312,15 +305,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -340,15 +332,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -368,15 +359,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
         }
 
@@ -396,15 +386,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
 
         }
@@ -425,15 +414,14 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                     AsxCode = "XYZ",
                     Name = "XYZ Pty Ltd",
                     ListingDate = new Date(2000, 01, 01),
-                    Category = RestApi.Stocks.AssetCategory.AustralianStocks,
+                    Category = Models.Stock.AssetCategory.AustralianStocks,
                     Trust = false,
-                    StapledSecurity = false,
                     DelistedDate = Date.MaxValue,
                     LastPrice = 12.25m,
                     CompanyTaxRate = 0.30m,
                     DividendRoundingRule = RoundingRule.Round,
                     DrpActive = false,
-                    DrpMethod = RestApi.Stocks.DrpMethod.Round
+                    DrpMethod = Models.Stock.DrpMethod.Round
                 });
 
         }
@@ -477,7 +465,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                                 ToDate = new Date(2009, 12, 31),
                                 AsxCode = "ABC",
                                 Name = "ABC Pty Ltd",
-                                Category = RestApi.Stocks.AssetCategory.AustralianStocks
+                                Category = Models.Stock.AssetCategory.AustralianStocks
                             },
                             new StockHistoryResponse.HistoricProperties()
                             {
@@ -485,7 +473,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                                 ToDate = Date.MaxValue,
                                 AsxCode = "XYZ",
                                 Name = "XYZ Pty Ltd",
-                                Category = RestApi.Stocks.AssetCategory.AustralianStocks
+                                Category = Models.Stock.AssetCategory.AustralianStocks
                             }
                         },
 
@@ -497,7 +485,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                             ToDate = Date.MaxValue,
                             CompanyTaxRate = 0.30m,
                             DrpActive = false,
-                            DrpMethod = RestApi.Stocks.DrpMethod.Round,
+                            DrpMethod = Models.Stock.DrpMethod.Round,
                             RoundingRule = RoundingRule.Round
                         }
                     }
@@ -585,7 +573,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 AsxCode = "XYZ",
                 Name = "XYZ Name",
                 Trust = true,
-                Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
+                Category = Models.Stock.AssetCategory.AustralianFixedInterest
             };
 
             var response = await _Controller.CreateStock(command);
@@ -603,7 +591,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 AsxCode = "XYZ",
                 Name = "XYZ Name",
                 Trust = true,
-                Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
+                Category = Models.Stock.AssetCategory.AustralianFixedInterest
             };
 
             var response = await _Controller.CreateStock(command);
@@ -620,7 +608,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 ChangeDate = new Date(2012, 01, 01),
                 AsxCode = "XYZ",
                 Name = "XYZ Name",
-                Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
+                Category = Models.Stock.AssetCategory.AustralianFixedInterest
             };
             var response = await _Controller.ChangeStock(_MissingStockId, command);
 
@@ -637,7 +625,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 ChangeDate = new Date(2009, 01, 01),
                 AsxCode = "XYZ",
                 Name = "XYZ Name",
-                Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
+                Category = Models.Stock.AssetCategory.AustralianFixedInterest
             };
             var response = await _Controller.ChangeStock(_Stock.Id, command);
 
@@ -653,7 +641,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 ChangeDate = new Date(2009, 01, 01),
                 AsxCode = "XYZ",
                 Name = "XYZ Name",
-                Category = RestApi.Stocks.AssetCategory.AustralianFixedInterest
+                Category = Models.Stock.AssetCategory.AustralianFixedInterest
             };
             var response = await _Controller.ChangeStock(_Stock.Id, command);
 
@@ -748,7 +736,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 CompanyTaxRate = 0.40m,
                 DividendRoundingRule = RoundingRule.Truncate,
                 DrpActive = true,
-                DrpMethod = RestApi.Stocks.DrpMethod.RoundUp
+                DrpMethod = Models.Stock.DrpMethod.RoundUp
             };
             var response = await _Controller.ChangeDividendRules(_MissingStockId, command);
 
@@ -765,7 +753,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 CompanyTaxRate = 10.45m,
                 DividendRoundingRule = RoundingRule.Truncate,
                 DrpActive = true,
-                DrpMethod = RestApi.Stocks.DrpMethod.RoundUp
+                DrpMethod = Models.Stock.DrpMethod.RoundUp
             };
             var response = await _Controller.ChangeDividendRules(_Stock.Id, command);
 
@@ -782,7 +770,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
                 CompanyTaxRate = 0.40m,
                 DividendRoundingRule = RoundingRule.Truncate,
                 DrpActive = true,
-                DrpMethod = RestApi.Stocks.DrpMethod.RoundUp
+                DrpMethod = Models.Stock.DrpMethod.RoundUp
             };
             var response = await _Controller.ChangeDividendRules(_Stock.Id, command);
 

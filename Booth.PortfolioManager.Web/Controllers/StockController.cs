@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
-using Booth.PortfolioManager.RestApi.Stocks;
+using Booth.PortfolioManager.Web.Models.Stock;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Web.Mappers;
@@ -210,81 +210,6 @@ namespace Booth.PortfolioManager.Web.Controllers
 
             return result.ToActionResult();
         }
-
-  /*      // GET : /api/stocks/{id}/relativenta
-        [Route("{id:guid}/relativenta")]
-        [HttpGet]
-        public ActionResult<RelativeNtaResponse> GetRelativeNta([FromRoute] Guid id, [FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate)
-        {
-            throw new NotSupportedException();
-                      var stock = _StockQuery.Get(id);
-                      if (stock == null)
-                          return NotFound();
-
-                      if (stock is StapledSecurity stapledSecurity)
-                      {
-                          var dateRange = new DateRange((fromDate != null) ? (DateTime)fromDate : DateUtils.NoStartDate, (toDate != null) ? (DateTime)toDate : DateTime.Today);
-
-                          return Ok(stapledSecurity.ToRelativeNTAResponse(dateRange));
-                      }
-                      else
-                      {
-                          return BadRequest("Relative NTAs only apply stapled securities");
-                      }
-
-                     
-        }*/
-
-        // POST : /api/stocks/{id}/relativenta
-     /*   [Authorize(Policy.CanMantainStocks)]
-        [Route("{id:guid}/relativenta")]
-        [HttpPost]
-        public ActionResult ChangeRelativeNta([FromRoute] Guid id, [FromBody] ChangeRelativeNtaCommand command)
-        {
-            throw new NotSupportedException();
-                        // Check id in URL and id in command match
-                        if (id != command.Id)
-                            return BadRequest("Id in command doesn't match id on URL");
-
-                        var stock = _StockQuery.Get(id);
-                        if (stock == null)
-                            return NotFound();
-
-                        if (stock is StapledSecurity stapledSecurity)
-                        {
-                            if (command.RelativeNTAs.Count != stapledSecurity.ChildSecurities.Count)
-                            {
-                                return BadRequest(String.Format("The number of relative ntas provided ({0}) did not match the number of child securities ({1})", command.RelativeNTAs.Count, stapledSecurity.ChildSecurities.Count));
-                            }
-
-                            var ntas = new decimal[stapledSecurity.ChildSecurities.Count];
-                            for (var i = 0; i < stapledSecurity.ChildSecurities.Count; i++)
-                            {
-                                var nta = command.RelativeNTAs.Find(x => x.ChildSecurity == stapledSecurity.ChildSecurities[i].ASXCode);
-                                if (nta == null)
-                                    return BadRequest(String.Format("Relative nta not provided for {0}", stapledSecurity.ChildSecurities[i].ASXCode));
-
-                                ntas[i] = nta.Percentage;
-                            }
-
-                            try
-                            {
-                                _StockService.ChangeRelativeNTAs(id, command.ChangeDate, ntas);
-                            }
-                            catch (Exception e)
-                            {
-                                return BadRequest(e.Message);
-                            }
-
-                            return Ok();
-                        }
-                        else
-                        {
-                            return BadRequest("Relative NTAs only apply stapled securities");
-                        }
-
-                        
-        } */
 
         private bool MatchesQuery(StockProperties stock, string query)
         {

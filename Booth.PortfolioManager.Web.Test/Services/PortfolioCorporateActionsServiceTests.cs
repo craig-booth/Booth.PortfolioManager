@@ -12,7 +12,7 @@ using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Portfolios;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Test.Services
@@ -126,7 +126,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Result.Should().BeEquivalentTo(new []
             {
-                new RestApi.Transactions.UnitCountAdjustment()
+                new Models.Transaction.UnitCountAdjustment()
                 {
                     Stock = _Fixture.Stock_WAM.Id,
                     TransactionDate = new Date(2002, 01, 01),

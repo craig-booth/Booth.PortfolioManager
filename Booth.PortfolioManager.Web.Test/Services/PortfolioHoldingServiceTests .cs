@@ -41,7 +41,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Result.Should().BeEquivalentTo(new []
             {
-                new RestApi.Portfolios.Holding()
+                new Models.Portfolio.Holding()
                 {
                     Stock = _Fixture.Stock_ARG,
                     Units = 100,
@@ -49,7 +49,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     Cost = 119.95m,
                     CostBase = 119.95m,
                 },
-                new RestApi.Portfolios.Holding()
+                new Models.Portfolio.Holding()
                 {
                     Stock = _Fixture.Stock_WAM,
                     Units = 200,
@@ -72,7 +72,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Result.Should().BeEquivalentTo(new[]
             {
-                new RestApi.Portfolios.Holding()
+                new Models.Portfolio.Holding()
                 {
                     Stock = _Fixture.Stock_ARG,
                     Units = 200,
@@ -80,7 +80,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     Cost = 239.90m,
                     CostBase = 239.90m,
                 },
-                new RestApi.Portfolios.Holding()
+                new Models.Portfolio.Holding()
                 {
                     Stock = _Fixture.Stock_WAM,
                     Units = 200,
@@ -112,7 +112,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             var result = service.GetHolding(_Fixture.Stock_ARG.Id, new Date(2000, 01, 01));
 
-            result.Result.Should().BeEquivalentTo(new RestApi.Portfolios.Holding()
+            result.Result.Should().BeEquivalentTo(new Models.Portfolio.Holding()
             {
                 Stock = _Fixture.Stock_ARG,
                 Units = 100,

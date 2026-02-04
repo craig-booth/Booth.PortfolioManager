@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 using Booth.PortfolioManager.Web.Authentication;
-using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Web.Models.Transaction;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Mappers;
 

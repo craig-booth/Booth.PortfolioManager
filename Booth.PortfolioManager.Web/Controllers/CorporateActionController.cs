@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 
 using Booth.Common;
-using Booth.PortfolioManager.RestApi.CorporateActions;
+using Booth.PortfolioManager.Web.Models.CorporateAction;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Mappers;

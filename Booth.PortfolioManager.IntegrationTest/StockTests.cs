@@ -1,13 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Xunit;
+﻿using Booth.Common;
+using Booth.PortfolioManager.Web.Models.Stock;
 using FluentAssertions;
-
-using Booth.Common;
-using Booth.PortfolioManager.RestApi.Client;
-using Booth.PortfolioManager.RestApi.Stocks;
-using MongoDB.Driver;
+using System;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Booth.PortfolioManager.IntegrationTest
 {
@@ -24,8 +20,8 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task CreateStock()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var asxCode = _Fixture.GenerateUniqueAsxCode();
@@ -38,9 +34,9 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(command);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", command, TestContext.Current.CancellationToken);
 
-            var stock = await client.Stocks.Get(stockId);
+            var stock = await httpClient.GetAsync<StockResponse>($"https://integrationtest.com/api/stocks/{stockId}", TestContext.Current.CancellationToken);
 
             stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "Test", Category = AssetCategory.AustralianStocks, Trust = false, ListingDate = new Date(2003, 06, 01) });
         }
@@ -48,8 +44,8 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task DelistStock()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var asxCode = _Fixture.GenerateUniqueAsxCode();
@@ -62,25 +58,25 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(createCommand);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", createCommand, TestContext.Current.CancellationToken);
 
             var delistCommand = new DelistStockCommand()
             {
                 Id = stockId,
                 DelistingDate = new Date(2010, 01, 01)
             };
-            await client.Stocks.DelistStock(delistCommand);
+            await httpClient.PostAsync<DelistStockCommand>($"https://integrationtest.com/api/stocks/{stockId}/delist", delistCommand, TestContext.Current.CancellationToken);
 
-            var stock = await client.Stocks.Get(stockId);
+            var stock = await httpClient.GetAsync<StockResponse>("https://integrationtest.com/api/stocks/" + stockId, TestContext.Current.CancellationToken);
 
             stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "Test", Category = AssetCategory.AustralianStocks, Trust = false, ListingDate = new Date(2003, 06, 01), DelistedDate = new Date(2010, 01, 01) });
-        }
+            }
 
         [Fact]
         public async Task ChangeStock()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             
@@ -93,7 +89,7 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(createCommand);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", createCommand, TestContext.Current.CancellationToken);
 
             var asxCode = _Fixture.GenerateUniqueAsxCode();
             var changeCommand = new ChangeStockCommand()
@@ -103,19 +99,18 @@ namespace Booth.PortfolioManager.IntegrationTest
                 AsxCode = asxCode,
                 Name = "New Name"
             };
-            await client.Stocks.ChangeStock(changeCommand);
+            await httpClient.PostAsync<ChangeStockCommand>($"https://integrationtest.com/api/stocks/{stockId}/change", changeCommand, TestContext.Current.CancellationToken);
 
-            var stock = await client.Stocks.Get(stockId);
+            var stock = await httpClient.GetAsync<StockResponse>($"https://integrationtest.com/api/stocks/{stockId}", TestContext.Current.CancellationToken);
 
             stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "New Name", });
-
         }
 
         [Fact]
         public async Task ChangeDividendRules()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var asxCode = _Fixture.GenerateUniqueAsxCode();
@@ -128,7 +123,7 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(createCommand);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", createCommand, TestContext.Current.CancellationToken);
 
             var changeCommand = new ChangeDividendRulesCommand()
             {
@@ -136,19 +131,18 @@ namespace Booth.PortfolioManager.IntegrationTest
                 ChangeDate = new Date(2005, 01, 01),
                 CompanyTaxRate = 0.40m
             };
-            await client.Stocks.ChangeDividendRules(changeCommand);
+            await httpClient.PostAsync<ChangeDividendRulesCommand>($"https://integrationtest.com/api/stocks/{stockId}/changedividendrules", changeCommand, TestContext.Current.CancellationToken);
 
-            var stock = await client.Stocks.Get(stockId);
+            var stock = await httpClient.GetAsync<StockResponse>($"https://integrationtest.com/api/stocks/{stockId}", TestContext.Current.CancellationToken);
 
             stock.Should().BeEquivalentTo(new { Id = stockId, AsxCode = asxCode, Name = "Test", CompanyTaxRate = 0.40m });
-
         }
 
         [Fact]
         public async Task UpdateClosingPrices()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
             var stockId = Guid.NewGuid();
             var createCommand = new CreateStockCommand()
@@ -160,7 +154,7 @@ namespace Booth.PortfolioManager.IntegrationTest
                 Trust = false,
                 Category = AssetCategory.AustralianStocks
             };
-            await client.Stocks.CreateStock(createCommand);
+            await httpClient.PostAsync<CreateStockCommand>("https://integrationtest.com/api/stocks/", createCommand, TestContext.Current.CancellationToken);
 
             var updateCommand = new UpdateClosingPricesCommand()
             {
@@ -169,33 +163,31 @@ namespace Booth.PortfolioManager.IntegrationTest
             updateCommand.AddClosingPrice(new Date(2003, 06, 01), 1.30m);
             updateCommand.AddClosingPrice(new Date(2003, 06, 02), 1.35m);
             updateCommand.AddClosingPrice(new Date(2003, 06, 03), 1.32m);
-            await client.Stocks.UpdateClosingPrices(updateCommand);
+            await httpClient.PostAsync<UpdateClosingPricesCommand>($"https://integrationtest.com/api/stocks/{stockId}/closingprices", updateCommand, TestContext.Current.CancellationToken);
 
-            var prices = await client.Stocks.GetPrices(stockId, new DateRange(new Date(2003, 06, 01), new Date(2003, 06, 30)));
+            var prices = await httpClient.GetAsync<StockPriceResponse>($"https://integrationtest.com/api/stocks/{stockId}/closingprices?fromdate=2003-06-01&todate=2003-06-30", TestContext.Current.CancellationToken);
 
             prices.ClosingPrices.Should().HaveCount(3);
-
         }
 
         [Fact]
         public async Task Get()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
-            var stock = await client.Stocks.Get(Integration.StockId);
-
+            var stock = await httpClient.GetAsync<StockResponse>($"https://integrationtest.com/api/stocks/{Integration.StockId}", TestContext.Current.CancellationToken);
+ 
             stock.Should().BeEquivalentTo(new { Id = Integration.StockId, AsxCode = "ABC", Name = "Test Company" });
-
         }
 
         [Fact]
         public async Task GetHistory()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
-            var stock = await client.Stocks.GetHistory(Integration.StockId);
+            var stock = await httpClient.GetAsync<StockHistoryResponse>($"https://integrationtest.com/api/stocks/{Integration.StockId}/history", TestContext.Current.CancellationToken);
 
             stock.Should().BeEquivalentTo(new { Id = Integration.StockId, AsxCode = "ABC", Name = "Test Company" });
         }
@@ -203,10 +195,10 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task GetClosingPrices()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.AdminUser, Integration.Password);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.AdminUser, Integration.Password, TestContext.Current.CancellationToken);
 
-            var prices = await client.Stocks.GetPrices(Integration.StockId, new DateRange(new Date(2020, 01, 01), new Date(2020, 01, 10)));
+            var prices = await httpClient.GetAsync<StockPriceResponse>($"https://integrationtest.com/api/stocks/{Integration.StockId}/closingprices?fromdate=2020-01-01&todate=2020-01-10", TestContext.Current.CancellationToken);
 
             prices.ClosingPrices.Should().HaveCount(7);
         }

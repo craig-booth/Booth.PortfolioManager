@@ -99,7 +99,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task AddCorporateActionStockNotFound()
         {
-            var dividend = new RestApi.CorporateActions.Dividend();
+            var dividend = new Models.CorporateAction.Dividend();
 
             var result = await _Service.AddCorporateActionAsync(Guid.NewGuid(), dividend);
 
@@ -109,7 +109,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task AddCapitalReturn()
         {
-            var action = new RestApi.CorporateActions.CapitalReturn()
+            var action = new Models.CorporateAction.CapitalReturn()
             {
                 Id = _NewAction,
                 Stock = _StockWithoutCorporateActions.Id,
@@ -132,7 +132,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task AddCompositeAction()
         {
-            var action = new RestApi.CorporateActions.CompositeAction()
+            var action = new Models.CorporateAction.CompositeAction()
             {
                 Id = _NewAction,
                 Stock = _StockWithoutCorporateActions.Id,
@@ -140,7 +140,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Description = "Restructure"
             };
             var child1 = Guid.NewGuid();
-            action.ChildActions.Add(new RestApi.CorporateActions.CapitalReturn()
+            action.ChildActions.Add(new Models.CorporateAction.CapitalReturn()
             {
                 Id = child1,
                 Stock = _StockWithoutCorporateActions.Id,
@@ -150,7 +150,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Amount = 10.00m
             });
             var child2 = Guid.NewGuid();
-            action.ChildActions.Add(new RestApi.CorporateActions.SplitConsolidation()
+            action.ChildActions.Add(new Models.CorporateAction.SplitConsolidation()
             {
                 Id = child2,
                 Stock = _StockWithoutCorporateActions.Id,
@@ -178,7 +178,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task AddDividend()
         {
-            var action = new RestApi.CorporateActions.Dividend()
+            var action = new Models.CorporateAction.Dividend()
             {
                 Id = _NewAction,
                 Stock = _StockWithoutCorporateActions.Id,
@@ -203,7 +203,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task AddSplitConsolidation()
         {
-            var action = new RestApi.CorporateActions.SplitConsolidation()
+            var action = new Models.CorporateAction.SplitConsolidation()
             {
                 Id = _NewAction,
                 Stock = _StockWithoutCorporateActions.Id,
@@ -228,7 +228,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task AddTransformation()
         {
-            var action = new RestApi.CorporateActions.Transformation()
+            var action = new Models.CorporateAction.Transformation()
             {
                 Id = _NewAction,
                 Stock = _StockWithoutCorporateActions.Id,
@@ -238,7 +238,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 CashComponent = 10.15m,
                 RolloverRefliefApplies = true
             };
-            action.ResultingStocks.Add(new RestApi.CorporateActions.Transformation.ResultingStock()
+            action.ResultingStocks.Add(new Models.CorporateAction.Transformation.ResultingStock()
             {
                 Stock = _StockWithCorporateActions.Id,
                 AquisitionDate = new Date(2001, 04, 01),
@@ -262,7 +262,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task UpdateCorporateActionStockNotFound()
         {
-            var dividend = new RestApi.CorporateActions.Dividend() { Id = _Action1 };
+            var dividend = new Models.CorporateAction.Dividend() { Id = _Action1 };
 
             var result = await _Service.UpdateCorporateActionAsync(Guid.NewGuid(), dividend);
 
@@ -272,7 +272,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task UpdateCorporateActionNotFound()
         {
-            var dividend = new RestApi.CorporateActions.Dividend() { Id = Guid.NewGuid() };
+            var dividend = new Models.CorporateAction.Dividend() { Id = Guid.NewGuid() };
 
             var result = await _Service.UpdateCorporateActionAsync(_StockWithCorporateActions.Id, dividend);
 
@@ -282,7 +282,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
         [Fact]
         public async Task UpdateCorporateAction()
         {
-            var capitalReturn = new RestApi.CorporateActions.CapitalReturn()
+            var capitalReturn = new Models.CorporateAction.CapitalReturn()
             {
                 Id = _Action1,
                 Stock = _StockWithCorporateActions.Id,

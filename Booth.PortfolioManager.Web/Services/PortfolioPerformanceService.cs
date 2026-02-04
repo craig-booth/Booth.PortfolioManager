@@ -7,7 +7,7 @@ using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
 using Booth.PortfolioManager.Domain.Utils;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services

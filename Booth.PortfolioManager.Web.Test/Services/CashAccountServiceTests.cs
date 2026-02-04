@@ -12,7 +12,7 @@ using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Utilities;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.Transactions;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 
 namespace Booth.PortfolioManager.Web.Test.Services
 {
@@ -93,7 +93,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     new CashAccountTransactionsResponse.Transaction()
                     {
                         Date = new Date(2000, 04, 01),
-                        Type = RestApi.Transactions.CashTransactionType.Withdrawl,
+                        Type = Models.Transaction.CashTransactionType.Withdrawl,
                         Description = "Withdrawl",
                         Amount = -50.00m,
                         Balance = 50.00m

@@ -9,7 +9,7 @@ using FluentAssertions;
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
 using Booth.PortfolioManager.Web.Services;
-using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Web.Models.Transaction;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {

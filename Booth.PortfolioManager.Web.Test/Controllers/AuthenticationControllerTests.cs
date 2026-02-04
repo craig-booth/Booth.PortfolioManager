@@ -9,7 +9,7 @@ using Xunit;
 using Moq;
 using FluentAssertions;
 
-using Booth.PortfolioManager.RestApi.Users;
+using Booth.PortfolioManager.Web.Models.User;
 using Booth.PortfolioManager.Web.Controllers;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Authentication;

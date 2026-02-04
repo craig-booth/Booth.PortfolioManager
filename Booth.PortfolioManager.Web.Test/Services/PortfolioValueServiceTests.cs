@@ -6,8 +6,8 @@ using FluentAssertions;
 
 using Booth.Common;
 using Booth.PortfolioManager.Web.Services;
-using Booth.PortfolioManager.RestApi.Portfolios;
-using Booth.PortfolioManager.RestApi.Stocks;
+using Booth.PortfolioManager.Web.Models.Portfolio;
+using Booth.PortfolioManager.Web.Models.Stock;
 using Microsoft.VisualBasic;
 
 namespace Booth.PortfolioManager.Web.Test.Services

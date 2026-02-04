@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Services
@@ -40,7 +40,7 @@ namespace Booth.PortfolioManager.Web.Services
 
             foreach (var holding in _Portfolio.Holdings.All())
             {
-                var holdingProperty = new RestApi.Portfolios.HoldingProperties()
+                var holdingProperty = new Models.Portfolio.HoldingProperties()
                 {
                     Stock = holding.Stock.ToSummaryResponse(Date.Today),
                     StartDate = holding.EffectivePeriod.FromDate,

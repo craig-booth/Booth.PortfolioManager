@@ -11,8 +11,8 @@ namespace Booth.PortfolioManager.Web.Services
 {
     public interface ITradingCalendarService
     {
-        Task<ServiceResult<RestApi.TradingCalendars.TradingCalendar>> GetAsync(Guid calendarId, int year);
-        Task<ServiceResult> UpdateAsync(Guid calendarId, RestApi.TradingCalendars.TradingCalendar tradingCalendar);
+        Task<ServiceResult<Models.TradingCalendar.TradingCalendar>> GetAsync(Guid calendarId, int year);
+        Task<ServiceResult> UpdateAsync(Guid calendarId, Models.TradingCalendar.TradingCalendar tradingCalendar);
         Task<ServiceResult> SetNonTradingDaysAsync(Guid calendarId, int year, IEnumerable<NonTradingDay> nonTradingDays);
     }
 
@@ -25,23 +25,23 @@ namespace Booth.PortfolioManager.Web.Services
             _Repository = repository;        
         }
 
-        public async Task<ServiceResult<RestApi.TradingCalendars.TradingCalendar>> GetAsync(Guid calendarId, int year)
+        public async Task<ServiceResult<Models.TradingCalendar.TradingCalendar>> GetAsync(Guid calendarId, int year)
         {
             var tradingCalendar = await _Repository.GetAsync(calendarId);
             if (tradingCalendar == null)
-                return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.NotFound();
+                return ServiceResult<Models.TradingCalendar.TradingCalendar>.NotFound();
 
-            var result = new RestApi.TradingCalendars.TradingCalendar();
+            var result = new Models.TradingCalendar.TradingCalendar();
 
             result.Year = year;
 
             foreach (var nonTradingDay in tradingCalendar.NonTradingDays(year))
                 result.AddNonTradingDay(nonTradingDay.Date, nonTradingDay.Description);
             
-            return ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(result);
+            return ServiceResult<Models.TradingCalendar.TradingCalendar>.Ok(result);
         }
         
-        public async Task<ServiceResult> UpdateAsync(Guid calendarId, RestApi.TradingCalendars.TradingCalendar tradingCalendar)
+        public async Task<ServiceResult> UpdateAsync(Guid calendarId, Models.TradingCalendar.TradingCalendar tradingCalendar)
         {
             var nonTradingDays = tradingCalendar.NonTradingDays.Select(x => new NonTradingDay(x.Date, x.Description));
 

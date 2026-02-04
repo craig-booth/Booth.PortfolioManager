@@ -22,10 +22,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var response = new RestApi.TradingCalendars.TradingCalendar();
+            var response = new Models.TradingCalendar.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
-            service.Setup(x => x.GetAsync(TradingCalendarIds.ASX, 2010)).Returns(Task.FromResult(ServiceResult<RestApi.TradingCalendars.TradingCalendar>.Ok(response))).Verifiable();
+            service.Setup(x => x.GetAsync(TradingCalendarIds.ASX, 2010)).Returns(Task.FromResult(ServiceResult<Models.TradingCalendar.TradingCalendar>.Ok(response))).Verifiable();
 
             var controller = new TradingCalendarController(service.Object);
             var result = await controller.Get(2010);
@@ -40,7 +40,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var tradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
+            var tradingCalendar = new Models.TradingCalendar.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
             service.Setup(x => x.UpdateAsync(TradingCalendarIds.ASX, tradingCalendar)).Returns(Task.FromResult(ServiceResult.Error("Error message"))).Verifiable();
@@ -58,7 +58,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
         {
             var mockRepository = new MockRepository(MockBehavior.Strict);
 
-            var tradingCalendar = new RestApi.TradingCalendars.TradingCalendar();
+            var tradingCalendar = new Models.TradingCalendar.TradingCalendar();
 
             var service = mockRepository.Create<ITradingCalendarService>();
             service.Setup(x => x.UpdateAsync(TradingCalendarIds.ASX, tradingCalendar)).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();

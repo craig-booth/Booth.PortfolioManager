@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Domain.Portfolios;
-using Booth.PortfolioManager.RestApi.Stocks;
+using Booth.PortfolioManager.Web.Models.Stock;
 
 namespace Booth.PortfolioManager.Web.Mappers
 {
@@ -78,7 +78,6 @@ namespace Booth.PortfolioManager.Web.Mappers
                 ListingDate = stock.EffectivePeriod.FromDate,
                 Category = stockProperties.Category.ToResponse(),
                 Trust = stock.Trust,
-                StapledSecurity = false,
                 DelistedDate = stock.EffectivePeriod.ToDate,
                 LastPrice = _PriceRetreiver.GetPrice(stock.Id, Date.Today),
                 CompanyTaxRate = dividendRules.CompanyTaxRate,
@@ -93,11 +92,11 @@ namespace Booth.PortfolioManager.Web.Mappers
 
     public static class StockMapperExtension
     {
-        public static RestApi.Portfolios.Stock ToSummaryResponse(this IReadOnlyStock stock, Date date)
+        public static Models.Portfolio.Stock ToSummaryResponse(this IReadOnlyStock stock, Date date)
         {
             var stockProperties = stock.Properties.ClosestTo(date);
 
-            var result = new RestApi.Portfolios.Stock()
+            var result = new Models.Portfolio.Stock()
             {
                 Id = stock.Id,
                 AsxCode = stockProperties.AsxCode,

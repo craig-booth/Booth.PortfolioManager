@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-
-using Xunit;
+﻿using Booth.Common;
+using Booth.PortfolioManager.Domain.Stocks;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 using FluentAssertions;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
-using Booth.Common;
-using Booth.PortfolioManager.RestApi.Client;
-using Booth.PortfolioManager.RestApi.Portfolios;
 
 
 namespace Booth.PortfolioManager.IntegrationTest
@@ -26,11 +26,10 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task ListHoldings()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            var response = await client.Holdings.Get(new Date(2020, 01, 15));
+            var response = await httpClient.GetAsync<List<Holding>>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/holdings?date=2020-01-15", TestContext.Current.CancellationToken); 
 
             response.Should().HaveCount(1);
         }
@@ -39,48 +38,49 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task GetHolding()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            var response = await client.Holdings.Get(Integration.StockId, new Date(2020, 01, 15));
+            var response = await httpClient.GetAsync<Holding>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/holdings/{Integration.StockId}/?date=2020-01-15", TestContext.Current.CancellationToken);
 
-            response.Units.Should().Be(100);
+            response.Units.Should().Be(100); 
         }
 
         [Fact]
         public async Task ChangeDrpParticipation()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            await client.Holdings.ChangeDrpParticipation(Integration.StockId, true);
+            var command = new ChangeDrpParticipationCommand()
+            {
+                Holding = Integration.StockId,
+                Participate = true
+            };
+            await httpClient.PostAsync<ChangeDrpParticipationCommand>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/holdings/{Integration.StockId}/changedrpparticipation", command, TestContext.Current.CancellationToken);
 
-            var response = await client.Portfolio.GetProperties();
-            response.Holdings.Should().Contain(x => x.Stock.Id == Integration.StockId).Which.ParticipatingInDrp.Should().BeTrue();
+            var response = await httpClient.GetAsync<PortfolioPropertiesResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/properties", TestContext.Current.CancellationToken);
+            response.Holdings.Should().Contain(x => x.Stock.Id == Integration.StockId).Which.ParticipatingInDrp.Should().BeTrue(); 
         }
 
         [Fact]
         public async Task GetValue()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            var response = await client.Holdings.GetValue(Integration.StockId, new DateRange(new Date(2020, 01, 10), new Date(2020, 01, 15)), ValueFrequency.Day);
+            var response = await httpClient.GetAsync<PortfolioValueResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/holdings/{Integration.StockId}/value?fromdate=2020-01-10&todate=2020-01-15&frequency=day", TestContext.Current.CancellationToken); 
 
-            response.Values.Should().HaveCount(4);
+            response.Values.Should().HaveCount(4); 
         }
 
         [Fact]
         public async Task GetCapitalGains()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            var response = await client.Holdings.GetCapitalGains(Integration.StockId, new Date(2020, 01, 15));
+            var response = await httpClient.GetAsync<SimpleUnrealisedGainsResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/holdings/{Integration.StockId}/capitalgains?date=2020-01-15", TestContext.Current.CancellationToken); 
 
             response.UnrealisedGains.Should().HaveCount(1);
         }
@@ -88,11 +88,10 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task GetDetailedCapitalGains()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            var response = await client.Holdings.GetDetailedCapitalGains(Integration.StockId, new Date(2020, 01, 15));
+            var response = await httpClient.GetAsync<DetailedUnrealisedGainsResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/holdings/{Integration.StockId}/detailedcapitalgains?date=2020-01-15", TestContext.Current.CancellationToken); 
 
             response.UnrealisedGains.Should().HaveCount(1);
         }
@@ -100,13 +99,12 @@ namespace Booth.PortfolioManager.IntegrationTest
         [Fact]
         public async Task GetCorporateActions()
         {
-            var client = new RestClient(_Fixture.CreateClient(), "https://integrationtest.com/api/");
-            await client.Authenticate(Integration.User, Integration.Password);
-            client.SetPortfolio(Integration.PortfolioId);
+            var httpClient = _Fixture.CreateClient();
+            await httpClient.AuthenticateAsync(Integration.User, Integration.Password, TestContext.Current.CancellationToken);
 
-            var response = await client.Holdings.GetCorporateActions(Integration.StockId);
+            var response = await httpClient.GetAsync<CorporateActionsResponse>($"https://integrationtest.com/api/portfolio/{Integration.PortfolioId}/holdings/{Integration.StockId}/corporateactions", TestContext.Current.CancellationToken); 
 
-            response.CorporateActions.Should().HaveCount(2);
+            response.CorporateActions.Should().HaveCount(2); 
         }
     }
 }

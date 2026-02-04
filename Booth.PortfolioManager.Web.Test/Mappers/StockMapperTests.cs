@@ -11,7 +11,7 @@ using Moq;
 using Booth.Common;
 using Booth.PortfolioManager.Domain.Stocks;
 using Booth.PortfolioManager.Web.Mappers;
-using Booth.PortfolioManager.RestApi.Stocks;
+using Booth.PortfolioManager.Web.Models.Stock;
 using Booth.PortfolioManager.Domain.Portfolios;
 
 namespace Booth.PortfolioManager.Web.Test.Mappers
@@ -41,15 +41,14 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 AsxCode = "ABC",
                 Name = "ABC Pty Ltd",
                 ListingDate = new Date(2000, 01, 01),
-                Category = RestApi.Stocks.AssetCategory.InternationalProperty,
+                Category = Models.Stock.AssetCategory.InternationalProperty,
                 Trust = true,
-                StapledSecurity = false,
                 DelistedDate = new Date(2010, 01, 01),
                 LastPrice= 1.20m,
                 CompanyTaxRate = 0.30m,
                 DividendRoundingRule = RoundingRule.Truncate,
                 DrpActive = true,
-                DrpMethod = RestApi.Stocks.DrpMethod.RoundDown
+                DrpMethod = Models.Stock.DrpMethod.RoundDown
             });
 
         }
@@ -88,7 +87,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                         ToDate = new Date(2009, 12, 31),
                         AsxCode = "ABC",
                         Name = "ABC Pty Ltd",
-                        Category = RestApi.Stocks.AssetCategory.InternationalProperty
+                        Category = Models.Stock.AssetCategory.InternationalProperty
                     }),
                     second => second.Should().BeEquivalentTo(new
                      {
@@ -96,7 +95,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                         ToDate = new Date(2020, 01, 01),
                         AsxCode = "XYZ",
                         Name = "XYZ Pty Ltd",
-                        Category = RestApi.Stocks.AssetCategory.InternationalStocks
+                        Category = Models.Stock.AssetCategory.InternationalStocks
                     }));
 
                 reponse.DividendRules.Should().SatisfyRespectively(
@@ -107,7 +106,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                         CompanyTaxRate = 0.30m,
                         RoundingRule = RoundingRule.Round,
                         DrpActive = false,
-                        DrpMethod = RestApi.Stocks.DrpMethod.Round
+                        DrpMethod = Models.Stock.DrpMethod.Round
                     }),
                     second => second.Should().BeEquivalentTo(new
                     {
@@ -116,7 +115,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                         CompanyTaxRate = 0.40m,
                         RoundingRule = RoundingRule.Truncate,
                         DrpActive = true,
-                        DrpMethod = RestApi.Stocks.DrpMethod.RoundDown
+                        DrpMethod = Models.Stock.DrpMethod.RoundDown
                     }));
             }
 

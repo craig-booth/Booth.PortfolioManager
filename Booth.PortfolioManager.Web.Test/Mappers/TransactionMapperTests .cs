@@ -47,7 +47,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = aquisition.Id,
-                Type = RestApi.Transactions.TransactionType.Aquisition,
+                Type = Models.Transaction.TransactionType.Aquisition,
                 Stock = stock.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
@@ -70,7 +70,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var aquisition = new RestApi.Transactions.Aquisition()
+            var aquisition = new Models.Transaction.Aquisition()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -124,12 +124,12 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = cashTransaction.Id,
-                Type = RestApi.Transactions.TransactionType.CashTransaction,
+                Type = Models.Transaction.TransactionType.CashTransaction,
                 Stock = Guid.Empty,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
                 Description = "Withdrawl $12.00",
-                CashTransactionType = RestApi.Transactions.CashTransactionType.Withdrawl,
+                CashTransactionType = Models.Transaction.CashTransactionType.Withdrawl,
                 Amount = 12.00m
             });
         }
@@ -141,14 +141,14 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
 
             var stockResolver = mockRepository.Create<IStockResolver>();
 
-            var cashTransaction = new RestApi.Transactions.CashTransaction()
+            var cashTransaction = new Models.Transaction.CashTransaction()
             {
                 Id = Guid.NewGuid(),
                 Stock = Guid.Empty,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
                 Description = "Withdrawl $12.00",
-                CashTransactionType = RestApi.Transactions.CashTransactionType.Withdrawl,
+                CashTransactionType = Models.Transaction.CashTransactionType.Withdrawl,
                 Amount = 12.00m
             };
 
@@ -190,7 +190,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = costBaseAdjustment.Id,
-                Type = RestApi.Transactions.TransactionType.CostBaseAdjustment,
+                Type = Models.Transaction.TransactionType.CostBaseAdjustment,
                 Stock = stock.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
@@ -209,7 +209,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var costBaseAdjustment = new RestApi.Transactions.CostBaseAdjustment()
+            var costBaseAdjustment = new Models.Transaction.CostBaseAdjustment()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -261,7 +261,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = disposal.Id,
-                Type = RestApi.Transactions.TransactionType.Disposal,
+                Type = Models.Transaction.TransactionType.Disposal,
                 Stock = stock.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
@@ -269,7 +269,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 Units = 10,
                 AveragePrice = 1.20m,
                 TransactionCosts = 19.95m,
-                CgtMethod = RestApi.Transactions.CgtCalculationMethod.MinimizeGain,
+                CgtMethod = Models.Transaction.CgtCalculationMethod.MinimizeGain,
                 CreateCashTransaction = true
             });
         }
@@ -284,7 +284,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var disposal = new RestApi.Transactions.Disposal()
+            var disposal = new Models.Transaction.Disposal()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -294,7 +294,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 Units = 10,
                 AveragePrice = 1.20m,
                 TransactionCosts = 19.95m,
-                CgtMethod = RestApi.Transactions.CgtCalculationMethod.MinimizeGain,
+                CgtMethod = Models.Transaction.CgtCalculationMethod.MinimizeGain,
                 CreateCashTransaction = true
             };
 
@@ -348,7 +348,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = income.Id,
-                Type = RestApi.Transactions.TransactionType.IncomeReceived,
+                Type = Models.Transaction.TransactionType.IncomeReceived,
                 Stock = stock.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
@@ -374,7 +374,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var income = new RestApi.Transactions.IncomeReceived()
+            var income = new Models.Transaction.IncomeReceived()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -438,7 +438,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = openingBalance.Id,
-                Type = RestApi.Transactions.TransactionType.OpeningBalance,
+                Type = Models.Transaction.TransactionType.OpeningBalance,
                 Stock = stock.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
@@ -459,7 +459,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var openingBalance = new RestApi.Transactions.OpeningBalance()
+            var openingBalance = new Models.Transaction.OpeningBalance()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -513,7 +513,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = returnOfCapital.Id,
-                Type = RestApi.Transactions.TransactionType.ReturnOfCapital,
+                Type = Models.Transaction.TransactionType.ReturnOfCapital,
                 Stock = stock.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
@@ -534,7 +534,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var returnOfCapital = new RestApi.Transactions.ReturnOfCapital()
+            var returnOfCapital = new Models.Transaction.ReturnOfCapital()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -587,7 +587,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = adjustment.Id,
-                Type = RestApi.Transactions.TransactionType.UnitCountAdjustment,
+                Type = Models.Transaction.TransactionType.UnitCountAdjustment,
                 Stock = stock.Id,
                 TransactionDate = new Date(2001, 01, 01),
                 Comment = "Test",
@@ -607,7 +607,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var adjustment = new RestApi.Transactions.UnitCountAdjustment()
+            var adjustment = new Models.Transaction.UnitCountAdjustment()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,

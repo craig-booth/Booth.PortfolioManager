@@ -9,7 +9,7 @@ using FluentAssertions;
 using Booth.Common;
 using Booth.PortfolioManager.Web.Controllers;
 using Booth.PortfolioManager.Web.Services;
-using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Web.Models.Transaction;
 
 namespace Booth.PortfolioManager.Web.Test.Controllers
 {
@@ -23,7 +23,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var stockId = Guid.NewGuid();
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(Date.MinValue, Date.MaxValue))).Returns(ServiceResult<List<RestApi.CorporateActions.CorporateAction>>.NotFound()).Verifiable();
+            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(Date.MinValue, Date.MaxValue))).Returns(ServiceResult<List<Models.CorporateAction.CorporateAction>>.NotFound()).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, null, null);
@@ -40,10 +40,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var actions = new List<RestApi.CorporateActions.CorporateAction>() { new RestApi.CorporateActions.Dividend() { Id = actionId } };
+            var actions = new List<Models.CorporateAction.CorporateAction>() { new Models.CorporateAction.Dividend() { Id = actionId } };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(Date.MinValue, Date.MaxValue))).Returns(ServiceResult<List<RestApi.CorporateActions.CorporateAction>>.Ok(actions)).Verifiable();
+            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(Date.MinValue, Date.MaxValue))).Returns(ServiceResult<List<Models.CorporateAction.CorporateAction>>.Ok(actions)).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, null, null);
@@ -60,10 +60,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var actions = new List<RestApi.CorporateActions.CorporateAction>() { new RestApi.CorporateActions.Dividend() { Id = actionId } };
+            var actions = new List<Models.CorporateAction.CorporateAction>() { new Models.CorporateAction.Dividend() { Id = actionId } };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(new Date(2000, 01, 01), Date.MaxValue))).Returns(ServiceResult<List<RestApi.CorporateActions.CorporateAction>>.Ok(actions)).Verifiable();
+            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(new Date(2000, 01, 01), Date.MaxValue))).Returns(ServiceResult<List<Models.CorporateAction.CorporateAction>>.Ok(actions)).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, new DateTime(2000, 01, 01), null);
@@ -80,10 +80,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var actions = new List<RestApi.CorporateActions.CorporateAction>() { new RestApi.CorporateActions.Dividend() { Id = actionId } };
+            var actions = new List<Models.CorporateAction.CorporateAction>() { new Models.CorporateAction.Dividend() { Id = actionId } };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(Date.MinValue, new Date(2000, 01, 01)))).Returns(ServiceResult<List<RestApi.CorporateActions.CorporateAction>>.Ok(actions)).Verifiable();
+            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(Date.MinValue, new Date(2000, 01, 01)))).Returns(ServiceResult<List<Models.CorporateAction.CorporateAction>>.Ok(actions)).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, null, new DateTime(2000, 01, 01));
@@ -100,10 +100,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var actions = new List<RestApi.CorporateActions.CorporateAction>() { new RestApi.CorporateActions.Dividend() { Id = actionId } };
+            var actions = new List<Models.CorporateAction.CorporateAction>() { new Models.CorporateAction.Dividend() { Id = actionId } };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(new Date(2000, 01, 01), new Date(2001, 01, 01)))).Returns(ServiceResult<List<RestApi.CorporateActions.CorporateAction>>.Ok(actions)).Verifiable();
+            service.Setup(x => x.GetCorporateActions(stockId, new DateRange(new Date(2000, 01, 01), new Date(2001, 01, 01)))).Returns(ServiceResult<List<Models.CorporateAction.CorporateAction>>.Ok(actions)).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateActions(stockId, new DateTime(2000, 01, 01), new DateTime(2001, 01, 01));
@@ -122,7 +122,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var actionId = Guid.NewGuid();
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateAction(stockId, actionId)).Returns(ServiceResult<RestApi.CorporateActions.CorporateAction>.NotFound()).Verifiable();
+            service.Setup(x => x.GetCorporateAction(stockId, actionId)).Returns(ServiceResult<Models.CorporateAction.CorporateAction>.NotFound()).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateAction(stockId, actionId);
@@ -141,7 +141,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
             var actionId = Guid.NewGuid();
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateAction(stockId, actionId)).Returns(ServiceResult<RestApi.CorporateActions.CorporateAction>.NotFound()).Verifiable();
+            service.Setup(x => x.GetCorporateAction(stockId, actionId)).Returns(ServiceResult<Models.CorporateAction.CorporateAction>.NotFound()).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateAction(stockId, actionId);
@@ -158,10 +158,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.Dividend() { Id = actionId };
+            var action = new Models.CorporateAction.Dividend() { Id = actionId };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.GetCorporateAction(stockId, actionId)).Returns(ServiceResult<RestApi.CorporateActions.CorporateAction>.Ok(action)).Verifiable();
+            service.Setup(x => x.GetCorporateAction(stockId, actionId)).Returns(ServiceResult<Models.CorporateAction.CorporateAction>.Ok(action)).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = controller.GetCorporateAction(stockId, actionId);
@@ -178,7 +178,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.Dividend() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.Dividend() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
             service.Setup(x => x.AddCorporateActionAsync(stockId, action)).Returns(Task.FromResult(ServiceResult.NotFound())).Verifiable();
@@ -215,7 +215,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.CapitalReturn() { Id = actionId, Stock = Guid.NewGuid() };
+            var action = new Models.CorporateAction.CapitalReturn() { Id = actionId, Stock = Guid.NewGuid() };
 
             var service = mockRepository.Create<ICorporateActionService>();
 
@@ -234,10 +234,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.CapitalReturn() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.CapitalReturn() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<RestApi.CorporateActions.CapitalReturn>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
+            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<Models.CorporateAction.CapitalReturn>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = await controller.AddCorporateAction(stockId, action);
@@ -254,10 +254,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.CompositeAction() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.CompositeAction() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<RestApi.CorporateActions.CompositeAction>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
+            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<Models.CorporateAction.CompositeAction>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = await controller.AddCorporateAction(stockId, action);
@@ -274,10 +274,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.Dividend() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.Dividend() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<RestApi.CorporateActions.Dividend>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
+            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<Models.CorporateAction.Dividend>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = await controller.AddCorporateAction(stockId, action);
@@ -294,10 +294,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.SplitConsolidation() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.SplitConsolidation() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<RestApi.CorporateActions.SplitConsolidation>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
+            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<Models.CorporateAction.SplitConsolidation>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = await controller.AddCorporateAction(stockId, action);
@@ -314,10 +314,10 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.Transformation() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.Transformation() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
-            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<RestApi.CorporateActions.Transformation>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
+            service.Setup(x => x.AddCorporateActionAsync(stockId, It.IsAny<Models.CorporateAction.Transformation>())).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();
 
             var controller = new CorporateActionController(service.Object);
             var result = await controller.AddCorporateAction(stockId, action);
@@ -335,7 +335,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.Dividend() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.Dividend() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
             service.Setup(x => x.UpdateCorporateActionAsync(stockId, action)).Returns(Task.FromResult(ServiceResult.NotFound())).Verifiable();
@@ -355,7 +355,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.CapitalReturn() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.CapitalReturn() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
             service.Setup(x => x.UpdateCorporateActionAsync(stockId, action)).Returns(Task.FromResult(ServiceResult.NotFound())).Verifiable();
@@ -393,7 +393,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.CapitalReturn() { Id = Guid.NewGuid(), Stock = stockId };
+            var action = new Models.CorporateAction.CapitalReturn() { Id = Guid.NewGuid(), Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
 
@@ -412,7 +412,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.CapitalReturn() { Id = actionId, Stock = Guid.NewGuid() };
+            var action = new Models.CorporateAction.CapitalReturn() { Id = actionId, Stock = Guid.NewGuid() };
 
             var service = mockRepository.Create<ICorporateActionService>();
 
@@ -431,7 +431,7 @@ namespace Booth.PortfolioManager.Web.Test.Controllers
 
             var stockId = Guid.NewGuid();
             var actionId = Guid.NewGuid();
-            var action = new RestApi.CorporateActions.CapitalReturn() { Id = actionId, Stock = stockId };
+            var action = new Models.CorporateAction.CapitalReturn() { Id = actionId, Stock = stockId };
 
             var service = mockRepository.Create<ICorporateActionService>();
             service.Setup(x => x.UpdateCorporateActionAsync(stockId, action)).Returns(Task.FromResult(ServiceResult.Ok())).Verifiable();

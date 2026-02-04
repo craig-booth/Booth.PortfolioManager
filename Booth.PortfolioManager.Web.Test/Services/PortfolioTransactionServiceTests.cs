@@ -9,7 +9,7 @@ using Moq;
 using Booth.Common;
 using Booth.PortfolioManager.Repository;
 using Booth.PortfolioManager.Web.Services;
-using Booth.PortfolioManager.RestApi.Transactions;
+using Booth.PortfolioManager.Web.Models.Transaction;
 using Booth.PortfolioManager.Web.Mappers;
 
 namespace Booth.PortfolioManager.Web.Test.Services
@@ -80,7 +80,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Result.Transactions.Should().BeEquivalentTo(new []
             {
-                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                new Models.Portfolio.TransactionsResponse.TransactionItem()
                 {
                     Id = portfolio.Transactions[0].Id,
                     Stock = null,
@@ -88,7 +88,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     Description = "Deposit $10,000.00",
                     Comment= ""
                 },
-                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                new Models.Portfolio.TransactionsResponse.TransactionItem()
                 {
                     Id = portfolio.Transactions[1].Id,
                     Stock = _Fixture.Stock_ARG,
@@ -96,7 +96,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
                     Description = "Aquired 100 shares @ $1.00",
                     Comment= ""
                 },
-                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                new Models.Portfolio.TransactionsResponse.TransactionItem()
                 {
                     Id = portfolio.Transactions[2].Id,
                     Stock = _Fixture.Stock_WAM,
@@ -132,7 +132,7 @@ namespace Booth.PortfolioManager.Web.Test.Services
 
             result.Result.Transactions.Should().BeEquivalentTo(new[]
             {
-                new RestApi.Portfolios.TransactionsResponse.TransactionItem()
+                new Models.Portfolio.TransactionsResponse.TransactionItem()
                 {
                     Id = portfolio.Transactions[2].Id,
                     Stock = _Fixture.Stock_WAM,

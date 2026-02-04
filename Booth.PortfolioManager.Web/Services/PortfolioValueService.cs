@@ -8,8 +8,8 @@ using Booth.Common;
 using Booth.PortfolioManager.Domain.Portfolios;
 using Booth.PortfolioManager.Domain.TradingCalendars;
 using Booth.PortfolioManager.Repository;
-using Booth.PortfolioManager.RestApi.Portfolios;
-using Booth.PortfolioManager.RestApi.Stocks;
+using Booth.PortfolioManager.Web.Models.Portfolio;
+using Booth.PortfolioManager.Web.Models.Stock;
 using Booth.PortfolioManager.Web.Utilities;
 
 namespace Booth.PortfolioManager.Web.Services

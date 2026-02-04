@@ -9,10 +9,9 @@ using Microsoft.AspNetCore.Authentication;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 
-using Booth.PortfolioManager.RestApi.Users;
+using Booth.PortfolioManager.Web.Models.User;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Authentication;
-using Booth.PortfolioManager.Domain.Users;
 
 namespace Booth.PortfolioManager.Web.Controllers
 {

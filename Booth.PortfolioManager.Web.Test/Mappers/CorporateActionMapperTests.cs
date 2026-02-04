@@ -37,7 +37,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = capitalReturn.Id,
-                Type = RestApi.CorporateActions.CorporateActionType.CapitalReturn,
+                Type = Models.CorporateAction.CorporateActionType.CapitalReturn,
                 Stock = capitalReturn.Stock.Id,
                 ActionDate = capitalReturn.Date,
                 Description = capitalReturn.Description,
@@ -57,7 +57,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var capitalReturn = new RestApi.CorporateActions.CapitalReturn()
+            var capitalReturn = new Models.CorporateAction.CapitalReturn()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -105,7 +105,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = id,
-                Type = RestApi.CorporateActions.CorporateActionType.CompositeAction,
+                Type = Models.CorporateAction.CorporateActionType.CompositeAction,
                 Stock = stock.Id,
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Composite Action",
@@ -113,7 +113,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 {
                     new
                     {
-                        Type = RestApi.CorporateActions.CorporateActionType.CapitalReturn,
+                        Type = Models.CorporateAction.CorporateActionType.CapitalReturn,
                         Stock = stock.Id,
                         ActionDate = new Date(2001, 01, 01),
                         Description = "Capital Return",
@@ -122,7 +122,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                     },
                     new
                     {
-                        Type = RestApi.CorporateActions.CorporateActionType.Dividend,
+                        Type = Models.CorporateAction.CorporateActionType.Dividend,
                         Stock = stock.Id,
                         ActionDate = new Date(2001, 01, 01),
                         Description = "Dividend",
@@ -147,14 +147,14 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
             var id = Guid.NewGuid();
-            var compositeAction = new RestApi.CorporateActions.CompositeAction()
+            var compositeAction = new Models.CorporateAction.CompositeAction()
             {
                 Id = id,
                 Stock = stock.Id,
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Composite Action",
             };
-            compositeAction.ChildActions.Add(new RestApi.CorporateActions.CapitalReturn()
+            compositeAction.ChildActions.Add(new Models.CorporateAction.CapitalReturn()
             {
                 Id = id,
                 Stock = stock.Id,
@@ -163,7 +163,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 PaymentDate = new Date(2001, 01, 15),
                 Amount = 10.00m
             });
-            compositeAction.ChildActions.Add(new RestApi.CorporateActions.Dividend()
+            compositeAction.ChildActions.Add(new Models.CorporateAction.Dividend()
             {
                 Id = id,
                 Stock = stock.Id,
@@ -227,7 +227,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = dividend.Id,
-                Type = RestApi.CorporateActions.CorporateActionType.Dividend,
+                Type = Models.CorporateAction.CorporateActionType.Dividend,
                 Stock = dividend.Stock.Id,
                 ActionDate = dividend.Date,
                 Description = dividend.Description,
@@ -248,7 +248,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var dividend = new RestApi.CorporateActions.Dividend()
+            var dividend = new Models.CorporateAction.Dividend()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -294,7 +294,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = split.Id,
-                Type = RestApi.CorporateActions.CorporateActionType.SplitConsolidation,
+                Type = Models.CorporateAction.CorporateActionType.SplitConsolidation,
                 Stock = split.Stock.Id,
                 ActionDate = split.Date,
                 Description = split.Description,
@@ -313,7 +313,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             var stockResolver = mockRepository.Create<IStockResolver>();
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
 
-            var split = new RestApi.CorporateActions.SplitConsolidation()
+            var split = new Models.CorporateAction.SplitConsolidation()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -360,7 +360,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             response.Should().BeEquivalentTo(new
             {
                 Id = transformation.Id,
-                Type = RestApi.CorporateActions.CorporateActionType.Transformation,
+                Type = Models.CorporateAction.CorporateActionType.Transformation,
                 Stock = transformation.Stock.Id,
                 ActionDate = transformation.Date,
                 Description = transformation.Description,
@@ -391,7 +391,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
             stockResolver.Setup(x => x.GetStock(stock.Id)).Returns(stock);
             stockResolver.Setup(x => x.GetStock(stock2.Id)).Returns(stock2);
 
-            var transformation = new RestApi.CorporateActions.Transformation()
+            var transformation = new Models.CorporateAction.Transformation()
             {
                 Id = Guid.NewGuid(),
                 Stock = stock.Id,
@@ -400,7 +400,7 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 ImplementationDate = new Date(2002, 02, 01),
                 CashComponent = 6.50m,
             };
-            transformation.ResultingStocks.Add(new RestApi.CorporateActions.Transformation.ResultingStock()
+            transformation.ResultingStocks.Add(new Models.CorporateAction.Transformation.ResultingStock()
             {
                 Stock = stock2.Id,
                 OriginalUnits = 1,

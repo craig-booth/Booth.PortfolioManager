@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 
 using Booth.Common;
-using Booth.PortfolioManager.RestApi.Portfolios;
+using Booth.PortfolioManager.Web.Models.Portfolio;
 using Booth.PortfolioManager.Web.Authentication;
 using Booth.PortfolioManager.Web.Services;
 using Booth.PortfolioManager.Web.Mappers;

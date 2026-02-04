@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <PackageReference Include="Booth.Common" Version="1.0.8" />
-    <PackageReference Include="Booth.PortfolioManager.RestApi" Version="1.2.1" />
     <PackageReference Include="Booth.Scheduler" Version="1.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.2" />
@@ -42,6 +41,12 @@
     <ProjectReference Include="..\booth.portfoliomanager.ui\booth.portfoliomanager.ui.esproj">
 		<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\CorporateAction\" />
+    <Folder Include="Models\TradingCalendar\" />
+    <Folder Include="Models\User\" />
   </ItemGroup>
 
 
