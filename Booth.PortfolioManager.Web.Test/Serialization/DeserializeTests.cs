@@ -117,7 +117,7 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                 }
             };
 
-            a.Should().ThrowExactly<Newtonsoft.Json.JsonReaderException>();
+            a.Should().ThrowExactly<System.Text.Json.JsonException>();
         }
 
         [Fact]

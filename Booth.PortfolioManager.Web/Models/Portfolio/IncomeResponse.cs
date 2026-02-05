@@ -16,7 +16,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
             public decimal GrossIncome { get; set; }
         }
 
-        public List<IncomeItem> Income { get; } = new List<IncomeItem>();
+        public List<IncomeItem> Income { get; set; } = new List<IncomeItem>();
     }
 
 }

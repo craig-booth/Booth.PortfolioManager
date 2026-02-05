@@ -17,7 +17,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
         public decimal Interest { get; set; }
         public decimal Fees { get; set; }
         public decimal ClosingCashBalance { get; set; }
-        public List<HoldingPerformanceItem> HoldingPerformance { get; } = new List<HoldingPerformanceItem>();
+        public List<HoldingPerformanceItem> HoldingPerformance { get; set; } = new List<HoldingPerformanceItem>();
 
         public class HoldingPerformanceItem
         {

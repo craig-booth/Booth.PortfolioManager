@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.Formatters;
 using System.IO;
-using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 
 namespace Booth.PortfolioManager.Web.Serialization
@@ -14,64 +12,68 @@ namespace Booth.PortfolioManager.Web.Serialization
         string Serialize(object obj);
         string Serialize<T>(T obj);
         void Serialize(StreamWriter streamWriter, object obj);
+        void Serialize(Stream stream, object obj);
         void Serialize<T>(StreamWriter streamWriter, T obj);
+        void Serialize<T>(Stream stream, T obj);
 
         T Deserialize<T>(string source);
         T Deserialize<T>(StreamReader streamReader);
+        T Deserialize<T>(Stream stream);
     }
     public class ModelSerializer : IModelSerializer
     {
-        private readonly JsonSerializer _Serializer;
+        private readonly JsonSerializerOptions _Options;
+
         public ModelSerializer()
         {
-            _Serializer = JsonSerializer.CreateDefault(SerializerSettings.Settings);
+            _Options = SerializerSettings.JsonSerializerOptions;
         }
 
         public T Deserialize<T>(string source)
         {
-            using (var textReader = new StringReader(source))
-            {
-                using (var jsonReader = new JsonTextReader(textReader))
-                {
-                    return _Serializer.Deserialize<T>(jsonReader);
-                }
-            }
+            return JsonSerializer.Deserialize<T>(source, _Options);
         }
 
         public T Deserialize<T>(StreamReader streamReader)
         {
-            using (var jsonReader = new JsonTextReader(streamReader))
-            {
-                var obj = _Serializer.Deserialize<T>(jsonReader);
+            return Deserialize<T>(streamReader.BaseStream);
+        }
 
-                return obj;
-            }
+        public T Deserialize<T>(Stream stream)
+        {
+            var obj = JsonSerializer.Deserialize<T>(stream, _Options);
+
+            return obj;
         }
 
         public string Serialize(object obj)
         {
-            var textWriter = new StringWriter();
-            _Serializer.Serialize(textWriter, obj);
-
-            return textWriter.ToString();
+            return JsonSerializer.Serialize(obj, _Options);
         }
 
         public string Serialize<T>(T obj)
         {
-            var textWriter = new StringWriter();
-            _Serializer.Serialize(textWriter, obj, typeof(T));
-
-            return textWriter.ToString();
+            return JsonSerializer.Serialize(obj, typeof(T), _Options);
         }
 
         public void Serialize(StreamWriter streamWriter, object obj)
         {
-            _Serializer.Serialize(streamWriter, obj);
+            Serialize(streamWriter.BaseStream, obj);
+        }
+
+        public void Serialize(Stream stream, object obj)
+        {
+            JsonSerializer.Serialize(stream, obj, _Options);
         }
 
         public void Serialize<T>(StreamWriter streamWriter, T obj)
         {
-            _Serializer.Serialize(streamWriter, obj, typeof(T));
+            Serialize<T>(streamWriter.BaseStream, obj);
+        }
+
+        public void Serialize<T>(Stream stream, T obj)
+        {
+            JsonSerializer.Serialize<T>(stream, obj, _Options);
         }
     }
 }

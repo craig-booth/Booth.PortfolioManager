@@ -1,36 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Globalization;
-
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Booth.Common;
 
 
 namespace Booth.PortfolioManager.Web.Serialization
 {
-    class TimeJsonConverter : JsonConverter
+    class TimeJsonConverter : JsonConverter<Time>
     {
-        public override bool CanConvert(Type objectType)
+        public override Time Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return (objectType == typeof(Time));
+            return Time.Parse(reader.GetString());
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, Time value, JsonSerializerOptions options)
         {
-            return Time.Parse(reader.Value.ToString());
-        }
-
-        public override bool CanWrite
-        {
-            get { return true; }
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            writer.WriteValue(((Time)value).ToString(@"HH\:mm\:ss"));
+            writer.WriteStringValue(value.ToString(@"HH\:mm\:ss"));
         }
     }
 }

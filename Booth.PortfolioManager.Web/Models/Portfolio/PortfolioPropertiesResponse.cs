@@ -13,7 +13,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
         public Date StartDate { get; set; }
         public Date EndDate { get; set; }
 
-        public List<HoldingProperties> Holdings { get; } = new List<HoldingProperties>();
+        public List<HoldingProperties> Holdings { get; set; } = new List<HoldingProperties>();
     }
 
     public class HoldingProperties

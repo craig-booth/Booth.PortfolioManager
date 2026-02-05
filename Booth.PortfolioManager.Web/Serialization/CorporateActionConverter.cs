@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using Newtonsoft.Json;
-
-using Booth.Common;
+﻿using Booth.Common;
 using Booth.PortfolioManager.Web.Models.CorporateAction;
-using Newtonsoft.Json.Linq;
-
+using Booth.PortfolioManager.Web.Models.Transaction;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Booth.PortfolioManager.Web.Serialization
 {
-    class CorporateActionConverter : JsonConverter
+    class CorporateActionConverter : JsonConverter<CorporateAction>
     {
         private Dictionary<CorporateActionType, Type> _ActionTypes = new Dictionary<CorporateActionType, Type>();
         public CorporateActionConverter()
@@ -23,43 +21,44 @@ namespace Booth.PortfolioManager.Web.Serialization
             }
         }
 
-        public override bool CanConvert(Type objectType)
+        public override CorporateAction Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return (objectType == typeof(CorporateAction));
-        }
+            Utf8JsonReader readerCopy = reader;
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            var jObject = JToken.ReadFrom(reader) as JObject;
+            if (readerCopy.TokenType != JsonTokenType.StartObject)
+                throw new JsonException("Expected start of object");
 
-            if (!jObject.TryGetValue("type", out var jToken))
-                throw new JsonReaderException("Type field is missing. Unable to determine the type of the corporate action");
-
-            CorporateActionType type;
-            try
+            string typeProperty = null;
+            while (readerCopy.Read())
             {
-                type = jToken.ToObject<CorporateActionType>();
+                if (readerCopy.TokenType == JsonTokenType.EndObject)
+                    break;
+
+                if (readerCopy.TokenType == JsonTokenType.PropertyName && readerCopy.GetString() == "type")
+                {
+                    readerCopy.Read();
+                    typeProperty = readerCopy.GetString();
+                    break;
+                }
             }
-            catch
-            {
-                throw new JsonReaderException("Type field is invalid. Unable to determine the type of the corporate action");
-            }
 
-            var action = Activator.CreateInstance(_ActionTypes[type]);
+            if (typeProperty == null)
+                throw new JsonException("Type field is missing. Unable to determine the type of the corporate action");
 
-            serializer.Populate(jObject.CreateReader(), action);
+            if (!Enum.TryParse(typeof(CorporateActionType), typeProperty, true, out var corporateActionType))
+                throw new JsonException($"Unknown corporate action type {typeProperty}");
 
-            return action;
+            var optionsWithOutTransactionConverter = new JsonSerializerOptions(options);
+            optionsWithOutTransactionConverter.Converters.Remove(optionsWithOutTransactionConverter.Converters.FirstOrDefault(c => c is CorporateActionConverter));
+            var corporateAction = JsonSerializer.Deserialize(ref reader, _ActionTypes[(CorporateActionType)corporateActionType], optionsWithOutTransactionConverter);
+
+            return (CorporateAction)corporateAction;
         }
 
-        public override bool CanWrite
+        public override void Write(Utf8JsonWriter writer, CorporateAction value, JsonSerializerOptions options)
         {
-            get { return false; }
+            JsonSerializer.Serialize(writer, value, value.GetType(), options);
         }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
+       
     }
 }

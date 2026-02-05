@@ -13,7 +13,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
         public decimal OpeningBalance { get; set; }
         public decimal ClosingBalance { get; set; }
 
-        public List<Transaction> Transactions { get; } = new List<Transaction>();
+        public List<Transaction> Transactions { get; set; } = new List<Transaction>();
 
         public void AddTransaction(Date date, CashTransactionType type, string description, decimal amount, decimal balance)
         {

@@ -100,7 +100,7 @@ namespace Booth.PortfolioManager.Web.Mappers
             };
 
             var childActions = action.ChildActions.Select(x => ToApi(x));
-            response.ChildActions.AddRange(childActions);
+            response.ChildActions = new List<Models.CorporateAction.CorporateAction>(childActions);
 
             return response;
         }
@@ -177,8 +177,7 @@ namespace Booth.PortfolioManager.Web.Mappers
                 CostBase = x.CostBasePercentage,
                 AquisitionDate = x.AquisitionDate
             });
-
-            response.ResultingStocks.AddRange(resultStocks);
+            response.ResultingStocks = new List<Models.CorporateAction.Transformation.ResultingStock>(resultStocks);
 
             return response;
         }

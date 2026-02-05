@@ -8,12 +8,12 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
 {
     public class DetailedUnrealisedGainsResponse
     {
-        public List<DetailedUnrealisedGainsItem> UnrealisedGains { get; } = new List<DetailedUnrealisedGainsItem>();
+        public List<DetailedUnrealisedGainsItem> UnrealisedGains { get; set; } = new List<DetailedUnrealisedGainsItem>();
     }
 
     public class DetailedUnrealisedGainsItem : SimpleUnrealisedGainsItem
     {
-        public List<CGTEventItem> CGTEvents { get; } = new List<CGTEventItem>();
+        public List<CGTEventItem> CGTEvents { get; set; } = new List<CGTEventItem>();
 
         public class CGTEventItem
         {

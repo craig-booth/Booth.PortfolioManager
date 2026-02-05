@@ -8,7 +8,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
 {
     public class CorporateActionsResponse
     {
-        public List<CorporateActionItem> CorporateActions { get; } = new List<CorporateActionItem>();
+        public List<CorporateActionItem> CorporateActions { get; set; } = new List<CorporateActionItem>();
 
         public class CorporateActionItem
         {

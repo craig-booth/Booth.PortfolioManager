@@ -10,6 +10,6 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
 
     public class PortfolioValueResponse
     {
-        public List<ClosingPrice> Values { get; } = new List<ClosingPrice>();   
+        public List<ClosingPrice> Values { get; set; } = new List<ClosingPrice>();   
     }
 }

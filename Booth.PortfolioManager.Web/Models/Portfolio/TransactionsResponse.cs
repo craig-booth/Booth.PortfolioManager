@@ -8,7 +8,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
 {
     public class TransactionsResponse
     {
-        public List<TransactionItem> Transactions = new List<TransactionItem>();
+        public List<TransactionItem> Transactions { get; set; } = new List<TransactionItem>();
 
         public class TransactionItem
         {

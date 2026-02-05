@@ -13,6 +13,6 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
         public decimal? Return5Year { get; set; }
         public decimal? ReturnAll { get; set; }
         public decimal CashBalance { get; set; }
-        public List<Holding> Holdings { get; } = new List<Holding>();
+        public List<Holding> Holdings { get; set; } = new List<Holding>();
     }
 }

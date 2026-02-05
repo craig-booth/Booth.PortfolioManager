@@ -12,7 +12,7 @@ namespace Booth.PortfolioManager.Web.Models.Stock
         public Guid Id { get; set; }
         public string AsxCode { get; set; }
         public string Name { get; set; }
-        public List<ClosingPrice> ClosingPrices { get; } = new List<ClosingPrice>();
+        public List<ClosingPrice> ClosingPrices { get; set; } = new List<ClosingPrice>();
 
         public void AddClosingPrice(Date date, decimal price)
         {

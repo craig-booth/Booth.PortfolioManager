@@ -140,25 +140,27 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 Description = "Restructure"
             };
             var child1 = Guid.NewGuid();
-            action.ChildActions.Add(new Models.CorporateAction.CapitalReturn()
-            {
-                Id = child1,
-                Stock = _StockWithoutCorporateActions.Id,
-                ActionDate = new Date(2001, 01, 01),
-                Description = "Capital Return",
-                PaymentDate = new Date(2001, 01, 15),
-                Amount = 10.00m
-            });
             var child2 = Guid.NewGuid();
-            action.ChildActions.Add(new Models.CorporateAction.SplitConsolidation()
-            {
-                Id = child2,
-                Stock = _StockWithoutCorporateActions.Id,
-                ActionDate = new Date(2001, 01, 01),
-                Description = "Split",
-                OriginalUnits = 1,
-                NewUnits = 2
-            });
+            action.ChildActions = [
+                new Models.CorporateAction.CapitalReturn()
+                {
+                    Id = child1,
+                    Stock = _StockWithoutCorporateActions.Id,
+                    ActionDate = new Date(2001, 01, 01),
+                    Description = "Capital Return",
+                    PaymentDate = new Date(2001, 01, 15),
+                    Amount = 10.00m
+                },
+                new Models.CorporateAction.SplitConsolidation()
+                {
+                    Id = child2,
+                    Stock = _StockWithoutCorporateActions.Id,
+                    ActionDate = new Date(2001, 01, 01),
+                    Description = "Split",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                }
+             ];
 
             var result = await _Service.AddCorporateActionAsync(_StockWithoutCorporateActions.Id, action);
 
@@ -238,14 +240,15 @@ namespace Booth.PortfolioManager.Web.Test.Services
                 CashComponent = 10.15m,
                 RolloverRefliefApplies = true
             };
-            action.ResultingStocks.Add(new Models.CorporateAction.Transformation.ResultingStock()
-            {
-                Stock = _StockWithCorporateActions.Id,
-                AquisitionDate = new Date(2001, 04, 01),
-                CostBase = 0.50m,
-                OriginalUnits = 1,
-                NewUnits = 2
-            });
+            action.ResultingStocks = [
+                new Models.CorporateAction.Transformation.ResultingStock()
+                {
+                    Stock = _StockWithCorporateActions.Id,
+                    AquisitionDate = new Date(2001, 04, 01),
+                    CostBase = 0.50m,
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                }];
 
             var result = await _Service.AddCorporateActionAsync(_StockWithoutCorporateActions.Id, action);
 
