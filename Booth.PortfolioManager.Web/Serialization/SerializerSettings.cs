@@ -1,32 +1,35 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
+﻿
+
+using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Booth.PortfolioManager.Web.Serialization
 {
     public static class SerializerSettings
     {
-        public static JsonSerializerSettings Settings
+        public static JsonSerializerOptions JsonSerializerOptions
         {
             get
             {
-                var settings = new JsonSerializerSettings();
+                var options = new JsonSerializerOptions();
+                ConfigureOptions(options);
 
-                Configure(settings);
-
-                return settings;
+                return options;
             }
-        }
 
-        public static void Configure(JsonSerializerSettings settings)
+        }
+        public static void ConfigureOptions(JsonSerializerOptions options)
         {
-            settings.NullValueHandling = NullValueHandling.Ignore;
-            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-            settings.Converters.Add(new StringEnumConverter { NamingStrategy = new CamelCaseNamingStrategy() });
-            settings.Converters.Add(new DateJsonConverter());
-            settings.Converters.Add(new TimeJsonConverter());
-            settings.Converters.Add(new TransactionConverter());
-            settings.Converters.Add(new CorporateActionConverter());
+            options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            options.PreferredObjectCreationHandling = JsonObjectCreationHandling.Populate;
+            options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            options.Converters.Add(new DateJsonConverter());
+            options.Converters.Add(new TimeJsonConverter());
+            options.Converters.Add(new TransactionConverter());
+            options.Converters.Add(new CorporateActionConverter());
+            options.Converters.Add(new CorporateActionListConverter());
         }
     }
 }

@@ -22,7 +22,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
         public decimal NetCapitalGainDiscounted { get; set; }
         public decimal NetCapitalGainTotal { get; set; }
 
-        public List<CgtLiabilityEvent> Events { get; } = new List<CgtLiabilityEvent>();
+        public List<CgtLiabilityEvent> Events { get; set; } = new List<CgtLiabilityEvent>();
 
         public class CgtLiabilityEvent
         {

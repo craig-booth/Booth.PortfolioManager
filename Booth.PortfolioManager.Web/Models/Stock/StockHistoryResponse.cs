@@ -14,8 +14,8 @@ namespace Booth.PortfolioManager.Web.Models.Stock
         public string Name { get; set; }
         public Date ListingDate { get; set; }
         public Date DelistedDate { get; set; }
-        public List<HistoricProperties> History { get; } = new List<HistoricProperties>();
-        public List<HistoricDividendRules> DividendRules { get; } = new List<HistoricDividendRules>();
+        public List<HistoricProperties> History { get; set; } = new List<HistoricProperties>();
+        public List<HistoricDividendRules> DividendRules { get; set; } = new List<HistoricDividendRules>();
 
         public void AddHistory(Date fromDate, Date toDate, string asxCode, string name, AssetCategory category)
         {

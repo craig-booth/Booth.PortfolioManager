@@ -34,8 +34,6 @@ namespace Booth.PortfolioManager.Web
 
         public static IServiceCollection AddPortfolioManagerServices(this IServiceCollection services, AppSettings settings)
         {
-            services.AddTransient<IConfigureOptions<MvcNewtonsoftJsonOptions>, RestApiMvcJsonOptions>();
-
             IJwtTokenConfigurationProvider jwtTokenConfigProvider;
             if ((settings.JwtTokenConfiguration.Key != null) && (settings.JwtTokenConfiguration.Key != ""))
             {
@@ -183,15 +181,6 @@ namespace Booth.PortfolioManager.Web
             });
         }
 
-    }
-
-
-    class RestApiMvcJsonOptions : IConfigureOptions<MvcNewtonsoftJsonOptions>
-    {
-        public void Configure(MvcNewtonsoftJsonOptions options)
-        {
-            SerializerSettings.Configure(options.SerializerSettings);
-        }
     }
 
 }

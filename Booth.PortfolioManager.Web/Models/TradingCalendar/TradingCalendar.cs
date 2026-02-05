@@ -9,7 +9,7 @@ namespace Booth.PortfolioManager.Web.Models.TradingCalendar
     public class TradingCalendar
     {
         public int Year { get; set; }
-        public List<NonTradingDay> NonTradingDays { get; } = new List<NonTradingDay>();
+        public List<NonTradingDay> NonTradingDays { get; set; } = new List<NonTradingDay>();
 
         public void AddNonTradingDay(Date date, string description)
         {

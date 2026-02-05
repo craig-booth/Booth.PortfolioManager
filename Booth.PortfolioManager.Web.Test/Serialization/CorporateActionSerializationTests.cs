@@ -1,14 +1,13 @@
-﻿using System;
-
-using Xunit;
-using FluentAssertions;
-using FluentAssertions.Json;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using Booth.Common;
+﻿using Booth.Common;
 using Booth.PortfolioManager.Web.Models.CorporateAction;
 using Booth.PortfolioManager.Web.Serialization;
+using FluentAssertions;
+using FluentAssertions.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Text.Json;
+using Xunit;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Booth.PortfolioManager.Web.Test.Serialization
 {
@@ -29,7 +28,7 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
 
 
             Action a = () => serializer.Deserialize<CorporateAction>(json);
-            a.Should().ThrowExactly<JsonReaderException>();
+            a.Should().ThrowExactly<JsonException>();
         }
 
         [Fact]
@@ -47,7 +46,7 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                             + "\"description\":\"description\"}";
 
             Action a = () => serializer.Deserialize<CorporateAction>(json);
-            a.Should().ThrowExactly<JsonReaderException>();
+            a.Should().ThrowExactly<JsonException>();
         }
 
         [Fact]
@@ -125,15 +124,17 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                 ActionDate = new Date(2000, 01, 10),
                 Description = "description"
             };
-            action.ChildActions.Add(new CapitalReturn()
-            {
-                Id = actionId,
-                Stock = stockId,
-                ActionDate = new Date(2000, 01, 10),
-                Description = "description",
-                PaymentDate = new Date(2000, 02, 01),
-                Amount = 12.00m
-            });
+            action.ChildActions = [
+                new CapitalReturn()
+                {
+                    Id = actionId,
+                    Stock = stockId,
+                    ActionDate = new Date(2000, 01, 10),
+                    Description = "description",
+                    PaymentDate = new Date(2000, 02, 01),
+                    Amount = 12.00m
+                }
+            ];
 
             var json = JToken.Parse(serializer.Serialize(action));
 
@@ -187,15 +188,16 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                 ActionDate = new Date(2000, 01, 10),
                 Description = "description"
             };
-            expected.ChildActions.Add(new CapitalReturn()
-            {
-                Id = actionId,
-                Stock = stockId,
-                ActionDate = new Date(2000, 01, 10),
-                Description = "description",
-                PaymentDate = new Date(2000, 02, 01),
-                Amount = 12.00m
-            });
+            expected.ChildActions = [
+                new CapitalReturn()
+                {
+                    Id = actionId,
+                    Stock = stockId,
+                    ActionDate = new Date(2000, 01, 10),
+                    Description = "description",
+                    PaymentDate = new Date(2000, 02, 01),
+                    Amount = 12.00m
+                }];
 
             transaction.Should().BeEquivalentTo(expected);
         }
@@ -348,7 +350,15 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                 CashComponent = 3.00m,
                 RolloverRefliefApplies = true
             };
-            action.AddResultingStock(resultStockId, 1, 2, 45.00m, new Date(2000, 03, 04));
+            action.ResultingStocks = [
+                new Transformation.ResultingStock()
+                {
+                    Stock = resultStockId,
+                    OriginalUnits = 1,
+                    NewUnits = 2,
+                    CostBase = 45.00m,
+                    AquisitionDate = new Date(2000, 03, 04)
+                }];
 
             var json = JToken.Parse(serializer.Serialize(action));
 
@@ -407,7 +417,15 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                 CashComponent = 3.00m,
                 RolloverRefliefApplies = true
             };
-            expected.AddResultingStock(resultStockId, 1, 2, 45.00m, new Date(2000, 03, 04));
+            expected.ResultingStocks = [
+                new Transformation.ResultingStock()
+                {
+                    Stock = resultStockId,
+                    OriginalUnits = 1,
+                    NewUnits = 2,
+                    CostBase = 45.00m,
+                    AquisitionDate = new Date(2000, 03, 04)
+                }];
 
             transaction.Should().BeEquivalentTo(expected);
         }

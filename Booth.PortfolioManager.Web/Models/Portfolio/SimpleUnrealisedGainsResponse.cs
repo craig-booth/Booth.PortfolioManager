@@ -8,7 +8,7 @@ namespace Booth.PortfolioManager.Web.Models.Portfolio
 {
     public class SimpleUnrealisedGainsResponse
     {
-        public List<SimpleUnrealisedGainsItem> UnrealisedGains { get; } = new List<SimpleUnrealisedGainsItem>();
+        public List<SimpleUnrealisedGainsItem> UnrealisedGains { get; set; } = new List<SimpleUnrealisedGainsItem>();
     }
 
     public class SimpleUnrealisedGainsItem

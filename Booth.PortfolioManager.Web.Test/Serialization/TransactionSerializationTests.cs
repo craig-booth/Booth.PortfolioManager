@@ -1,14 +1,14 @@
-﻿using System;
-
-using Xunit;
-using FluentAssertions;
-using FluentAssertions.Json;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-
-using Booth.Common;
+﻿using Booth.Common;
 using Booth.PortfolioManager.Web.Models.Transaction;
 using Booth.PortfolioManager.Web.Serialization;
+using FluentAssertions;
+using FluentAssertions.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+
+using Xunit;
 
 namespace Booth.PortfolioManager.Web.Test.Serialization
 {
@@ -31,7 +31,7 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
 
             
             Action a = () => serializer.Deserialize<Transaction>(json);
-            a.Should().ThrowExactly<JsonReaderException>();
+            a.Should().ThrowExactly<JsonException>();
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                             + "\"description\":\"description\"}";
 
             Action a = () => serializer.Deserialize<Transaction>(json);
-            a.Should().ThrowExactly<JsonReaderException>();
+            a.Should().ThrowExactly<JsonException>();
         }
 
         [Fact]
@@ -103,10 +103,10 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
                              + "\"transactionDate\":\"2000-01-10\","
                              + "\"comment\":\"comment\","
                              + "\"description\":\"description\","
-                             + "\"units\":\"100\","
-                             + "\"averagePrice\":\"12.00\","
-                             + "\"transactionCosts\":\"19.95\","
-                             + "\"createCashTransaction\":\"true\"}";
+                             + "\"units\":100,"
+                             + "\"averagePrice\":12.00,"
+                             + "\"transactionCosts\":19.95,"
+                             + "\"createCashTransaction\":true}";
 
             var transaction = serializer.Deserialize<Transaction>(json);
 
@@ -620,5 +620,165 @@ namespace Booth.PortfolioManager.Web.Test.Serialization
 
             transaction.Should().BeEquivalentTo(expected);
         }
-    } 
+
+        [Fact]
+        public void SerializeTransactionList()
+        {
+            var serializer = new ModelSerializer();
+
+            var stockId = Guid.NewGuid();
+            var transactionId1 = Guid.NewGuid();
+            var transactionId2 = Guid.NewGuid();
+            var transactionId3 = Guid.NewGuid();
+            var transactions = new List<Transaction>()
+            { 
+                new OpeningBalance()
+                {
+                    Id = transactionId1,
+                    Stock = stockId,
+                    TransactionDate = new Date(2000, 01, 10),
+                    Comment = "comment",
+                    Description = "description",
+                    Units = 100,
+                    CostBase = 1450.45m,
+                    AquisitionDate = new Date(2000, 01, 01)
+                },
+                new UnitCountAdjustment()
+                {
+                    Id = transactionId2,
+                    Stock = stockId,
+                    TransactionDate = new Date(2000, 01, 10),
+                    Comment = "comment",
+                    Description = "description",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                },
+                new ReturnOfCapital()
+                {
+                    Id = transactionId3,
+                    Stock = stockId,
+                    TransactionDate = new Date(2000, 01, 10),
+                    Comment = "comment",
+                    Description = "description",
+                    RecordDate = new Date(2000, 01, 01),
+                    Amount = 45.00m,
+                    CreateCashTransaction = true
+                }
+            };
+
+            var json = JToken.Parse(serializer.Serialize(transactions));
+
+            var expectedJson = JToken.Parse("[" 
+                             + "{\"id\":\"" + transactionId1 + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"openingBalance\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"units\":100,"
+                             + "\"costBase\":1450.45,"
+                             + "\"aquisitionDate\":\"2000-01-01\"},"
+                             + "{\"id\":\"" + transactionId2 + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"unitCountAdjustment\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"originalUnits\":1,"
+                             + "\"newUnits\":2},"
+                             + "{\"id\":\"" + transactionId3 + "\","
+                             + "\"stock\":\"" + stockId + "\","
+                             + "\"type\":\"returnOfCapital\","
+                             + "\"transactionDate\":\"2000-01-10\","
+                             + "\"comment\":\"comment\","
+                             + "\"description\":\"description\","
+                             + "\"recordDate\":\"2000-01-01\","
+                             + "\"amount\":45.00,"
+                             + "\"createCashTransaction\":true}"
+                             + "]");
+
+            json.Should().BeEquivalentTo(expectedJson);
+        }
+
+        [Fact]
+        public void DeserializeTransactionList()
+        {
+            var serializer = new ModelSerializer();
+
+            var stockId = Guid.NewGuid();
+            var transactionId1 = Guid.NewGuid();
+            var transactionId2 = Guid.NewGuid();
+            var transactionId3 = Guid.NewGuid();
+
+            var json = "["
+                        + "{\"id\":\"" + transactionId1 + "\","
+                        + "\"stock\":\"" + stockId + "\","
+                        + "\"type\":\"openingBalance\","
+                        + "\"transactionDate\":\"2000-01-10\","
+                        + "\"comment\":\"comment\","
+                        + "\"description\":\"description\","
+                        + "\"units\":100,"
+                        + "\"costBase\":1450.45,"
+                        + "\"aquisitionDate\":\"2000-01-01\"},"
+                        + "{\"id\":\"" + transactionId2 + "\","
+                        + "\"stock\":\"" + stockId + "\","
+                        + "\"type\":\"unitCountAdjustment\","
+                        + "\"transactionDate\":\"2000-01-10\","
+                        + "\"comment\":\"comment\","
+                        + "\"description\":\"description\","
+                        + "\"originalUnits\":1,"
+                        + "\"newUnits\":2},"
+                        + "{\"id\":\"" + transactionId3 + "\","
+                        + "\"stock\":\"" + stockId + "\","
+                        + "\"type\":\"returnOfCapital\","
+                        + "\"transactionDate\":\"2000-01-10\","
+                        + "\"comment\":\"comment\","
+                        + "\"description\":\"description\","
+                        + "\"recordDate\":\"2000-01-01\","
+                        + "\"amount\":45.00,"
+                        + "\"createCashTransaction\":true}"
+                        + "]";
+
+            var transactions = serializer.Deserialize<List<Transaction>>(json);
+
+            var expected = new List<Transaction>()
+            {
+                new OpeningBalance()
+                {
+                    Id = transactionId1,
+                    Stock = stockId,
+                    TransactionDate = new Date(2000, 01, 10),
+                    Comment = "comment",
+                    Description = "description",
+                    Units = 100,
+                    CostBase = 1450.45m,
+                    AquisitionDate = new Date(2000, 01, 01)
+                },
+                new UnitCountAdjustment()
+                {
+                    Id = transactionId2,
+                    Stock = stockId,
+                    TransactionDate = new Date(2000, 01, 10),
+                    Comment = "comment",
+                    Description = "description",
+                    OriginalUnits = 1,
+                    NewUnits = 2
+                },
+                new ReturnOfCapital()
+                {
+                    Id = transactionId3,
+                    Stock = stockId,
+                    TransactionDate = new Date(2000, 01, 10),
+                    Comment = "comment",
+                    Description = "description",
+                    RecordDate = new Date(2000, 01, 01),
+                    Amount = 45.00m,
+                    CreateCashTransaction = true
+                }
+            };
+
+            transactions.Should().BeEquivalentTo(expected);
+        }
+    }
+
 }

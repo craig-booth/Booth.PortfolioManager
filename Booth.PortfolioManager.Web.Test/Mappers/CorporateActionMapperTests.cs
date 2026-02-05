@@ -154,26 +154,27 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 ActionDate = new Date(2001, 01, 01),
                 Description = "Composite Action",
             };
-            compositeAction.ChildActions.Add(new Models.CorporateAction.CapitalReturn()
-            {
-                Id = id,
-                Stock = stock.Id,
-                ActionDate = new Date(2001, 01, 01),
-                Description = "Capital Return",
-                PaymentDate = new Date(2001, 01, 15),
-                Amount = 10.00m
-            });
-            compositeAction.ChildActions.Add(new Models.CorporateAction.Dividend()
-            {
-                Id = id,
-                Stock = stock.Id,
-                ActionDate = new Date(2001, 01, 01),
-                Description = "Dividend",
-                PaymentDate = new Date(2001, 01, 15),
-                Amount = 10.00m,
-                PercentFranked = 0.50m,
-                DrpPrice = 1.00m
-            });
+            compositeAction.ChildActions = [
+                new Models.CorporateAction.CapitalReturn()
+                {
+                    Id = id,
+                    Stock = stock.Id,
+                    ActionDate = new Date(2001, 01, 01),
+                    Description = "Capital Return",
+                    PaymentDate = new Date(2001, 01, 15),
+                    Amount = 10.00m
+                },
+                new Models.CorporateAction.Dividend()
+                {
+                    Id = id,
+                    Stock = stock.Id,
+                    ActionDate = new Date(2001, 01, 01),
+                    Description = "Dividend",
+                    PaymentDate = new Date(2001, 01, 15),
+                    Amount = 10.00m,
+                    PercentFranked = 0.50m,
+                    DrpPrice = 1.00m
+                }];
 
 
             var mapper = new CorporateActionMapper(stockResolver.Object);
@@ -400,14 +401,15 @@ namespace Booth.PortfolioManager.Web.Test.Mappers
                 ImplementationDate = new Date(2002, 02, 01),
                 CashComponent = 6.50m,
             };
-            transformation.ResultingStocks.Add(new Models.CorporateAction.Transformation.ResultingStock()
-            {
-                Stock = stock2.Id,
-                OriginalUnits = 1,
-                NewUnits = 2,
-                CostBase = 0.50m,
-                AquisitionDate = new Date(2010, 01, 01)
-            });
+            transformation.ResultingStocks = [
+                new Models.CorporateAction.Transformation.ResultingStock()
+                {
+                    Stock = stock2.Id,
+                    OriginalUnits = 1,
+                    NewUnits = 2,
+                    CostBase = 0.50m,
+                    AquisitionDate = new Date(2010, 01, 01)
+                }];
 
             var mapper = new CorporateActionMapper(stockResolver.Object);
             var response = mapper.FromApi(transformation);

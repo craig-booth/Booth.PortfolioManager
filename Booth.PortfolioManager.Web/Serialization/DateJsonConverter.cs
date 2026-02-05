@@ -1,34 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Booth.Common;
 
 namespace Booth.PortfolioManager.Web.Serialization
 {
-    class DateJsonConverter : JsonConverter
+    class DateJsonConverter : JsonConverter<Date>
     {
-        public override bool CanConvert(Type objectType)
+        public override Date Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return (objectType == typeof(Date));
+            return Date.Parse(reader.GetString());
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, Date value, JsonSerializerOptions options)
         {
-            return Date.Parse(reader.Value.ToString());
-        }
-
-        public override bool CanWrite
-        {
-            get { return true; }
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            writer.WriteValue(((Date)value).ToIsoDateString());
+            writer.WriteStringValue(value.ToIsoDateString());
         }
     }
 }

@@ -13,20 +13,7 @@ namespace Booth.PortfolioManager.Web.Models.CorporateAction
         public decimal CashComponent { get; set; }
         public bool RolloverRefliefApplies { get; set; }
 
-        public List<ResultingStock> ResultingStocks = new List<ResultingStock>();
-
-        public void AddResultingStock(Guid stock, int originalUnits, int newUnits, decimal costBase, Date aquisitionDate)
-        {
-            var resultingStock = new ResultingStock()
-            {
-                Stock = stock,
-                OriginalUnits = originalUnits,
-                NewUnits = newUnits,
-                CostBase = costBase,
-                AquisitionDate = aquisitionDate
-            };
-            ResultingStocks.Add(resultingStock);
-        }
+        public List<ResultingStock> ResultingStocks { get; set; }
 
         public class ResultingStock
         {
