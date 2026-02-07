@@ -59,19 +59,30 @@ pipeline {
 
 		}
 		
-		stage('Deploy') {
+		stage('Create Image') {
 			steps {
 				script {
-					def dockerImage = docker.build("craigbooth/portfoliomanager")
-				    httpRequest httpMode: 'POST', responseHandle: 'NONE', url: "${PORTAINER_WEBHOOK}", wrapAsMultipart: false
+					def dockerImage = docker.build("craigbooth/portfoliomanager")			
+					withDockerRegistry(credentialsId: 'DockerHub') {
+						dockerImage.push()
+					}
 				}
             }
 		}
+
+		stage('Deploy') {
+			steps {
+				script {
+				    httpRequest httpMode: 'POST', responseHandle: 'NONE', url: "${PORTAINER_WEBHOOK}", wrapAsMultipart: false
+				}
+            }
+
+		}
     }
 	
-	//post {
-	//	success {
-	//		cleanWs()
-	//	}
-	//}
+	post {
+		success {
+			cleanWs()
+		}
+	}
 }
