@@ -34,28 +34,42 @@ namespace Booth.PortfolioManager.DataServices
                 string url = String.Format($"https://query1.finance.yahoo.com/v8/finance/chart/{asxCode}.AX?interval=1d&range={range}");
                 var response = await _HttpClient.GetAsync(url, cancellationToken);
 
-                if (!cancellationToken.IsCancellationRequested)
+                if (!response.IsSuccessStatusCode)
+                    return result;
+
+                if (cancellationToken.IsCancellationRequested)
+                    return result;
+               
+                var responseStream = await response.Content.ReadAsStreamAsync();
+
+                var json = await JsonNode.ParseAsync(responseStream);
+                if (json == null)
+                    return result;
+
+                var results = json["chart"]?["result"]?.AsArray().First();
+                if (results == null)
+                    return result;
+
+                var gmtOffset = (int)results["meta"]?["gmtoffset"];
+
+                var timeStamps = results["timestamp"]?.AsArray();
+                if (timeStamps == null)
+                    return result;
+
+                var closingPrices = results["indicators"]?["quote"]?.AsArray().First()?["close"]?.AsArray();
+                if (closingPrices == null)
+                    return result;
+
+                for (var i = 0; i < timeStamps.Count; i++) 
                 {
-                    var responseStream = await response.Content.ReadAsStreamAsync();
+                    if (timeStamps.ElementAt(i) == null || closingPrices.ElementAt(i) == null)
+                        continue;
 
-                    var json = await JsonNode.ParseAsync(responseStream);
+                    var date = new Date(DateTimeOffset.FromUnixTimeSeconds((int)timeStamps.ElementAt(i) + gmtOffset).Date);
+                    var price = Math.Round((decimal)closingPrices.ElementAt(i), 5);
 
-                    var results = json["chart"]["result"].AsArray().First();
-                    var gmtOffset = (int)results["meta"]["gmtoffset"];
-                    var timeStamps = results["timestamp"].AsArray();
-                    var closingPrices = results["indicators"]["quote"].AsArray().First()["close"].AsArray();
-
-                    for (var i = 0; i < timeStamps.Count; i++) 
-                    {
-                        if (timeStamps.ElementAt(i) == null || closingPrices.ElementAt(i) == null)
-                            continue;
-
-                        var date = new Date(DateTimeOffset.FromUnixTimeSeconds((int)timeStamps.ElementAt(i) + gmtOffset).Date);
-                        var price = Math.Round((decimal)closingPrices.ElementAt(i), 5);
-
-                        if (date.InRange(dateRange))
-                            result.Add(new StockPrice(asxCode, date, price));
-                    }
+                    if (date.InRange(dateRange))
+                        result.Add(new StockPrice(asxCode, date, price));
                 }
             }
             catch
