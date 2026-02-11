@@ -44,7 +44,20 @@ namespace Booth.PortfolioManager.Web
             }
 
             app.UseDefaultFiles();
-            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                    OnPrepareResponse = ctx =>
+                    {
+                        Console.WriteLine($"Requesting static file: {ctx.File.PhysicalPath}");
+                        // Don't cache index.html
+                        if (ctx.File.PhysicalPath == "index.html")
+                        {
+                            ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store";
+                            ctx.Context.Response.Headers["Pragma"] = "no-cache";
+                            ctx.Context.Response.Headers["Expires"] = "-1";
+                        }
+                    }
+            });
 
             app.UsePortfolioManager();
 
