@@ -48,9 +48,8 @@ namespace Booth.PortfolioManager.Web
             {
                     OnPrepareResponse = ctx =>
                     {
-                        Console.WriteLine($"Requesting static file: {ctx.File.PhysicalPath}");
                         // Don't cache index.html
-                        if (ctx.File.PhysicalPath == "index.html")
+                        if (ctx.File.PhysicalPath.EndsWith("index.html"))
                         {
                             ctx.Context.Response.Headers["Cache-Control"] = "no-cache, no-store";
                             ctx.Context.Response.Headers["Pragma"] = "no-cache";
